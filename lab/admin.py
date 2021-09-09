@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from . import models
+
+
+@admin.register(models.Experiment)
+class ExperimentAdmin(admin.ModelAdmin):
+    list_display = ["name", "date", "particle_type", "modified", "created"]
