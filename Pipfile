@@ -10,6 +10,12 @@ psycopg2 = "*"
 python-dotenv = "*"
 
 [dev-packages]
+black = "*"
+pylint = "*"
+flake8 = "*"
 
 [requires]
 python_version = "3.9"
+
+[pipenv]
+allow_prereleases = true
