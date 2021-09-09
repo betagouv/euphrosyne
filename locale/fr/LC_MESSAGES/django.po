@@ -1,0 +1,69 @@
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-09-09 19:04+0200\n"
+"PO-Revision-Date: 2021-09-09 19:04+0200\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: lab/models.py:7
+msgid "Created"
+msgstr "Créé"
+
+#: lab/models.py:9
+msgid "Date this entry was first created"
+msgstr "Date de création de cette entrée"
+
+#: lab/models.py:12
+msgid "Modified"
+msgstr "Modifié"
+
+#: lab/models.py:14
+msgid "Date this entry was most recently changed."
+msgstr "Date de la dernière modification de cette entrée"
+
+#: lab/models.py:20
+msgid "Open"
+msgstr "Ouvert"
+
+#: lab/models.py:21
+msgid "Closed"
+msgstr "Fermé"
+
+#: lab/models.py:24
+msgid "Status"
+msgstr "Statut"
+
+#: lab/models.py:29
+msgid "Experiment name"
+msgstr "Nom de l'expérience"
+
+#: lab/models.py:32
+msgid "Experiment date"
+msgstr "Date de l'expérience"
+
+#: lab/models.py:34
+msgid "Date of the experiment."
+msgstr "Date de l'expérience"
+
+#: lab/models.py:41
+msgid "Proton"
+msgstr "Proton"
+
+#: lab/models.py:42
+msgid "Alpha particle"
+msgstr "Particule alpha"
+
+#: lab/models.py:43
+msgid "Deuton"
+msgstr "Deuton"
+
+#: lab/models.py:46
+msgid "Particle type"
+msgstr "Type de particule"
