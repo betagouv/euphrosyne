@@ -17,5 +17,5 @@ jobs:
           pipenv lock --dev --requirements > dev-requirements.txt
       - name: Install dependencies
         run: pip install --user -r dev-requirements.txt
-      - run: pylint $(find . -type f -path '*.py')
+      - run: pylint $(find . -type f -path '*.py' -not -path '*/migrations*')
       - run: black --check .
