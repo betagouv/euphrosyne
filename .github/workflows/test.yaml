@@ -1,0 +1,21 @@
+name: Tests
+on: push
+
+jobs:
+  lint:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9.2'
+      - name: Install pipenv  # [TODO] Move install steps to a separate job & add cache.
+        run: |
+          python -m pip install --upgrade pip pipenv wheel
+      - name: Build requirements file with all dependencies including dev
+        run: |
+          pipenv lock --dev --requirements > dev-requirements.txt
+      - name: Install dependencies
+        run: pip install --user -r dev-requirements.txt
+      - run: pylint $(find . -type f -path '*.py')
+      - run: black --check .
