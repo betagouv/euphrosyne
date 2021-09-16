@@ -27,7 +27,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.getenv("DJANGO_DEBUG", ""))
 
-ALLOWED_HOSTS = ["localhost", "euphrosyne-*.*.scalingo.io"]
+ALLOWED_HOSTS = ["localhost", ".scalingo.io"] if not DEBUG else []
 
 
 # Application definition
