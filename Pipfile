@@ -8,6 +8,7 @@ django = "*"
 pytest-django = "*"
 psycopg2 = "*"
 python-dotenv = "*"
+gunicorn = "*"
 
 [dev-packages]
 black = "*"
