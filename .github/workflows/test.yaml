@@ -111,9 +111,11 @@ jobs:
       - name: Black
         run: python -m black --check .
 
-  build:
-    runs-on: ubuntu-18.04
+  build and deploy:
     needs: install-requirements
+    if: github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
 
@@ -144,34 +146,9 @@ jobs:
       - name: Install requirements
         run: pip install --user -r ci-requirements/ci-requirements.txt
 
-      # This could be cached:
-      - name: Compile messages
-        run: python manage.py compilemessages
-      # Already done by Scalingo:
-      # - name: Collect static files
-      #   run: python manage.py collectstatic --clear --noinput
-      
       - name: Create archive
         run: tar --exclude='./euphrosyne/.git' -czf /tmp/euphrosyne.tar.gz euphrosyne
         working-directory: ..
-      - name: Upload archive artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: euphrosyne-${{ github.sha }}
-          path: /tmp/euphrosyne.tar.gz
-          retention-days: 1
-  
-  deploy:
-    needs: [build, lint]
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-18.04
-    steps:
-      - run: mkdir euphrosyne
-      - name: Download archive artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: euphrosyne-${{ github.sha }}
-          path: /tmp/
 
       - name: Deploy to Scalingo
         run: scalingo -app euphrosyne-staging deploy /tmp/euphrosyne.tar.gz
