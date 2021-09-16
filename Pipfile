@@ -9,6 +9,7 @@ pytest-django = "*"
 psycopg2 = "*"
 python-dotenv = "*"
 gunicorn = "*"
+dj-database-url = "*"
 
 [dev-packages]
 black = "*"

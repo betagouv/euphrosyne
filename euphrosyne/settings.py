@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
+import dj_database_url
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -74,8 +76,13 @@ WSGI_APPLICATION = "euphrosyne.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
+DATABASES = {}
+
+_djdb_config = dj_database_url.config()
+if _djdb_config:
+    DATABASES["default"] = _djdb_config
+else:
+    DATABASES["default"] = {
         "ENGINE": "django.db.backends.postgresql",
         "USER": os.getenv("DB_USER"),
         "NAME": os.getenv("DB_NAME"),
@@ -84,7 +91,6 @@ DATABASES = {
         "PORT": os.getenv("DB_PORT"),
         "CONN_MAX_AGE": 60,
     }
-}
 
 
 # Password validation
@@ -125,7 +131,7 @@ LOCALE_PATHS = ["locale"]
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = f"{BASE_DIR}/_static"
+STATIC_ROOT = os.path.join(BASE_DIR, "_static")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
