@@ -38,6 +38,7 @@ jobs:
           name: ci-requirements-${{ hashFiles('Pipfile.lock') }}
           path: ci-requirements.txt
           retention-days: 1
+
   install-requirements:
     runs-on: ubuntu-18.04
     needs: build-requirements
@@ -71,9 +72,10 @@ jobs:
 
       - name: Install requirements
         run: pip install --user -r ci-requirements/ci-requirements.txt
+
   lint:
     runs-on: ubuntu-18.04
-    needs: [build-requirements, install-requirements]
+    needs: install-requirements
     steps:
       - uses: actions/checkout@v2
 
@@ -95,6 +97,7 @@ jobs:
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ hashFiles('Pipfile.lock') }}-a
+      # [XXX] Try not downloading, should be in cache
       - name: Download ci-requirements.txt artifact
         uses: actions/download-artifact@v2
         with:
@@ -107,3 +110,68 @@ jobs:
         run: python -m pylint $(find . -type f -path '*.py' -not -path '*/migrations*')
       - name: Black
         run: python -m black --check .
+
+  build:
+    runs-on: ubuntu-18.04
+    needs: install-requirements
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use the cached python install
+        uses: actions/cache@v2
+        with:
+          path: /opt/hostedtoolcache/Python/3.9.2
+          key: ${{ runner.os }}-python-3.9.2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9.2'
+
+      - name: Get pip cache dir
+        id: pip-cache
+        run: |
+          echo "::set-output name=dir::$(pip cache dir)"
+      - name: Cache the pip cache for requirements
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('Pipfile.lock') }}-a
+      # [XXX] Try not downloading, should be in cache
+      - name: Download ci-requirements.txt artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ci-requirements-${{ hashFiles('Pipfile.lock') }}
+          path: ci-requirements
+      - name: Install requirements
+        run: pip install --user -r ci-requirements/ci-requirements.txt
+
+      # This could be cached:
+      - name: Compile messages
+        run: python manage.py compilemessages
+      # Already done by Scalingo:
+      # - name: Collect static files
+      #   run: python manage.py collectstatic --clear --noinput
+      
+      - name: Create archive
+        run: tar --exclude='./euphrosyne/.git' -czf /tmp/euphrosyne.tar.gz euphrosyne
+        working-directory: ..
+      - name: Upload archive artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: euphrosyne-${{ github.sha }}
+          path: /tmp/euphrosyne.tar.gz
+          retention-days: 1
+  
+  deploy:
+    needs: [build, lint]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-18.04
+    steps:
+      - run: mkdir euphrosyne
+      - name: Download archive artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: euphrosyne-${{ github.sha }}
+          path: /tmp/
+
+      - name: Deploy to Scalingo
+        run: scalingo -app euphrosyne-staging deploy /tmp/euphrosyne.tar.gz
