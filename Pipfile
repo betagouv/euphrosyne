@@ -10,6 +10,7 @@ psycopg2 = "*"
 python-dotenv = "*"
 gunicorn = "*"
 dj-database-url = "*"
+whitenoise = "*"
 
 [dev-packages]
 black = "*"
