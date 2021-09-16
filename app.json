@@ -1,22 +1,25 @@
 {
-	"name": "euphrosyne",
+  "name": "euphrosyne",
   "stack": "scalingo-18",
-	"env": {
-		"DJANGO_SECRET_KEY": {
-			"required": true
-		}
-	},
-	"formation": {
-		"web": {
-			"quantity": 1
-		}
-	},
-	"scripts": {
-    	"postdeploy": "python manage.py migrate"
-  	},
-	"addons": [
+  "env": {
+    "DJANGO_SECRET_KEY": {
+      "required": true
+    },
+    "DISABLE_COLLECTSTATIC": {
+      "value": 1
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "scripts": {
+      "postdeploy": "python manage.py migrate"
+    },
+  "addons": [
     {
       "plan": "postgresql-sandbox"
     }
-	]
+  ]
 }
