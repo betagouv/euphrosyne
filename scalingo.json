@@ -14,9 +14,6 @@
       "quantity": 1
     }
   },
-  "scripts": {
-      "postdeploy": "python manage.py migrate"
-    },
   "addons": [
     {
       "plan": "postgresql-sandbox"
