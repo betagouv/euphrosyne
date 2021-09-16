@@ -2,24 +2,33 @@ name: Tests
 on: push
 
 jobs:
-  get-requirements:
+  build-requirements:
     runs-on: ubuntu-18.04
     steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache the python install
+        uses: actions/cache@v2
+        with:
+          path: /opt/hostedtoolcache/Python/3.9.2
+          key: ${{ runner.os }}-python-3.9.2
       - uses: actions/setup-python@v2
         with:
           python-version: '3.9.2'
-      - uses: actions/checkout@v2
+
       - name: Get pip cache dir
         id: pip-cache
         run: |
           echo "::set-output name=dir::$(pip cache dir)"
-      - uses: actions/cache@v2
+      - name: Cache the pip cache for pip and pipenv
+        uses: actions/cache@v2
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-pipenv
       - name: Install pipenv 
         run: |
           pip install --upgrade pip pipenv
+
       - name: Build requirements file with all dependencies including dev
         run: |
           pipenv lock --dev --requirements > ci-requirements.txt
@@ -29,42 +38,60 @@ jobs:
           name: ci-requirements-${{ hashFiles('Pipfile.lock') }}
           path: ci-requirements.txt
           retention-days: 1
-  build:
+  install-requirements:
     runs-on: ubuntu-18.04
-    needs: get-requirements
+    needs: build-requirements
     steps:
+      - uses: actions/checkout@v2
+
+      - name: Use the cached python install
+        uses: actions/cache@v2
+        with:
+          path: /opt/hostedtoolcache/Python/3.9.2
+          key: ${{ runner.os }}-python-3.9.2
       - uses: actions/setup-python@v2
         with:
           python-version: '3.9.2'
-      - uses: actions/checkout@v2
+
       - name: Get pip cache dir
         id: pip-cache
         run: |
           echo "::set-output name=dir::$(pip cache dir)"
-      - uses: actions/cache@v2
+      - name: Cache the pip cache for requirements
+        uses: actions/cache@v2
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ hashFiles('Pipfile.lock') }}-a
+
       - name: Download ci-requirements.txt artifact
         uses: actions/download-artifact@v2
         with:
           name: ci-requirements-${{ hashFiles('Pipfile.lock') }}
           path: ci-requirements
-      - name: Install dependencies
+
+      - name: Install requirements
         run: pip install --user -r ci-requirements/ci-requirements.txt
   lint:
     runs-on: ubuntu-18.04
-    needs: [get-requirements, build]
+    needs: [build-requirements, install-requirements]
     steps:
+      - uses: actions/checkout@v2
+
+      - name: Use the cached python install
+        uses: actions/cache@v2
+        with:
+          path: /opt/hostedtoolcache/Python/3.9.2
+          key: ${{ runner.os }}-python-3.9.2
       - uses: actions/setup-python@v2
         with:
           python-version: '3.9.2'
-      - uses: actions/checkout@v2
+
       - name: Get pip cache dir
         id: pip-cache
         run: |
           echo "::set-output name=dir::$(pip cache dir)"
-      - uses: actions/cache@v2
+      - name: Use the cached pip cache for requirements
+        uses: actions/cache@v2
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ hashFiles('Pipfile.lock') }}-a
@@ -73,8 +100,9 @@ jobs:
         with:
           name: ci-requirements-${{ hashFiles('Pipfile.lock') }}
           path: ci-requirements
-      - name: Install dependencies
+      - name: Install requirements
         run: pip install --user -r ci-requirements/ci-requirements.txt
+
       - name: Pylint
         run: python -m pylint $(find . -type f -path '*.py' -not -path '*/migrations*')
       - name: Black
