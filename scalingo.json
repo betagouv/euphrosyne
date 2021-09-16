@@ -4,9 +4,6 @@
   "env": {
     "DJANGO_SECRET_KEY": {
       "required": true
-    },
-    "DISABLE_COLLECTSTATIC": {
-      "value": 1
     }
   },
   "formation": {
