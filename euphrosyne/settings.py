@@ -134,8 +134,7 @@ LOCALE_PATHS = ["locale"]
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "_static")
 
-if not DEBUG:
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
