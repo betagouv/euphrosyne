@@ -34,6 +34,7 @@ ALLOWED_HOSTS = ["localhost", ".scalingo.io"] if not DEBUG else []
 
 INSTALLED_APPS = [
     "django.contrib.admin",
+    "euphro_auth",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -140,6 +141,10 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Custom user model
+
+AUTH_USER_MODEL = "euphro_auth.User"
 
 # For Django Debug Toolbar
 
