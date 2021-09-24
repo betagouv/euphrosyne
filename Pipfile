@@ -11,6 +11,7 @@ python-dotenv = "*"
 gunicorn = "*"
 dj-database-url = "*"
 whitenoise = "*"
+django-debug-toolbar = "*"
 
 [dev-packages]
 black = "*"
