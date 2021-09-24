@@ -1,1 +1,3 @@
+apt-get update -y
+apt-get install -y gettext
 python manage.py compilemessages
