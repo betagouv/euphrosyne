@@ -149,3 +149,13 @@ AUTH_USER_MODEL = "euphro_auth.User"
 # For Django Debug Toolbar
 
 INTERNAL_IPS = ["127.0.0.1"]
+
+# Sending emails
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS") != "false"
+
+DEFAULT_FROM_EMAIL = "no-reply@euphrosyne.fr"  # to be changed asap
