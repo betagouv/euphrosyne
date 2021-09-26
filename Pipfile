@@ -12,12 +12,12 @@ gunicorn = "*"
 dj-database-url = "*"
 whitenoise = "*"
 django-debug-toolbar = "*"
+pyyaml = "*"
 
 [dev-packages]
 black = "*"
 pylint = "*"
 flake8 = "*"
-pyyaml = "*"
 ipython = "*"
 
 [requires]
