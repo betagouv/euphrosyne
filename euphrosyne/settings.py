@@ -83,7 +83,7 @@ DATABASES = {}
 _djdb_config = dj_database_url.config()
 if _djdb_config:
     DATABASES["default"] = _djdb_config
-else:
+elif os.getenv("DB_HOST"):
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.postgresql",
         "USER": os.getenv("DB_USER"),
@@ -92,6 +92,11 @@ else:
         "HOST": os.getenv("DB_HOST"),
         "PORT": os.getenv("DB_PORT"),
         "CONN_MAX_AGE": 60,
+    }
+else:  # Use sqlite by default, for ci
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "mydatabase",
     }
 
 
