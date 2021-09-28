@@ -1,18 +1,10 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from shared.model_mixins import TimestampedModelMixin
 
-class Experiment(models.Model):
-    created = models.DateTimeField(
-        _("Created"),
-        auto_now_add=True,
-        help_text=_("Date this entry was first created"),
-    )
-    modified = models.DateTimeField(
-        _("Modified"),
-        auto_now=True,
-        help_text=_("Date this entry was most recently changed."),
-    )
+
+class Experiment(TimestampedModelMixin):
 
     OPEN_STATUS = 1
     CLOSED_STATUS = 2

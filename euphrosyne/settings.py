@@ -29,6 +29,8 @@ DEBUG = bool(os.getenv("DJANGO_DEBUG", ""))
 
 ALLOWED_HOSTS = ["localhost", ".scalingo.io"] if not DEBUG else []
 
+SITE_URL = os.environ["SITE_URL"]
+
 
 # Application definition
 
@@ -41,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "lab",
+    "user_management",
 ] + (["debug_toolbar"] if DEBUG else [])
 
 MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else []) + [

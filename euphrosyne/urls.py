@@ -19,6 +19,8 @@ from django.urls import path, include
 from django.conf import settings
 import debug_toolbar
 
+from euphro_auth.views import UserTokenRegistrationView
+
 urlpatterns = [
     path(
         "admin/password_reset/",
@@ -40,5 +42,10 @@ urlpatterns = [
         "reset/done/",
         auth_views.PasswordResetCompleteView.as_view(),
         name="password_reset_complete",
+    ),
+    path(
+        "registration/<uidb64>/<token>/",
+        UserTokenRegistrationView.as_view(),
+        name="registration_token",
     ),
 ] + ([path("__debug__/", include(debug_toolbar.urls))] if settings.DEBUG else [])
