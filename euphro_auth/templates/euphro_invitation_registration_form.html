@@ -1,0 +1,47 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; {% translate 'Password reset confirmation' %}
+</div>
+{% endblock %}
+
+{% block content %}
+
+{% if validlink %}
+
+<p>{% translate "You can change your address email and choose a password." %}</p>
+
+<form method="post">{% csrf_token %}
+    <fieldset class="module aligned">
+        <div class="form-row field-email">
+            {{ form.email.errors }}
+            <label for="id_email">{% translate 'Email:' %}</label>
+            {{ form.email }}
+        </div>
+        <br>
+        <div class="form-row field-password1">
+            {{ form.new_password1.errors }}
+            <label for="id_new_password1">{% translate 'Password:' %}</label>
+            {{ form.new_password1 }}
+        </div>
+        <div class="form-row field-password2">
+            {{ form.new_password2.errors }}
+            <label for="id_new_password2">{% translate 'Confirm password:' %}</label>
+            {{ form.new_password2 }}
+        </div>
+        <input type="submit" value="{% translate 'Change my password' %}">
+    </fieldset>
+</form>
+
+{% else %}
+
+<p>{% translate "The registration link was invalid, possibly because it has already been used." %}</p>
+
+{% endif %}
+
+{% endblock %}
