@@ -13,13 +13,14 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import debug_toolbar
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.urls import path, include
-from django.conf import settings
-import debug_toolbar
+from django.urls import include, path
 
 from euphro_auth.views import UserTokenRegistrationView
+from user_management.views import ProfileCreateView
 
 urlpatterns = [
     path(
@@ -47,5 +48,10 @@ urlpatterns = [
         "registration/<uidb64>/<token>/",
         UserTokenRegistrationView.as_view(),
         name="registration_token",
+    ),
+    path(
+        "registration/profile/me",
+        ProfileCreateView.as_view(),
+        name="registration_profile",
     ),
 ] + ([path("__debug__/", include(debug_toolbar.urls))] if settings.DEBUG else [])

@@ -1,7 +1,8 @@
-from django.test import TestCase
 from django.core import mail
+from django.test import TestCase
 
 from euphro_auth.models import User
+
 from ...forms import UserInvitationForm
 from ...models import UserInvitation
 
@@ -25,7 +26,6 @@ class TestUserInvitationForm(TestCase):
         self.assertTrue(user_invitation.id)
         self.assertTrue(user_invitation.user)
         self.assertTrue(user_invitation.user.email, "test@test.test")
-        self.assertFalse(user_invitation.user.is_active)
 
     def test_email_sending(self):
         form = UserInvitationForm(data={"email": "test@test.test"})

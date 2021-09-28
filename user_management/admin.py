@@ -1,7 +1,15 @@
 from django.contrib import admin
 
-from .models import UserInvitation
 from .forms import UserInvitationForm
+from .models import Profile, UserInvitation
+
+
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = [
+        "user",
+        "last_name",
+        "first_name",
+    ]
 
 
 class UserInvitationAdmin(admin.ModelAdmin):
@@ -11,3 +19,4 @@ class UserInvitationAdmin(admin.ModelAdmin):
 
 
 admin.site.register(UserInvitation, UserInvitationAdmin)
+admin.site.register(Profile, ProfileAdmin)

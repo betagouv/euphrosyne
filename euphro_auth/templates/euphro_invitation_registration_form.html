@@ -6,7 +6,7 @@
 {% block breadcrumbs %}
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-    &rsaquo; {% translate 'Password reset confirmation' %}
+    &rsaquo; {% translate 'Account registration (1/2)' %}
 </div>
 {% endblock %}
 
@@ -14,7 +14,7 @@
 
 {% if validlink %}
 
-<p>{% translate "You can change your address email and choose a password." %}</p>
+<p>{% translate "You can change your email and choose a password." %}</p>
 
 <form method="post">{% csrf_token %}
     <fieldset class="module aligned">

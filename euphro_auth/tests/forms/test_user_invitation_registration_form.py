@@ -35,5 +35,5 @@ class TestUserInvitationRegistrationForm(TestCase):
         self.assertIn("email", form.errors)
         self.assertEqual(
             form.errors["email"][0],
-            "An account with this address email already exists.",
+            "An account with this email already exists.",
         )

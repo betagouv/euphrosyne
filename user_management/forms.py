@@ -1,11 +1,13 @@
 from django import forms
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
+from django.forms import fields
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
+
 from .emails import send_invitation_email
-from .models import UserInvitation
+from .models import Profile, UserInvitation
 
 
 class UserInvitationForm(forms.ModelForm):
@@ -33,10 +35,24 @@ class UserInvitationForm(forms.ModelForm):
         commit=True,
     ):
         email = self.cleaned_data["email"]
-        user = User.objects.create(email=email, is_active=False)
+        user = User.objects.create(email=email)
         token = default_token_generator.make_token(user)
 
         self.instance.user = user
         super().save(commit=commit)
         send_invitation_email(email=email, user_id=user.pk, token=token)
         return self.instance
+
+
+class ProfileRegistrationForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ("first_name", "last_name", "profession")
+
+    def __init__(self, user: User, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit: bool = True) -> Profile:
+        self.instance.user = self.user
+        return super().save(commit=commit)
