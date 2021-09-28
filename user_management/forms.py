@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
 from .emails import send_invitation_email
+from .models import UserInvitation
 
 
 class UserInvitationForm(forms.ModelForm):
@@ -17,6 +18,7 @@ class UserInvitationForm(forms.ModelForm):
 
     class Meta:
         fields = ("email",)
+        model = UserInvitation
 
     def clean_email(self):
         email: str = self.cleaned_data["email"]
@@ -36,5 +38,5 @@ class UserInvitationForm(forms.ModelForm):
 
         self.instance.user = user
         super().save(commit=commit)
-        send_invitation_email(email=email, user=user, token=token)
+        send_invitation_email(email=email, user_id=user.pk, token=token)
         return self.instance

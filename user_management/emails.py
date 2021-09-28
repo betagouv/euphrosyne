@@ -4,18 +4,16 @@ from django.utils.http import urlsafe_base64_encode
 from django.template import loader
 from django.conf import settings
 
-from euphro_auth.models import User
 
-
-def send_invitation_email(email: str, user: User, token: str):
+def send_invitation_email(email: str, user_id: int, token: str):
     """
-    Send a django.core.mail.EmailMultiAlternatives to `to_email`.
+    Send an email with an invitation link based on a user ID and a token used for authentication.
     """
 
     context = {
         "email": email,
         "site_url": settings.SITE_URL,
-        "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+        "uid": urlsafe_base64_encode(force_bytes(user_id)),
         "token": token,
     }
     subject = "[Euphrosyne] Invitation to register"
