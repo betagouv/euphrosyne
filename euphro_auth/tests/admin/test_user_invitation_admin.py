@@ -1,15 +1,14 @@
 from http import HTTPStatus
 
+from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
-
-from euphro_auth.models import User
 
 
 class UserInvitationAdmin(TestCase):
     def setUp(self):
         self.client = Client()
-        self.superuser = User.objects.create_superuser(
+        self.superuser = get_user_model().objects.create_superuser(
             email="superuser@test.com", password="superuser"
         )
 
@@ -33,4 +32,4 @@ class UserInvitationAdmin(TestCase):
         self.client.post(
             admin_invitation_creation_url, data={"email": "test@test.test"}
         )
-        self.assertTrue(User.objects.get(email="test@test.test"))
+        self.assertTrue(get_user_model().objects.get(email="test@test.test"))

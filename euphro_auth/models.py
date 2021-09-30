@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from shared.model_mixins import TimestampedModelMixin
+from shared.models import TimestampedModel
 
 from .managers import UserManager
 
@@ -24,6 +24,6 @@ class User(AbstractUser):
         return self.email
 
 
-class UserInvitation(TimestampedModelMixin):
+class UserInvitation(TimestampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     completed = models.BooleanField(default=False)

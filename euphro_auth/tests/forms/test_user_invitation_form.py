@@ -1,7 +1,6 @@
+from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import TestCase
-
-from euphro_auth.models import User
 
 from ...forms import UserInvitationForm
 from ...models import UserInvitation
@@ -9,7 +8,7 @@ from ...models import UserInvitation
 
 class TestUserInvitationForm(TestCase):
     def test_email_should_be_unique(self):
-        User.objects.create(email="test@test.test")
+        get_user_model().objects.create(email="test@test.test")
         form = UserInvitationForm(data={"email": "test@test.test"})
 
         self.assertFalse(form.is_valid())

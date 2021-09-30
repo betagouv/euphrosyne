@@ -1,13 +1,12 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
-
-from euphro_auth.models import User
 
 from ...forms import UserInvitationRegistrationForm
 
 
 class TestUserInvitationRegistrationForm(TestCase):
     def test_email_can_be_the_same_as_user(self):
-        user = User.objects.create(email="test@test.test")
+        user = get_user_model().objects.create(email="test@test.test")
         form = UserInvitationRegistrationForm(
             data={
                 "email": "test@test.test",
@@ -20,8 +19,8 @@ class TestUserInvitationRegistrationForm(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_email_should_be_unique(self):
-        user = User.objects.create(email="test@test.test")
-        User.objects.create(email="anotheruser@test.test")
+        user = get_user_model().objects.create(email="test@test.test")
+        get_user_model().objects.create(email="anotheruser@test.test")
         form = UserInvitationRegistrationForm(
             data={
                 "email": "anotheruser@test.test",

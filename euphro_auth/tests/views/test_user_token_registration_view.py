@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
 from django.test import TestCase
@@ -6,15 +7,11 @@ from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-from euphro_auth.models import User
-
-from ...views import UserTokenRegistrationView
-
 
 class TestUserTokenRegistrationView(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = User.objects.create(email="test@test.test")
+        self.user = get_user_model().objects.create(email="test@test.test")
         self.view_url = reverse(
             "registration_token",
             args=[
@@ -46,7 +43,8 @@ class TestUserTokenRegistrationView(TestCase):
         )
         self.assertTrue(
             check_password(
-                "securepassword", User.objects.get(email="test@test.test").password
+                "securepassword",
+                get_user_model().objects.get(email="test@test.test").password,
             )
         )
 
@@ -61,5 +59,6 @@ class TestUserTokenRegistrationView(TestCase):
             },
         )
         self.assertEqual(
-            User.objects.get(id=self.user.id).email, "anotheremail@test.test"
+            get_user_model().objects.get(id=self.user.id).email,
+            "anotheremail@test.test",
         )

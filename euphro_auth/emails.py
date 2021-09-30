@@ -1,8 +1,9 @@
+from django.conf import settings
 from django.core.mail.message import EmailMultiAlternatives
+from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from django.template import loader
-from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 
 def send_invitation_email(email: str, user_id: int, token: str):
@@ -16,7 +17,7 @@ def send_invitation_email(email: str, user_id: int, token: str):
         "uid": urlsafe_base64_encode(force_bytes(user_id)),
         "token": token,
     }
-    subject = "[Euphrosyne] Invitation to register"
+    subject = _("[Euphrosyne] Invitation to register")
     body = loader.render_to_string("invitation_email.txt", context)
 
     email_message = EmailMultiAlternatives(subject=subject, body=body, to=[email])

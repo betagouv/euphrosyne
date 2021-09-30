@@ -9,9 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from .forms import UserInvitationRegistrationForm
 
 
-class UserTokenRegistrationView(
-    PasswordResetConfirmView
-):  # pylint: disable=too-many-ancestors
+class UserTokenRegistrationView(PasswordResetConfirmView):
     title = _("Enter your information")
     form_class = UserInvitationRegistrationForm
     template_name = "euphro_invitation_registration_form.html"

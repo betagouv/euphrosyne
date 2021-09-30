@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class TimestampedModelMixin(models.Model):
+class TimestampedModel(models.Model):
     created = models.DateTimeField(
         _("Created"),
         auto_now_add=True,

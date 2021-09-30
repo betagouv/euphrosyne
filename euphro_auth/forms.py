@@ -56,7 +56,7 @@ class UserInvitationForm(forms.ModelForm):
 
     def clean_email(self):
         email: str = self.cleaned_data["email"]
-        if User.objects.filter(email=email).count():
+        if User.objects.filter(email=email).exists():
             raise ValidationError(
                 _("This user has already been invited."), code="email-unique"
             )

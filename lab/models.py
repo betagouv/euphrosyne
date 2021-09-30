@@ -1,10 +1,10 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from shared.model_mixins import TimestampedModelMixin
+from shared.models import TimestampedModel
 
 
-class Experiment(TimestampedModelMixin):
+class Experiment(TimestampedModel):
 
     OPEN_STATUS = 1
     CLOSED_STATUS = 2
