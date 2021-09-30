@@ -2,32 +2,36 @@ from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import TestCase
 
-from ...forms import UserInvitationForm
-from ...models import UserInvitation
+from ...forms import UserSendInvitationForm
+from ...models import UserGroups, UserInvitation
 
 
-class TestUserInvitationForm(TestCase):
+class TestUserSendInvitationForm(TestCase):
     def test_email_should_be_unique(self):
         get_user_model().objects.create(email="test@test.test")
-        form = UserInvitationForm(data={"email": "test@test.test"})
+        form = UserSendInvitationForm(data={"email": "test@test.test"})
 
         self.assertFalse(form.is_valid())
         self.assertIn("email", form.errors)
         self.assertEqual(form.errors["email"][0], "This user has already been invited.")
 
     def test_user_creation(self):
-        form = UserInvitationForm(data={"email": "test@test.test"})
+        form = UserSendInvitationForm(data={"email": "test@test.test"})
         self.assertTrue(form.is_valid())
         user_invitation: UserInvitation = form.save()
 
         self.assertTrue(user_invitation)
-        self.assertFalse(user_invitation.completed)
         self.assertTrue(user_invitation.id)
         self.assertTrue(user_invitation.user)
-        self.assertTrue(user_invitation.user.email, "test@test.test")
+        self.assertEqual(user_invitation.user.email, "test@test.test")
+        self.assertFalse(user_invitation.user.invitation_completed)
+        self.assertEqual(user_invitation.user.groups.count(), 1)
+        self.assertEqual(
+            user_invitation.user.groups.first().name, UserGroups.PROJECT_MEMBER.value
+        )
 
     def test_email_sending(self):
-        form = UserInvitationForm(data={"email": "test@test.test"})
+        form = UserSendInvitationForm(data={"email": "test@test.test"})
         form.is_valid()
         form.save()
 

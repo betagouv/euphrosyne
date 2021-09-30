@@ -36,3 +36,18 @@ class TestUserInvitationRegistrationForm(TestCase):
             form.errors["email"][0],
             "An account with this email already exists.",
         )
+
+    def test_complete_invitation_on_save(self):
+        user = get_user_model().objects.create(email="test@test.test")
+        form = UserInvitationRegistrationForm(
+            data={
+                "email": "test@test.test",
+                "new_password1": "abcdef102",
+                "new_password2": "abcdef102",
+            },
+            user=user,
+        )
+
+        form.is_valid()
+        form.save()
+        self.assertTrue(user.invitation_completed)

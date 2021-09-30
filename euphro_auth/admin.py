@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
-from .forms import UserChangeForm, UserCreationForm, UserInvitationForm
+from .forms import UserChangeForm, UserCreationForm, UserSendInvitationForm
 from .models import User, UserInvitation
 
 
@@ -22,7 +22,7 @@ class UserAdmin(DjangoUserAdmin):
     )
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("Permissions", {"fields": ("is_staff", "is_active")}),
+        ("Permissions", {"fields": ("is_staff", "is_active", "groups")}),
     )
     add_fieldsets = (
         (
@@ -38,7 +38,7 @@ class UserAdmin(DjangoUserAdmin):
 
 
 class UserInvitationAdmin(admin.ModelAdmin):
-    form = UserInvitationForm
+    form = UserSendInvitationForm
     add_form_template = "invitation_add_form.html"
     list_display = ["user", "created"]
 

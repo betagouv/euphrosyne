@@ -3,12 +3,13 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.forms import SetPasswordForm as DjangoSetPasswordForm
 from django.contrib.auth.forms import UserChangeForm as DjangoUserChangeForm
 from django.contrib.auth.forms import UserCreationForm as DjangoUserCreationForm
+from django.contrib.auth.models import Group
 from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from .emails import send_invitation_email
-from .models import User, UserInvitation
+from .models import User, UserGroups, UserInvitation
 
 
 class UserCreationForm(DjangoUserCreationForm):
@@ -39,10 +40,11 @@ class UserInvitationRegistrationForm(DjangoSetPasswordForm):
 
     def save(self, commit: bool = True) -> AbstractBaseUser:
         self.user.email = self.cleaned_data["email"]
+        self.user.invitation_completed = True
         return super().save(commit=commit)
 
 
-class UserInvitationForm(forms.ModelForm):
+class UserSendInvitationForm(forms.ModelForm):
 
     email = forms.EmailField(
         label=_("Email"),
@@ -68,6 +70,8 @@ class UserInvitationForm(forms.ModelForm):
     ):
         email = self.cleaned_data["email"]
         user = User.objects.create(email=email)
+        project_member_group = Group.objects.get(name=UserGroups.PROJECT_MEMBER.value)
+        user.groups.add(project_member_group)
         token = default_token_generator.make_token(user)
 
         self.instance.user = user
