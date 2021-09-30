@@ -1,7 +1,8 @@
 from http import HTTPStatus
 
-from django.test import TestCase, Client
+from django.test import Client, TestCase
 from django.urls import reverse
+
 from euphro_auth.models import User
 
 
@@ -13,9 +14,7 @@ class UserInvitationAdmin(TestCase):
         )
 
     def test_user_invitation_get(self):
-        admin_invitation_creation_url = reverse(
-            "admin:user_management_userinvitation_add"
-        )
+        admin_invitation_creation_url = reverse("admin:euphro_auth_userinvitation_add")
 
         self.client.force_login(self.superuser)
         response = self.client.get(admin_invitation_creation_url)
@@ -28,9 +27,7 @@ class UserInvitationAdmin(TestCase):
         )
 
     def test_user_invitation_post_success(self):
-        admin_invitation_creation_url = reverse(
-            "admin:user_management_userinvitation_add"
-        )
+        admin_invitation_creation_url = reverse("admin:euphro_auth_userinvitation_add")
 
         self.client.force_login(self.superuser)
         self.client.post(

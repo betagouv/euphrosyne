@@ -15,7 +15,7 @@ class UserTokenRegistrationView(
     title = _("Enter your information")
     form_class = UserInvitationRegistrationForm
     template_name = "euphro_invitation_registration_form.html"
-    success_url = reverse_lazy("registration_profile")
+    success_url = reverse_lazy("admin:index")
 
     def get_initial(self) -> Dict[str, Any]:
         initial = super().get_initial()

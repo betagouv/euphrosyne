@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
-from .forms import UserCreationForm, UserChangeForm
-from .models import User
+from .forms import UserChangeForm, UserCreationForm, UserInvitationForm
+from .models import User, UserInvitation
 
 
 class UserAdmin(DjangoUserAdmin):
@@ -37,4 +37,11 @@ class UserAdmin(DjangoUserAdmin):
     ordering = ("email",)
 
 
+class UserInvitationAdmin(admin.ModelAdmin):
+    form = UserInvitationForm
+    add_form_template = "invitation_add_form.html"
+    list_display = ["user", "created"]
+
+
 admin.site.register(User, UserAdmin)
+admin.site.register(UserInvitation, UserInvitationAdmin)

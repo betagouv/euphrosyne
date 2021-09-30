@@ -20,7 +20,6 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
 from euphro_auth.views import UserTokenRegistrationView
-from user_management.views import ProfileCreateView
 
 urlpatterns = [
     path(
@@ -48,10 +47,5 @@ urlpatterns = [
         "registration/<uidb64>/<token>/",
         UserTokenRegistrationView.as_view(),
         name="registration_token",
-    ),
-    path(
-        "registration/profile/me",
-        ProfileCreateView.as_view(),
-        name="registration_profile",
     ),
 ] + ([path("__debug__/", include(debug_toolbar.urls))] if settings.DEBUG else [])
