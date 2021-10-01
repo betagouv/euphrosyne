@@ -1,0 +1,39 @@
+name: Close PR
+on:
+  pull_request:
+    types: [closed]
+  
+jobs:
+  teardown-review-environment:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Auth to Scalingo
+        id: scalingo-bearer-token
+        run: |
+          token=$(
+            curl --fail -H "Accept: application/json" -H "Content-Type: application/json" -u ":${{ secrets.SCALINGO_API_TOKEN }}" \
+             -X POST https://auth.scalingo.com/v1/tokens/exchange \
+            | jq -r .token
+          ) 
+          echo "::set-output name=token::$token"
+      - name: Destroy Scalingo child app
+        run: |
+          curl --fail -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
+            -H "Accept: application/json" -H "Content-Type: application/json" \
+            -X DELETE https://api.osc-fr1.scalingo.com/v1/apps/euphrosyne-child-${{ github.event.pull_request.number }}
+
+      - name: Find Comment
+        uses: peter-evans/find-comment@v1
+        id: find-deploy-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }} #e.g. 1
+          comment-author: 'github-actions[bot]'
+          body-includes: scalingo 
+      - name: Create comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ steps.find-deploy-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            ⛔️ L'environnement de test a été supprimé.
