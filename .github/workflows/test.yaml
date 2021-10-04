@@ -12,6 +12,8 @@ env:
   EMAIL_HOST_PASSWORD:
   EMAIL_USE_TLS: false
   DEFAULT_FROM_EMAIL: h@ll.o
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+  SITE_URL: http://localhost:8080
   
 
 jobs:
@@ -157,6 +159,8 @@ jobs:
           path: ci-requirements
       - name: Install requirements
         run: pip install --user -r ci-requirements/ci-requirements.txt
+      - name: Collect static files
+        run: python manage.py collectstatic --clear --noinput
       # -- endblock install --
 
       - name: Pytest
