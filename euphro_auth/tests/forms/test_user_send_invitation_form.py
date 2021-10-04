@@ -3,7 +3,7 @@ from django.core import mail
 from django.test import TestCase
 
 from ...forms import UserSendInvitationForm
-from ...models import UserGroups, UserInvitation
+from ...models import UserInvitation
 
 
 class TestUserSendInvitationForm(TestCase):
@@ -25,10 +25,6 @@ class TestUserSendInvitationForm(TestCase):
         self.assertTrue(user_invitation.user)
         self.assertEqual(user_invitation.user.email, "test@test.test")
         self.assertFalse(user_invitation.user.invitation_completed)
-        self.assertEqual(user_invitation.user.groups.count(), 1)
-        self.assertEqual(
-            user_invitation.user.groups.first().name, UserGroups.PROJECT_MEMBER.value
-        )
 
     def test_email_sending(self):
         form = UserSendInvitationForm(data={"email": "test@test.test"})

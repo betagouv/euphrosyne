@@ -11,8 +11,6 @@ from .managers import UserManager
 
 class UserGroups(Enum):
     ADMIN = "Admin"
-    PROJECT_LEADER = "Project leader"
-    PROJECT_MEMBER = "Project member"
 
 
 class User(AbstractUser):
