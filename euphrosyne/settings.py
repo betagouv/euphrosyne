@@ -10,9 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
+import subprocess
 from pathlib import Path
 
 import dj_database_url
+import psycopg2
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -82,6 +84,32 @@ WSGI_APPLICATION = "euphrosyne.wsgi.application"
 
 DATABASES = {}
 
+
+def build_development_db_name(base_db_name):
+    branch_suffix = (
+        subprocess.check_output(
+            [
+                (
+                    Path(BASE_DIR) / Path("scripts") / Path("db_suffix_for_branch.sh")
+                ).resolve()
+            ]
+        )
+        .strip()
+        .decode("utf-8")
+    )
+    branch_db_name = f"{base_db_name}_{branch_suffix}"
+
+    try:
+        conn = psycopg2.connect(database=branch_db_name)
+    except psycopg2.OperationalError:
+        print(f"🅸 Using normal database {base_db_name}")
+        return base_db_name
+    else:
+        conn.close()
+        print(f"🆈 Using branch database {branch_db_name}")
+        return branch_db_name
+
+
 _djdb_config = dj_database_url.config()
 if _djdb_config:
     DATABASES["default"] = _djdb_config
@@ -89,7 +117,7 @@ elif os.getenv("DB_HOST"):
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.postgresql",
         "USER": os.getenv("DB_USER"),
-        "NAME": os.getenv("DB_NAME"),
+        "NAME": build_development_db_name(os.getenv("DB_NAME")),
         "PASSWORD": os.getenv("DB_PASSWORD"),
         "HOST": os.getenv("DB_HOST"),
         "PORT": os.getenv("DB_PORT"),
