@@ -1,0 +1,34 @@
+- model: auth.group
+  fields:
+    name: Admin
+    permissions:
+    - - view_logentry
+      - admin
+      - logentry
+    - - view_permission
+      - auth
+      - permission
+    - - add_user
+      - euphro_auth
+      - user
+    - - change_user
+      - euphro_auth
+      - user
+    - - delete_user
+      - euphro_auth
+      - user
+    - - view_user
+      - euphro_auth
+      - user
+    - - add_experiment
+      - lab
+      - experiment
+    - - change_experiment
+      - lab
+      - experiment
+    - - delete_experiment
+      - lab
+      - experiment
+    - - view_experiment
+      - lab
+      - experiment

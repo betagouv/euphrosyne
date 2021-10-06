@@ -9,6 +9,10 @@ from euphro_auth.models import UserGroups
 
 
 class TestUserInvitationAdmin(TestCase):
+    fixtures = [
+        "groups",
+    ]
+
     def setUp(self):
         self.client = Client()
         self.admin_user = get_user_model().objects.create_user(
