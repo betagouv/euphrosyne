@@ -1,5 +1,5 @@
+from django.contrib import auth
 from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import check_password
 from django.contrib.auth.tokens import default_token_generator
 from django.test import TestCase
 from django.test.client import Client
@@ -31,34 +31,15 @@ class TestUserTokenRegistrationView(TestCase):
             ),
         )
 
-    def test_user_can_set_password(self):
-        response = self.client.get(self.view_url)
+    def test_user_logged_in_on_success(self):
+        preresponse = self.client.get(self.view_url)
         self.client.post(
-            response.headers["Location"],
+            preresponse.headers["Location"],
             data={
-                "new_password1": "securepassword",
-                "new_password2": "securepassword",
                 "email": "test@test.test",
+                "new_password1": "NewPassword@1",
+                "new_password2": "NewPassword@1",
             },
         )
-        self.assertTrue(
-            check_password(
-                "securepassword",
-                get_user_model().objects.get(email="test@test.test").password,
-            )
-        )
-
-    def test_user_can_change_email(self):
-        response = self.client.get(self.view_url)
-        self.client.post(
-            response.headers["Location"],
-            data={
-                "new_password1": "securepassword",
-                "new_password2": "securepassword",
-                "email": "anotheremail@test.test",
-            },
-        )
-        self.assertEqual(
-            get_user_model().objects.get(id=self.user.id).email,
-            "anotheremail@test.test",
-        )
+        user = auth.get_user(self.client)
+        self.assertTrue(user.is_authenticated)

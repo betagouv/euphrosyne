@@ -32,6 +32,12 @@
     - - view_experiment
       - lab
       - experiment
+    - - add_userinvitation
+      - euphro_auth
+      - userinvitation
+    - - view_userinvitation
+      - euphro_auth
+      - userinvitation
 - model: auth.group
   fields:
     name: Project leader

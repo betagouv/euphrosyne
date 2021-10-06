@@ -1,13 +1,13 @@
-from django.test import TestCase
-from django.core import mail
 from django.conf import settings
+from django.core import mail
+from django.test.testcases import SimpleTestCase
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
 from ..emails import send_invitation_email
 
 
-class InvitationEmailTests(TestCase):
+class InvitationEmailTests(SimpleTestCase):
     def test_send_email(self):
         user_id = 1
         uid = urlsafe_base64_encode(force_bytes(user_id))

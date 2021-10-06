@@ -33,7 +33,7 @@ class UserInvitationRegistrationForm(DjangoSetPasswordForm):
     def clean_email(self) -> str:
         if self.user and self.user.email == self.cleaned_data["email"]:
             return self.cleaned_data["email"]
-        if User.objects.filter(email=self.cleaned_data["email"]).count():
+        if User.objects.filter(email=self.cleaned_data["email"]).exists():
             raise ValidationError(_("An account with this email already exists."))
         return self.cleaned_data["email"]
 
@@ -68,7 +68,9 @@ class UserSendInvitationForm(forms.ModelForm):
         commit=True,
     ):
         email = self.cleaned_data["email"]
-        user = User.objects.create(email=email)
+        user = User(email=email, is_staff=True)
+        if commit:
+            user.save()
         token = default_token_generator.make_token(user)
 
         self.instance.user = user
