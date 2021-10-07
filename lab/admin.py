@@ -1,8 +1,186 @@
+from typing import Optional, Union
+
 from django.contrib import admin
+from django.db.models import Q
+from django.http.request import HttpRequest
 
-from . import models
+from .forms import ProjectForm, ProjectFormForNonAdmins
+from .lib import is_project_admin
+from .models import Participation, Project, Run
 
 
-@admin.register(models.Experiment)
-class ExperimentAdmin(admin.ModelAdmin):
-    list_display = ["name", "date", "particle_type", "modified", "created"]
+@admin.register(Run)
+class RunAdmin(admin.ModelAdmin):
+    list_display = ["label", "date", "project"]
+
+    def has_view_permission(self, request: HttpRequest, obj: Optional[Run] = None):
+        """Allow list view but only allow detail to leader or admin"""
+        return (
+            not obj
+            or obj.project.leader_id == request.user.id
+            or is_project_admin(request.user)
+        ) and super().has_view_permission(request, obj)
+
+    def has_change_permission(self, request: HttpRequest, obj: Optional[Run] = None):
+        """Allow change in general but only allow specific edition to leader or admin"""
+        return (
+            not obj
+            or obj.project.leader_id == request.user.id
+            or is_project_admin(request.user)
+        ) and super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request: HttpRequest, obj: Optional[Run] = None):
+        """Allow deletion in general but only allow specific del to leader or admin"""
+        return (
+            not obj
+            or obj.project.leader_id == request.user.id
+            or is_project_admin(request.user)
+        ) and super().has_delete_permission(request, obj)
+
+    # This one seems redundant with `get_readonly_fields` according to the
+    # `ModelAdmin` view:
+    def get_exclude(self, request: HttpRequest, obj: Optional[Run] = None):
+        excluded = super().get_exclude(request, obj)
+        if obj:
+            return excluded + ("project",) if excluded else ("project",)
+        return excluded
+
+    def get_readonly_fields(self, request: HttpRequest, obj: Optional[Run] = None):
+        """Don't allow changing project in change mode"""
+        readonly_fields = super().get_readonly_fields(request, obj)
+        if obj:
+            return readonly_fields + ("project",)
+        return readonly_fields
+
+    def get_queryset(self, request: HttpRequest):
+        runs_queryset = super().get_queryset(request)
+        if is_project_admin(request.user):
+            return runs_queryset
+        return runs_queryset.filter(project__leader=request.user)
+
+    def formfield_for_foreignkey(self, db_field, request: HttpRequest, **kwargs):
+        if not is_project_admin(request.user):
+            if db_field.name == "project":
+                kwargs["queryset"] = Project.objects.filter(leader=request.user)
+
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ["name", "leader"]
+    readonly_fields = ("members",)
+
+    def has_view_permission(self, request: HttpRequest, obj: Optional[Project] = None):
+        return (
+            not obj
+            or obj.leader_id == request.user.id
+            or is_project_admin(request.user)
+        ) and super().has_view_permission(request, obj)
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: Optional[Project] = None
+    ):
+        return (
+            not obj
+            or obj.leader_id == request.user.id
+            or is_project_admin(request.user)
+        ) and super().has_change_permission(request, obj)
+
+    def has_delete_permission(
+        self, request: HttpRequest, obj: Optional[Project] = None
+    ):
+        return (
+            not obj
+            or obj.leader_id == request.user.id
+            or is_project_admin(request.user)
+        ) and super().has_delete_permission(request, obj)
+
+    def get_exclude(self, request: HttpRequest, obj: Optional[Project] = None):
+        excluded = super().get_exclude(request, obj)
+        if not is_project_admin(request.user):
+            return excluded + ("project",) if excluded else ("project",)
+        return excluded
+
+    def get_readonly_fields(self, request: HttpRequest, obj: Optional[Project] = None):
+        """Allow only to admins to change leader"""
+        readonly_fields = super().get_readonly_fields(request, obj)
+        if not is_project_admin(request.user):
+            return readonly_fields + ("leader",)
+        return readonly_fields
+
+    def get_queryset(self, request: HttpRequest):
+        projects_qs = super().get_queryset(request)
+        if is_project_admin(request.user):
+            return projects_qs
+        return projects_qs.filter(leader=request.user)
+
+    def formfield_for_foreignkey(self, db_field, request: HttpRequest, **kwargs):
+        if not is_project_admin(request.user):
+            kwargs["queryset"] = Project.objects.filter(leader=request.user)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def save_model(
+        self,
+        request: HttpRequest,
+        obj: Project,
+        form: Union[ProjectFormForNonAdmins, ProjectForm],
+        change: bool,
+    ) -> None:
+        if not is_project_admin(request.user):
+            obj.leader_id = request.user.id
+        obj.save()
+        obj.members.add(obj.leader_id)
+
+
+# [XXX] Add Tests
+@admin.register(Participation)
+class ParticipationAdmin(admin.ModelAdmin):
+    list_display = ["project", "user"]
+    readonly_fields = ["project", "user"]
+
+    def has_view_permission(
+        self, request: HttpRequest, obj: Optional[Participation] = None
+    ):
+        return (
+            not obj
+            or obj.project.leader_id == request.user.id
+            or is_project_admin(request.user)
+        ) and super().has_view_permission(request, obj)
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: Optional[Participation] = None
+    ):
+        return (
+            not obj
+            or obj.project.leader_id == request.user.id
+            or is_project_admin(request.user)
+        ) and super().has_change_permission(request, obj)
+
+    def has_delete_permission(
+        self, request: HttpRequest, obj: Optional[Participation] = None
+    ):
+        return (
+            not obj
+            or obj.project.leader_id == request.user.id
+            or is_project_admin(request.user)
+        ) and super().has_delete_permission(request, obj)
+
+    def get_queryset(self, request: HttpRequest):
+        """
+        Non admins are only allowed to see their own participations or
+        participations of projects that they lead.
+        """
+        runs_queryset = super().get_queryset(request)
+        if is_project_admin(request.user):
+            return runs_queryset
+        return runs_queryset.filter(
+            Q(project__leader=request.user) | Q(user=request.user)
+        )
+
+    def formfield_for_foreignkey(self, db_field, request: HttpRequest, **kwargs):
+        if not is_project_admin(request.user):
+            if db_field.name == "project":
+                kwargs["queryset"] = Project.objects.filter(leader=request.user)
+
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)

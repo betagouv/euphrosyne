@@ -1,40 +1,52 @@
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from shared.models import TimestampedModel
 
 
-class Experiment(TimestampedModel):
-
-    OPEN_STATUS = 1
-    CLOSED_STATUS = 2
-    STATUS_CHOICES = (
-        (OPEN_STATUS, _("Open")),
-        (CLOSED_STATUS, _("Closed")),
-    )
-    status = models.IntegerField(
-        _("Status"),
-        choices=STATUS_CHOICES,
-        default=OPEN_STATUS,
-    )
-
-    name = models.CharField(_("Experiment name"), max_length=255, unique=True)
-
+class Run(TimestampedModel):
+    label = models.CharField(_("Run label"), max_length=255, unique=True)
     date = models.DateTimeField(
-        _("Experiment date"),
+        _("Run date"),
         blank=True,
-        help_text=_("Date of the experiment."),
+    )
+    project = models.ForeignKey("lab.Project", null=False, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f"Run {self.label} on {self.date}"
+
+
+class Project(TimestampedModel):
+    """A project is a collection of runs done by the same team"""
+
+    name = models.CharField(_("Project name"), max_length=255, unique=True)
+    # Caveat: we might want to allow CASCADE in on_delete. But we might want
+    # also to add a pre_delete signal handler to abort deletion (or fallback to
+    # a default project leader?) in case the Project is not finished (depending
+    # if the Runs are all finished or not).
+    leader = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=False,
+        on_delete=models.PROTECT,
+        related_name="projects_as_leader",
+    )
+    members = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, through="lab.Participation"
     )
 
-    PROTON_PARTICLE = 1
-    ALPHA_PARTICLE = 2
-    DEUTON_PARTICLE = 3
-    PARTICLES_CHOICES = (
-        (PROTON_PARTICLE, _("Proton")),
-        (ALPHA_PARTICLE, _("Alpha particle")),
-        (DEUTON_PARTICLE, _("Deuton")),
-    )
-    particle_type = models.IntegerField(
-        _("Particle type"),
-        choices=PARTICLES_CHOICES,
-    )
+    def __str__(self):
+        return f"{self.name}"
+
+
+class Participation(TimestampedModel):
+    """JOIN table between User and Project
+
+    A user who participates in a project is a project member (possibly leader).
+    """
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    project = models.ForeignKey("lab.Project", on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f"{self.user} participation in {self.project}"
