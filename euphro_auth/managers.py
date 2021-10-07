@@ -1,9 +1,17 @@
 from django.contrib.auth.base_user import BaseUserManager
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
+class UserManagerQuerySet(models.QuerySet):
+    """Prevent deletion, rather update is_active to False"""
+
+    def delete(self):
+        self.update(is_active=False)
+
+
 class UserManager(BaseUserManager):
-    """Custom user model manager with email as identifier."""
+    """Custom user model manager with email as identifier and no deletion."""
 
     def create_user(self, email, password, **extra_fields):
         if not email:
@@ -24,3 +32,6 @@ class UserManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError(_("Superuser must have is_superuser=True."))
         return self.create_user(email, password, **extra_fields)
+
+    def get_queryset(self):
+        return UserManagerQuerySet(self.model, using=self._db)
