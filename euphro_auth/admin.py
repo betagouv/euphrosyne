@@ -41,6 +41,10 @@ class UserAdmin(DjangoUserAdmin):
     search_fields = ("email",)
     ordering = ("email",)
 
+    def has_delete_permission(self, request, obj=None):
+        # Disable delete
+        return False
+
 
 class UserInvitationAdmin(admin.ModelAdmin):
     form = UserSendInvitationForm
