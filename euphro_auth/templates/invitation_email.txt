@@ -1,0 +1,12 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %}You've been invited to register at Euphrosyne.{% endblocktrans %}
+
+{% trans "Please go to the following page and create your account:" %}
+{% block reset_link %}
+{{site_url}}{% url 'registration_token' uid token %}
+{% endblock %}
+
+
+{% blocktrans %}The Euphrosyne team{% endblocktrans %}
+
+{% endautoescape %}

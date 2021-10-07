@@ -1,8 +1,13 @@
+from typing import Any, Optional
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from django.contrib.auth.tokens import default_token_generator
+from django.http.request import HttpRequest
 
-from .forms import UserCreationForm, UserChangeForm
-from .models import User
+from .emails import send_invitation_email
+from .forms import UserChangeForm, UserCreationForm, UserSendInvitationForm
+from .models import User, UserInvitation
 
 
 class UserAdmin(DjangoUserAdmin):
@@ -22,7 +27,7 @@ class UserAdmin(DjangoUserAdmin):
     )
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("Permissions", {"fields": ("is_staff", "is_active")}),
+        ("Permissions", {"fields": ("is_staff", "is_active", "groups")}),
     )
     add_fieldsets = (
         (
@@ -37,4 +42,36 @@ class UserAdmin(DjangoUserAdmin):
     ordering = ("email",)
 
 
+class UserInvitationAdmin(admin.ModelAdmin):
+    form = UserSendInvitationForm
+    add_form_template = "invitation_add_form.html"
+    list_display = ["user", "created"]
+    actions = ["view", "add"]
+
+    def save_model(
+        self,
+        request: Any,
+        obj: UserInvitation,
+        form: UserSendInvitationForm,
+        change: bool,
+    ) -> None:
+        if obj.user and not obj.user.id:
+            user: User = obj.user
+            user.save()
+            token = default_token_generator.make_token(user)
+            send_invitation_email(email=user.email, user_id=user.pk, token=token)
+        return super().save_model(request, obj, form, change)
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: Optional[UserInvitation] = ...
+    ) -> bool:
+        return False
+
+    def has_delete_permission(
+        self, request: HttpRequest, obj: Optional[UserInvitation] = ...
+    ) -> bool:
+        return False
+
+
 admin.site.register(User, UserAdmin)
+admin.site.register(UserInvitation, UserInvitationAdmin)

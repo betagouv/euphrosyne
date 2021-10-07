@@ -1,0 +1,59 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; {% translate 'Account registration' %}
+</div>
+{% endblock %}
+
+{% block content %}
+
+{% if validlink %}
+
+<p>{% translate "You can change your email and choose a password." %}</p>
+
+<form method="post">{% csrf_token %}
+    <fieldset class="module aligned">
+        <div class="form-row field-email">
+            {{ form.email.errors }}
+            <label for="id_email">{% translate 'Email' %}:</label>
+            {{ form.email }}
+        </div>
+        <div class="form-row field-first_name">
+            {{ form.first_name.errors }}
+            <label for="id_first_name">{% translate 'First name' %}:</label>
+            {{ form.first_name }}
+        </div>
+        <div class="form-row field-last_name">
+            {{ form.last_name.errors }}
+            <label for="id_last_name">{% translate 'Last name' %}:</label>
+            {{ form.last_name }}
+        </div>
+        <br>
+        <div class="form-row field-password1">
+            {{ form.new_password1.errors }}
+            <label for="id_new_password1">{% translate 'Password' %}:</label>
+            {{ form.new_password1 }}
+        </div>
+        <div class="form-row field-password2">
+            {{ form.new_password2.errors }}
+            <label for="id_new_password2">{% translate 'Confirm password' %}:</label>
+            {{ form.new_password2 }}
+        </div>
+        <br>
+
+        <input type="submit" value="{% translate 'Save my information' %}">
+    </fieldset>
+</form>
+
+{% else %}
+
+<p>{% translate "The registration link was invalid, possibly because it has already been used." %}</p>
+
+{% endif %}
+
+{% endblock %}
