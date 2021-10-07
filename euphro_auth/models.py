@@ -30,6 +30,10 @@ class User(AbstractUser):
     def __str__(self):
         return self.email
 
+    def delete(self, *_):
+        self.is_active = False
+        self.save()
+
 
 class UserInvitation(TimestampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
