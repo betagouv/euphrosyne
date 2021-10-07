@@ -22,6 +22,9 @@
     },
     "DEFAULT_FROM_EMAIL": {
       "required": true
+    },
+    "SITE_URL": {
+      "generator": "site_url"
     }
   },
   "formation": {

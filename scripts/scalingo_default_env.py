@@ -5,6 +5,7 @@ Parse the scalingo.json file and print a default env.
 """
 
 import json
+import os
 import random
 import string
 import sys
@@ -17,12 +18,18 @@ def get_random_secret():
     )
 
 
+def get_site_url():
+    return f"https://euphrosyne-child-${os.environ['PR_NUMBER']}.osc-fr1.scalingo.io"
+
+
 def build_default_value(description):
     """Build the default value based on instructions"""
     if "value" in description:
         return description["value"]
     if description.get("generator") == "secret":
         return get_random_secret()
+    if description.get("generator") == "site_url":
+        return get_site_url()
     return None
 
 

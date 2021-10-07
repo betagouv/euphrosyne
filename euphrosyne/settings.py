@@ -29,6 +29,8 @@ DEBUG = bool(os.getenv("DJANGO_DEBUG", ""))
 
 ALLOWED_HOSTS = ["localhost", ".scalingo.io"] if not DEBUG else []
 
+SITE_URL = os.environ["SITE_URL"]
+
 
 # Application definition
 

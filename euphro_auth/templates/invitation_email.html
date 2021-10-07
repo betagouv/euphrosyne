@@ -1,0 +1,20 @@
+{% load i18n %}{% autoescape off %}
+<p>
+    {% trans "Hello," %}
+</p>
+<p>
+    {% trans "You've been invited to register at Euphrosyne." %}
+    {% trans "Please go to the following page and create your account:" %}
+</p>
+<p>
+    {% block reset_link %}
+    <a href="{{site_url}}{% url 'registration_token' uid token %}">
+        {% trans "Create account" %}
+    </a>
+    {% endblock %}
+</p>
+
+
+{% trans "The Euphrosyne team" %}
+
+{% endautoescape %}
