@@ -79,7 +79,7 @@ class UserSendInvitationForm(forms.ModelForm):
         commit=True,
     ):
         email = self.cleaned_data["email"]
-        user = User(email=email, is_staff=True)
+        user = User(email=email)
         if commit:
             user.save()
         self.instance.user = user
