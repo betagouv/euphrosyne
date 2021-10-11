@@ -26,4 +26,3 @@ class TestUserSendInvitationForm(SimpleTestCase):
         self.assertTrue(user_invitation.user)
         self.assertEqual(user_invitation.user.email, "test@test.test")
         self.assertFalse(user_invitation.user.invitation_completed)
-        self.assertTrue(user_invitation.user.is_staff)
