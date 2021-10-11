@@ -19,6 +19,8 @@ black = "*"
 pylint = "*"
 flake8 = "*"
 ipython = "*"
+mypy = "*"
+django-stubs = "*"
 
 [requires]
 python_version = "3.9"
