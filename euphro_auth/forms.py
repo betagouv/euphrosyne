@@ -22,6 +22,8 @@ class UserChangeForm(DjangoUserChangeForm):
 
 
 class UserInvitationRegistrationForm(DjangoSetPasswordForm):
+    user: User  # type: ignore
+
     email = forms.EmailField(
         label=_("Email"),
         max_length=254,

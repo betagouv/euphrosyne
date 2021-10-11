@@ -126,6 +126,8 @@ jobs:
         run: python -m pylint $(find . -type f -path '*.py' -not -path '*/migrations*')
       - name: Black
         run: python -m black --check .
+      - name: Mypy
+        run: python -m mypy .
 
   test:
     runs-on: ubuntu-18.04

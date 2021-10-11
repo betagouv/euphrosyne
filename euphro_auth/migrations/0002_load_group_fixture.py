@@ -9,4 +9,3 @@ class Migration(migrations.Migration):
         ("euphro_auth", "0001_initial"),
     ]
 
-    operations = []

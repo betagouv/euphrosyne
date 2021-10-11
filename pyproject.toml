@@ -5,3 +5,11 @@ exclude = '''
 )/
 
 '''
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+mypy_path = "./mypy_stubs"
+exclude = "./mypy_stubs/"
+
+[tool.django-stubs]
+django_settings_module = "euphrosyne.settings"

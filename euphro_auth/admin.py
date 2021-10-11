@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
@@ -62,14 +62,10 @@ class UserInvitationAdmin(admin.ModelAdmin):
             send_invitation_email(email=user.email, user_id=user.pk, token=token)
         return super().save_model(request, obj, form, change)
 
-    def has_change_permission(
-        self, request: HttpRequest, obj: Optional[UserInvitation] = ...
-    ) -> bool:
+    def has_change_permission(self, request: HttpRequest, obj=...) -> bool:
         return False
 
-    def has_delete_permission(
-        self, request: HttpRequest, obj: Optional[UserInvitation] = ...
-    ) -> bool:
+    def has_delete_permission(self, request: HttpRequest, obj=...) -> bool:
         return False
 
 

@@ -14,7 +14,7 @@ def send_invitation_email(email: str, user_id: int, token: str):
     context = {
         "email": email,
         "site_url": settings.SITE_URL,
-        "uid": urlsafe_base64_encode(force_bytes(user_id)),
+        "uid": urlsafe_base64_encode(bytes(force_bytes(user_id))),
         "token": token,
     }
     subject = _("[Euphrosyne] Invitation to register")
