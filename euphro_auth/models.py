@@ -11,6 +11,7 @@ from .managers import UserManager
 
 class UserGroups(Enum):
     ADMIN = "Admin"
+    PARTICIPANT = "Project Participant"
 
 
 class User(AbstractUser):
@@ -28,7 +29,11 @@ class User(AbstractUser):
     objects = UserManager()
 
     def __str__(self):
-        return self.email
+        return (
+            f"{self.last_name}, {self.first_name}<{self.email}>"
+            if (self.last_name and self.first_name)
+            else self.email
+        )
 
     def delete(self, *_):
         self.is_active = False

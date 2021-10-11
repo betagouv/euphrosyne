@@ -2,39 +2,85 @@
   fields:
     name: Admin
     permissions:
-    - - view_logentry
-      - admin
-      - logentry
-    - - view_permission
-      - auth
-      - permission
-    - - add_user
-      - euphro_auth
-      - user
-    - - change_user
-      - euphro_auth
-      - user
-    - - delete_user
-      - euphro_auth
-      - user
-    - - view_user
-      - euphro_auth
-      - user
-    - - add_experiment
+    - - add_project
       - lab
-      - experiment
-    - - change_experiment
+      - project
+    - - change_project
       - lab
-      - experiment
-    - - delete_experiment
+      - project
+    - - delete_project
       - lab
-      - experiment
-    - - view_experiment
+      - project
+    - - view_project
       - lab
-      - experiment
+      - project
+    - - add_participation
+      - lab
+      - participation
+    - - change_participation
+      - lab
+      - participation
+    - - delete_participation
+      - lab
+      - participation
+    - - view_participation
+      - lab
+      - participation
+    - - add_run
+      - lab
+      - run
+    - - change_run
+      - lab
+      - run
+    - - delete_run
+      - lab
+      - run
+    - - view_run
+      - lab
+      - run
     - - add_userinvitation
       - euphro_auth
       - userinvitation
     - - view_userinvitation
       - euphro_auth
       - userinvitation
+- model: auth.group
+  fields:
+    name: Project Participant
+    permissions:
+    - - add_project
+      - lab
+      - project
+    - - change_project
+      - lab
+      - project
+    - - delete_project
+      - lab
+      - project
+    - - view_project
+      - lab
+      - project
+    - - add_participation
+      - lab
+      - participation
+    - - change_participation
+      - lab
+      - participation
+    - - delete_participation
+      - lab
+      - participation
+    - - view_participation
+      - lab
+      - participation
+    - - add_run
+      - lab
+      - run
+    - - change_run
+      - lab
+      - run
+    - - delete_run
+      - lab
+      - run
+    - - view_run
+      - lab
+      - run
