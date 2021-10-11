@@ -8,7 +8,8 @@ from django.utils.translation import gettext_lazy as _
 
 def send_invitation_email(email: str, user_id: int, token: str):
     """
-    Send an email with an invitation link based on a user ID and a token used for authentication.
+    Send an email with an invitation link based on a user ID and a token used for
+    authentication.
     """
 
     context = {
