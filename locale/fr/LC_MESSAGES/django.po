@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-18 20:21+0200\n"
+"POT-Creation-Date: 2021-10-22 11:42+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -15,6 +15,9 @@ msgstr ""
 msgid "Profile"
 msgstr "Profil"
 
+msgid "Superuser"
+msgstr ""
+
 msgid "[Euphrosyne] Invitation to register"
 msgstr "[Euphrosyne] Invitation à s'inscrire"
 
@@ -24,18 +27,15 @@ msgstr "Email"
 #, fuzzy
 #| msgid "first name"
 msgid "First name"
-msgstr "prénom"
+msgstr "Prénom"
 
 #, fuzzy
 #| msgid "last name"
 msgid "Last name"
-msgstr "nom"
+msgstr "Nom"
 
 msgid "An account with this email already exists."
-msgstr "Un compte avec cet email existe déjà"
-
-msgid "This user has already been invited."
-msgstr "Cet utilisateur a déjà été invité"
+msgstr "Un compte avec cet email existe déjà."
 
 msgid "The Email must be set"
 msgstr "L'email doit être défini"
@@ -55,8 +55,14 @@ msgstr "prénom"
 msgid "last name"
 msgstr "nom"
 
-msgid "invitation completed"
-msgstr "invitation complétée"
+msgid "invitation completed at"
+msgstr "invitation complétée le"
+
+msgid "In Admin group"
+msgstr "Dans le group Admin"
+
+msgid "In Participant group"
+msgstr "Dans le groupe Participant"
 
 msgid ""
 "First, enter an email and password. Then, you'll be able to edit more user "
@@ -68,11 +74,11 @@ msgstr ""
 msgid "Enter an email and password."
 msgstr "Entrez un email et un mot de passe"
 
-#, fuzzy
-#| msgid "Enter an email and password."
 msgid ""
 "You can change your email, fill up your information and choose a password."
-msgstr "Entrez un email et un mot de passe"
+msgstr ""
+"Vous pouvez indiquer votre email, complétez vos informations et choisir un "
+"mot de passe."
 
 msgid "Password"
 msgstr "Mot de passe"
@@ -81,30 +87,27 @@ msgid "Confirm password"
 msgstr "Confirmez le mot de passe"
 
 msgid "Save my information"
-msgstr "Sauvegarder mes informations"
+msgstr "Enregistrer mon profil"
 
 msgid "Connect your ORCID ID"
-msgstr "Connectez votre identifiant ORCID"
+msgstr "Connecter votre ORCID ID"
 
 msgid ""
 "The registration link was invalid, possibly because it has already been used."
 msgstr ""
-"Le lien d'inscription est invalide, probablement car il a déjà été utilisé."
-
-msgid "Invite user"
-msgstr "Inviter un utilisateur"
+"Le lien d'inscription est invalid, peut-être parce qu'il a déjà été utilisé."
 
 msgid "Hello,"
 msgstr "Bonjour,"
 
 msgid "You've been invited to register at Euphrosyne."
-msgstr "Vous avez été invité(e) à vous inscrire sur Euphrosyne"
+msgstr "Vous avez été invité à vous inscrire sur Euphrosyne."
 
 msgid "Please go to the following page and create your account:"
-msgstr "Merci d'aller à la page suivante pour créer votre compte:"
+msgstr "Cliquez sur ce lien pour créer votre compte :"
 
 msgid "Create account"
-msgstr "Créer un compte"
+msgstr "Créer mon compte"
 
 msgid "The Euphrosyne team"
 msgstr "L'équipe Euphrosyne"
@@ -113,29 +116,42 @@ msgid "Enter your information"
 msgstr "Entrez vos informations"
 
 msgid "Log in with ORCID"
-msgstr "Connectez-vous avez ORCID"
+msgstr "Se connecter avec ORCID"
+
+#, python-brace-format
+msgid "[Euphrosyne] Invitation to join project {project.name}"
+msgstr "[Euphrosyne] Invitation à rejoindre le projet {project.name}"
 
 msgid "Run label"
-msgstr "Nom du Run"
+msgstr "Libellé du run"
 
 msgid "Run date"
-msgstr "Date du Run"
+msgstr "Date du run"
 
 #, fuzzy
 #| msgid "first name"
 msgid "Project name"
 msgstr "prénom"
 
+#, python-format
+msgid "You've been invited to join %(project_name)s on Euphrosyne."
+msgstr ""
+"Vous avez été invité à rejoindre le projet %(project_name)s sur Euphrosyne"
+
+msgid "You can check the invitation there:"
+msgstr "Vous pouvez accéder à l'invitation ici :"
+
+msgid "Join project"
+msgstr "Rejoindre le projet"
+
 msgid "Home"
 msgstr "Accueil"
 
 msgid "Account registration"
-msgstr "Création de compte"
+msgstr "Inscription du compte"
 
-#, fuzzy
-#| msgid "Enter your information"
 msgid "Verify your information."
-msgstr "Entrez vos informations"
+msgstr "Vérifiez vos informations."
 
 msgid "Created"
 msgstr "Créé"

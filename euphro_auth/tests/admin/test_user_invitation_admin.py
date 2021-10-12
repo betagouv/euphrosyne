@@ -1,5 +1,3 @@
-from http import HTTPStatus
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core import mail
@@ -22,16 +20,6 @@ class TestUserInvitationAdmin(TestCase):
         self.admin_user.groups.add(Group.objects.get(name=UserGroups.ADMIN.value))
         self.view_url = reverse("admin:euphro_auth_userinvitation_add")
         self.client.force_login(self.admin_user)
-
-    def test_user_invitation_get(self):
-        response = self.client.get(self.view_url)
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertContains(
-            response,
-            '<input type="email" name="email" \
-                 autocomplete="email" maxlength="254" required="" id="id_email">',
-            html=True,
-        )
 
     def test_add_user_invitation_creates_user_with_right_permissions(self):
         self.client.post(self.view_url, data={"email": "test@test.test"})

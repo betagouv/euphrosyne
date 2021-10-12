@@ -4,8 +4,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from shared.models import TimestampedModel
-
 from .managers import UserManager
 
 
@@ -24,7 +22,9 @@ class User(AbstractUser):
     first_name = models.CharField(_("first name"), max_length=150, blank=False)
     last_name = models.CharField(_("last name"), max_length=150, blank=False)
     username = None
-    invitation_completed = models.BooleanField(_("invitation completed"), default=False)
+    invitation_completed_at = models.DateTimeField(
+        _("invitation completed at"), blank=True, null=True
+    )
 
     objects = UserManager()
 
@@ -52,5 +52,6 @@ class User(AbstractUser):
     in_participant_group.short_description = _("In Participant group")
 
 
-class UserInvitation(TimestampedModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+class UserInvitation(User):
+    class Meta:
+        proxy = True

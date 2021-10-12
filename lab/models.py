@@ -50,3 +50,9 @@ class Participation(TimestampedModel):
 
     def __str__(self):
         return f"{self.user} participation in {self.project}"
+
+    class Meta:
+        unique_together = (
+            "user",
+            "project",
+        )
