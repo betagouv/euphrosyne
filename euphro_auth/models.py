@@ -26,7 +26,7 @@ class User(AbstractUser):
     username = None  # type: ignore
     invitation_completed = models.BooleanField(_("invitation completed"), default=False)
 
-    objects: "BaseManager[User]" = UserManager()  # type: ignore
+    objects: BaseManager["User"] = UserManager()  # type: ignore
 
     def __str__(self):
         return self.email
