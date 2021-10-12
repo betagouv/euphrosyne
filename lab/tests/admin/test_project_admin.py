@@ -5,9 +5,29 @@ from django.contrib.auth.models import Group
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from euphro_auth.models import UserGroups
+from euphro_auth.models import User, UserGroups
 
-from ...models import Project
+from ...models import Participation, Project
+
+
+def get_add_participation_post_data(
+    project: Project, new_member: User, leader_participation: Participation
+):
+    return {
+        "name": "some project name",
+        "leader": project.leader_id,
+        "participation_set-0-user": project.leader_id,
+        "participation_set-0-project": project.id,
+        "participation_set-0-id": leader_participation.id,
+        "participation_set-1-user": new_member.id,
+        "participation_set-1-project": project.id,
+        "participation_set-1-id": "",
+        "participation_set-TOTAL_FORMS": "5",
+        "participation_set-INITIAL_FORMS": "1",
+        "participation_set-__prefix__-id": "",
+        "participation_set-__prefix__-project": "2",
+        "participation_set-__prefix__-user": "",
+    }
 
 
 class TestProjectAdminViewAsAdminUser(TestCase):
@@ -45,6 +65,8 @@ class TestProjectAdminViewAsAdminUser(TestCase):
             data={
                 "name": "some project name",
                 "leader": self.project_participant_user.id,
+                "participation_set-TOTAL_FORMS": "5",
+                "participation_set-INITIAL_FORMS": "0",
             },
         )
         assert response.status_code == 302
@@ -58,6 +80,8 @@ class TestProjectAdminViewAsAdminUser(TestCase):
             data={
                 "name": "some project name",
                 "leader": self.project_participant_user.id,
+                "participation_set-TOTAL_FORMS": "5",
+                "participation_set-INITIAL_FORMS": "0",
             },
         )
         assert response.status_code == 302
@@ -75,6 +99,8 @@ class TestProjectAdminViewAsAdminUser(TestCase):
             data={
                 "name": "some other project name",
                 "leader": self.project_participant_user.id,
+                "participation_set-TOTAL_FORMS": "5",
+                "participation_set-INITIAL_FORMS": "0",
             },
         )
         assert response.status_code == 302
@@ -93,6 +119,28 @@ class TestProjectAdminViewAsAdminUser(TestCase):
         assert response.status_code == 200
         assert "other project 1" in response.content.decode()
         assert "other project 2" in response.content.decode()
+
+    def test_add_participations_is_allowed(self):
+        project = Project.objects.create(
+            name="some project name", leader=self.project_participant_user
+        )
+        project.members.add(self.project_participant_user)
+        member = get_user_model().objects.create_user(
+            email="member@test.com", password="password"
+        )
+        change_view_url = reverse("admin:lab_project_change", args=[project.id])
+        response = self.client.post(
+            change_view_url,
+            data=get_add_participation_post_data(
+                project=project,
+                new_member=member,
+                leader_participation=project.participation_set.first(),
+            ),
+        )
+        assert response.status_code == 302
+        project.refresh_from_db()
+        assert project.members.count() == 2
+        assert project.members.last().id == member.id
 
 
 class TestProjectAdminViewAsProjectLeader(TestCase):
@@ -129,6 +177,8 @@ class TestProjectAdminViewAsProjectLeader(TestCase):
             data={
                 "name": "some other project name",
                 "leader": self.admin_user.id,
+                "participation_set-TOTAL_FORMS": "5",
+                "participation_set-INITIAL_FORMS": "0",
             },
         )
         assert response.status_code == 302
@@ -138,7 +188,12 @@ class TestProjectAdminViewAsProjectLeader(TestCase):
     def test_change_project_name_is_allowed(self):
         change_view_url = reverse("admin:lab_project_change", args=[self.project.id])
         response = self.client.post(
-            change_view_url, data={"name": "some other project name"}
+            change_view_url,
+            data={
+                "name": "some other project name",
+                "participation_set-TOTAL_FORMS": "5",
+                "participation_set-INITIAL_FORMS": "0",
+            },
         )
         assert response.status_code == 302
         self.project.refresh_from_db()
@@ -149,6 +204,25 @@ class TestProjectAdminViewAsProjectLeader(TestCase):
         response = self.client.get(reverse("admin:lab_project_changelist"))
         assert response.status_code == 200
         assert "unviewable" not in response.content.decode()
+
+    def test_add_participations_is_allowed(self):
+        member = get_user_model().objects.create_user(
+            email="member@test.com", password="password"
+        )
+        self.project.members.add(self.project_leader)
+        change_view_url = reverse("admin:lab_project_change", args=[self.project.id])
+        response = self.client.post(
+            change_view_url,
+            data=get_add_participation_post_data(
+                project=self.project,
+                new_member=member,
+                leader_participation=self.project.participation_set.first(),
+            ),
+        )
+        assert response.status_code == 302
+        self.project.refresh_from_db()
+        assert self.project.members.count() == 2
+        assert self.project.members.last().id == member.id
 
 
 class TestProjectAdminViewAsProjectMember(TestCase):
@@ -177,7 +251,7 @@ class TestProjectAdminViewAsProjectMember(TestCase):
             Project.objects.create(name="project bar", leader=self.admin_user),
         ]
         for project in self.projects_with_member:
-            project.members.add(self.project_member)
+            Participation.objects.create(user=self.project_member, project=project)
         self.client.force_login(self.project_member)
 
     def test_add_project_form_has_no_leader_dropdown(self):
@@ -191,7 +265,11 @@ class TestProjectAdminViewAsProjectMember(TestCase):
     def test_add_project_sets_user_as_leader(self):
         response = self.client.post(
             self.add_view_url,
-            data={"name": "some project name"},
+            data={
+                "name": "some project name",
+                "participation_set-TOTAL_FORMS": "5",
+                "participation_set-INITIAL_FORMS": "0",
+            },
         )
         assert response.status_code == 302
         projects_as_leader_qs = Project.objects.filter(leader=self.project_member)
@@ -202,7 +280,11 @@ class TestProjectAdminViewAsProjectMember(TestCase):
     def test_add_project_adds_user_as_member(self):
         response = self.client.post(
             self.add_view_url,
-            data={"name": "some project name"},
+            data={
+                "name": "some project name",
+                "participation_set-TOTAL_FORMS": "5",
+                "participation_set-INITIAL_FORMS": "0",
+            },
         )
         assert response.status_code == 302
         project = Project.objects.get(name="some project name")
@@ -214,3 +296,35 @@ class TestProjectAdminViewAsProjectMember(TestCase):
         assert response.status_code == 200
         assert "project foo" in response.content.decode()
         assert "project bar" in response.content.decode()
+
+    def test_can_view_project(self):
+        response = self.client.get(
+            reverse("admin:lab_project_change", args=[self.projects_with_member[0].id])
+        )
+        assert response.status_code == 200
+        assert (
+            "<label>Project name\xc2\xa0:</label>\n \n "
+            '<div class="readonly">{}</div>'.format(self.projects_with_member[0].name)
+        )
+
+    def test_add_participations_is_ignored(self):
+        project = Project.objects.create(
+            name="some project name", leader=self.admin_user
+        )
+        project.members.add(self.project_member)
+        member = get_user_model().objects.create_user(
+            email="member@test.com", password="password"
+        )
+        change_view_url = reverse("admin:lab_project_change", args=[project.id])
+        response = self.client.post(
+            change_view_url,
+            data=get_add_participation_post_data(
+                project=project,
+                new_member=member,
+                leader_participation=project.participation_set.first(),
+            ),
+        )
+        assert response.status_code == 302
+        project = Project.objects.get(name="some project name")
+        assert project.members.count() == 1
+        assert project.members.all()[0].id == self.project_member.id

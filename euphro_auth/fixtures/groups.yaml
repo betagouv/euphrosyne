@@ -84,3 +84,6 @@
     - - view_run
       - lab
       - run
+    - - add_userinvitation
+      - euphro_auth
+      - userinvitation

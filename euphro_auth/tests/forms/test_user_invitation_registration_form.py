@@ -80,4 +80,4 @@ class TestUserInvitationRegistrationForm(SimpleTestCase):
         with patch.object(QuerySet, "exists", return_value=False):
             form.is_valid()
         form.save(commit=False)
-        self.assertTrue(user.invitation_completed)
+        self.assertIsNotNone(user.invitation_completed_at)

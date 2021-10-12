@@ -4,9 +4,10 @@ from django.contrib.auth.forms import SetPasswordForm as DjangoSetPasswordForm
 from django.contrib.auth.forms import UserChangeForm as DjangoUserChangeForm
 from django.contrib.auth.forms import UserCreationForm as DjangoUserCreationForm
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from .models import User, UserInvitation
+from .models import User
 
 
 class UserCreationForm(DjangoUserCreationForm):
@@ -50,38 +51,5 @@ class UserInvitationRegistrationForm(DjangoSetPasswordForm):
         self.user.email = self.cleaned_data["email"]
         self.user.first_name = self.cleaned_data["first_name"]
         self.user.last_name = self.cleaned_data["last_name"]
-        self.user.invitation_completed = True
+        self.user.invitation_completed_at = timezone.now()
         return super().save(commit=commit)
-
-
-class UserSendInvitationForm(forms.ModelForm):
-
-    email = forms.EmailField(
-        label=_("Email"),
-        max_length=254,
-        widget=forms.EmailInput(attrs={"autocomplete": "email"}),
-    )
-
-    class Meta:
-        fields = ("email",)
-        model = UserInvitation
-
-    def clean_email(self):
-        email: str = self.cleaned_data["email"]
-        if User.objects.filter(email=email).exists():
-            raise ValidationError(
-                _("This user has already been invited."), code="email-unique"
-            )
-        return email
-
-    def save(
-        self,
-        commit=True,
-    ):
-        email = self.cleaned_data["email"]
-        user = User(email=email)
-        if commit:
-            user.save()
-        self.instance.user = user
-        super().save(commit=commit)
-        return self.instance

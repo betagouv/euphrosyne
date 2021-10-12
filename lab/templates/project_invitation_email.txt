@@ -1,0 +1,12 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans %}You've been invited to join {{ project_name }} on Euphrosyne.{% endblocktrans %}
+
+{% trans "You can check the invitation there:" %}
+{% block reset_link %}
+{{site_url}}{% url 'admin:lab_project_change' project_id %}
+{% endblock %}
+
+
+{% blocktrans %}The Euphrosyne team{% endblocktrans %}
+
+{% endautoescape %}

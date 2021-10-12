@@ -4,12 +4,13 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.models import Group
 from django.contrib.auth.tokens import default_token_generator
+from django.forms.models import ModelForm
 from django.http.request import HttpRequest
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from .emails import send_invitation_email
-from .forms import UserChangeForm, UserCreationForm, UserSendInvitationForm
+from .forms import UserChangeForm, UserCreationForm
 from .models import User, UserGroups, UserInvitation
 
 
@@ -82,26 +83,25 @@ class UserAdmin(DjangoUserAdmin):
 
 
 class UserInvitationAdmin(admin.ModelAdmin):
-    form = UserSendInvitationForm
-    add_form_template = "invitation_add_form.html"
-    list_display = ["user", "created"]
-    actions = ["view", "add"]
+    list_display = ("email", "invitation_completed_at")
+    fields = ("email",)
+    actions = ("view", "add")
 
     def save_model(
         self,
         request: HttpRequest,
         obj: UserInvitation,
-        form: UserSendInvitationForm,
+        form: ModelForm,
         change: bool,
     ) -> None:
-        if obj.user and not obj.user.id:
-            user: User = obj.user
-            user.is_staff = True
-            user.save()
-            user.groups.add(Group.objects.get(name=UserGroups.PARTICIPANT.value))
+        if not change:
+            obj.is_staff = True
+            obj.save()
+            obj.groups.add(Group.objects.get(name=UserGroups.PARTICIPANT.value))
 
-            token = default_token_generator.make_token(user)
-            send_invitation_email(email=user.email, user_id=user.pk, token=token)
+            token = default_token_generator.make_token(obj)
+            send_invitation_email(email=obj.email, user_id=obj.pk, token=token)
+            return obj
         return super().save_model(request, obj, form, change)
 
     def has_change_permission(
