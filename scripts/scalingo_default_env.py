@@ -19,7 +19,7 @@ def get_random_secret():
 
 
 def get_site_url():
-    return f"https://euphrosyne-child-${os.environ['PR_NUMBER']}.osc-fr1.scalingo.io"
+    return f"https://euphrosyne-child-{os.environ['PR_NUMBER']}.osc-fr1.scalingo.io"
 
 
 def build_default_value(description):
