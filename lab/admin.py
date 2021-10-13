@@ -13,7 +13,7 @@ from .models import Participation, Project, Run
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Run)
 class RunAdmin(admin.ModelAdmin):
-    list_display = ["label", "date", "project"]
+    list_display = ("label", "date", "project")
 
     def has_view_permission(self, request: HttpRequest, obj: Optional[Run] = None):
         """Allow list view but only allow detail to leader or admin"""
@@ -77,7 +77,7 @@ class RunAdmin(admin.ModelAdmin):
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ["name", "leader"]
+    list_display = ("name", "leader")
     readonly_fields = ("members",)
 
     def has_view_permission(self, request: HttpRequest, obj: Optional[Project] = None):
@@ -144,8 +144,8 @@ class ProjectAdmin(admin.ModelAdmin):
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:<custom (obj.user)>
 @admin.register(Participation)
 class ParticipationAdmin(admin.ModelAdmin):
-    list_display = ["project", "user"]
-    readonly_fields = ["project", "user"]
+    list_display = ("project", "user")
+    readonly_fields = ("project", "user")
 
     def has_view_permission(
         self, request: HttpRequest, obj: Optional[Participation] = None

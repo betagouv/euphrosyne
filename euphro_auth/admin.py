@@ -5,6 +5,7 @@ from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.models import Group
 from django.contrib.auth.tokens import default_token_generator
 from django.http.request import HttpRequest
+from django.utils.translation import gettext_lazy as _
 
 from .emails import send_invitation_email
 from .forms import UserChangeForm, UserCreationForm, UserSendInvitationForm
@@ -28,7 +29,7 @@ class UserAdmin(DjangoUserAdmin):
     )
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("ID", {"fields": ("first_name", "last_name")}),
+        (_("Profile"), {"fields": ("first_name", "last_name")}),
         ("Permissions", {"fields": ("is_staff", "is_active", "groups")}),
     )
     add_fieldsets = (
@@ -48,7 +49,6 @@ class UserAdmin(DjangoUserAdmin):
     )
 
     def has_delete_permission(self, request, obj=None):
-        # Disable delete
         return False
 
 
