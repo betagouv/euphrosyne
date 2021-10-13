@@ -9,6 +9,7 @@ from .lib import is_project_admin
 from .models import Participation, Project, Run
 
 
+# Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Run)
 class RunAdmin(admin.ModelAdmin):
     list_display = ["label", "date", "project"]
@@ -16,25 +17,26 @@ class RunAdmin(admin.ModelAdmin):
     def has_view_permission(self, request: HttpRequest, obj: Optional[Run] = None):
         """Allow list view but only allow detail to leader or admin"""
         return (
-            not obj
+            is_project_admin(request.user)
+            or not obj
             or obj.project.leader_id == request.user.id
-            or is_project_admin(request.user)
+            or obj.project.members.filter(id=request.user.id).exists()
         ) and super().has_view_permission(request, obj)
 
     def has_change_permission(self, request: HttpRequest, obj: Optional[Run] = None):
         """Allow change in general but only allow specific edition to leader or admin"""
         return (
-            not obj
+            is_project_admin(request.user)
+            or not obj
             or obj.project.leader_id == request.user.id
-            or is_project_admin(request.user)
         ) and super().has_change_permission(request, obj)
 
     def has_delete_permission(self, request: HttpRequest, obj: Optional[Run] = None):
         """Allow deletion in general but only allow specific del to leader or admin"""
         return (
-            not obj
+            is_project_admin(request.user)
+            or not obj
             or obj.project.leader_id == request.user.id
-            or is_project_admin(request.user)
         ) and super().has_delete_permission(request, obj)
 
     # This one seems redundant with `get_readonly_fields` according to the
@@ -56,7 +58,9 @@ class RunAdmin(admin.ModelAdmin):
         runs_queryset = super().get_queryset(request)
         if is_project_admin(request.user):
             return runs_queryset
-        return runs_queryset.filter(project__leader=request.user)
+        return runs_queryset.filter(
+            Q(project__leader=request.user) | Q(project__members__id=request.user.id)
+        )
 
     def formfield_for_foreignkey(self, db_field, request: HttpRequest, **kwargs):
         if not is_project_admin(request.user):
@@ -66,6 +70,7 @@ class RunAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
+# Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
     list_display = ["name", "leader"]
@@ -73,27 +78,28 @@ class ProjectAdmin(admin.ModelAdmin):
 
     def has_view_permission(self, request: HttpRequest, obj: Optional[Project] = None):
         return (
-            not obj
+            is_project_admin(request.user)
+            or not obj
             or obj.leader_id == request.user.id
-            or is_project_admin(request.user)
+            or obj.members.filter(id=request.user.id).exists()
         ) and super().has_view_permission(request, obj)
 
     def has_change_permission(
         self, request: HttpRequest, obj: Optional[Project] = None
     ):
         return (
-            not obj
+            is_project_admin(request.user)
+            or not obj
             or obj.leader_id == request.user.id
-            or is_project_admin(request.user)
         ) and super().has_change_permission(request, obj)
 
     def has_delete_permission(
         self, request: HttpRequest, obj: Optional[Project] = None
     ):
         return (
-            not obj
+            is_project_admin(request.user)
+            or not obj
             or obj.leader_id == request.user.id
-            or is_project_admin(request.user)
         ) and super().has_delete_permission(request, obj)
 
     def get_exclude(self, request: HttpRequest, obj: Optional[Project] = None):
@@ -113,7 +119,9 @@ class ProjectAdmin(admin.ModelAdmin):
         projects_qs = super().get_queryset(request)
         if is_project_admin(request.user):
             return projects_qs
-        return projects_qs.filter(leader=request.user)
+        return projects_qs.filter(
+            Q(leader=request.user) | Q(members__id=request.user.id)
+        )
 
     def formfield_for_foreignkey(self, db_field, request: HttpRequest, **kwargs):
         if not is_project_admin(request.user):
@@ -134,6 +142,7 @@ class ProjectAdmin(admin.ModelAdmin):
 
 
 # [XXX] Add Tests
+# Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:<custom (obj.user)>
 @admin.register(Participation)
 class ParticipationAdmin(admin.ModelAdmin):
     list_display = ["project", "user"]
@@ -143,27 +152,30 @@ class ParticipationAdmin(admin.ModelAdmin):
         self, request: HttpRequest, obj: Optional[Participation] = None
     ):
         return (
-            not obj
+            is_project_admin(request.user)
+            or not obj
             or obj.project.leader_id == request.user.id
-            or is_project_admin(request.user)
+            or obj.user == request.user
         ) and super().has_view_permission(request, obj)
 
     def has_change_permission(
         self, request: HttpRequest, obj: Optional[Participation] = None
     ):
         return (
-            not obj
+            is_project_admin(request.user)
+            or not obj
             or obj.project.leader_id == request.user.id
-            or is_project_admin(request.user)
+            or obj.user == request.user
         ) and super().has_change_permission(request, obj)
 
     def has_delete_permission(
         self, request: HttpRequest, obj: Optional[Participation] = None
     ):
         return (
-            not obj
+            is_project_admin(request.user)
+            or not obj
             or obj.project.leader_id == request.user.id
-            or is_project_admin(request.user)
+            or obj.user == request.user
         ) and super().has_delete_permission(request, obj)
 
     def get_queryset(self, request: HttpRequest):
