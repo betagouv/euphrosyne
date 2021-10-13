@@ -2,6 +2,7 @@ from typing import Optional, Union
 
 from django.contrib import admin
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 
 from .forms import ProjectForm, ProjectFormForNonAdmins
@@ -62,12 +63,15 @@ class RunAdmin(admin.ModelAdmin):
             Q(project__leader=request.user) | Q(project__members__id=request.user.id)
         )
 
-    def formfield_for_foreignkey(self, db_field, request: HttpRequest, **kwargs):
-        if not is_project_admin(request.user):
-            if db_field.name == "project":
-                kwargs["queryset"] = Project.objects.filter(leader=request.user)
+    def formfield_for_foreignkey(  # pylint: disable=arguments-differ
+        self, db_field, request: HttpRequest, queryset: QuerySet[Run] = None, **kwargs
+    ):
+        if not is_project_admin(request.user) and db_field.name == "project":
+            queryset = Project.objects.filter(leader=request.user)
 
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+        return super().formfield_for_foreignkey(
+            db_field, request, queryset=queryset, **kwargs
+        )
 
 
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
@@ -122,11 +126,6 @@ class ProjectAdmin(admin.ModelAdmin):
         return projects_qs.filter(
             Q(leader=request.user) | Q(members__id=request.user.id)
         )
-
-    def formfield_for_foreignkey(self, db_field, request: HttpRequest, **kwargs):
-        if not is_project_admin(request.user):
-            kwargs["queryset"] = Project.objects.filter(leader=request.user)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def save_model(
         self,
@@ -190,9 +189,16 @@ class ParticipationAdmin(admin.ModelAdmin):
             Q(project__leader=request.user) | Q(user=request.user)
         )
 
-    def formfield_for_foreignkey(self, db_field, request: HttpRequest, **kwargs):
-        if not is_project_admin(request.user):
-            if db_field.name == "project":
-                kwargs["queryset"] = Project.objects.filter(leader=request.user)
+    def formfield_for_foreignkey(  # pylint: disable=arguments-differ
+        self,
+        db_field,
+        request: HttpRequest,
+        queryset: QuerySet[Participation] = None,
+        **kwargs
+    ):
+        if not is_project_admin(request.user) and db_field.name == "project":
+            queryset = Project.objects.filter(leader=request.user)
 
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+        return super().formfield_for_foreignkey(
+            db_field, request, queryset=queryset, **kwargs
+        )

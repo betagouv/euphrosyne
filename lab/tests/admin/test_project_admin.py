@@ -132,6 +132,12 @@ class TestProjectAdminViewAsProjectLeader(TestCase):
         self.project.refresh_from_db()
         assert self.project.name == "some other project name"
 
+    def test_cannot_view_other_projects(self):
+        Project.objects.create(name="unviewable", leader=self.admin_user)
+        response = self.client.get(reverse("admin:lab_project_changelist"))
+        assert response.status_code == 200
+        assert "unviewable" not in response.content.decode()
+
 
 class TestProjectAdminViewAsProjectMember(TestCase):
 
