@@ -203,10 +203,14 @@ jobs:
       - name: Install GNU gettext
         run: sudo apt install gettext
 
-      - name: Collect static files
-        run: python manage.py collectstatic --clear --noinput
+      - name: Check makemessages translations are already there
+        run: |
+          ./manage.py makemessages --all
+          git diff -I'^"PO' --exit-code  # exit 1 if any change apart from headers
       - name: Compile gettext messages
         run: python manage.py compilemessages
+      - name: Collect static files
+        run: python manage.py collectstatic --clear --noinput
       - name: Build requirements
         run: pipenv lock --requirements > requirements.txt
       - name: Build archive
