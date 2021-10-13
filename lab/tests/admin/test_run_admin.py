@@ -9,7 +9,6 @@ from euphro_auth.models import UserGroups
 from ...models import Project, Run
 
 
-# [XXX] Try to only test the has_x_permission methods
 class TestRunAdminViewAsLeader(TestCase):
     fixtures = ["groups"]
 
@@ -35,7 +34,6 @@ class TestRunAdminViewAsLeader(TestCase):
         )
         self.client.force_login(self.project_leader_user)
 
-    # [XXX] Should only be needed to test has_add_permission:
     def test_add_run_is_allowed(self):
         response = self.client.post(
             reverse("admin:lab_run_add"),
@@ -49,7 +47,6 @@ class TestRunAdminViewAsLeader(TestCase):
         assert response.status_code == 302
         assert Run.objects.all().count() == 1
 
-    # [XXX] We should only test `formfield_for_foreignkey`
     def test_add_run_of_non_lead_project_not_allowed(self):
         "Test add Run of non-lead Project not allowed via formfield_for_foreignkey"
         response = self.client.post(
@@ -112,7 +109,6 @@ class TestRunAdminViewAsAdmin(TestCase):
         )
         self.client.force_login(self.admin_user)
 
-    # [XXX] Maybe delete in favor of just testing the has_change_permission:
     def test_change_project_of_run_is_ignored(self):
         "Test change run project is ignored thanks to excluding project field"
         response = self.client.post(
