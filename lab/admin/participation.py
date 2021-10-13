@@ -9,7 +9,6 @@ from ..lib import is_lab_admin
 from ..models import Participation, Project
 
 
-# [XXX] Add Tests
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:<custom (obj.user)>
 @admin.register(Participation)
 class ParticipationAdmin(admin.ModelAdmin):

@@ -82,6 +82,18 @@ class TestProjectAdminViewAsAdminUser(TestCase):
         assert project.name == "some other project name"
         assert project.leader_id == self.project_participant_user.id
 
+    def test_can_view_all_projects(self):
+        Project.objects.create(
+            name="other project 1", leader=self.project_participant_user
+        )
+        Project.objects.create(
+            name="other project 2", leader=self.project_participant_user
+        )
+        response = self.client.get(reverse("admin:lab_project_changelist"))
+        assert response.status_code == 200
+        assert "other project 1" in response.content.decode()
+        assert "other project 2" in response.content.decode()
+
 
 class TestProjectAdminViewAsProjectLeader(TestCase):
 
