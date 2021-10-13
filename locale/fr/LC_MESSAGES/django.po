@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-24 12:04+0200\n"
+"POT-Creation-Date: 2021-10-13 16:47+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -12,31 +12,65 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: euphro_auth/managers.py:10
+#: euphro_auth/emails.py:21
+msgid "[Euphrosyne] Invitation to register"
+msgstr "[Euphrosyne] Invitation à s'inscrire"
+
+#: euphro_auth/forms.py:26 euphro_auth/forms.py:60
+#: euphro_auth/templates/euphro_invitation_registration_form.html:23
+msgid "Email"
+msgstr "Email"
+
+#: euphro_auth/forms.py:32
+#: euphro_auth/templates/euphro_invitation_registration_form.html:28
+#, fuzzy
+#| msgid "first name"
+msgid "First name"
+msgstr "prénom"
+
+#: euphro_auth/forms.py:38
+#: euphro_auth/templates/euphro_invitation_registration_form.html:33
+#, fuzzy
+#| msgid "last name"
+msgid "Last name"
+msgstr "nom"
+
+#: euphro_auth/forms.py:46
+msgid "An account with this email already exists."
+msgstr "Un compte avec cet email existe déjà"
+
+#: euphro_auth/forms.py:73
+msgid "This user has already been invited."
+msgstr "Cet utilisateur a déjà été invité"
+
+#: euphro_auth/managers.py:18
 msgid "The Email must be set"
 msgstr "L'email doit être défini"
 
-#: euphro_auth/managers.py:23
+#: euphro_auth/managers.py:31
 msgid "Superuser must have is_staff=True."
 msgstr "Le superutilisateur doit avoir is_staff=True"
 
-#: euphro_auth/managers.py:25
+#: euphro_auth/managers.py:33
 msgid "Superuser must have is_superuser=True."
 msgstr "Le superutilisateur doit avoir is_superuser=True"
 
-#: euphro_auth/models.py:14
+#: euphro_auth/models.py:23
 msgid "email address"
 msgstr "adresse email"
 
-#: euphro_auth/models.py:15
+#: euphro_auth/models.py:24
 msgid "first name"
 msgstr "prénom"
 
-#: euphro_auth/models.py:16
+#: euphro_auth/models.py:25
 msgid "last name"
 msgstr "nom"
 
-#: euphro_auth/templates/admin/auth/user/add_form.html:6
+#: euphro_auth/models.py:27
+msgid "invitation completed"
+msgstr "invitation complétée"
+
 #: euphro_auth/templates/euphro_add_form.html:6
 msgid ""
 "First, enter an email and password. Then, you'll be able to edit more user "
@@ -45,63 +79,99 @@ msgstr ""
 "Tout d'abord, entrez un email et un mot de passe. Suite à quoi vous pourrez "
 "modifier plus d'options de l'utilisateur."
 
-#: euphro_auth/templates/admin/auth/user/add_form.html:8
 #: euphro_auth/templates/euphro_add_form.html:8
 msgid "Enter an email and password."
 msgstr "Entrez un email et un mot de passe"
 
-#: lab/models.py:7
+#: euphro_auth/templates/euphro_invitation_registration_form.html:8
+msgid "Home"
+msgstr "Accueil"
+
+#: euphro_auth/templates/euphro_invitation_registration_form.html:9
+msgid "Account registration"
+msgstr "Inscription"
+
+#: euphro_auth/templates/euphro_invitation_registration_form.html:17
+#, fuzzy
+#| msgid "Enter an email and password."
+msgid "You can change your email and choose a password."
+msgstr "Entrez un email et un mot de passe"
+
+#: euphro_auth/templates/euphro_invitation_registration_form.html:39
+msgid "Password"
+msgstr "Mot de passe"
+
+#: euphro_auth/templates/euphro_invitation_registration_form.html:44
+msgid "Confirm password"
+msgstr "Confirmez le mot de passe"
+
+#: euphro_auth/templates/euphro_invitation_registration_form.html:49
+msgid "Save my information"
+msgstr "Sauvegarder mes informations"
+
+#: euphro_auth/templates/euphro_invitation_registration_form.html:55
+msgid ""
+"The registration link was invalid, possibly because it has already been used."
+msgstr ""
+"Le lien d'inscription est invalide, probablement car il a déjà été utilisé."
+
+#: euphro_auth/templates/invitation_add_form.html:7
+msgid "Invite user"
+msgstr "Inviter un utilisateur"
+
+#: euphro_auth/templates/invitation_email.html:3
+msgid "Hello,"
+msgstr "Bonjour,"
+
+#: euphro_auth/templates/invitation_email.html:6
+#: euphro_auth/templates/invitation_email.txt:2
+msgid "You've been invited to register at Euphrosyne."
+msgstr "Vous avez été invité(e) à vous inscrire sur Euphrosyne"
+
+#: euphro_auth/templates/invitation_email.html:7
+#: euphro_auth/templates/invitation_email.txt:4
+msgid "Please go to the following page and create your account:"
+msgstr "Merci d'aller à la page suivante pour créer votre compte:"
+
+#: euphro_auth/templates/invitation_email.html:12
+msgid "Create account"
+msgstr "Créer un compte"
+
+#: euphro_auth/templates/invitation_email.html:18
+#: euphro_auth/templates/invitation_email.txt:10
+msgid "The Euphrosyne team"
+msgstr "L'équipe Euphrosyne"
+
+#: euphro_auth/views.py:11
+msgid "Enter your information"
+msgstr "Entrez vos informations"
+
+#: lab/models.py:9
+msgid "Run label"
+msgstr "Nom du Run"
+
+#: lab/models.py:11
+msgid "Run date"
+msgstr "Date du Run"
+
+#: lab/models.py:23
+#, fuzzy
+#| msgid "first name"
+msgid "Project name"
+msgstr "prénom"
+
+#: shared/models.py:7
 msgid "Created"
 msgstr "Créé"
 
-#: lab/models.py:9
+#: shared/models.py:9
 msgid "Date this entry was first created"
 msgstr "Date de création de cette entrée"
 
-#: lab/models.py:12
+#: shared/models.py:12
 msgid "Modified"
 msgstr "Modifié"
 
-#: lab/models.py:14
+#: shared/models.py:14
 msgid "Date this entry was most recently changed."
 msgstr "Date de la dernière modification de cette entrée"
-
-#: lab/models.py:20
-msgid "Open"
-msgstr "Ouvert"
-
-#: lab/models.py:21
-msgid "Closed"
-msgstr "Fermé"
-
-#: lab/models.py:24
-msgid "Status"
-msgstr "Statut"
-
-#: lab/models.py:29
-msgid "Experiment name"
-msgstr "Nom de l'expérience"
-
-#: lab/models.py:32
-msgid "Experiment date"
-msgstr "Date de l'expérience"
-
-#: lab/models.py:34
-msgid "Date of the experiment."
-msgstr "Date de l'expérience"
-
-#: lab/models.py:41
-msgid "Proton"
-msgstr "Proton"
-
-#: lab/models.py:42
-msgid "Alpha particle"
-msgstr "Particule alpha"
-
-#: lab/models.py:43
-msgid "Deuton"
-msgstr "Deuton"
-
-#: lab/models.py:46
-msgid "Particle type"
-msgstr "Type de particule"
