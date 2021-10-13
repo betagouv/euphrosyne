@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-24 12:04+0200\n"
+"POT-Creation-Date: 2021-10-18 20:21+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -12,32 +12,52 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: euphro_auth/managers.py:10
+msgid "Profile"
+msgstr "Profil"
+
+msgid "[Euphrosyne] Invitation to register"
+msgstr "[Euphrosyne] Invitation à s'inscrire"
+
+msgid "Email"
+msgstr "Email"
+
+#, fuzzy
+#| msgid "first name"
+msgid "First name"
+msgstr "prénom"
+
+#, fuzzy
+#| msgid "last name"
+msgid "Last name"
+msgstr "nom"
+
+msgid "An account with this email already exists."
+msgstr "Un compte avec cet email existe déjà"
+
+msgid "This user has already been invited."
+msgstr "Cet utilisateur a déjà été invité"
+
 msgid "The Email must be set"
 msgstr "L'email doit être défini"
 
-#: euphro_auth/managers.py:23
 msgid "Superuser must have is_staff=True."
 msgstr "Le superutilisateur doit avoir is_staff=True"
 
-#: euphro_auth/managers.py:25
 msgid "Superuser must have is_superuser=True."
 msgstr "Le superutilisateur doit avoir is_superuser=True"
 
-#: euphro_auth/models.py:14
 msgid "email address"
 msgstr "adresse email"
 
-#: euphro_auth/models.py:15
 msgid "first name"
 msgstr "prénom"
 
-#: euphro_auth/models.py:16
 msgid "last name"
 msgstr "nom"
 
-#: euphro_auth/templates/admin/auth/user/add_form.html:6
-#: euphro_auth/templates/euphro_add_form.html:6
+msgid "invitation completed"
+msgstr "invitation complétée"
+
 msgid ""
 "First, enter an email and password. Then, you'll be able to edit more user "
 "options."
@@ -45,63 +65,86 @@ msgstr ""
 "Tout d'abord, entrez un email et un mot de passe. Suite à quoi vous pourrez "
 "modifier plus d'options de l'utilisateur."
 
-#: euphro_auth/templates/admin/auth/user/add_form.html:8
-#: euphro_auth/templates/euphro_add_form.html:8
 msgid "Enter an email and password."
 msgstr "Entrez un email et un mot de passe"
 
-#: lab/models.py:7
+#, fuzzy
+#| msgid "Enter an email and password."
+msgid ""
+"You can change your email, fill up your information and choose a password."
+msgstr "Entrez un email et un mot de passe"
+
+msgid "Password"
+msgstr "Mot de passe"
+
+msgid "Confirm password"
+msgstr "Confirmez le mot de passe"
+
+msgid "Save my information"
+msgstr "Sauvegarder mes informations"
+
+msgid "Connect your ORCID ID"
+msgstr "Connectez votre identifiant ORCID"
+
+msgid ""
+"The registration link was invalid, possibly because it has already been used."
+msgstr ""
+"Le lien d'inscription est invalide, probablement car il a déjà été utilisé."
+
+msgid "Invite user"
+msgstr "Inviter un utilisateur"
+
+msgid "Hello,"
+msgstr "Bonjour,"
+
+msgid "You've been invited to register at Euphrosyne."
+msgstr "Vous avez été invité(e) à vous inscrire sur Euphrosyne"
+
+msgid "Please go to the following page and create your account:"
+msgstr "Merci d'aller à la page suivante pour créer votre compte:"
+
+msgid "Create account"
+msgstr "Créer un compte"
+
+msgid "The Euphrosyne team"
+msgstr "L'équipe Euphrosyne"
+
+msgid "Enter your information"
+msgstr "Entrez vos informations"
+
+msgid "Log in with ORCID"
+msgstr "Connectez-vous avez ORCID"
+
+msgid "Run label"
+msgstr "Nom du Run"
+
+msgid "Run date"
+msgstr "Date du Run"
+
+#, fuzzy
+#| msgid "first name"
+msgid "Project name"
+msgstr "prénom"
+
+msgid "Home"
+msgstr "Accueil"
+
+msgid "Account registration"
+msgstr "Création de compte"
+
+#, fuzzy
+#| msgid "Enter your information"
+msgid "Verify your information."
+msgstr "Entrez vos informations"
+
 msgid "Created"
 msgstr "Créé"
 
-#: lab/models.py:9
 msgid "Date this entry was first created"
 msgstr "Date de création de cette entrée"
 
-#: lab/models.py:12
 msgid "Modified"
 msgstr "Modifié"
 
-#: lab/models.py:14
 msgid "Date this entry was most recently changed."
 msgstr "Date de la dernière modification de cette entrée"
-
-#: lab/models.py:20
-msgid "Open"
-msgstr "Ouvert"
-
-#: lab/models.py:21
-msgid "Closed"
-msgstr "Fermé"
-
-#: lab/models.py:24
-msgid "Status"
-msgstr "Statut"
-
-#: lab/models.py:29
-msgid "Experiment name"
-msgstr "Nom de l'expérience"
-
-#: lab/models.py:32
-msgid "Experiment date"
-msgstr "Date de l'expérience"
-
-#: lab/models.py:34
-msgid "Date of the experiment."
-msgstr "Date de l'expérience"
-
-#: lab/models.py:41
-msgid "Proton"
-msgstr "Proton"
-
-#: lab/models.py:42
-msgid "Alpha particle"
-msgstr "Particule alpha"
-
-#: lab/models.py:43
-msgid "Deuton"
-msgstr "Deuton"
-
-#: lab/models.py:46
-msgid "Particle type"
-msgstr "Type de particule"
