@@ -88,7 +88,7 @@ jobs:
       - name: Install requirements
         run: pip install --user -r ci-requirements/ci-requirements.txt
 
-  lint:
+  lint-and-checks:
     runs-on: ubuntu-18.04
     needs: install-requirements
     steps:
@@ -121,11 +121,31 @@ jobs:
       - name: Install requirements
         run: pip install --user -r ci-requirements/ci-requirements.txt
       # -- endblock install --
+      
+      - name: Install GNU gettext
+        run: sudo apt install gettext
 
-      - name: Pylint
+      - name: Pylint check
         run: python -m pylint $(find . -type f -path '*.py' -not -path '*/migrations*')
-      - name: Black
+      - name: Black check
         run: python -m black --check .
+      - name: Isort check
+        run: python -m isort --check .
+      - name: Flake8 check with mccabe complexity 10
+        run: python -m flake8 --max-complexity 10 .
+
+      - name: Check no migration is missing
+        run: ./manage.py makemigrations --check --dry-run
+      - name: Check no makemessages translation is missing
+        run: |
+          ./manage.py makemessages --all --verbosity 0 --no-location --no-obsolete
+          git diff -I'^"PO' --exit-code locale/*/LC_MESSAGES/django.po  # Fail if any change apart from headers.
+          git checkout -- locale/*/LC_MESSAGES/django.po
+      - name: Check no translation is empty
+        run: |
+          # Inspired from https://blog.erw.dk/2015/06/06/checks-for-your-django-project/
+          missing_translations=$(sed '$a\\' locale/*/LC_MESSAGES/django.po | tac | sed '/^$/N;/\nmsgstr ""$/,/^msgid/!d' | tac)
+          [ $(wc -l <(echo $missing_translations) | cut -d ' ' -f1) = '1' ]
 
   test:
     runs-on: ubuntu-18.04
@@ -203,10 +223,10 @@ jobs:
       - name: Install GNU gettext
         run: sudo apt install gettext
 
-      - name: Collect static files
-        run: python manage.py collectstatic --clear --noinput
       - name: Compile gettext messages
         run: python manage.py compilemessages
+      - name: Collect static files
+        run: python manage.py collectstatic --clear --noinput
       - name: Build requirements
         run: pipenv lock --requirements > requirements.txt
       - name: Build archive
@@ -221,7 +241,7 @@ jobs:
   
   deploy-pr:
     needs:
-      - lint
+      - lint-and-checks
       - test
       - build
     if: github.event_name == 'pull_request'
@@ -362,7 +382,7 @@ jobs:
 
   deploy-staging:
     needs:
-      - lint
+      - lint-and-checks
       - test
       - build
     if: github.ref == 'refs/heads/main'

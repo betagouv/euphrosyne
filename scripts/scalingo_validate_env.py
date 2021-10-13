@@ -5,8 +5,6 @@ Check that an env is filled enough according to the scalingo.json file
 """
 
 import json
-import random
-import string
 import sys
 from pathlib import Path
 
