@@ -198,3 +198,34 @@ DEFAULT_FROM_EMAIL = os.environ["DEFAULT_FROM_EMAIL"]
 
 # Necessary for the correct behavior of password reset flow:
 LOGIN_URL = "/admin/login/"
+
+# Logging
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "null": {"level": "DEBUG", "class": "logging.NullHandler"},
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["null"],
+            "propagate": True,
+        },
+        "": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+        },
+    },
+}
