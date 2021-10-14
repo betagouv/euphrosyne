@@ -1,4 +1,4 @@
 python manage.py loaddata euphro_auth/fixtures/groups.yaml
 python manage.py migrate
-python manage.py createsuperuser --email alexandre.hajjar@beta.gouv.fr --noinput || true
-python manage.py createsuperuser --email witold.wroblewski@beta.gouv.fr --noinput || true
+ DJANGO_SUPERUSER_PASSWORD=$(openssl rand -base64 64) python manage.py createsuperuser --email alexandre.hajjar@beta.gouv.fr --noinput || true
+ DJANGO_SUPERUSER_PASSWORD=$(openssl rand -base64 64) python manage.py createsuperuser --email witold.wroblewski@beta.gouv.fr --noinput || true
