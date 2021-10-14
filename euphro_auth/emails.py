@@ -25,4 +25,4 @@ def send_invitation_email(email: str, user_id: int, token: str):
     html_email = loader.render_to_string("invitation_email.html", context)
     email_message.attach_alternative(html_email, "text/html")
 
-    email_message.send()
+    return email_message.send()

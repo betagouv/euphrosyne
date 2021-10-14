@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
-from euphro_auth.views import UserTokenRegistrationView
+from euphro_auth.views import SendAnEmailView, UserTokenRegistrationView
 
 urlpatterns = [
     path(
@@ -47,5 +47,10 @@ urlpatterns = [
         "registration/<uidb64>/<token>/",
         UserTokenRegistrationView.as_view(),
         name="registration_token",
+    ),
+    path(
+        "email-test-view/",
+        SendAnEmailView.as_view(),
+        name="email-test-view",
     ),
 ] + ([path("__debug__/", include(debug_toolbar.urls))] if settings.DEBUG else [])
