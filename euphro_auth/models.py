@@ -39,6 +39,18 @@ class User(AbstractUser):
         self.is_active = False
         self.save()
 
+    def in_admin_group(self):
+        return self.groups.filter(name=UserGroups.ADMIN.value).exists()
+
+    in_admin_group.boolean = True
+    in_admin_group.short_description = _("In Admin group")
+
+    def in_participant_group(self):
+        return self.groups.filter(name=UserGroups.PARTICIPANT.value).exists()
+
+    in_participant_group.boolean = True
+    in_participant_group.short_description = _("In Participant group")
+
 
 class UserInvitation(TimestampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
