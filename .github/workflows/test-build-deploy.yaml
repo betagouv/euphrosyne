@@ -17,46 +17,8 @@ env:
   
 
 jobs:
-  build-requirements:
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Cache the python install
-        uses: actions/cache@v2
-        with:
-          path: /opt/hostedtoolcache/Python/3.9.2
-          key: ${{ runner.os }}-python-3.9.2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.9.2'
-
-      - name: Get pip cache dir
-        id: pip-cache
-        run: |
-          echo "::set-output name=dir::$(pip cache dir)"
-      - name: Cache the pip cache for pip and pipenv
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-pipenv
-      - name: Install pipenv 
-        run: |
-          pip install --upgrade pip pipenv
-
-      - name: Build requirements file with all dependencies including dev
-        run: |
-          pipenv lock --dev --requirements > ci-requirements.txt
-      - name: Upload ci-requirements.txt artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: ci-requirements-${{ hashFiles('Pipfile.lock') }}
-          path: ci-requirements.txt
-          retention-days: 1
-
   install-requirements:
     runs-on: ubuntu-18.04
-    needs: build-requirements
     steps:
       - uses: actions/checkout@v2
 
@@ -77,16 +39,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('Pipfile.lock') }}-a
+          key: ${{ runner.os }}-pip-${{ hashFiles('dev-requirements.txt') }}
 
-      - name: Download ci-requirements.txt artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: ci-requirements-${{ hashFiles('Pipfile.lock') }}
-          path: ci-requirements
-
-      - name: Install requirements
-        run: pip install --user -r ci-requirements/ci-requirements.txt
+      - name: Install dev requirements
+        run: pip install --user -r dev-requirements.txt
 
   lint-and-checks:
     runs-on: ubuntu-18.04
@@ -112,14 +68,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('Pipfile.lock') }}-a
-      - name: Download ci-requirements.txt artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: ci-requirements-${{ hashFiles('Pipfile.lock') }}
-          path: ci-requirements
+          key: ${{ runner.os }}-pip-${{ hashFiles('dev-requirements.txt') }}
       - name: Install requirements
-        run: pip install --user -r ci-requirements/ci-requirements.txt
+        run: pip install --user -r dev-requirements.txt
       # -- endblock install --
       
       - name: Install GNU gettext
@@ -171,17 +122,13 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('Pipfile.lock') }}-a
-      - name: Download ci-requirements.txt artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: ci-requirements-${{ hashFiles('Pipfile.lock') }}
-          path: ci-requirements
+          key: ${{ runner.os }}-pip-${{ hashFiles('dev-requirements.txt') }}
       - name: Install requirements
-        run: pip install --user -r ci-requirements/ci-requirements.txt
+        run: pip install --user -r dev-requirements.txt
+      # -- endblock install --
+      
       - name: Collect static files
         run: python manage.py collectstatic --clear --noinput
-      # -- endblock install --
 
       - name: Pytest
         run: python -m pytest .
@@ -210,14 +157,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('Pipfile.lock') }}-a
-      - name: Download ci-requirements.txt artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: ci-requirements-${{ hashFiles('Pipfile.lock') }}
-          path: ci-requirements
+          key: ${{ runner.os }}-pip-${{ hashFiles('dev-requirements.txt') }}
       - name: Install requirements
-        run: pip install --user -r ci-requirements/ci-requirements.txt
+        run: pip install --user -r dev-requirements.txt
       # -- endblock install --
 
       - name: Install GNU gettext
@@ -227,10 +169,8 @@ jobs:
         run: python manage.py compilemessages
       - name: Collect static files
         run: python manage.py collectstatic --clear --noinput
-      - name: Build requirements
-        run: pipenv lock --requirements > requirements.txt
       - name: Build archive
-        run: tar --exclude='./euphrosyne/.git' --exclude="./euprhosyne/Pipfile" --exclude="./euprhosyne/Pipfile.lock" -czf /tmp/euphrosyne-build.tar.gz euphrosyne
+        run: tar --exclude='./euphrosyne/.git' -czf /tmp/euphrosyne-build.tar.gz euphrosyne
         working-directory: ..
       - name: Upload archive artifact
         uses: actions/upload-artifact@v2
