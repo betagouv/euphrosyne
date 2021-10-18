@@ -1,10 +1,11 @@
-from typing import Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.models import Group
 from django.contrib.auth.tokens import default_token_generator
 from django.http.request import HttpRequest
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from .emails import send_invitation_email
@@ -21,16 +22,17 @@ class UserAdmin(DjangoUserAdmin):
         "email",
         "is_staff",
         "is_active",
+        "in_admin_group",
+        "in_participant_group",
     )
-    list_filter = (
-        "email",
-        "is_staff",
-        "is_active",
-    )
+    list_filter = ("email", "is_staff", "is_active")
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         (_("Profile"), {"fields": ("first_name", "last_name")}),
-        ("Permissions", {"fields": ("is_staff", "is_active", "groups")}),
+        (
+            "Permissions",
+            {"fields": ("is_staff", "is_active", "groups")},
+        ),
     )
     add_fieldsets = (
         (
@@ -50,6 +52,33 @@ class UserAdmin(DjangoUserAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.prefetch_related("groups")
+
+    def get_list_display(self, request):
+        if request.user.is_superuser:
+            return self.list_display + ("is_superuser",)
+        return self.list_display
+
+    def get_readonly_fields(self, request: HttpRequest, obj: Optional[User] = None):
+        if request.user.is_superuser:
+            return self.readonly_fields + ("is_superuser",)
+        return self.readonly_fields
+
+    def get_fieldsets(
+        self, request: HttpRequest, obj: Optional[User] = None
+    ) -> List[Tuple[Optional[str], Dict[str, Any]]]:
+        fieldsets = super().get_fieldsets(request, obj)
+        if request.user.is_superuser:
+            return fieldsets + (
+                (
+                    gettext("Superuser"),
+                    {"fields": ("is_superuser",)},
+                ),
+            )
+        return fieldsets
 
 
 class UserInvitationAdmin(admin.ModelAdmin):
