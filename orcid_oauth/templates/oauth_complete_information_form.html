@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+    &rsaquo; {% translate 'Account registration' %}
+</div>
+{% endblock %}
+
+{% block content %}
+
+
+<p>{% translate "Verify your information." %}</p>
+
+<form method="post">{% csrf_token %}
+    <fieldset class="module aligned">
+        {{ form.as_p }}
+
+        <input type="submit" value="{% translate 'Save my information' %}">
+    </fieldset>
+</form>
+
+{% endblock %}

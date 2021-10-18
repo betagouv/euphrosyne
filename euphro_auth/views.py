@@ -13,9 +13,16 @@ class UserTokenRegistrationView(PasswordResetConfirmView):
     template_name = "euphro_invitation_registration_form.html"
     success_url = reverse_lazy("admin:index")
     post_reset_login = True
+    reset_url_token = "registration"
+    post_reset_login_backend = "django.contrib.auth.backends.ModelBackend"
 
     def get_initial(self) -> Dict[str, Any]:
         initial = super().get_initial()
         if self.user:
             initial["email"] = self.user.email
         return initial
+
+    def get_context_data(self, **kwargs: Any):
+        context = super().get_context_data(**kwargs)
+        context.update({"user_id": self.user.id})
+        return context

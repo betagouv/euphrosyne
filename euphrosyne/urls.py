@@ -20,6 +20,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
 from euphro_auth.views import UserTokenRegistrationView
+from orcid_oauth.views import UserCompleteAccountView
 
 urlpatterns = [
     path(
@@ -48,4 +49,10 @@ urlpatterns = [
         UserTokenRegistrationView.as_view(),
         name="registration_token",
     ),
+    path(
+        "registration/orcid/verify/<token>",
+        UserCompleteAccountView.as_view(),
+        name="complete_registration_orcid",
+    ),
+    path("", include("social_django.urls")),
 ] + ([path("__debug__/", include(debug_toolbar.urls))] if settings.DEBUG else [])
