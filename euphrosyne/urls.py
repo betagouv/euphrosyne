@@ -17,6 +17,7 @@ import debug_toolbar
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.shortcuts import redirect
 from django.urls import include, path
 
 from euphro_auth.views import UserTokenRegistrationView
@@ -55,4 +56,5 @@ urlpatterns = [
         name="complete_registration_orcid",
     ),
     path("", include("social_django.urls")),
+    path("", lambda request: redirect("/admin/")),
 ] + ([path("__debug__/", include(debug_toolbar.urls))] if settings.DEBUG else [])
