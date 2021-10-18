@@ -2,19 +2,15 @@
 {% load i18n static %}
 
 {% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">{% endblock %}
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-    &rsaquo; {% translate 'Account registration' %}
-</div>
+<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
+<link rel="stylesheet" type="text/css" href="{% static "css/registration.css" %}">
 {% endblock %}
 
 {% block content %}
 
 {% if validlink %}
 
-<p>{% translate "You can change your email and choose a password." %}</p>
+<p>{% translate "You can change your email, fill up your information and choose a password." %}</p>
 
 <form method="post">{% csrf_token %}
     <fieldset class="module aligned">
@@ -49,6 +45,14 @@
         <input type="submit" value="{% translate 'Save my information' %}">
     </fieldset>
 </form>
+
+<div class="orcid-row">
+    <h1>Other registration provider</h1>
+    <a href="{% url "social:begin" "orcid" %}?user_id={{ user_id }}">
+        <img alt="ORCID logo" src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_24x24.png" width="24" height="24" />
+        {% translate 'Connect your ORCID ID' %}
+    </a>
+</div>
 
 {% else %}
 

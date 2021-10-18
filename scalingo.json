@@ -23,8 +23,17 @@
     "DEFAULT_FROM_EMAIL": {
       "required": true
     },
+    "ORCID_USE_SANDBOX": {
+      "required": false
+    },
     "SITE_URL": {
       "generator": "site_url"
+    },
+    "SOCIAL_AUTH_ORCID_KEY": {
+      "required": true
+    },
+    "SOCIAL_AUTH_ORCID_SECRET": {
+      "required": true
     }
   },
   "formation": {

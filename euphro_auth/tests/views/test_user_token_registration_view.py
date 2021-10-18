@@ -45,3 +45,11 @@ class TestUserTokenRegistrationView(TestCase):
         )
         user = auth.get_user(self.client)
         self.assertTrue(user.is_authenticated)
+
+    def test_orcid_registration_link_is_valid(self):
+        preresponse = self.client.get(self.view_url)
+        response = self.client.get(preresponse.headers["Location"])
+        self.assertContains(
+            response,
+            f'href="{reverse("social:begin", args=("orcid",))}?user_id={self.user.pk}"',
+        )

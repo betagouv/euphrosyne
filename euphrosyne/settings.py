@@ -40,14 +40,16 @@ SITE_URL = os.environ["SITE_URL"]
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
+    "euphrosyne.apps.AdminConfig",
     "euphro_auth",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "social_django",
     "lab",
+    "orcid_oauth",
 ] + (["debug_toolbar"] if DEBUG else [])
 
 MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else []) + [
@@ -66,7 +68,7 @@ ROOT_URLCONF = "euphrosyne.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "euphrosyne/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -151,6 +153,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Authentication backends
+# https://docs.djangoproject.com/en/dev/topics/auth/customizing/#other-authentication-sources
+
+AUTHENTICATION_BACKENDS = [
+    "orcid_oauth.backends.ORCIDOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -173,6 +183,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, "_static")
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
+STATICFILES_DIRS = [
+    BASE_DIR / "euphrosyne/static",
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -181,6 +195,29 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Custom user model
 
 AUTH_USER_MODEL = "euphro_auth.User"
+
+# For Python Social Auth; used for ORCID OAuth 2.0 flow
+
+ORCID_USE_SANDBOX = os.getenv("ORCID_USE_SANDBOX", "false") == "true"
+
+SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ["user_id"]
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/admin"
+SOCIAL_AUTH_ORCID_KEY = os.getenv("SOCIAL_AUTH_ORCID_KEY")
+SOCIAL_AUTH_ORCID_SECRET = os.getenv("SOCIAL_AUTH_ORCID_SECRET")
+SOCIAL_AUTH_PIPELINE = (
+    "social_core.pipeline.social_auth.social_details",
+    "social_core.pipeline.social_auth.social_uid",
+    "social_core.pipeline.social_auth.auth_allowed",
+    "orcid_oauth.pipeline.social_user",
+    "social_core.pipeline.social_auth.associate_user",
+    "social_core.pipeline.social_auth.load_extra_data",
+    "social_core.pipeline.user.user_details",
+    "orcid_oauth.pipeline.complete_information",
+)
+SOCIAL_AUTH_URL_NAMESPACE = "social"
+SOCIAL_AUTH_USER_MODEL = "euphro_auth.User"
+
 
 # For Django Debug Toolbar
 

@@ -13,6 +13,7 @@ dj-database-url = "*"
 whitenoise = "*"
 django-debug-toolbar = "*"
 pyyaml = "*"
+social-auth-app-django = "*"
 
 [dev-packages]
 black = "*"
