@@ -234,6 +234,19 @@ jobs:
               | jq -r .app.url
           )
           echo "::set-output name=url::$url"
+      - name: Invite all collaborators to child app
+        run: |
+          staging_collaborators=$(
+            curl --fail -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
+             -X GET "https://api.osc-fr1.scalingo.com/v1/apps/euphrosyne-child-${{ github.event.pull_request.number }}/collaborators" \
+             | jq -rc '{collaborator: .collaborators[] | with_entries(select(.key == "email"))}'
+          )
+          while read collaborator_json
+          do
+            curl -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
+              -X POST "https://api.osc-fr1.scalingo.com/v1/apps/euphrosyne-child-23/collaborators" \
+              -d "$collaborator_json"
+          done <<<$staging_collaborators
       - name: Define child app environment variables
         run: |
           # Get environment variables:
