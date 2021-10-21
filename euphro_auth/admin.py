@@ -9,6 +9,8 @@ from django.http.request import HttpRequest
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
+from shared.admin import ModelAdmin
+
 from .emails import send_invitation_email
 from .forms import UserChangeForm, UserCreationForm
 from .models import User, UserGroups, UserInvitation
@@ -81,8 +83,11 @@ class UserAdmin(DjangoUserAdmin):
             )
         return fieldsets
 
+    class Media:
+        css = {"all": ("css/euphro_admin/base.css",)}
 
-class UserInvitationAdmin(admin.ModelAdmin):
+
+class UserInvitationAdmin(ModelAdmin):
     list_display = ("email", "invitation_completed_at")
     fields = ("email",)
     actions = ("view", "add")

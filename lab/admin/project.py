@@ -10,6 +10,7 @@ from django.http.request import HttpRequest
 from django.urls import reverse
 
 from euphro_auth.models import User
+from shared.admin import ModelAdmin
 
 from ..forms import (
     ParticipationWithEmailInvitForm,
@@ -54,7 +55,7 @@ class ParticipationInline(admin.TabularInline):
 
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Project)
-class ProjectAdmin(admin.ModelAdmin):
+class ProjectAdmin(ModelAdmin):
     list_display = ("name", "leader")
     readonly_fields = ("members",)
 
