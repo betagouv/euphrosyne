@@ -34,7 +34,7 @@ class TestRunAdminViewAsLeader(TestCase):
         )
         self.client.force_login(self.project_leader_user)
 
-    def test_add_run_is_allowed(self):
+    def test_add_run_is_not_allowed(self):
         response = self.client.post(
             reverse("admin:lab_run_add"),
             data={
@@ -44,26 +44,7 @@ class TestRunAdminViewAsLeader(TestCase):
                 "date_1": timezone.now().time(),
             },
         )
-        assert response.status_code == 302
-        assert Run.objects.all().count() == 1
-
-    def test_add_run_of_non_lead_project_not_allowed(self):
-        "Test add Run of non-lead Project not allowed via formfield_for_foreignkey"
-        response = self.client.post(
-            reverse("admin:lab_run_add"),
-            data={
-                "label": "new run label",
-                "project": self.existing_project_2.id,
-                "date_0": timezone.now().date(),
-                "date_1": timezone.now().time(),
-            },
-        )
-        assert response.status_code == 200
-        assert Run.objects.all().count() == 0
-        assert (
-            "Ce choix ne fait pas partie de ceux disponibles."
-            in response.content.decode()
-        )
+        assert response.status_code == 403
 
     def test_change_run_is_allowed(self):
         existing_run = Run.objects.create(
@@ -79,14 +60,14 @@ class TestRunAdminViewAsLeader(TestCase):
         )
         assert response.status_code == 302
 
-    def test_delete_run_is_allowed(self):
+    def test_delete_run_is_not_allowed(self):
         existing_run = Run.objects.create(
             label="existing run", project=self.existing_project, date=timezone.now()
         )
         response = self.client.post(
             reverse("admin:lab_run_delete", args=[existing_run.id]),
         )
-        assert response.status_code == 200
+        assert response.status_code == 403
 
 
 class TestRunAdminViewAsAdmin(TestCase):
