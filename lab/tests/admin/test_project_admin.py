@@ -316,5 +316,5 @@ class TestProjectAdminViewAsProjectMember(TestCase):
         assert response.status_code == 302
         project = Project.objects.get(name="some project name")
         assert project.members.count() == 2
-        assert project.members.all()[0].id == self.admin_user.id
-        assert project.members.all()[1].id == self.project_member.id
+        assert project.members.get(id=self.admin_user.id)
+        assert project.members.get(id=self.project_member.id)
