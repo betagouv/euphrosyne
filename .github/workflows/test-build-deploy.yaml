@@ -101,6 +101,20 @@ jobs:
   test:
     runs-on: ubuntu-18.04
     needs: install-requirements
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: euphrosyne
+          POSTGRES_USER: euphrosyne
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       # -- block install --
       - uses: actions/checkout@v2
@@ -132,6 +146,12 @@ jobs:
 
       - name: Pytest
         run: python -m pytest .
+        env:
+          DB_HOST: localhost
+          DB_USER: euphrosyne
+          DB_PORT: 5432
+          DB_PASSWORD: password
+          DB_NAME: euphrosyne
 
   build:
     runs-on: ubuntu-18.04
