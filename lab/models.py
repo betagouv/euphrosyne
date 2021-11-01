@@ -1,7 +1,13 @@
+from typing import Optional
+
 from django.conf import settings
+from django.contrib.postgres.constraints import ExclusionConstraint
+from django.contrib.postgres.fields import RangeOperators
 from django.db import models
+from django.db.models.constraints import UniqueConstraint
 from django.utils.translation import gettext_lazy as _
 
+from euphro_auth.models import User
 from shared.models import TimestampedModel
 
 
@@ -21,22 +27,20 @@ class Project(TimestampedModel):
     """A project is a collection of runs done by the same team"""
 
     name = models.CharField(_("Project name"), max_length=255, unique=True)
-    # Caveat: we might want to allow CASCADE in on_delete. But we might want
-    # also to add a pre_delete signal handler to abort deletion (or fallback to
-    # a default project leader?) in case the Project is not finished (depending
-    # if the Runs are all finished or not).
-    leader = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        null=False,
-        on_delete=models.PROTECT,
-        related_name="projects_as_leader",
-    )
+
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL, through="lab.Participation"
     )
 
     def __str__(self):
         return f"{self.name}"
+
+    @property
+    def leader(self) -> Optional[User]:
+        try:
+            return self.participation_set.get(is_leader=True)
+        except Participation.DoesNotExist:
+            return None
 
 
 class Participation(TimestampedModel):
@@ -47,12 +51,21 @@ class Participation(TimestampedModel):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     project = models.ForeignKey("lab.Project", on_delete=models.PROTECT)
+    is_leader = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user} participation in {self.project}"
 
     class Meta:
-        unique_together = (
-            "user",
-            "project",
-        )
+        constraints = [
+            UniqueConstraint(
+                fields=["user", "project"], name="unique_user_participation_per_project"
+            ),
+            ExclusionConstraint(
+                name="exclude_multiple_leader_participation_per_project",
+                expressions=[
+                    ("project", RangeOperators.EQUAL),
+                ],
+                condition=models.Q(is_leader=True),
+            ),
+        ]

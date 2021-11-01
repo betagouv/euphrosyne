@@ -1,31 +1,15 @@
-from typing import Any, List, Mapping, Optional, Tuple, Type, Union
+from typing import Any, List, Mapping, Optional, Type
 
 from django.contrib import admin
 from django.contrib.admin.options import InlineModelAdmin
-from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
-from django.db.models import Q
-from django.forms.models import inlineformset_factory
-from django.forms.widgets import Select
+from django.forms.models import ModelForm, inlineformset_factory
 from django.http.request import HttpRequest
-from django.urls import reverse
 
-from euphro_auth.models import User
 from shared.admin import ModelAdmin
 
-from ..forms import (
-    ParticipationWithEmailInvitForm,
-    ProjectForm,
-    ProjectFormForNonAdmins,
-)
+from ..forms import BaseParticipationForm, LeaderParticipationForm
 from ..lib import is_lab_admin
 from ..models import Participation, Project
-
-
-class UserWidgetWrapper(RelatedFieldWidgetWrapper):
-    def get_related_url(self, info: Tuple[str, str], action: str, *args: Any) -> str:
-        if action == "add":
-            return reverse("admin:euphro_auth_userinvitation_add")
-        return super().get_related_url(info, action, *args)
 
 
 class ParticipationInline(admin.TabularInline):
@@ -37,18 +21,16 @@ class ParticipationInline(admin.TabularInline):
         obj: Optional[Project] = ...,
         **kwargs: Mapping[str, Any]
     ):
+        form = BaseParticipationForm if obj else LeaderParticipationForm
         formset = inlineformset_factory(
             Project,
             Participation,
-            fields=("user",),
-            widgets={
-                "user": UserWidgetWrapper(
-                    Select(),
-                    User.participation_set.rel,
-                    self.admin_site,
-                )
-            },
-            form=ParticipationWithEmailInvitForm,
+            form=form,
+            extra=0,
+            min_num=1,
+            # On creation, only leader participation can be added
+            max_num=1000 if obj else 1,
+            can_delete=bool(obj),
         )
         return formset
 
@@ -57,13 +39,12 @@ class ParticipationInline(admin.TabularInline):
 @admin.register(Project)
 class ProjectAdmin(ModelAdmin):
     list_display = ("name", "leader")
-    readonly_fields = ("members",)
+    readonly_fields = ("members", "leader")
 
     def has_view_permission(self, request: HttpRequest, obj: Optional[Project] = None):
         return (
             is_lab_admin(request.user)
             or not obj
-            or obj.leader_id == request.user.id
             or obj.participation_set.filter(user_id=request.user.id).exists()
         ) and super().has_view_permission(request, obj)
 
@@ -73,7 +54,6 @@ class ProjectAdmin(ModelAdmin):
         return (
             is_lab_admin(request.user)
             or not obj
-            or obj.leader_id == request.user.id
             or obj.members.filter(id=request.user.id).exists()
         ) and super().has_change_permission(request, obj)
 
@@ -81,7 +61,9 @@ class ProjectAdmin(ModelAdmin):
         self, request: HttpRequest, obj: Optional[Project] = None
     ):
         return (
-            is_lab_admin(request.user) or not obj or obj.leader_id == request.user.id
+            is_lab_admin(request.user)
+            or not obj
+            or obj.leader.user_id == request.user.id
         ) and super().has_delete_permission(request, obj)
 
     def get_exclude(self, request: HttpRequest, obj: Optional[Project] = None):
@@ -95,9 +77,7 @@ class ProjectAdmin(ModelAdmin):
         # Admin
         readonly_fields = super().get_readonly_fields(request, obj)
         if not is_lab_admin(request.user):
-            # Leader
-            readonly_fields = readonly_fields + ("leader",)
-            if obj and obj.leader_id != request.user.id:
+            if obj and obj.leader.user_id != request.user.id:
                 # Participant on change
                 readonly_fields = readonly_fields + ("name",)
         return readonly_fields
@@ -106,45 +86,25 @@ class ProjectAdmin(ModelAdmin):
         projects_qs = super().get_queryset(request)
         if is_lab_admin(request.user):
             return projects_qs
-        return projects_qs.filter(
-            Q(leader=request.user)
-            | Q(
-                participation__user_id=request.user.id,
-            )
-        ).distinct()
+        return projects_qs.filter(participation__user_id=request.user.id).distinct()
 
     def get_inlines(
         self, request: HttpRequest, obj: Optional[Project] = ...
     ) -> List[Type[InlineModelAdmin]]:
         inlines = super().get_inlines(request, obj=obj)
-        if obj and (is_lab_admin(request.user) or obj.leader_id == request.user.id):
+        if is_lab_admin(request.user) or (
+            obj and obj.leader.user_id == request.user.id
+        ):
             return inlines + [ParticipationInline]
         return inlines
-
-    def get_form(
-        self,
-        request: Any,
-        obj: Optional[Project] = ...,
-        change: bool = ...,
-        **kwargs: Any
-    ):
-        form = super().get_form(request, obj=obj, change=change, **kwargs)
-        if "leader" in form.base_fields:
-            form.base_fields["leader"].widget = UserWidgetWrapper(
-                Select(),
-                Project.leader.field.remote_field,
-                self.admin_site,
-            )
-        return form
 
     def save_model(
         self,
         request: HttpRequest,
         obj: Project,
-        form: Union[ProjectFormForNonAdmins, ProjectForm],
+        form: ModelForm,
         change: bool,
     ) -> None:
-        if not is_lab_admin(request.user):
-            obj.leader_id = request.user.id
         obj.save()
-        obj.members.add(obj.leader_id)
+        if not change and not is_lab_admin(request.user):
+            obj.participation_set.create(user_id=request.user.id, is_leader=True)
