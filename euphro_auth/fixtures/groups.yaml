@@ -44,6 +44,20 @@
     - - view_userinvitation
       - euphro_auth
       - userinvitation
+    - - view_institution
+      - lab
+      - institution
+    - - change_institution
+      - lab
+      - institution
+    - - add_institution
+      - lab
+      - institution
+    - - delete_institution
+      - lab
+      - institution
+
+
 - model: auth.group
   fields:
     name: Project Participant
@@ -87,3 +101,9 @@
     - - add_userinvitation
       - euphro_auth
       - userinvitation
+    - - view_institution
+      - lab
+      - institution
+    - - add_institution
+      - lab
+      - institution

@@ -52,6 +52,9 @@ class Participation(TimestampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
     project = models.ForeignKey("lab.Project", on_delete=models.PROTECT)
     is_leader = models.BooleanField(default=False)
+    institution = models.ForeignKey(
+        "lab.Institution", on_delete=models.SET_NULL, null=True
+    )
 
     def __str__(self):
         return f"{self.user} participation in {self.project}"
@@ -69,3 +72,13 @@ class Participation(TimestampedModel):
                 condition=models.Q(is_leader=True),
             ),
         ]
+
+
+class Institution(models.Model):
+    name = models.CharField(max_length=255)
+    country = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self) -> str:
+        if self.country:
+            return f"{self.name}, {self.country}"
+        return self.name

@@ -61,7 +61,7 @@ class ParticipationAdmin(ModelAdmin):
                 & Q(project__participation__is_leader=True)
             )
             | Q(user=request.user)
-        )
+        ).distinct()
 
     def formfield_for_foreignkey(  # pylint: disable=arguments-differ
         self,

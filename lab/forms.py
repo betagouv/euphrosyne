@@ -23,11 +23,14 @@ class BaseParticipationForm(ModelForm):
 
     class Meta:
         model = models.Participation
-        fields = ("user",)
+        fields = ("user", "institution")
         widgets = {
             "user": widgets.UserWidgetWrapper(
                 Select(),
                 User.participation_set.rel,
+            ),
+            "institution": widgets.InstitutionWidgetWrapper(
+                Select(), models.Institution.participation_set.rel
             ),
         }
 
@@ -41,7 +44,7 @@ class LeaderParticipationForm(BaseParticipationForm):
 
     class Meta:
         model = models.Participation
-        fields = ("user",)
+        fields = ("user", "institution")
         widgets = {
             "user": widgets.UserWidgetWrapper(
                 Select(),
