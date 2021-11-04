@@ -15,7 +15,7 @@ from ..models import Participation, Project
 @admin.register(Participation)
 class ParticipationAdmin(ModelAdmin):
     list_display = ("project", "user")
-    readonly_fields = ("project", "user")
+    readonly_fields = ("project", "user", "institution")
 
     def has_view_permission(
         self, request: HttpRequest, obj: Optional[Participation] = None
