@@ -7,7 +7,6 @@ from django.db import models
 from django.db.models.constraints import UniqueConstraint
 from django.utils.translation import gettext_lazy as _
 
-from euphro_auth.models import User
 from shared.models import TimestampedModel
 
 
@@ -36,7 +35,7 @@ class Project(TimestampedModel):
         return f"{self.name}"
 
     @property
-    def leader(self) -> Optional[User]:
+    def leader(self) -> Optional["Participation"]:
         try:
             return self.participation_set.get(is_leader=True)
         except Participation.DoesNotExist:
