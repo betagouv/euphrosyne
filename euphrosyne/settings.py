@@ -105,7 +105,13 @@ def build_development_db_name(base_db_name):
     branch_db_name = f"{base_db_name}_{branch_suffix}"
 
     try:
-        conn = psycopg2.connect(database=branch_db_name)
+        conn = psycopg2.connect(
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT"),
+            database=branch_db_name,
+        )
     except psycopg2.OperationalError:
         print(f"🅸 Using normal database {base_db_name}")
         return base_db_name
