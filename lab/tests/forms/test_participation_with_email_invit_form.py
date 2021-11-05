@@ -5,18 +5,15 @@ from django.core import mail
 from django.forms.models import BaseModelForm
 from django.test import SimpleTestCase
 
-from ...forms import ParticipationWithEmailInvitForm
+from ...forms import BaseParticipationForm
 from ...models import Participation, Project
 
 
-class TestParticipationWithEmailInvitForm(SimpleTestCase):
+class TestBaseParticipationForm(SimpleTestCase):
     def test_send_email_on_save(self):
-        leader = get_user_model()(id=1, email="leader@test.com", password="test")
         member = get_user_model()(id=2, email="member@test.com", password="test")
-        project = Project(id=1, leader=leader, name="Test project")
-        form = ParticipationWithEmailInvitForm(
-            data={"project": project.id, "user": member.id}
-        )
+        project = Project(id=1, name="Test project")
+        form = BaseParticipationForm(data={"project": project.id, "user": member.id})
         with mock.patch.object(
             BaseModelForm,
             "save",

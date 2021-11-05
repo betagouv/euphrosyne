@@ -15,7 +15,7 @@ from ..models import Participation, Project
 @admin.register(Participation)
 class ParticipationAdmin(ModelAdmin):
     list_display = ("project", "user")
-    readonly_fields = ("project", "user")
+    readonly_fields = ("project", "user", "institution")
 
     def has_view_permission(
         self, request: HttpRequest, obj: Optional[Participation] = None
@@ -23,8 +23,8 @@ class ParticipationAdmin(ModelAdmin):
         return (
             is_lab_admin(request.user)
             or not obj
-            or obj.project.leader_id == request.user.id
             or obj.user == request.user
+            or obj.project.leader.user_id == request.user.id
         ) and super().has_view_permission(request, obj)
 
     def has_change_permission(
@@ -33,8 +33,8 @@ class ParticipationAdmin(ModelAdmin):
         return (
             is_lab_admin(request.user)
             or not obj
-            or obj.project.leader_id == request.user.id
             or obj.user == request.user
+            or obj.project.leader.user_id == request.user.id
         ) and super().has_change_permission(request, obj)
 
     def has_delete_permission(
@@ -43,8 +43,8 @@ class ParticipationAdmin(ModelAdmin):
         return (
             is_lab_admin(request.user)
             or not obj
-            or obj.project.leader_id == request.user.id
             or obj.user == request.user
+            or obj.project.leader.user_id == request.user.id
         ) and super().has_delete_permission(request, obj)
 
     def get_queryset(self, request: HttpRequest):
@@ -56,8 +56,12 @@ class ParticipationAdmin(ModelAdmin):
         if is_lab_admin(request.user):
             return runs_queryset
         return runs_queryset.filter(
-            Q(project__leader=request.user) | Q(user=request.user)
-        )
+            (
+                Q(project__participation__user=request.user)
+                & Q(project__participation__is_leader=True)
+            )
+            | Q(user=request.user)
+        ).distinct()
 
     def formfield_for_foreignkey(  # pylint: disable=arguments-differ
         self,
@@ -67,7 +71,9 @@ class ParticipationAdmin(ModelAdmin):
         **kwargs
     ):
         if not is_lab_admin(request.user) and db_field.name == "project":
-            queryset = Project.objects.filter(leader=request.user)
+            queryset = Project.objects.filter(
+                participation__user=request.user, participation__is_leader=True
+            )
 
         return super().formfield_for_foreignkey(
             db_field, request, queryset=queryset, **kwargs

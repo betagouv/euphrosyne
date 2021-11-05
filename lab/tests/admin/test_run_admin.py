@@ -20,8 +20,9 @@ class TestRunAdminViewAsLeader(TestCase):
         self.project_leader_user.groups.add(
             Group.objects.get(name=UserGroups.PARTICIPANT.value)
         )
-        self.existing_project = Project.objects.create(
-            name="some project name", leader=self.project_leader_user
+        self.existing_project = Project.objects.create(name="some project name")
+        self.existing_project.participation_set.create(
+            user=self.project_leader_user, is_leader=True
         )
         self.project_leader_user_2 = get_user_model().objects.create_user(
             email="leader_user_2@test.com", password="leader_user_2", is_staff=True
@@ -29,8 +30,9 @@ class TestRunAdminViewAsLeader(TestCase):
         self.project_leader_user_2.groups.add(
             Group.objects.get(name=UserGroups.PARTICIPANT.value)
         )
-        self.existing_project_2 = Project.objects.create(
-            name="some project name 2", leader=self.project_leader_user_2
+        self.existing_project_2 = Project.objects.create(name="some project name 2")
+        self.existing_project_2.participation_set.create(
+            user=self.project_leader_user_2, is_leader=True
         )
         self.client.force_login(self.project_leader_user)
 
@@ -98,14 +100,16 @@ class TestRunAdminViewAsAdmin(TestCase):
             email="admin_user@test.com", password="admin_user", is_staff=True
         )
         self.admin_user.groups.add(Group.objects.get(name=UserGroups.ADMIN.value))
-        self.admin_project_1 = Project.objects.create(
-            name="some project name", leader=self.admin_user
+        self.admin_project_1 = Project.objects.create(name="some project name")
+        self.admin_project_1.participation_set.create(
+            user=self.admin_user, is_leader=True
         )
         self.project_1_run_1 = Run.objects.create(
             label="run 1", project=self.admin_project_1, date=timezone.now()
         )
-        self.admin_project_2 = Project.objects.create(
-            name="some other project name", leader=self.admin_user
+        self.admin_project_2 = Project.objects.create(name="some other project name")
+        self.admin_project_2.participation_set.create(
+            user=self.admin_user, is_leader=True
         )
         self.client.force_login(self.admin_user)
 
