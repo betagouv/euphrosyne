@@ -9,7 +9,7 @@ from ...emails import send_project_invitation_email
 
 class TestSendProjectInvitationEmail(SimpleTestCase):
     def test_send_email(self):
-        project = Project(id=1, name="Test Project", leader_id=1)
+        project = Project(id=1, name="Test Project")
 
         send_project_invitation_email(
             email="test@test.com",
