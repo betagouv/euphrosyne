@@ -1,6 +1,5 @@
-{% extends "admin/login.html" %}
+{% extends 'admin/base.html' %}
 {% load i18n static %}
-{% block extrastyle %}{{ block.super }}
+{% block extrastyle %}
 <link rel="stylesheet" type="text/css" href="{% static "css/euphro_admin/base.css" %}">
-{{ form.media }}
 {% endblock %}

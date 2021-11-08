@@ -1,10 +1,9 @@
 from typing import Optional
 
 from django.contrib import admin
+from django.contrib.admin import ModelAdmin
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
-
-from shared.admin import ModelAdmin
 
 from ..lib import is_lab_admin
 from ..models import Project, Run

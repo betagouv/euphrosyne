@@ -1,11 +1,10 @@
 from typing import Any, List, Mapping, Optional, Type
 
 from django.contrib import admin
+from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import InlineModelAdmin
 from django.forms.models import ModelForm, inlineformset_factory
 from django.http.request import HttpRequest
-
-from shared.admin import ModelAdmin
 
 from ..forms import BaseParticipationForm, LeaderParticipationForm
 from ..lib import is_lab_admin

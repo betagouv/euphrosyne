@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional, Tuple
 
 from django.contrib import admin
+from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.models import Group
 from django.contrib.auth.tokens import default_token_generator
@@ -8,8 +9,6 @@ from django.forms.models import ModelForm
 from django.http.request import HttpRequest
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
-
-from shared.admin import ModelAdmin
 
 from .emails import send_invitation_email
 from .forms import UserChangeForm, UserCreationForm
@@ -82,9 +81,6 @@ class UserAdmin(DjangoUserAdmin):
                 ),
             )
         return fieldsets
-
-    class Media:
-        css = {"all": ("css/euphro_admin/base.css",)}
 
 
 class UserInvitationAdmin(ModelAdmin):
