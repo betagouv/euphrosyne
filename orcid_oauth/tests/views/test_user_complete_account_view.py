@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from unittest.mock import patch
 
-from django.test import SimpleTestCase
+from django.test.testcases import TestCase
 from django.urls import reverse
 
 from euphro_auth.models import User
@@ -23,17 +23,7 @@ class PartialMock:
     backend = "orcid"
 
 
-class FormMock:
-    @staticmethod
-    def save():
-        return {}
-
-    @staticmethod
-    def is_valid():
-        return True
-
-
-class TestUserCompleteAccountView(SimpleTestCase):
+class TestUserCompleteAccountView(TestCase):
     def setUp(self) -> None:
         self.view_url = reverse(
             "complete_registration_orcid", kwargs={"token": "token"}
@@ -67,18 +57,13 @@ class TestUserCompleteAccountView(SimpleTestCase):
             "get_partial",
             return_value=PartialMock(),
         ):
-            with patch.object(
-                UserCompleteAccountView,
-                "get_form",
-                return_value=FormMock(),
-            ):
-                response = self.client.post(
-                    self.view_url,
-                    data={
-                        "email": "test@test.test",
-                        "fist_name": "John",
-                        "last_name": "Doe",
-                    },
-                )
+            response = self.client.post(
+                self.view_url,
+                data={
+                    "email": "test@test.test",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                },
+            )
         assert response.status_code == HTTPStatus.FOUND
         assert response.url == reverse("social:complete", args=("orcid",))
