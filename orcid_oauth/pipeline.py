@@ -30,7 +30,7 @@ def social_user(
 def complete_information(
     current_partial: Mapping[str, Any], user: User, *args, **kwargs
 ):  # pylint: disable=unused-argument
-    if user and not user.invitation_completed:
+    if user and not user.invitation_completed_at:
         # redirect to a view where the user can verify
         # the information received from ORCID
         return redirect(

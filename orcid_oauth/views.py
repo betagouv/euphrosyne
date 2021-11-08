@@ -5,6 +5,7 @@ from django.db import models
 from django.forms.models import ModelForm
 from django.http.response import HttpResponse
 from django.urls.base import reverse
+from django.utils import timezone
 from django.views.generic.edit import UpdateView
 from social_django.models import Partial
 from social_django.utils import load_strategy
@@ -42,7 +43,7 @@ class UserCompleteAccountView(UpdateView):
         }
 
     def form_valid(self, form: ModelForm) -> HttpResponse:
-        self.object.invitation_completed = True
+        self.object.invitation_completed_at = timezone.now()
         response = super().form_valid(form)
         return response
 
