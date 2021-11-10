@@ -5,14 +5,18 @@ from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import InlineModelAdmin
 from django.forms.models import ModelForm, inlineformset_factory
 from django.http.request import HttpRequest
+from django.utils.translation import gettext_lazy as _
+
+from euphro_auth.models import User
 
 from ..forms import BaseParticipationForm, LeaderParticipationForm
 from ..lib import is_lab_admin
-from ..models import Participation, Project
+from ..models import BeamTimeRequest, Participation, Project
 
 
 class ParticipationInline(admin.TabularInline):
     model = Participation
+    verbose_name = _("Project member")
 
     def get_formset(
         self,
@@ -34,11 +38,52 @@ class ParticipationInline(admin.TabularInline):
         return formset
 
 
+class BeamTimeRequestInline(admin.StackedInline):
+    model = BeamTimeRequest
+    fields = ("request_type", "request_id", "form_type", "problem_statement")
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: Optional[Project] = ...
+    ) -> bool:
+        return obj and (
+            is_lab_admin(request.user) or obj.leader.user_id == request.user.id
+        )
+
+    def has_add_permission(
+        self, request: HttpRequest, obj: Optional[Project] = ...
+    ) -> bool:
+        return obj and (
+            is_lab_admin(request.user) or obj.leader.user_id == request.user.id
+        )
+
+
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Project)
 class ProjectAdmin(ModelAdmin):
-    list_display = ("name", "leader")
-    readonly_fields = ("members", "leader")
+    list_display = ("name", "leader_user", "status")
+    readonly_fields = ("members", "status", "leader_user")
+    fieldsets = (
+        (
+            _("Basic information"),
+            {
+                "fields": (
+                    "name",
+                    "status",
+                    "admin",
+                    "comments",
+                    "leader_user",
+                    "members",
+                )
+            },
+        ),
+    )
+
+    @staticmethod
+    @admin.display(description=_("Leader"))
+    def leader_user(obj: Optional[Project]) -> Optional[User]:
+        if obj and obj.leader:
+            return obj.leader.user
+        return None
 
     def has_view_permission(self, request: HttpRequest, obj: Optional[Project] = None):
         return (
@@ -76,9 +121,11 @@ class ProjectAdmin(ModelAdmin):
         # Admin
         readonly_fields = super().get_readonly_fields(request, obj)
         if not is_lab_admin(request.user):
+            # Leader
+            readonly_fields = readonly_fields + ("admin", "run_date")
             if obj and obj.leader.user_id != request.user.id:
                 # Participant on change
-                readonly_fields = readonly_fields + ("name",)
+                readonly_fields = readonly_fields + ("name", "comments")
         return readonly_fields
 
     def get_queryset(self, request: HttpRequest):
@@ -90,11 +137,13 @@ class ProjectAdmin(ModelAdmin):
     def get_inlines(
         self, request: HttpRequest, obj: Optional[Project] = ...
     ) -> List[Type[InlineModelAdmin]]:
-        inlines = super().get_inlines(request, obj=obj)
+        inlines = []
         if is_lab_admin(request.user) or (
             obj and obj.leader.user_id == request.user.id
         ):
-            return inlines + [ParticipationInline]
+            inlines += [ParticipationInline]
+        if obj:
+            inlines += [BeamTimeRequestInline]
         return inlines
 
     def save_model(
@@ -104,6 +153,8 @@ class ProjectAdmin(ModelAdmin):
         form: ModelForm,
         change: bool,
     ) -> None:
+        if not change and is_lab_admin(request.user):
+            obj.admin_id = request.user.id
         obj.save()
         if not change and not is_lab_admin(request.user):
             obj.participation_set.create(user_id=request.user.id, is_leader=True)

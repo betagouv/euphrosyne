@@ -56,6 +56,15 @@
     - - delete_institution
       - lab
       - institution
+    - - view_beamtimerequest
+      - lab
+      - beamtimerequest
+    - - change_beamtimerequest
+      - lab
+      - beamtimerequest
+    - - add_beamtimerequest
+      - lab
+      - beamtimerequest
 
 
 - model: auth.group
@@ -107,3 +116,13 @@
     - - add_institution
       - lab
       - institution
+    - - view_beamtimerequest
+      - lab
+      - beamtimerequest
+    - - change_beamtimerequest
+      - lab
+      - beamtimerequest
+    - - add_beamtimerequest
+      - lab
+      - beamtimerequest
+
