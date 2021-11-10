@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-01 15:28+0100\n"
+"POT-Creation-Date: 2021-11-05 10:14+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -118,12 +118,27 @@ msgstr "Entrez vos informations"
 msgid "Log in with ORCID"
 msgstr "Se connecter avec ORCID"
 
+msgid "Project member"
+msgstr "Membre du projet"
+
+msgid "Basic information"
+msgstr "Information sessentielles"
+
+msgid "Leader"
+msgstr "Chef de projet"
+
 #, python-brace-format
 msgid "[Euphrosyne] Invitation to join project {project.name}"
 msgstr "[Euphrosyne] Invitation à rejoindre le projet {project.name}"
 
-msgid "Leader"
-msgstr "Chef de projet"
+msgid "To schedule"
+msgstr "A planifier"
+
+msgid "French"
+msgstr "Français"
+
+msgid "European"
+msgstr "Européen"
 
 msgid "Run label"
 msgstr "Libellé du run"
@@ -135,6 +150,30 @@ msgstr "Date du run"
 #| msgid "first name"
 msgid "Project name"
 msgstr "prénom"
+
+msgid "Administrator"
+msgstr "Administrateur"
+
+msgid "Comments"
+msgstr "Commentaires"
+
+msgid "Request type"
+msgstr "Type de requête"
+
+msgid "Request ID"
+msgstr "Numéro de requête"
+
+msgid "ID appearing on the official form"
+msgstr "Numéro identifiant apparaissant sur le formulaire officiel"
+
+msgid "Problem statement"
+msgstr "Question posée"
+
+msgid "Description of the problematic being studied with the beam analysis"
+msgstr "Description de a problématique étudiée par analyse de faisceau"
+
+msgid "Form type"
+msgstr "Type du formulaire"
 
 #, python-format
 msgid "You've been invited to join %(project_name)s on Euphrosyne."

@@ -126,3 +126,7 @@ tr:nth-child(2n + 1) + .row-form-errors,
 tr:nth-child(2n + 1) + .row-form-errors .errorlist {
   background: var(--body-bg);
 }
+
+.inline-group h2 {
+  text-transform: inherit;
+}
