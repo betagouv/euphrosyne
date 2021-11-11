@@ -3,7 +3,7 @@ from typing import Any, List, Mapping, Optional, Type
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import InlineModelAdmin
-from django.forms.models import ModelForm, inlineformset_factory
+from django.forms.models import BaseInlineFormSet, ModelForm, inlineformset_factory
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
@@ -12,6 +12,35 @@ from euphro_auth.models import User
 from ..forms import BaseParticipationForm, LeaderParticipationForm
 from ..lib import is_lab_admin
 from ..models import BeamTimeRequest, Participation, Project
+
+
+class ParticipationFormSet(BaseInlineFormSet):
+    # pylint: disable=too-many-arguments
+    def __init__(
+        self,
+        data: Optional[Any] = None,
+        files: Optional[Any] = None,
+        instance: Optional[Any] = None,
+        save_as_new: bool = None,
+        prefix: Optional[Any] = None,
+        queryset: Optional[Any] = None,
+        **kwargs: Any
+    ) -> None:
+        super().__init__(
+            data=data,
+            files=files,
+            instance=instance,
+            save_as_new=save_as_new,
+            prefix=prefix,
+            queryset=queryset,
+            **kwargs
+        )
+        for form in self:
+            if form.instance.is_leader and "DELETE" in form.fields:
+                form.fields["DELETE"].disabled = True
+
+    def get_queryset(self):
+        return super().get_queryset().order_by("-is_leader")
 
 
 class ParticipationInline(admin.TabularInline):
@@ -34,6 +63,7 @@ class ParticipationInline(admin.TabularInline):
             # On creation, only leader participation can be added
             max_num=1000 if obj else 1,
             can_delete=bool(obj),
+            formset=ParticipationFormSet,
         )
         return formset
 
