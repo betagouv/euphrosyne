@@ -217,6 +217,18 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         assert project.members.count() == 2
         assert project.members.last().id == member.id
 
+    def test_get_content_has_change_leader_link(self):
+        project = Project.objects.create(name="some project name")
+        project.participation_set.create(
+            user=self.project_participant_user,
+            is_leader=True,
+            institution=self.base_institution,
+        )
+        change_view_url = reverse("admin:lab_project_change", args=[project.id])
+        response = self.client.get(change_view_url)
+
+        assert "change-leader-link" in response.content.decode()
+
 
 class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
     def setUp(self):
@@ -302,6 +314,12 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
         self.project.refresh_from_db()
         assert self.project.members.count() == 2
         assert self.project.members.last().id == member.id
+
+    def test_change_leader_link_is_hidden(self):
+        change_view_url = reverse("admin:lab_project_change", args=[self.project.id])
+        response = self.client.get(change_view_url)
+
+        assert "change-leader-link" not in response.content.decode()
 
 
 class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
@@ -449,3 +467,15 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
         project = Project.objects.get(name="some project name")
         with self.assertRaises(BeamTimeRequest.DoesNotExist):
             assert project.beamtimerequest
+
+    def test_change_leader_link_is_hidden(self):
+        project = Project.objects.create(name="some project name")
+        project.participation_set.create(
+            user=self.project_member,
+            is_leader=False,
+            institution=self.base_institution,
+        )
+        change_view_url = reverse("admin:lab_project_change", args=[project.id])
+        response = self.client.get(change_view_url)
+
+        assert "change-leader-link" not in response.content.decode()

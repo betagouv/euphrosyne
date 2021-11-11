@@ -1,16 +1,18 @@
-from typing import Any, List, Mapping, Optional, Type
+from typing import Any, Dict, List, Mapping, Optional, Tuple, Type
 
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import InlineModelAdmin
 from django.forms.models import BaseInlineFormSet, ModelForm, inlineformset_factory
 from django.http.request import HttpRequest
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
+from lab.widgets import LeaderReadonlyWidget
 
 from ..forms import BaseParticipationForm, LeaderParticipationForm
-from ..lib import is_lab_admin
+from ..lib import is_lab_admin, is_project_leader
 from ..models import BeamTimeRequest, Participation, Project
 
 
@@ -76,14 +78,14 @@ class BeamTimeRequestInline(admin.StackedInline):
         self, request: HttpRequest, obj: Optional[Project] = ...
     ) -> bool:
         return obj and (
-            is_lab_admin(request.user) or obj.leader.user_id == request.user.id
+            is_lab_admin(request.user) or is_project_leader(request.user, obj)
         )
 
     def has_add_permission(
         self, request: HttpRequest, obj: Optional[Project] = ...
     ) -> bool:
         return obj and (
-            is_lab_admin(request.user) or obj.leader.user_id == request.user.id
+            is_lab_admin(request.user) or is_project_leader(request.user, obj)
         )
 
 
@@ -91,22 +93,7 @@ class BeamTimeRequestInline(admin.StackedInline):
 @admin.register(Project)
 class ProjectAdmin(ModelAdmin):
     list_display = ("name", "leader_user", "status")
-    readonly_fields = ("members", "status", "leader_user")
-    fieldsets = (
-        (
-            _("Basic information"),
-            {
-                "fields": (
-                    "name",
-                    "status",
-                    "admin",
-                    "comments",
-                    "leader_user",
-                    "members",
-                )
-            },
-        ),
-    )
+    readonly_fields = ("members", "status", "editable_leader_user", "leader_user")
 
     @staticmethod
     @admin.display(description=_("Leader"))
@@ -114,6 +101,18 @@ class ProjectAdmin(ModelAdmin):
         if obj and obj.leader:
             return obj.leader.user
         return None
+
+    @staticmethod
+    @admin.display(description=_("Leader"))
+    def editable_leader_user(obj: Optional[Project]) -> str:
+        return format_html(
+            LeaderReadonlyWidget().render(
+                context={
+                    "user": obj.leader.user if obj.leader else None,
+                    "project_id": obj.id,
+                }
+            )
+        )
 
     def has_view_permission(self, request: HttpRequest, obj: Optional[Project] = None):
         return (
@@ -137,8 +136,29 @@ class ProjectAdmin(ModelAdmin):
         return (
             is_lab_admin(request.user)
             or not obj
-            or obj.leader.user_id == request.user.id
+            or is_project_leader(request.user, obj)
         ) and super().has_delete_permission(request, obj)
+
+    def get_fieldsets(
+        self, request: HttpRequest, obj: Optional[Project] = ...
+    ) -> List[Tuple[Optional[str], Dict[str, Any]]]:
+        return [
+            (
+                _("Basic information"),
+                {
+                    "fields": (
+                        "name",
+                        "status",
+                        "admin",
+                        "comments",
+                        "editable_leader_user"
+                        if is_lab_admin(request.user)
+                        else "leader_user",
+                        "members",
+                    )
+                },
+            ),
+        ]
 
     def get_exclude(self, request: HttpRequest, obj: Optional[Project] = None):
         excluded = super().get_exclude(request, obj)
@@ -148,12 +168,11 @@ class ProjectAdmin(ModelAdmin):
 
     def get_readonly_fields(self, request: HttpRequest, obj: Optional[Project] = None):
         """Set edit permission based on user role."""
-        # Admin
         readonly_fields = super().get_readonly_fields(request, obj)
         if not is_lab_admin(request.user):
             # Leader
             readonly_fields = readonly_fields + ("admin", "run_date")
-            if obj and obj.leader.user_id != request.user.id:
+            if obj and not is_project_leader(request.user, obj):
                 # Participant on change
                 readonly_fields = readonly_fields + ("name", "comments")
         return readonly_fields
@@ -168,9 +187,7 @@ class ProjectAdmin(ModelAdmin):
         self, request: HttpRequest, obj: Optional[Project] = ...
     ) -> List[Type[InlineModelAdmin]]:
         inlines = []
-        if is_lab_admin(request.user) or (
-            obj and obj.leader.user_id == request.user.id
-        ):
+        if is_lab_admin(request.user) or (obj and is_project_leader(request.user, obj)):
             inlines += [ParticipationInline]
         if obj:
             inlines += [BeamTimeRequestInline]

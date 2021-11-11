@@ -1,0 +1,37 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label='lab' %}">Lab</a>
+&rsaquo; <a href="{% url 'admin:lab_project_changelist' %}">{% translate 'Projects' %}</a>
+&rsaquo; <a href="{% url 'admin:lab_project_change' project.id %}">{{ project.name|truncatewords:"18" }}</a>
+&rsaquo; {% translate 'Change leader' %}</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>{% translate 'Change leader' %}</h1>
+<h2>{{ project.name }}</h2>
+<div id="content-main">
+    <form action="{% url 'admin:lab_project_leader_participation_change' project.id %}" method="post">
+        {% csrf_token %}
+        <fieldset class="module aligned">
+            <div class="form-row">
+            {{ form }}
+            </div>
+        </fieldset>
+        <div class="submit-row">
+            <input type="submit" value="{% translate 'Save' %}" class="default" name="_save">
+        </div>
+    </form>
+</div>
+{% endblock %}
