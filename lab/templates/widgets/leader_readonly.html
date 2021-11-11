@@ -1,0 +1,13 @@
+{% load i18n static %}
+{% if user %} {{ user }} {% else %} {% translate 'No leader' %} {% endif %}
+<a
+  class="change-related"
+  href="{% url 'admin:lab_project_leader_participation_change' project_id %}"
+  title="{% blocktranslate %}Change leader{% endblocktranslate %}"
+  data-test="change-leader-link"
+>
+  <img
+    src="{% static 'admin/img/icon-changelink.svg' %}"
+    alt="{% translate 'Change' %}"
+  />
+</a>

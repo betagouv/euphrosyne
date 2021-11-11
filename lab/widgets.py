@@ -4,7 +4,9 @@ from django import forms
 from django.contrib.admin import site
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.db.models.fields.reverse_related import ForeignObjectRel
+from django.forms.renderers import get_default_renderer
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 
 class UserWidgetWrapper(RelatedFieldWidgetWrapper):
@@ -54,3 +56,11 @@ class InstitutionWidgetWrapper(RelatedFieldWidgetWrapper):
             can_delete_related=False,
             can_view_related=can_view_related,
         )
+
+
+class LeaderReadonlyWidget:
+    template_name = "widgets/leader_readonly.html"
+
+    def render(self, context, renderer=None):
+        renderer = get_default_renderer()
+        return mark_safe(renderer.render(self.template_name, context))

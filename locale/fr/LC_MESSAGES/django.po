@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-05 10:14+0100\n"
+"POT-Creation-Date: 2021-11-12 16:30+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -121,15 +121,18 @@ msgstr "Se connecter avec ORCID"
 msgid "Project member"
 msgstr "Membre du projet"
 
-msgid "Basic information"
-msgstr "Information sessentielles"
-
 msgid "Leader"
 msgstr "Chef de projet"
+
+msgid "Basic information"
+msgstr "Information sessentielles"
 
 #, python-brace-format
 msgid "[Euphrosyne] Invitation to join project {project.name}"
 msgstr "[Euphrosyne] Invitation à rejoindre le projet {project.name}"
+
+msgid "No leader"
+msgstr "Aucun chef de projet"
 
 msgid "To schedule"
 msgstr "A planifier"
@@ -175,6 +178,18 @@ msgstr "Description de a problématique étudiée par analyse de faisceau"
 msgid "Form type"
 msgstr "Type du formulaire"
 
+msgid "Home"
+msgstr "Accueil"
+
+msgid "Projects"
+msgstr "Projet"
+
+msgid "Change leader"
+msgstr "Modification du chef de projet"
+
+msgid "Save"
+msgstr "Enregistrer"
+
 #, python-format
 msgid "You've been invited to join %(project_name)s on Euphrosyne."
 msgstr ""
@@ -185,6 +200,9 @@ msgstr "Vous pouvez accéder à l'invitation ici :"
 
 msgid "Join project"
 msgstr "Rejoindre le projet"
+
+msgid "Change"
+msgstr "Modification"
 
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"
