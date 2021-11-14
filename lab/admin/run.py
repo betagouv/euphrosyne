@@ -12,7 +12,7 @@ from ..models import Project, Run
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Run)
 class RunAdmin(ModelAdmin):
-    list_display = ("label", "date", "project")
+    list_display = ("label", "start_date", "end_date", "project")
 
     def has_view_permission(self, request: HttpRequest, obj: Optional[Run] = None):
         """Allow list view but only allow detail to leader or admin"""
