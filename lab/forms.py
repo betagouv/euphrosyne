@@ -50,6 +50,9 @@ class LeaderParticipationForm(BaseParticipationForm):
                 Select(),
                 User.participation_set.rel,
             ),
+            "institution": widgets.InstitutionWidgetWrapper(
+                Select(), models.Institution.participation_set.rel
+            ),
         }
         labels = {
             "user": _("Leader"),
