@@ -9,6 +9,8 @@ from django.utils.translation import gettext_lazy as _
 
 from shared.models import TimestampedModel
 
+from .run import AnalysisTechniqueUsed, DetectorUsed, Run  # noqa
+
 
 class ProjectStatus(models.IntegerChoices):
     TO_SCHEDULE = 1, _("To schedule")
@@ -25,18 +27,6 @@ class BeamTimeRequestFormType(models.TextChoices):
     SCIENCESCALL = "Sciencescall"
     HYPERION = "Hyperion"
     OSCAR = "OSCAR"
-
-
-class Run(TimestampedModel):
-    label = models.CharField(_("Run label"), max_length=255, unique=True)
-    date = models.DateTimeField(
-        _("Run date"),
-        blank=True,
-    )
-    project = models.ForeignKey("lab.Project", null=False, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return f"Run {self.label} on {self.date}"
 
 
 class Project(TimestampedModel):
