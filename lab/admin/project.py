@@ -11,10 +11,17 @@ from django.utils.translation import gettext_lazy as _
 from euphro_auth.models import User
 from lab.widgets import LeaderReadonlyWidget
 
-from ..forms import BaseParticipationForm, LeaderParticipationForm
-from ..models import BeamTimeRequest, Participation, Project
+from ..forms import (
+    RUN_DETAILS_FIELDS,
+    BaseParticipationForm,
+    LeaderParticipationForm,
+    RunStatusAdminForm,
+    RunStatusMemberForm,
+)
+from ..models import BeamTimeRequest, Participation, Project, Run
 from ..permissions import is_lab_admin, is_project_leader
 from .mixins import LabPermission, LabPermissionMixin, LabRole
+from .run import BASE_RUN_FIELDSETS
 
 
 class ParticipationFormSet(BaseInlineFormSet):
@@ -92,6 +99,47 @@ class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
 
     def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
         return obj
+
+
+class RunInline(LabPermissionMixin, admin.StackedInline):
+    model = Run
+    extra = 0
+    show_change_link = True
+    readonly_fields = RUN_DETAILS_FIELDS
+    fieldsets = BASE_RUN_FIELDSETS
+    template = "admin/edit_inline/stacked_run_in_project.html"
+
+    lab_permissions = LabPermission(
+        change_permission=LabRole.PROJECT_MEMBER,
+        view_permission=LabRole.PROJECT_MEMBER,
+    )
+
+    def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
+        return obj
+
+    def has_add_permission(
+        self, request: HttpRequest, obj: Optional[Project] = ...
+    ) -> bool:
+        """Disable adding a new run through the inline, force the user to go
+        through the Run admin page
+        """
+        return False
+
+    def has_delete_permission(
+        self, request: HttpRequest, obj: Optional[Project] = ...
+    ) -> bool:
+        return False
+
+    def get_formset(
+        self,
+        request: HttpRequest,
+        obj: Optional[Project] = ...,
+        **kwargs: Mapping[str, Any]
+    ):
+        self.form = (
+            RunStatusAdminForm if is_lab_admin(request.user) else RunStatusMemberForm
+        )
+        return super().get_formset(request, obj, **kwargs)
 
 
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
@@ -176,7 +224,7 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
         if is_lab_admin(request.user) or (obj and is_project_leader(request.user, obj)):
             inlines += [ParticipationInline]
         if obj:
-            inlines += [BeamTimeRequestInline]
+            inlines += [BeamTimeRequestInline, RunInline]
         return inlines
 
     def save_model(
