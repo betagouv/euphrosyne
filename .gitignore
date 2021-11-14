@@ -2,6 +2,6 @@ __pycache__
 .env*
 /_static/
 *.mo
-venv
+venv*
 .vscode
 local.*
