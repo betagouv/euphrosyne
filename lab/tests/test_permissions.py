@@ -1,6 +1,5 @@
 from django.contrib.auth.models import AnonymousUser
 from django.test import SimpleTestCase
-from django.test.client import RequestFactory
 
 from ..permissions import is_lab_admin
 

@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-18 19:32+0100\n"
+"POT-Creation-Date: 2021-11-24 21:29+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgid "Profile"
 msgstr "Profil"
 
 msgid "Superuser"
-msgstr ""
+msgstr "Superutilisateur"
 
 msgid "Invitation completed"
 msgstr "Invitation complétée"
@@ -127,12 +127,39 @@ msgstr "Chef de projet"
 msgid "Basic information"
 msgstr "Information sessentielles"
 
+msgid "Experimental conditions"
+msgstr "Conditions expérimentales"
+
+#, fuzzy
+#| msgid "Projects"
+msgid "Project"
+msgstr "Projet"
+
 #, python-brace-format
 msgid "[Euphrosyne] Invitation to join project {project.name}"
 msgstr "[Euphrosyne] Invitation à rejoindre le projet {project.name}"
 
 msgid "No leader"
 msgstr "Aucun chef de projet"
+
+msgid "The end date must be after the start date"
+msgstr "La date de fin doit être après la date de début"
+
+msgid "The embargo date must be after the end date"
+msgstr "La date d'embargo doit être après la date de fin"
+
+#, python-brace-format
+msgid ""
+"The run can't start while the following Run fields aren't defined: {fields}."
+msgstr ""
+"Le run ne peut démarrer tant que les champs suivants ne sont pas remplis: "
+"{fields}."
+
+msgid "Only Admin users might validate and execute runs."
+msgstr "Seuls les utilisateurs Admin peuvent valider et exécuter des runs."
+
+msgid "Only Admin users might rewind runs."
+msgstr "Seuls les utilisateurs Admin peuvent remettre un run en arrière."
 
 msgid "To schedule"
 msgstr "A planifier"
@@ -142,12 +169,6 @@ msgstr "Français"
 
 msgid "European"
 msgstr "Européen"
-
-msgid "Run label"
-msgstr "Libellé du run"
-
-msgid "Run date"
-msgstr "Date du run"
 
 #, fuzzy
 #| msgid "first name"
@@ -178,6 +199,56 @@ msgstr "Description de a problématique étudiée par analyse de faisceau"
 msgid "Form type"
 msgstr "Type du formulaire"
 
+msgid "New"
+msgstr "Nouveau"
+
+msgid "Ask for execution"
+msgstr "Demande d'exécution"
+
+msgid "Planned"
+msgstr "Planifié"
+
+msgid "Started"
+msgstr "Démarré"
+
+msgid "Finished"
+msgstr "Terminé"
+
+msgid "Proton"
+msgstr "Proton"
+
+msgid "Alpha particle"
+msgstr "Particule alpha"
+
+msgid "Deuton"
+msgstr "Deuton"
+
+msgid "Run label"
+msgstr "Libellé du run"
+
+#, fuzzy
+#| msgid "Run date"
+msgid "Run status"
+msgstr "Date du run"
+
+msgid "Run start of period"
+msgstr "Début de période du run"
+
+msgid "Run end of period"
+msgstr "Fin de période du run"
+
+msgid "Embargo date"
+msgstr "Date d'embargo"
+
+msgid "Particle type"
+msgstr "Type de particule"
+
+msgid "Energy level (in keV)"
+msgstr "Niveau d'énergie (en keV)"
+
+msgid "Beamline"
+msgstr "Ligne de faisceau"
+
 msgid "Home"
 msgstr "Accueil"
 
@@ -190,6 +261,18 @@ msgstr "Modification du chef de projet"
 msgid "Save"
 msgstr "Enregistrer"
 
+msgid "Change"
+msgstr "Modification"
+
+msgid "View"
+msgstr "Voir"
+
+msgid "View on site"
+msgstr "Voir sur le site"
+
+msgid "Add new run"
+msgstr "Ajouter un nouveau run"
+
 #, python-format
 msgid "You've been invited to join %(project_name)s on Euphrosyne."
 msgstr ""
@@ -200,9 +283,6 @@ msgstr "Vous pouvez accéder à l'invitation ici :"
 
 msgid "Join project"
 msgstr "Rejoindre le projet"
-
-msgid "Change"
-msgstr "Modification"
 
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"

@@ -1,4 +1,8 @@
+from pathlib import Path
+
+import yaml
 from django import forms
+from django.core.exceptions import ValidationError
 from django.forms.forms import Form
 from django.forms.models import ModelForm
 from django.forms.utils import ErrorList
@@ -9,6 +13,10 @@ from euphro_auth.models import User
 from lab.emails import send_project_invitation_email
 
 from . import models, widgets
+
+# [TODO] Rewrite
+with open(Path(__file__).parent / "models" / "run-choices-config.yaml") as f:
+    RUN_CHOICES = yaml.safe_load(f.read())
 
 
 class BaseParticipationForm(ModelForm):
@@ -102,3 +110,115 @@ class ChangeLeaderForm(Form):
             renderer=renderer,
         )
         self.fields["leader_participation"].queryset = project.participation_set
+
+
+RUN_DETAILS_FIELDS = (
+    "label",
+    "start_date",
+    "end_date",
+    "embargo_date",
+    "particle_type",
+    "energy_in_keV",
+    "beamline",
+)
+
+
+class RunDetailsForm(ModelForm):
+    class Meta:
+        model = models.Run
+        fields = RUN_DETAILS_FIELDS
+        widgets = {
+            "project": widgets.ProjectWidgetWrapper(
+                widgets.DisabledSelectWithHidden(),
+                models.Run.project.field.remote_field,  # pylint: disable=no-member
+            )
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        cleaned_start_date = cleaned_data.get("start_date")
+        cleaned_end_date = cleaned_data.get("end_date")
+        cleaned_embargo_date = cleaned_data.get("embargo_date")
+        if (
+            cleaned_start_date
+            and cleaned_end_date
+            and cleaned_end_date < cleaned_start_date
+        ):
+            raise ValidationError(
+                {
+                    "end_date": ValidationError(
+                        _("The end date must be after the start date"),
+                        code="start_date_after_end_date",
+                    )
+                },
+            )
+
+        if (
+            cleaned_end_date
+            and cleaned_embargo_date
+            and cleaned_embargo_date < cleaned_end_date.date()
+        ):
+            raise ValidationError(
+                {
+                    "embargo_date": ValidationError(
+                        _("The embargo date must be after the end date"),
+                        code="end_date_after_embargo_date",
+                    )
+                }
+            )
+
+
+class RunStatusBaseForm(ModelForm):
+    class Meta:
+        model = models.Run
+        fields = ("status",)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        cleaned_status = cleaned_data.get("status")
+
+        if cleaned_status and cleaned_status != models.Run.Status.NEW:
+            missing_fields = [
+                rf for rf in RUN_DETAILS_FIELDS if not getattr(self.instance, rf)
+            ]
+            missing_fields_verbose = [
+                str(_(models.Run._meta.get_field(field_name).verbose_name))
+                for field_name in missing_fields
+            ]
+            if missing_fields:
+                raise ValidationError(
+                    _(
+                        "The run can't start while the following Run fields aren't "
+                        "defined: {fields}."
+                    ).format(fields=", ".join(missing_fields_verbose)),
+                    code="missing_field_for_run_start",
+                )
+
+        return cleaned_data
+
+
+class RunStatusAdminForm(RunStatusBaseForm):
+    pass
+
+
+class RunStatusMemberForm(RunStatusBaseForm):
+    def clean_status(self):
+        status = self.cleaned_data["status"]
+        if status not in [
+            models.Run.Status.NEW,
+            models.Run.Status.ASK_FOR_EXECUTION,
+        ]:
+            raise ValidationError(
+                _("Only Admin users might validate and execute runs."),
+                code="run_execution_not_allowed_to_members",
+            )
+        if self.instance and self.instance.status not in [
+            models.Run.Status.NEW,
+            models.Run.Status.ASK_FOR_EXECUTION,
+        ]:
+
+            raise ValidationError(
+                _("Only Admin users might rewind runs."),
+                code="run_rewinding_not_allowed_to_members",
+            )
+        return status

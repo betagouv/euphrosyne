@@ -1,25 +1,40 @@
-from typing import Optional
+from typing import List, Optional, Tuple, Union
 
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
+from django.utils.translation import gettext_lazy as _
 
+from ..forms import RunDetailsForm
 from ..models import Project, Run
-from ..permissions import is_lab_admin
-from .mixins import LabPermission, LabPermissionMixin, LabRole
+from ..permissions import LabRole, get_user_permission_group, is_lab_admin
+from .mixins import LabPermission, LabPermissionMixin
+
+BASE_RUN_FIELDSETS = (
+    (
+        None,
+        {"fields": ("label", "status", "start_date", "end_date", "embargo_date")},
+    ),
+    (
+        _("Experimental conditions"),
+        {"fields": ("particle_type", "energy_in_keV", "beamline")},
+    ),
+)
 
 
-# Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Run)
 class RunAdmin(LabPermissionMixin, ModelAdmin):
-    list_display = ("label", "date", "project")
+    form = RunDetailsForm
+    list_display = ("project", "label", "start_date", "end_date")
+    readonly_fields = ("status",)
+    fieldsets = ((_("Project"), {"fields": ("project",)}),) + BASE_RUN_FIELDSETS
 
     lab_permissions = LabPermission(
         add_permission=LabRole.ANY_STAFF_USER,
         view_permission=LabRole.PROJECT_MEMBER,
-        change_permission=LabRole.PROJECT_LEADER,
-        delete_permission=LabRole.PROJECT_LEADER,
+        change_permission=LabRole.PROJECT_MEMBER,
+        delete_permission=LabRole.PROJECT_MEMBER,
     )
 
     def get_related_project(self, obj: Optional[Run] = None) -> Optional[Project]:
@@ -27,19 +42,35 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
             return obj.project
         return None
 
-    # This one seems redundant with `get_readonly_fields` according to the
-    # `ModelAdmin` view:
-    def get_exclude(self, request: HttpRequest, obj: Optional[Run] = None):
-        excluded = super().get_exclude(request, obj)
-        if obj:
-            return excluded + ("project",) if excluded else ("project",)
-        return excluded
+    def has_change_permission(
+        self, request: HttpRequest, obj: Optional[Run] = None
+    ) -> bool:
+        return super().has_change_permission(request, obj) and (
+            not obj or obj.status == Run.Status.NEW
+        )
 
-    def get_readonly_fields(self, request: HttpRequest, obj: Optional[Run] = None):
-        """Don't allow changing project in change mode"""
+    def has_delete_permission(
+        self, request: HttpRequest, obj: Optional[Run] = None
+    ) -> bool:
+        return super().has_delete_permission(request, obj) and (
+            not obj or obj.status == Run.Status.NEW
+        )
+
+    def has_module_permission(self, request: HttpRequest) -> bool:
+        return is_lab_admin(request.user)
+
+    def get_readonly_fields(
+        self, request: HttpRequest, obj: Optional[Run] = None
+    ) -> Union[List[str], Tuple]:
         readonly_fields = super().get_readonly_fields(request, obj)
         if obj:
-            return readonly_fields + ("project",)
+            readonly_fields += ("project",)
+            if (
+                obj.project
+                and get_user_permission_group(request, obj.project) < LabRole.LAB_ADMIN
+            ):
+                readonly_fields += ("start_date", "end_date")
+
         return readonly_fields
 
     def get_queryset(self, request: HttpRequest):
@@ -57,6 +88,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
                 participation__is_leader=True,
             )
 
-        return super().formfield_for_foreignkey(
-            db_field, request, queryset=queryset, **kwargs
-        )
+        if queryset is not None:
+            kwargs["queryset"] = queryset
+
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
