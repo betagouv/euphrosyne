@@ -12,7 +12,7 @@ from euphro_auth.models import User
 from lab.widgets import LeaderReadonlyWidget
 
 from ..forms import BaseParticipationForm, LeaderParticipationForm
-from ..lib import is_lab_admin, is_project_leader
+from ..lib import is_lab_admin, is_lab_admin_or_member, is_project_leader
 from ..models import BeamTimeRequest, Participation, Project
 
 
@@ -77,16 +77,12 @@ class BeamTimeRequestInline(admin.StackedInline):
     def has_change_permission(
         self, request: HttpRequest, obj: Optional[Project] = ...
     ) -> bool:
-        return obj and (
-            is_lab_admin(request.user) or is_project_leader(request.user, obj)
-        )
+        return obj and is_lab_admin_or_member(request.user, obj)
 
     def has_add_permission(
         self, request: HttpRequest, obj: Optional[Project] = ...
     ) -> bool:
-        return obj and (
-            is_lab_admin(request.user) or is_project_leader(request.user, obj)
-        )
+        return obj and is_lab_admin_or_member(request.user, obj)
 
 
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
@@ -116,27 +112,21 @@ class ProjectAdmin(ModelAdmin):
 
     def has_view_permission(self, request: HttpRequest, obj: Optional[Project] = None):
         return (
-            is_lab_admin(request.user)
-            or not obj
-            or obj.participation_set.filter(user_id=request.user.id).exists()
+            not obj or is_lab_admin_or_member(request.user, obj)
         ) and super().has_view_permission(request, obj)
 
     def has_change_permission(
         self, request: HttpRequest, obj: Optional[Project] = None
     ):
         return (
-            is_lab_admin(request.user)
-            or not obj
-            or obj.members.filter(id=request.user.id).exists()
-        ) and super().has_change_permission(request, obj)
+            not obj or is_lab_admin_or_member(request.user, obj)
+        ) and super().has_view_permission(request, obj)
 
     def has_delete_permission(
         self, request: HttpRequest, obj: Optional[Project] = None
     ):
         return (
-            is_lab_admin(request.user)
-            or not obj
-            or is_project_leader(request.user, obj)
+            not obj or is_lab_admin(request.user)
         ) and super().has_delete_permission(request, obj)
 
     def get_fieldsets(
@@ -172,9 +162,6 @@ class ProjectAdmin(ModelAdmin):
         if not is_lab_admin(request.user):
             # Leader
             readonly_fields = readonly_fields + ("admin", "run_date")
-            if obj and not is_project_leader(request.user, obj):
-                # Participant on change
-                readonly_fields = readonly_fields + ("name", "comments")
         return readonly_fields
 
     def get_queryset(self, request: HttpRequest):

@@ -7,13 +7,7 @@ from django.urls import reverse
 
 from euphro_auth.models import User, UserGroups
 
-from ...models import (
-    BeamTimeRequest,
-    BeamTimeRequestType,
-    Institution,
-    Participation,
-    Project,
-)
+from ...models import BeamTimeRequestType, Institution, Participation, Project
 
 
 def get_existing_particiation_post_data(index: int, participation: Participation):
@@ -248,44 +242,6 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
         )
         self.client.force_login(self.project_leader)
 
-    def test_add_project_automaticaly_set_user_as_leader(self):
-        response = self.client.post(
-            self.add_view_url,
-            data={
-                "name": "another project name",
-            },
-        )
-        assert response.status_code == 302
-        project = Project.objects.get(name="another project name")
-        assert project.leader.user_id == self.project_leader.id
-
-    def test_change_project_name_and_comments_is_allowed(self):
-        change_view_url = reverse("admin:lab_project_change", args=[self.project.id])
-        response = self.client.post(
-            change_view_url,
-            data={
-                "name": "some other project name",
-                "comments": "Ancient egypt mummies analysis",
-                **get_existing_particiation_post_data(
-                    index=0, participation=self.project.leader
-                ),
-                "participation_set-TOTAL_FORMS": "1",
-                "participation_set-INITIAL_FORMS": "1",
-                **get_empty_beam_time_request_post_data(project_id=self.project.id),
-            },
-        )
-        assert response.status_code == 302
-        self.project.refresh_from_db()
-        assert self.project.name == "some other project name"
-        assert self.project.comments == "Ancient egypt mummies analysis"
-
-    def test_cannot_view_other_projects(self):
-        project = Project.objects.create(name="unviewable")
-        project.participation_set.create(user=self.admin_user, is_leader=True)
-        response = self.client.get(reverse("admin:lab_project_changelist"))
-        assert response.status_code == 200
-        assert "unviewable" not in response.content.decode()
-
     def test_add_participations_is_allowed(self):
         member = get_user_model().objects.create_user(
             email="member@test.com", password="password"
@@ -342,6 +298,13 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
             project.participation_set.create(user=self.admin_user, is_leader=True)
             project.participation_set.create(user=self.project_member)
         self.client.force_login(self.project_member)
+
+    def test_cannot_view_other_projects(self):
+        project = Project.objects.create(name="unviewable")
+        project.participation_set.create(user=self.admin_user, is_leader=True)
+        response = self.client.get(reverse("admin:lab_project_changelist"))
+        assert response.status_code == 200
+        assert "unviewable" not in response.content.decode()
 
     def test_add_project_form_has_no_leader_dropdown(self):
         response = self.client.get(self.add_view_url)
@@ -432,7 +395,7 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
         assert project.members.get(id=self.admin_user.id)
         assert project.members.get(id=self.project_member.id)
 
-    def test_add_beam_time_request_is_ignored(self):
+    def test_add_beam_time_request_is_allowed(self):
         project = Project.objects.create(name="some project name")
         project.participation_set.create(
             user=self.admin_user, is_leader=True, institution=self.base_institution
@@ -465,17 +428,33 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
         )
         assert response.status_code == 302
         project = Project.objects.get(name="some project name")
-        with self.assertRaises(BeamTimeRequest.DoesNotExist):
-            assert project.beamtimerequest
+        assert project.beamtimerequest
 
-    def test_change_leader_link_is_hidden(self):
+    def test_change_project_name_and_comments_is_allowed(self):
         project = Project.objects.create(name="some project name")
         project.participation_set.create(
-            user=self.project_member,
-            is_leader=False,
-            institution=self.base_institution,
+            user=self.admin_user, is_leader=True, institution=self.base_institution
+        )
+        project.participation_set.create(
+            user=self.project_member, institution=self.base_institution
         )
         change_view_url = reverse("admin:lab_project_change", args=[project.id])
-        response = self.client.get(change_view_url)
 
-        assert "change-leader-link" not in response.content.decode()
+        response = self.client.post(
+            change_view_url,
+            data={
+                "name": "some other project name",
+                "comments": "Ancient egypt mummies analysis",
+                **get_existing_particiation_post_data(
+                    index=0, participation=project.leader
+                ),
+                "participation_set-TOTAL_FORMS": "1",
+                "participation_set-INITIAL_FORMS": "1",
+                **get_empty_beam_time_request_post_data(project_id=project.id),
+            },
+        )
+        project.refresh_from_db()
+
+        assert response.status_code == 302
+        assert project.name == "some other project name"
+        assert project.comments == "Ancient egypt mummies analysis"
