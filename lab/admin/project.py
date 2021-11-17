@@ -12,8 +12,9 @@ from euphro_auth.models import User
 from lab.widgets import LeaderReadonlyWidget
 
 from ..forms import BaseParticipationForm, LeaderParticipationForm
-from ..lib import is_lab_admin, is_lab_admin_or_member, is_project_leader
+from ..lib import is_lab_admin, is_project_leader
 from ..models import BeamTimeRequest, Participation, Project
+from .mixins import LabPermission, LabPermissionMixin, LabRole
 
 
 class ParticipationFormSet(BaseInlineFormSet):
@@ -70,26 +71,31 @@ class ParticipationInline(admin.TabularInline):
         return formset
 
 
-class BeamTimeRequestInline(admin.StackedInline):
+class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
     model = BeamTimeRequest
     fields = ("request_type", "request_id", "form_type", "problem_statement")
 
-    def has_change_permission(
-        self, request: HttpRequest, obj: Optional[Project] = ...
-    ) -> bool:
-        return obj and is_lab_admin_or_member(request.user, obj)
+    lab_permissions = LabPermission(
+        add_permission=LabRole.PROJECT_MEMBER,
+        change_permission=LabRole.PROJECT_MEMBER,
+        view_permission=LabRole.PROJECT_MEMBER,
+    )
 
-    def has_add_permission(
-        self, request: HttpRequest, obj: Optional[Project] = ...
-    ) -> bool:
-        return obj and is_lab_admin_or_member(request.user, obj)
+    def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
+        return obj
 
 
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Project)
-class ProjectAdmin(ModelAdmin):
+class ProjectAdmin(LabPermissionMixin, ModelAdmin):
     list_display = ("name", "leader_user", "status")
     readonly_fields = ("members", "status", "editable_leader_user", "leader_user")
+
+    lab_permissions = LabPermission(
+        add_permission=LabRole.NON_PARTICIPANT,
+        change_permission=LabRole.PROJECT_MEMBER,
+        view_permission=LabRole.PROJECT_MEMBER,
+    )
 
     @staticmethod
     @admin.display(description=_("Leader"))
@@ -110,24 +116,8 @@ class ProjectAdmin(ModelAdmin):
             )
         )
 
-    def has_view_permission(self, request: HttpRequest, obj: Optional[Project] = None):
-        return (
-            not obj or is_lab_admin_or_member(request.user, obj)
-        ) and super().has_view_permission(request, obj)
-
-    def has_change_permission(
-        self, request: HttpRequest, obj: Optional[Project] = None
-    ):
-        return (
-            not obj or is_lab_admin_or_member(request.user, obj)
-        ) and super().has_view_permission(request, obj)
-
-    def has_delete_permission(
-        self, request: HttpRequest, obj: Optional[Project] = None
-    ):
-        return (
-            not obj or is_lab_admin(request.user)
-        ) and super().has_delete_permission(request, obj)
+    def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
+        return obj
 
     def get_fieldsets(
         self, request: HttpRequest, obj: Optional[Project] = ...
