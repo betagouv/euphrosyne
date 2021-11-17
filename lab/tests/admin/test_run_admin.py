@@ -1,24 +1,16 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
-
-from euphro_auth.models import UserGroups
 
 from ...models import Project, Run
 
 
 class TestRunAdminViewAsLeader(TestCase):
-    fixtures = ["groups"]
-
     def setUp(self):
         self.client = Client()
         self.project_leader_user = get_user_model().objects.create_user(
             email="leader_user@test.com", password="leader_user", is_staff=True
-        )
-        self.project_leader_user.groups.add(
-            Group.objects.get(name=UserGroups.PARTICIPANT.value)
         )
         self.existing_project = Project.objects.create(name="some project name")
         self.existing_project.participation_set.create(
@@ -26,9 +18,6 @@ class TestRunAdminViewAsLeader(TestCase):
         )
         self.project_leader_user_2 = get_user_model().objects.create_user(
             email="leader_user_2@test.com", password="leader_user_2", is_staff=True
-        )
-        self.project_leader_user_2.groups.add(
-            Group.objects.get(name=UserGroups.PARTICIPANT.value)
         )
         self.existing_project_2 = Project.objects.create(name="some project name 2")
         self.existing_project_2.participation_set.create(
@@ -92,14 +81,14 @@ class TestRunAdminViewAsLeader(TestCase):
 
 
 class TestRunAdminViewAsAdmin(TestCase):
-    fixtures = ["groups"]
-
     def setUp(self):
         self.client = Client()
         self.admin_user = get_user_model().objects.create_user(
-            email="admin_user@test.com", password="admin_user", is_staff=True
+            email="admin_user@test.com",
+            password="admin_user",
+            is_staff=True,
+            is_lab_admin=True,
         )
-        self.admin_user.groups.add(Group.objects.get(name=UserGroups.ADMIN.value))
         self.admin_project_1 = Project.objects.create(name="some project name")
         self.admin_project_1.participation_set.create(
             user=self.admin_user, is_leader=True

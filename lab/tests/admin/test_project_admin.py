@@ -1,11 +1,10 @@
 from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from euphro_auth.models import User, UserGroups
+from euphro_auth.models import User
 
 from ...models import BeamTimeRequestType, Institution, Participation, Project
 
@@ -47,16 +46,16 @@ def get_empty_beam_time_request_post_data(project_id: int):
 
 class BaseTestCases:
     class BaseTestProjectAdmin(TestCase):
-        fixtures = ["groups"]
-
         def setUp(self):
             self.client = Client()
             self.add_view_url = reverse("admin:lab_project_add")
 
             self.admin_user = get_user_model().objects.create_user(
-                email="admin_user@test.com", password="admin_user", is_staff=True
+                email="admin_user@test.com",
+                password="admin_user",
+                is_staff=True,
+                is_lab_admin=True,
             )
-            self.admin_user.groups.add(Group.objects.get(name=UserGroups.ADMIN.value))
 
             self.base_institution = Institution.objects.create(
                 name="Louvre", country="France"
@@ -71,9 +70,6 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
             email="project_participant_user@test.com",
             password="project_participant_user",
             is_staff=True,
-        )
-        self.project_participant_user.groups.add(
-            Group.objects.get(name=UserGroups.PARTICIPANT.value)
         )
         self.client.force_login(self.admin_user)
 
@@ -233,9 +229,6 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
             password="leader",
             is_staff=True,
         )
-        self.project_leader.groups.add(
-            Group.objects.get(name=UserGroups.PARTICIPANT.value)
-        )
         self.project = Project.objects.create(name="some project name")
         self.leader_participation = self.project.participation_set.create(
             user=self.project_leader, is_leader=True, institution=self.base_institution
@@ -286,9 +279,6 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
             email="project_participant_user@test.com",
             password="project_participant_user",
             is_staff=True,
-        )
-        self.project_member.groups.add(
-            Group.objects.get(name=UserGroups.PARTICIPANT.value)
         )
         self.projects_with_member = [
             Project.objects.create(name="project foo"),

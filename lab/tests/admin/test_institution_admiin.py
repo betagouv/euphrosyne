@@ -1,23 +1,15 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.test import Client, TestCase
 from django.urls import reverse
-
-from euphro_auth.models import UserGroups
 
 from ...models import Institution
 
 
 class TestInstitutionAdminViewAsParticipant(TestCase):
-    fixtures = ["groups"]
-
     def setUp(self):
         self.client = Client()
         self.participant_user = get_user_model().objects.create_user(
             email="participant@test.com", password="password", is_staff=True
-        )
-        self.participant_user.groups.add(
-            Group.objects.get(name=UserGroups.PARTICIPANT.value)
         )
         self.client.force_login(self.participant_user)
 
@@ -51,14 +43,14 @@ class TestInstitutionAdminViewAsParticipant(TestCase):
 
 
 class TestInstitutionAdminViewAsAdmin(TestCase):
-    fixtures = ["groups"]
-
     def setUp(self):
         self.client = Client()
         self.participant_user = get_user_model().objects.create_user(
-            email="admin@test.com", password="password", is_staff=True
+            email="admin@test.com",
+            password="password",
+            is_staff=True,
+            is_lab_admin=True,
         )
-        self.participant_user.groups.add(Group.objects.get(name=UserGroups.ADMIN.value))
         self.client.force_login(self.participant_user)
 
     def test_change_institution_is_allowed(self):

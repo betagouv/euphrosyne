@@ -3,16 +3,17 @@ from typing import Any, Dict, List, Optional, Tuple
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
-from django.contrib.auth.models import Group
 from django.contrib.auth.tokens import default_token_generator
 from django.forms.models import ModelForm
 from django.http.request import HttpRequest
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
+from euphro_auth.mixins import StaffUserAllowedMixin
+
 from .emails import send_invitation_email
 from .forms import UserChangeForm, UserCreationForm
-from .models import User, UserGroups, UserInvitation
+from .models import User, UserInvitation
 
 
 class UserAdmin(DjangoUserAdmin):
@@ -20,20 +21,14 @@ class UserAdmin(DjangoUserAdmin):
     add_form_template = "euphro_add_form.html"
     form = UserChangeForm
     model = User
-    list_display = (
-        "email",
-        "is_staff",
-        "is_active",
-        "in_admin_group",
-        "in_participant_group",
-    )
+    list_display = ("email", "is_staff", "is_active", "is_lab_admin")
     list_filter = ("email", "is_staff", "is_active")
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         (_("Profile"), {"fields": ("first_name", "last_name")}),
         (
             "Permissions",
-            {"fields": ("is_staff", "is_active", "groups")},
+            {"fields": ("is_staff", "is_lab_admin", "is_active", "groups")},
         ),
     )
     add_fieldsets = (
@@ -83,7 +78,7 @@ class UserAdmin(DjangoUserAdmin):
         return fieldsets
 
 
-class UserInvitationAdmin(ModelAdmin):
+class UserInvitationAdmin(StaffUserAllowedMixin, ModelAdmin):
     list_display = ("email", "invitation_completed_at")
     fields = ("email",)
     actions = ("view", "add")
@@ -98,20 +93,22 @@ class UserInvitationAdmin(ModelAdmin):
         if not change:
             obj.is_staff = True
             obj.save()
-            obj.groups.add(Group.objects.get(name=UserGroups.PARTICIPANT.value))
 
             token = default_token_generator.make_token(obj)
             send_invitation_email(email=obj.email, user_id=obj.pk, token=token)
             return obj
         return super().save_model(request, obj, form, change)
 
+    def has_add_permission(self, request: HttpRequest) -> bool:
+        return request.user.is_staff
+
     def has_change_permission(
-        self, request: HttpRequest, obj: Optional[UserInvitation] = ...
+        self, request: HttpRequest, obj: Optional[UserInvitation] = None
     ) -> bool:
         return False
 
     def has_delete_permission(
-        self, request: HttpRequest, obj: Optional[UserInvitation] = ...
+        self, request: HttpRequest, obj: Optional[UserInvitation] = None
     ) -> bool:
         return False
 

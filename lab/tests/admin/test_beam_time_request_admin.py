@@ -1,9 +1,6 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.test import Client, TestCase
 from django.urls import reverse
-
-from euphro_auth.models import UserGroups
 
 from ...models import (
     BeamTimeRequest,
@@ -14,15 +11,10 @@ from ...models import (
 
 
 class TestBeamTimeRequestAdminViewAsParticipant(TestCase):
-    fixtures = ["groups"]
-
     def setUp(self):
         self.client = Client()
         self.participant_user = get_user_model().objects.create_user(
             email="participant@test.com", password="password", is_staff=True
-        )
-        self.participant_user.groups.add(
-            Group.objects.get(name=UserGroups.PARTICIPANT.value)
         )
         self.project = Project.objects.create(name="Project Test")
         self.project.participation_set.create(
@@ -38,7 +30,7 @@ class TestBeamTimeRequestAdminViewAsParticipant(TestCase):
 
         assert response.status_code == 403
 
-    def test_change_beam_time_request_is_ignored(self):
+    def test_change_beam_time_request_is_forbidden(self):
         beam_time_request = BeamTimeRequest.objects.create(
             project=self.project, request_type=BeamTimeRequestType.FRENCH.value
         )
@@ -51,10 +43,8 @@ class TestBeamTimeRequestAdminViewAsParticipant(TestCase):
                 "form_type": BeamTimeRequestFormType.SCIENCESCALL.value,
             },
         )
-        beam_time_request.refresh_from_db()
 
-        assert response.status_code == 302
-        assert beam_time_request.request_type == BeamTimeRequestType.FRENCH.value
+        assert response.status_code == 403
 
     def test_delete_beam_time_request_is_forbidden(self):
         beam_time_request = BeamTimeRequest.objects.create(
@@ -68,15 +58,10 @@ class TestBeamTimeRequestAdminViewAsParticipant(TestCase):
 
 
 class TestBeamTimeRequestAdminViewAsLeader(TestCase):
-    fixtures = ["groups"]
-
     def setUp(self):
         self.client = Client()
         self.participant_user = get_user_model().objects.create_user(
             email="participant@test.com", password="password", is_staff=True
-        )
-        self.participant_user.groups.add(
-            Group.objects.get(name=UserGroups.PARTICIPANT.value)
         )
         self.project = Project.objects.create(name="Project Test")
         self.project.participation_set.create(
@@ -92,7 +77,7 @@ class TestBeamTimeRequestAdminViewAsLeader(TestCase):
 
         assert response.status_code == 403
 
-    def test_change_beam_time_request_is_ignored(self):
+    def test_change_beam_time_request_is_forbidden(self):
         beam_time_request = BeamTimeRequest.objects.create(
             project=self.project, request_type=BeamTimeRequestType.FRENCH.value
         )
@@ -105,10 +90,8 @@ class TestBeamTimeRequestAdminViewAsLeader(TestCase):
                 "form_type": BeamTimeRequestFormType.SCIENCESCALL.value,
             },
         )
-        beam_time_request.refresh_from_db()
 
-        assert response.status_code == 302
-        assert beam_time_request.request_type == BeamTimeRequestType.FRENCH.value
+        assert response.status_code == 403
 
     def test_delete_beam_time_request_is_forbidden(self):
         beam_time_request = BeamTimeRequest.objects.create(
@@ -122,14 +105,14 @@ class TestBeamTimeRequestAdminViewAsLeader(TestCase):
 
 
 class TestBeamTimeRequestAdminViewAsAdmin(TestCase):
-    fixtures = ["groups"]
-
     def setUp(self):
         self.client = Client()
         self.participant_user = get_user_model().objects.create_user(
-            email="admin@test.com", password="password", is_staff=True
+            email="admin@test.com",
+            password="password",
+            is_staff=True,
+            is_lab_admin=True,
         )
-        self.participant_user.groups.add(Group.objects.get(name=UserGroups.ADMIN.value))
         self.client.force_login(self.participant_user)
         self.project = Project.objects.create(name="Project Test")
 

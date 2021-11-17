@@ -1,15 +1,8 @@
-from enum import Enum
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from .managers import UserManager
-
-
-class UserGroups(Enum):
-    ADMIN = "Admin"
-    PARTICIPANT = "Project Participant"
 
 
 class User(AbstractUser):
@@ -22,9 +15,11 @@ class User(AbstractUser):
     first_name = models.CharField(_("first name"), max_length=150, blank=False)
     last_name = models.CharField(_("last name"), max_length=150, blank=False)
     username = None
+
     invitation_completed_at = models.DateTimeField(
         _("invitation completed at"), blank=True, null=True
     )
+    is_lab_admin = models.BooleanField(_("is Euphrosyne admin"), default=False)
 
     objects = UserManager()
 
@@ -38,18 +33,6 @@ class User(AbstractUser):
     def delete(self, *_):
         self.is_active = False
         self.save()
-
-    def in_admin_group(self):
-        return self.groups.filter(name=UserGroups.ADMIN.value).exists()
-
-    in_admin_group.boolean = True
-    in_admin_group.short_description = _("In Admin group")
-
-    def in_participant_group(self):
-        return self.groups.filter(name=UserGroups.PARTICIPANT.value).exists()
-
-    in_participant_group.boolean = True
-    in_participant_group.short_description = _("In Participant group")
 
 
 class UserInvitation(User):

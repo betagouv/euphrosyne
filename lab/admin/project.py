@@ -8,6 +8,7 @@ from django.http.request import HttpRequest
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+from euphro_auth.mixins import StaffUserAllowedMixin
 from euphro_auth.models import User
 from lab.widgets import LeaderReadonlyWidget
 
@@ -46,9 +47,18 @@ class ParticipationFormSet(BaseInlineFormSet):
         return super().get_queryset().order_by("-is_leader")
 
 
-class ParticipationInline(admin.TabularInline):
+class ParticipationInline(LabPermissionMixin, admin.TabularInline):
     model = Participation
     verbose_name = _("Project member")
+
+    lab_permissions = LabPermission(
+        add_permission=LabRole.PROJECT_LEADER,
+        change_permission=LabRole.PROJECT_LEADER,
+        view_permission=LabRole.PROJECT_MEMBER,
+    )
+
+    def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
+        return obj
 
     def get_formset(
         self,
@@ -87,12 +97,12 @@ class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
 
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Project)
-class ProjectAdmin(LabPermissionMixin, ModelAdmin):
+class ProjectAdmin(StaffUserAllowedMixin, LabPermissionMixin, ModelAdmin):
     list_display = ("name", "leader_user", "status")
     readonly_fields = ("members", "status", "editable_leader_user", "leader_user")
 
     lab_permissions = LabPermission(
-        add_permission=LabRole.NON_PARTICIPANT,
+        add_permission=LabRole.ANY_USER,
         change_permission=LabRole.PROJECT_MEMBER,
         view_permission=LabRole.PROJECT_MEMBER,
     )

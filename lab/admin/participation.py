@@ -6,15 +6,32 @@ from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 
+from euphro_auth.mixins import StaffUserAllowedMixin
+from lab.admin.mixins import LabPermission, LabPermissionMixin, LabRole
+
 from ..lib import is_lab_admin
 from ..models import Participation, Project
 
 
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:<custom (obj.user)>
 @admin.register(Participation)
-class ParticipationAdmin(ModelAdmin):
+class ParticipationAdmin(StaffUserAllowedMixin, LabPermissionMixin, ModelAdmin):
     list_display = ("project", "user")
     readonly_fields = ("project", "user", "institution")
+
+    lab_permissions = LabPermission(
+        add_permission=LabRole.PROJECT_MEMBER,
+        change_permission=LabRole.PROJECT_LEADER,
+        view_permission=LabRole.PROJECT_MEMBER,
+        delete_permission=LabRole.PROJECT_LEADER,
+    )
+
+    def get_related_project(
+        self, obj: Optional[Participation] = None
+    ) -> Optional[Project]:
+        if obj:
+            return obj.project
+        return None
 
     def has_view_permission(
         self, request: HttpRequest, obj: Optional[Participation] = None

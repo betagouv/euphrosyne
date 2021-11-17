@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.http.request import HttpRequest
 
+from lab.admin.mixins import LabAdminAllowedMixin
 from lab.lib import is_lab_admin
 
 from ..models import BeamTimeRequest
@@ -19,7 +20,7 @@ ADMIN_FIELDS = (
 
 # Allowance: ADMIN:lab admin
 @admin.register(BeamTimeRequest)
-class BeamTimeRequestAdmin(ModelAdmin):
+class BeamTimeRequestAdmin(LabAdminAllowedMixin, ModelAdmin):
     list_display = ("project", "request_type")
     fields = ADMIN_FIELDS
     readonly_fields = ADMIN_FIELDS
@@ -33,16 +34,14 @@ class BeamTimeRequestAdmin(ModelAdmin):
         ).distinct()
 
     # pylint: disable=no-self-use
-    def has_add_permission(self, request: HttpRequest) -> bool:
+    def has_add_permission(
+        self, request: HttpRequest, obj: Optional[BeamTimeRequest] = None
+    ) -> bool:
         # User should only create beam time requests
         # via the inline form present in the Project admin page
         return False
 
-    def has_change_permission(
+    def has_delete_permission(
         self, request: HttpRequest, obj: Optional[BeamTimeRequest] = None
-    ):
-        return (
-            is_lab_admin(request.user)
-            or not obj
-            or obj.project.participation_set.filter(user_id=request.user.id).exists()
-        ) and super().has_change_permission(request, obj)
+    ) -> bool:
+        return False
