@@ -2,14 +2,11 @@ from typing import Optional
 
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.sites import AdminSite
-from django.contrib.auth import get_user_model, models
-from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
 from django.test import RequestFactory, TestCase
 
-from euphro_auth.models import UserGroups
-
-from ...admin.mixins import LabPermission, LabPermissionMixin, LabRole
-from ...models import Project
+from ....admin.mixins import LabPermission, LabPermissionMixin, LabRole
+from ....models import Project
 
 
 class TestModelAdmin(LabPermissionMixin, ModelAdmin):
@@ -18,30 +15,18 @@ class TestModelAdmin(LabPermissionMixin, ModelAdmin):
 
 
 class TestLabPermissionMixin(TestCase):
-    fixtures = ["groups"]
-
     def setUp(self):
         self.admin_user = get_user_model().objects.create(
-            email="admin@test.test", is_staff=True
+            email="admin@test.test", is_staff=True, is_lab_admin=True
         )
-        self.admin_user.groups.add(Group.objects.get(name=UserGroups.ADMIN.value))
         self.leader_user = get_user_model().objects.create(
             email="leader@test.test", is_staff=True
-        )
-        self.leader_user.groups.add(
-            Group.objects.get(name=UserGroups.PARTICIPANT.value)
         )
         self.member_user = get_user_model().objects.create(
             email="member@test.test", is_staff=True
         )
-        self.member_user.groups.add(
-            Group.objects.get(name=UserGroups.PARTICIPANT.value)
-        )
         self.non_participant_user = get_user_model().objects.create(
             email="someuser@test.test", is_staff=True
-        )
-        self.non_participant_user.groups.add(
-            Group.objects.get(name=UserGroups.PARTICIPANT.value)
         )
         self.project = Project.objects.create(name="Test project")
         self.project.participation_set.create(user=self.leader_user, is_leader=True)
@@ -119,10 +104,10 @@ class TestLabPermissionMixin(TestCase):
         request.user = self.non_participant_user
 
         self.model_admin.lab_permissions = LabPermission(
-            add_permission=LabRole.NON_PARTICIPANT,
-            change_permission=LabRole.NON_PARTICIPANT,
-            delete_permission=LabRole.NON_PARTICIPANT,
-            view_permission=LabRole.NON_PARTICIPANT,
+            add_permission=LabRole.ANY_USER,
+            change_permission=LabRole.ANY_USER,
+            delete_permission=LabRole.ANY_USER,
+            view_permission=LabRole.ANY_USER,
         )
 
         assert self.model_admin.has_view_permission(request, self.project)

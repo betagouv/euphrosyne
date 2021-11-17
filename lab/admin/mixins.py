@@ -13,7 +13,7 @@ T = TypeVar("T", bound=models.Model)
 
 
 class LabRole(enum.IntEnum):
-    NON_PARTICIPANT = 0
+    ANY_USER = 0
     PROJECT_MEMBER = 1
     PROJECT_LEADER = 2
     LAB_ADMIN = 3
@@ -52,17 +52,20 @@ class LabPermissionMixin:
             not project
             or self._get_user_permission_group(request, project)
             >= self.lab_permissions.view_permission
-        ) and super().has_view_permission(request, project)
+        )
 
     def has_add_permission(
         self, request: HttpRequest, obj: Optional[Project] = None
     ) -> bool:
         project = self.get_related_project(obj)
+        if not project:
+            if self.lab_permissions.add_permission == LabRole.ANY_USER:
+                return True
+            return is_lab_admin(request.user)
         return (
-            not project
-            or self._get_user_permission_group(request, project)
+            self._get_user_permission_group(request, project)
             >= self.lab_permissions.add_permission
-        ) and super().has_add_permission(request)
+        )
 
     def has_change_permission(
         self, request: HttpRequest, obj: Optional[T] = None
@@ -72,7 +75,7 @@ class LabPermissionMixin:
             not project
             or self._get_user_permission_group(request, project)
             >= self.lab_permissions.change_permission
-        ) and super().has_view_permission(request, project)
+        )
 
     def has_delete_permission(
         self, request: HttpRequest, obj: Optional[T] = None
@@ -82,10 +85,11 @@ class LabPermissionMixin:
             not project
             or self._get_user_permission_group(request, project)
             >= self.lab_permissions.delete_permission
-        ) and super().has_view_permission(request, project)
+        )
 
+    @staticmethod
     def _get_user_permission_group(
-        self, request: HttpRequest, project: Project
+        request: HttpRequest, project: Project
     ) -> Optional[LabRole]:
         if is_lab_admin(request.user):
             return LabRole.LAB_ADMIN
@@ -94,4 +98,33 @@ class LabPermissionMixin:
             if project_member_qs.filter(is_leader=True).exists():
                 return LabRole.PROJECT_LEADER
             return LabRole.PROJECT_MEMBER
-        return LabRole.NON_PARTICIPANT
+        return LabRole.ANY_USER
+
+
+class LabAdminAllowedMixin:
+    """Gives permission to every action to lab admin and restricts others."""
+
+    @staticmethod
+    # pylint: disable=unused-argument
+    def has_module_permission(request: HttpRequest) -> bool:
+        return request.user.is_staff and is_lab_admin(request.user)
+
+    @staticmethod
+    # pylint: disable=unused-argument
+    def has_view_permission(request: HttpRequest, obj: Optional[T] = None):
+        return request.user.is_staff and is_lab_admin(request.user)
+
+    @staticmethod
+    # pylint: disable=unused-argument
+    def has_add_permission(request: HttpRequest, obj: Optional[T] = None):
+        return request.user.is_staff and is_lab_admin(request.user)
+
+    @staticmethod
+    # pylint: disable=unused-argument
+    def has_change_permission(request: HttpRequest, obj: Optional[T] = None):
+        return request.user.is_staff and is_lab_admin(request.user)
+
+    @staticmethod
+    # pylint: disable=unused-argument
+    def has_delete_permission(request: HttpRequest, obj: Optional[T] = None):
+        return request.user.is_staff and is_lab_admin(request.user)
