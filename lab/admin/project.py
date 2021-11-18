@@ -8,7 +8,6 @@ from django.http.request import HttpRequest
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from euphro_auth.mixins import StaffUserAllowedMixin
 from euphro_auth.models import User
 from lab.widgets import LeaderReadonlyWidget
 
@@ -97,7 +96,7 @@ class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
 
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Project)
-class ProjectAdmin(StaffUserAllowedMixin, LabPermissionMixin, ModelAdmin):
+class ProjectAdmin(LabPermissionMixin, ModelAdmin):
     list_display = ("name", "leader_user", "status")
     readonly_fields = ("members", "status", "editable_leader_user", "leader_user")
 

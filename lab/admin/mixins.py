@@ -48,7 +48,7 @@ class LabPermissionMixin:
         self, request: HttpRequest, obj: Optional[T] = None
     ) -> bool:
         project = self.get_related_project(obj)
-        return (
+        return request.user.is_staff and (
             not project
             or self._get_user_permission_group(request, project)
             >= self.lab_permissions.view_permission
@@ -71,7 +71,7 @@ class LabPermissionMixin:
         self, request: HttpRequest, obj: Optional[T] = None
     ) -> bool:
         project = self.get_related_project(obj)
-        return (
+        return request.user.is_staff and (
             not project
             or self._get_user_permission_group(request, project)
             >= self.lab_permissions.change_permission
@@ -81,11 +81,15 @@ class LabPermissionMixin:
         self, request: HttpRequest, obj: Optional[T] = None
     ) -> bool:
         project = self.get_related_project(obj)
-        return (
+        return request.user.is_staff and (
             not project
             or self._get_user_permission_group(request, project)
             >= self.lab_permissions.delete_permission
         )
+
+    @staticmethod
+    def has_module_permission(request: HttpRequest) -> bool:
+        return request.user.is_staff
 
     @staticmethod
     def _get_user_permission_group(

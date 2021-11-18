@@ -5,8 +5,6 @@ from django.contrib.admin import ModelAdmin
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 
-from euphro_auth.mixins import StaffUserAllowedMixin
-
 from ..lib import is_lab_admin
 from ..models import Project, Run
 from .mixins import LabPermission, LabPermissionMixin, LabRole
@@ -14,7 +12,7 @@ from .mixins import LabPermission, LabPermissionMixin, LabRole
 
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Run)
-class RunAdmin(LabPermissionMixin, StaffUserAllowedMixin, ModelAdmin):
+class RunAdmin(LabPermissionMixin, ModelAdmin):
     list_display = ("label", "date", "project")
 
     lab_permissions = LabPermission(
