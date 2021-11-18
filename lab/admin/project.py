@@ -101,7 +101,7 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
     readonly_fields = ("members", "status", "editable_leader_user", "leader_user")
 
     lab_permissions = LabPermission(
-        add_permission=LabRole.ANY_USER,
+        add_permission=LabRole.ANY_STAFF_USER,
         change_permission=LabRole.PROJECT_MEMBER,
         view_permission=LabRole.PROJECT_MEMBER,
     )

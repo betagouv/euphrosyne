@@ -13,7 +13,7 @@ T = TypeVar("T", bound=models.Model)
 
 
 class LabRole(enum.IntEnum):
-    ANY_USER = 0
+    ANY_STAFF_USER = 0
     PROJECT_MEMBER = 1
     PROJECT_LEADER = 2
     LAB_ADMIN = 3
@@ -59,7 +59,7 @@ class LabPermissionMixin:
     ) -> bool:
         project = self.get_related_project(obj)
         if not project:
-            if self.lab_permissions.add_permission == LabRole.ANY_USER:
+            if self.lab_permissions.add_permission == LabRole.ANY_STAFF_USER:
                 return True
             return is_lab_admin(request.user)
         return (
@@ -105,7 +105,7 @@ class LabPermissionMixin:
             if is_leader:
                 return LabRole.PROJECT_LEADER
             return LabRole.PROJECT_MEMBER
-        return LabRole.ANY_USER
+        return LabRole.ANY_STAFF_USER
 
 
 class LabAdminAllowedMixin:

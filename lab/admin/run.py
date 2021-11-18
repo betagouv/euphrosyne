@@ -16,7 +16,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
     list_display = ("label", "date", "project")
 
     lab_permissions = LabPermission(
-        add_permission=LabRole.ANY_USER,
+        add_permission=LabRole.ANY_STAFF_USER,
         view_permission=LabRole.PROJECT_MEMBER,
         change_permission=LabRole.PROJECT_LEADER,
         delete_permission=LabRole.PROJECT_LEADER,

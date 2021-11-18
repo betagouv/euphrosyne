@@ -104,10 +104,10 @@ class TestLabPermissionMixin(TestCase):
         request.user = self.non_participant_user
 
         self.model_admin.lab_permissions = LabPermission(
-            add_permission=LabRole.ANY_USER,
-            change_permission=LabRole.ANY_USER,
-            delete_permission=LabRole.ANY_USER,
-            view_permission=LabRole.ANY_USER,
+            add_permission=LabRole.ANY_STAFF_USER,
+            change_permission=LabRole.ANY_STAFF_USER,
+            delete_permission=LabRole.ANY_STAFF_USER,
+            view_permission=LabRole.ANY_STAFF_USER,
         )
 
         assert self.model_admin.has_view_permission(request, self.project)
