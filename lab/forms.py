@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List, Tuple
 
 import yaml
 from django import forms
@@ -12,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from euphro_auth.models import User
 from lab.emails import send_project_invitation_email
 
-from . import models, widgets
+from . import fields, models, widgets
 
 # [TODO] Rewrite
 with open(Path(__file__).parent / "models" / "run-choices-config.yaml") as f:
@@ -122,6 +123,20 @@ RUN_DETAILS_FIELDS = (
     "beamline",
 )
 
+RECOMMENDED_ENERGY_LEVELS = {
+    models.Run.ParticleType.PROTON: [1000, 1500, 2000, 2500, 3000, 3500, 3800, 4000],
+    models.Run.ParticleType.ALPHA: [3000, 4000, 5000, 6000],
+    models.Run.ParticleType.DEUTON: [1000, 1500, 2000],
+}
+
+
+def get_energy_levels_choices(
+    particle_type: str,
+) -> List[Tuple[str, str]]:
+    return [
+        (level, f"{level} keV") for level in RECOMMENDED_ENERGY_LEVELS[particle_type]
+    ]
+
 
 class RunDetailsForm(ModelForm):
     class Meta:
@@ -134,23 +149,38 @@ class RunDetailsForm(ModelForm):
             )
         }
 
+    energy_in_keV = fields.MultiDatalistIntegerField(
+        widget=widgets.MultiDatalistWidget(
+            control_field_name="particle_type",
+            widgets={
+                particle_type: widgets.ControlledDatalist(
+                    field_name="energy_in_keV",
+                    control_value=particle_type,
+                    choices=get_energy_levels_choices(particle_type),
+                )
+                for particle_type in models.Run.ParticleType
+            },
+        ),
+    )
+
     def clean(self):
         cleaned_data = super().clean()
         cleaned_start_date = cleaned_data.get("start_date")
         cleaned_end_date = cleaned_data.get("end_date")
         cleaned_embargo_date = cleaned_data.get("embargo_date")
+        cleaned_energies = cleaned_data.get("energy_in_keV")
+        cleaned_particle_type = cleaned_data.get("particle_type")
+
+        errors = {}
+
         if (
             cleaned_start_date
             and cleaned_end_date
             and cleaned_end_date < cleaned_start_date
         ):
-            raise ValidationError(
-                {
-                    "end_date": ValidationError(
-                        _("The end date must be after the start date"),
-                        code="start_date_after_end_date",
-                    )
-                },
+            errors["end_date"] = ValidationError(
+                _("The end date must be after the start date"),
+                code="start_date_after_end_date",
             )
 
         if (
@@ -158,14 +188,23 @@ class RunDetailsForm(ModelForm):
             and cleaned_embargo_date
             and cleaned_embargo_date < cleaned_end_date.date()
         ):
-            raise ValidationError(
-                {
-                    "embargo_date": ValidationError(
-                        _("The embargo date must be after the end date"),
-                        code="end_date_after_embargo_date",
-                    )
-                }
+            errors["embargo_date"] = ValidationError(
+                _("The embargo date must be after the end date"),
+                code="end_date_after_embargo_date",
             )
+
+        # Get the right energy level depending on particle_type
+        if not cleaned_particle_type:
+            cleaned_data["energy_in_keV"] = None
+        else:
+            # [XXX] Test that order is kept from PaticleTypes to energies
+            cleaned_data["energy_in_keV"] = cleaned_energies[
+                list(models.Run.ParticleType).index(cleaned_particle_type)
+            ]
+
+        if errors:
+            raise ValidationError(errors)
+        return cleaned_data
 
 
 class RunStatusBaseForm(ModelForm):

@@ -1,0 +1,24 @@
+<input type="{{ widget.type }}" name="{{ widget.name }}" list="{{ widget.list_id }}"{% if widget.value != None %} value="{{ widget.value.0|stringformat:'s' }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}>
+<datalist id="{{ widget.list_id }}"{% include "django/forms/widgets/attrs.html" %}>{% for group_name, group_choices, group_index in widget.optgroups %}{% if group_name %}
+  <optgroup label="{{ group_name }}">{% endif %}{% for option in group_choices %}
+  {% include option.template_name with widget=option %}{% endfor %}{% if group_name %}
+  </optgroup>{% endif %}{% endfor %}
+</datalist>
+<script async>
+django.jQuery(document).ready(() => {
+  const $ = django.jQuery
+  const toggleDatalistInput = (controlValue) => {
+    $('input[controlled-datalist-label^="{{ widget.controlled_datalist_label_prefix }}"]').hide()
+    if (typeof controlValue !== 'undefined') {
+      $(`input[controlled-datalist-label="{{ widget.controlled_datalist_label_prefix}}${controlValue}"]`).show()
+    }
+  }
+  const initValue = $('select[name="{{ control_field_name }}"]').get(0).value
+  toggleDatalistInput(initValue)
+
+  $('select[name="{{ control_field_name }}"]').on('change', (e) => {
+    const newValue = e.target.value
+    toggleDatalistInput(newValue)
+  })
+})
+</script>
