@@ -9,24 +9,18 @@ from ...admin import RunAdmin
 from ...models import Project, Run
 
 
-class TestRunAdminViewAsLeader(TestCase):
+class TestRunAdminViewAsMember(TestCase):
     def setUp(self):
         self.request_factory = RequestFactory()
-        self.project_leader_user = get_user_model().objects.create_user(
-            email="leader_user@test.com", password="leader_user", is_staff=True
-        )
-        self.project_leader_user_2 = get_user_model().objects.create_user(
-            email="leader_user_2@test.com", password="leader_user_2", is_staff=True
+        self.project_member = get_user_model().objects.create_user(
+            email="user@test.com", password="member", is_staff=True
         )
         self.existing_project_2 = Project.objects.create(name="some project name 2")
-        self.existing_project_2.participation_set.create(
-            user=self.project_leader_user_2, is_leader=True
-        )
 
     def test_add_run_of_non_lead_project_not_allowed(self):
-        "Test add Run of non-lead Project not allowed via formfield_for_foreignkey"
+        "Test add Run of non-member Project not allowed via formfield_for_foreignkey"
         request = self.request_factory.get(reverse("admin:lab_run_add"))
-        request.user = self.project_leader_user
+        request.user = self.project_member
         admin = RunAdmin(Run, admin_site=AdminSite())
         admin_form = admin.get_form(request, obj=None, change=False)
 

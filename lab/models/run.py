@@ -80,32 +80,6 @@ class AnalysisTechniqueUsed(models.Model):
         blank=False,
     )
 
-    def clean(self):
-        beamline = self.run.beamline
-        analysis_techniques_available = RUN_CHOICES["beamlines"][beamline].get(
-            "analysis_techniques", dict()
-        )
-        # Analysis technique must correspond to beamline.
-        if self.label not in analysis_techniques_available.keys():
-            raise ValidationError(
-                _(
-                    "The analysis technique in use ({label}) doesn't correspond to "
-                    "the instrument's beamline in use ({beamline})"
-                ).format(label=self.label, beamline=self.run.beamline)
-            )
-        analysis_technique_choices = analysis_techniques_available[self.label]
-        # There must be a detector used for an analysis technique which has
-        # available detector choices.
-        if (
-            analysis_technique_choices.get("detectors", None)
-            and not self.detectors_used.exists()
-        ):
-            raise ValidationError(
-                _(
-                    "Analysis technique {analysis_technique_label} requires a detector."
-                ).format(analysis_technique_label=self.label)
-            )
-
     def __str__(self):
         return _("{analysis_technique_label} used in {run}").format(
             analysis_technique_label=self.label, run=self.run
@@ -123,45 +97,6 @@ class DetectorUsed(models.Model):
     label = models.CharField(_("Label"), max_length=45, blank=False)
 
     detector_filter = models.CharField(_("Filter"), max_length=45, blank=True)
-
-    def clean(self):
-        run = self.analysis_technique_used.run
-        analysis_technique_label = self.analysis_technique_used.label
-        detectors_available = RUN_CHOICES["beamlines"][run.beamline][
-            "analysis_techniques"
-        ][analysis_technique_label].get("detectors", dict())
-        detector_label = self.label
-        detector_filter = self.detector_filter
-        # Detector must correspond to analysis technique used.
-        if detector_label and detector_label not in detectors_available.keys():
-            raise ValidationError(
-                _(
-                    "The detector used ({detector_label}) doesn't correspond to "
-                    "the analysis technique in use ({analysis_technique_label})"
-                ).format(
-                    detector_label=self.label,
-                    analysis_technique_label=analysis_technique_label,
-                )
-            )
-        detector_choices = detectors_available[detector_label]
-        # There must be a filter used for a detector which has available filter
-        # choices, and the filter must correspond to the detector used.
-        if (
-            detector_choices.get("filters", None)
-            and detector_filter not in detector_choices["filters"]
-        ):
-            if not detector_filter:
-                raise ValidationError(
-                    _("The detector used ({detector_label}) requires a filter.").format(
-                        detector_label=detector_label
-                    )
-                )
-            raise ValidationError(
-                _(
-                    "The detector filter used ({detector_filter}) doesn't correspond "
-                    "to the detector used ({detector_label})"
-                ).format(detector_filter=detector_filter, detector_label=detector_label)
-            )
 
     def __str__(self):
         return _(
