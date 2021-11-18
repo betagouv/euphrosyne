@@ -97,9 +97,12 @@ class LabPermissionMixin:
     ) -> Optional[LabRole]:
         if is_lab_admin(request.user):
             return LabRole.LAB_ADMIN
-        project_member_qs = project.participation_set.filter(user=request.user)
-        if project_member_qs.exists():
-            if project_member_qs.filter(is_leader=True).exists():
+        member_participations_qs = project.participation_set.filter(
+            user=request.user
+        ).values_list("is_leader", flat=True)
+        if member_participations_qs.exists():
+            is_leader = member_participations_qs[0]
+            if is_leader:
                 return LabRole.PROJECT_LEADER
             return LabRole.PROJECT_MEMBER
         return LabRole.ANY_USER
