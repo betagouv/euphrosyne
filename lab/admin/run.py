@@ -25,6 +25,7 @@ BASE_RUN_FIELDSETS = (
 
 @admin.register(Run)
 class RunAdmin(LabPermissionMixin, ModelAdmin):
+
     form = RunDetailsForm
     list_display = ("project", "label", "start_date", "end_date")
     readonly_fields = ("status",)

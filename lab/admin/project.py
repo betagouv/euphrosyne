@@ -12,9 +12,9 @@ from euphro_auth.models import User
 from lab.widgets import LeaderReadonlyWidget
 
 from ..forms import (
-    RUN_DETAILS_FIELDS,
     BaseParticipationForm,
     LeaderParticipationForm,
+    RunDetailsForm,
     RunStatusAdminForm,
     RunStatusMemberForm,
 )
@@ -105,7 +105,7 @@ class RunInline(LabPermissionMixin, admin.StackedInline):
     model = Run
     extra = 0
     show_change_link = True
-    readonly_fields = RUN_DETAILS_FIELDS
+    readonly_fields = RunDetailsForm.Meta.fields
     fieldsets = BASE_RUN_FIELDSETS
     template = "admin/edit_inline/stacked_run_in_project.html"
 
