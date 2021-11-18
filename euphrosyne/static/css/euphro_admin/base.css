@@ -104,6 +104,10 @@ body {
   color: var(--black-euphro);
 }
 
+#user-tools #logout-link {
+  color: var(--delete-button-bg);
+}
+
 .module caption {
   background-color: white;
 }
