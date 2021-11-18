@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-24 21:29+0100\n"
+"POT-Creation-Date: 2021-11-25 10:27+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -114,6 +114,9 @@ msgstr "L'équipe Euphrosyne"
 
 msgid "Enter your information"
 msgstr "Entrez vos informations"
+
+msgid "Log out"
+msgstr "Déconnexion"
 
 msgid "Log in with ORCID"
 msgstr "Se connecter avec ORCID"
