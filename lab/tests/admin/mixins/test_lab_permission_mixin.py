@@ -32,7 +32,7 @@ class TestLabPermissionMixin(SimpleTestCase):
         "lab.permissions.get_user_permission_group",
         return_value=LabRole.LAB_ADMIN,
     )
-    def test_users_with_higher_or_equal_permission_are_allowed(self, mock_fn):
+    def test_users_with_higher_or_equal_permission_are_allowed(self, _):
         self.model_admin.lab_permissions = LabPermission(
             add_permission=LabRole.LAB_ADMIN,
             change_permission=LabRole.LAB_ADMIN,
@@ -53,7 +53,7 @@ class TestLabPermissionMixin(SimpleTestCase):
         "lab.permissions.get_user_permission_group",
         return_value=LabRole.PROJECT_LEADER,
     )
-    def test_users_with_less_permission_are_restricted(self, mock_fn):
+    def test_users_with_less_permission_are_restricted(self, _):
         request = self.request_factory.get("/someurl")
         request.user = get_user_model()(is_staff=True)
         assert not self.model_admin.has_view_permission(request, self.project)
