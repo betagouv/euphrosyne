@@ -1,22 +1,14 @@
-import enum
 from dataclasses import dataclass
 from typing import Optional, TypeVar
 
 from django.db import models
 from django.http.request import HttpRequest
 
-from lab.lib import is_lab_admin
-from lab.models import Project
+from ..models import Project
+from ..permissions import LabRole, get_user_permission_group, is_lab_admin
 
 # pylint: disable=invalid-name ; should be fixed with https://github.com/PyCQA/pylint/pull/5221
 T = TypeVar("T", bound=models.Model)
-
-
-class LabRole(enum.IntEnum):
-    ANY_STAFF_USER = 0
-    PROJECT_MEMBER = 1
-    PROJECT_LEADER = 2
-    LAB_ADMIN = 3
 
 
 @dataclass
@@ -50,7 +42,7 @@ class LabPermissionMixin:
         project = self.get_related_project(obj)
         return request.user.is_staff and (
             not project
-            or self._get_user_permission_group(request, project)
+            or get_user_permission_group(request, project)
             >= self.lab_permissions.view_permission
         )
 
@@ -63,7 +55,7 @@ class LabPermissionMixin:
                 return True
             return is_lab_admin(request.user)
         return (
-            self._get_user_permission_group(request, project)
+            get_user_permission_group(request, project)
             >= self.lab_permissions.add_permission
         )
 
@@ -73,7 +65,7 @@ class LabPermissionMixin:
         project = self.get_related_project(obj)
         return request.user.is_staff and (
             not project
-            or self._get_user_permission_group(request, project)
+            or get_user_permission_group(request, project)
             >= self.lab_permissions.change_permission
         )
 
@@ -83,29 +75,13 @@ class LabPermissionMixin:
         project = self.get_related_project(obj)
         return request.user.is_staff and (
             not project
-            or self._get_user_permission_group(request, project)
+            or get_user_permission_group(request, project)
             >= self.lab_permissions.delete_permission
         )
 
     @staticmethod
     def has_module_permission(request: HttpRequest) -> bool:
         return request.user.is_staff
-
-    @staticmethod
-    def _get_user_permission_group(
-        request: HttpRequest, project: Project
-    ) -> Optional[LabRole]:
-        if is_lab_admin(request.user):
-            return LabRole.LAB_ADMIN
-        member_participations_qs = project.participation_set.filter(
-            user=request.user
-        ).values_list("is_leader", flat=True)
-        if member_participations_qs.exists():
-            is_leader = member_participations_qs[0]
-            if is_leader:
-                return LabRole.PROJECT_LEADER
-            return LabRole.PROJECT_MEMBER
-        return LabRole.ANY_STAFF_USER
 
 
 class LabAdminAllowedMixin:

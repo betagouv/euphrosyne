@@ -12,7 +12,7 @@ from euphro_auth.models import User
 from lab.widgets import LeaderReadonlyWidget
 
 from ..forms import BaseParticipationForm, LeaderParticipationForm
-from ..lib import is_lab_admin, is_project_leader
+from ..permissions import is_lab_admin, is_project_leader
 from ..models import BeamTimeRequest, Participation, Project
 from .mixins import LabPermission, LabPermissionMixin, LabRole
 

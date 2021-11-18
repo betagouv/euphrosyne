@@ -5,7 +5,7 @@ from django.contrib.admin import ModelAdmin
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 
-from ..lib import is_lab_admin
+from ..permissions import is_lab_admin
 from ..models import Project, Run
 from .mixins import LabPermission, LabPermissionMixin, LabRole
 
