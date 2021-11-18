@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List, Tuple
 
 import yaml
 from django import forms
@@ -14,7 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from euphro_auth.models import User
 from lab.emails import send_project_invitation_email
 
-from . import models, widgets
+from . import fields, models, widgets
 
 # [XXX] Wrap in a service
 with open(Path(__file__).parent / "models" / "run-choices-config.yaml") as f:
@@ -124,6 +125,20 @@ RUN_DETAILS_FIELDS = (
     "beamline",
 )
 
+RECOMMENDED_ENERGY_LEVELS = {
+    models.Run.ParticleType.PROTON: [1000, 1500, 2000, 2500, 3000, 3500, 3800, 4000],
+    models.Run.ParticleType.ALPHA: [3000, 4000, 5000, 6000],
+    models.Run.ParticleType.DEUTON: [1000, 1500, 2000],
+}
+
+
+def get_energy_levels_choices(
+    particle_type: str,
+) -> List[Tuple[str, str]]:
+    return [
+        (level, f"{level} keV") for level in RECOMMENDED_ENERGY_LEVELS[particle_type]
+    ]
+
 
 # [XXX] Run end > run start and embargo >= run end
 class RunDetailsForm(ModelForm):
@@ -135,13 +150,27 @@ class RunDetailsForm(ModelForm):
                 widgets.DisabledSelectWithHidden(),
                 models.Run.project.field.remote_field,  # pylint: disable=no-member
                 admin_site,
-                # [XXX] Bug: plus button still appears
+                # [FIXME] Bug: plus button still appears
                 can_add_related=False,
                 can_change_related=False,
                 can_delete_related=True,
                 can_view_related=False,
-            )
+            ),
         }
+
+    energy_in_keV = fields.MultiDatalistIntegerField(
+        widget=widgets.MultiDatalistWidget(
+            control_field_name="particle_type",
+            widgets={
+                particle_type: widgets.ControlledDatalist(
+                    field_name="energy_in_keV",
+                    control_value=particle_type,
+                    choices=get_energy_levels_choices(particle_type),
+                )
+                for particle_type in models.Run.ParticleType
+            },
+        ),
+    )
 
     # Note: this validation will be useful when we will have multiple beamlines.
     def clean_beamline(self):
@@ -153,6 +182,20 @@ class RunDetailsForm(ModelForm):
                 code="invalid_beamline",
             )
         return beamline
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # Get the right energy level depending on particle_type
+        energies = cleaned_data.get("energy_in_keV")
+        particle_type = cleaned_data.get("particle_type")
+        if not particle_type:
+            cleaned_data["energy_in_keV"] = None
+        else:
+            # [XXX] Test that order is kept from PaticleTypes to energies
+            cleaned_data["energy_in_keV"] = energies[
+                list(models.Run.ParticleType).index(particle_type)
+            ]
+        return cleaned_data
 
 
 class RunStatusBaseForm(ModelForm):
