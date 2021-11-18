@@ -1,0 +1,18 @@
+{% include "django/forms/widgets/multiwidget.html" %}
+<script>
+(() => {
+  const toggleDatalistInputs = (controlValue) => {
+    document.querySelectorAll('input[name^="{{ widget.controlled_name_prefix }}"]').forEach((el) => {el.style.display = 'none'})
+    if (typeof controlValue !== 'undefined') {
+      document.querySelectorAll(`input[name="{{ widget.controlled_name_prefix}}${controlValue}"]`).forEach((el) => {el.style.display = 'inline-block'})
+    }
+  }
+  const initValue = document.querySelector('select[name="{{ widget.controller_field_name }}"]').value
+  toggleDatalistInputs(initValue)
+
+  document.querySelector('select[name="{{ widget.controller_field_name }}"]').addEventListener('change', (e) => {
+    const newValue = e.target.value
+    toggleDatalistInputs(newValue)
+  })
+})()
+</script>

@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List, Tuple
 
 import yaml
 from django import forms
@@ -13,6 +14,7 @@ from euphro_auth.models import User
 from lab.emails import send_project_invitation_email
 
 from . import models, widgets
+from .controlled_datalist import controlled_datalist_form
 
 # [TODO] Rewrite
 with open(Path(__file__).parent / "models" / "run-choices-config.yaml") as f:
@@ -112,21 +114,39 @@ class ChangeLeaderForm(Form):
         self.fields["leader_participation"].queryset = project.participation_set
 
 
-RUN_DETAILS_FIELDS = (
-    "label",
-    "start_date",
-    "end_date",
-    "embargo_date",
-    "particle_type",
-    "energy_in_keV",
-    "beamline",
+RECOMMENDED_ENERGY_LEVELS = {
+    models.Run.ParticleType.PROTON: [1000, 1500, 2000, 2500, 3000, 3500, 3800, 4000],
+    models.Run.ParticleType.ALPHA: [3000, 4000, 5000, 6000],
+    models.Run.ParticleType.DEUTON: [1000, 1500, 2000],
+}
+
+
+def _get_energy_levels_choices(
+    particle_type: str,
+) -> List[Tuple[str, str]]:
+    return [
+        (level, f"{level} keV") for level in RECOMMENDED_ENERGY_LEVELS[particle_type]
+    ]
+
+
+@controlled_datalist_form(
+    controller_field_name="particle_type",
+    controlled_field_name="energy_in_keV",
+    choices={
+        particle_type: _get_energy_levels_choices(particle_type)
+        for particle_type in models.Run.ParticleType
+    },
 )
-
-
 class RunDetailsForm(ModelForm):
     class Meta:
         model = models.Run
-        fields = RUN_DETAILS_FIELDS
+        fields = (
+            "label",
+            "start_date",
+            "end_date",
+            "embargo_date",
+            "beamline",
+        )
         widgets = {
             "project": widgets.ProjectWidgetWrapper(
                 widgets.DisabledSelectWithHidden(),
@@ -139,18 +159,17 @@ class RunDetailsForm(ModelForm):
         cleaned_start_date = cleaned_data.get("start_date")
         cleaned_end_date = cleaned_data.get("end_date")
         cleaned_embargo_date = cleaned_data.get("embargo_date")
+
+        errors = {}
+
         if (
             cleaned_start_date
             and cleaned_end_date
             and cleaned_end_date < cleaned_start_date
         ):
-            raise ValidationError(
-                {
-                    "end_date": ValidationError(
-                        _("The end date must be after the start date"),
-                        code="start_date_after_end_date",
-                    )
-                },
+            errors["end_date"] = ValidationError(
+                _("The end date must be after the start date"),
+                code="start_date_after_end_date",
             )
 
         if (
@@ -158,14 +177,13 @@ class RunDetailsForm(ModelForm):
             and cleaned_embargo_date
             and cleaned_embargo_date < cleaned_end_date.date()
         ):
-            raise ValidationError(
-                {
-                    "embargo_date": ValidationError(
-                        _("The embargo date must be after the end date"),
-                        code="end_date_after_embargo_date",
-                    )
-                }
+            errors["embargo_date"] = ValidationError(
+                _("The embargo date must be after the end date"),
+                code="end_date_after_embargo_date",
             )
+        if errors:
+            raise ValidationError(errors)
+        return cleaned_data
 
 
 class RunStatusBaseForm(ModelForm):
@@ -179,7 +197,9 @@ class RunStatusBaseForm(ModelForm):
 
         if cleaned_status and cleaned_status != models.Run.Status.NEW:
             missing_fields = [
-                rf for rf in RUN_DETAILS_FIELDS if not getattr(self.instance, rf)
+                rf
+                for rf in RunDetailsForm.Meta.fields
+                if not getattr(self.instance, rf)
             ]
             missing_fields_verbose = [
                 str(_(models.Run._meta.get_field(field_name).verbose_name))
