@@ -10,8 +10,8 @@ from django.urls import reverse
 from django.views.generic.edit import FormView
 
 from ..forms import ChangeLeaderForm
-from ..permissions import is_lab_admin
 from ..models import Project
+from ..permissions import is_lab_admin
 
 
 class ChangeLeaderView(LoginRequiredMixin, FormView):
