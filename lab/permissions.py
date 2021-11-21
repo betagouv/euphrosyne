@@ -31,7 +31,7 @@ def get_user_permission_group(
 
 
 def is_lab_admin(user: User) -> bool:
-    return user.is_superuser or user.is_lab_admin
+    return user.is_superuser or getattr(user, "is_lab_admin", None)
 
 
 def is_project_leader(user: User, project: Project) -> bool:
