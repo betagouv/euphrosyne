@@ -61,11 +61,8 @@ msgstr "nom"
 msgid "invitation completed at"
 msgstr "invitation complétée le"
 
-msgid "In Admin group"
-msgstr "Dans le group Admin"
-
-msgid "In Participant group"
-msgstr "Dans le groupe Participant"
+msgid "is Euphrosyne admin"
+msgstr "admin Euphrosyne"
 
 msgid ""
 "First, enter an email and password. Then, you'll be able to edit more user "

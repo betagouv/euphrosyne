@@ -5,38 +5,27 @@ from django.contrib.admin import ModelAdmin
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 
-from ..lib import is_lab_admin
 from ..models import Project, Run
+from ..permissions import is_lab_admin
+from .mixins import LabPermission, LabPermissionMixin, LabRole
 
 
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Run)
-class RunAdmin(ModelAdmin):
+class RunAdmin(LabPermissionMixin, ModelAdmin):
     list_display = ("label", "date", "project")
 
-    def has_view_permission(self, request: HttpRequest, obj: Optional[Run] = None):
-        """Allow list view but only allow detail to leader or admin"""
-        return (
-            is_lab_admin(request.user)
-            or not obj
-            or obj.project.members.filter(id=request.user.id).exists()
-        ) and super().has_view_permission(request, obj)
+    lab_permissions = LabPermission(
+        add_permission=LabRole.ANY_STAFF_USER,
+        view_permission=LabRole.PROJECT_MEMBER,
+        change_permission=LabRole.PROJECT_LEADER,
+        delete_permission=LabRole.PROJECT_LEADER,
+    )
 
-    def has_change_permission(self, request: HttpRequest, obj: Optional[Run] = None):
-        """Allow change in general but only allow specific edition to leader or admin"""
-        return (
-            is_lab_admin(request.user)
-            or not obj
-            or obj.project.leader.user_id == request.user.id
-        ) and super().has_change_permission(request, obj)
-
-    def has_delete_permission(self, request: HttpRequest, obj: Optional[Run] = None):
-        """Allow deletion in general but only allow specific del to leader or admin"""
-        return (
-            is_lab_admin(request.user)
-            or not obj
-            or obj.project.leader.user_id == request.user.id
-        ) and super().has_delete_permission(request, obj)
+    def get_related_project(self, obj: Optional[Run] = None) -> Optional[Project]:
+        if obj:
+            return obj.project
+        return None
 
     # This one seems redundant with `get_readonly_fields` according to the
     # `ModelAdmin` view:
