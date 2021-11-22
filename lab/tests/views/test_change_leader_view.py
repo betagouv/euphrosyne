@@ -1,37 +1,28 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.test.client import Client
 from django.urls import reverse
-
-from euphro_auth.models import UserGroups
 
 from ...models import Project
 
 
 class TestChangeLeaderView(TestCase):
-
-    fixtures = ["groups"]
-
     def setUp(self):
         self.admin_user = get_user_model().objects.create(
-            email="admin@test.test", is_staff=True
+            email="admin@test.test", is_staff=True, is_lab_admin=True
         )
-        self.admin_user.groups.add(Group.objects.get(name=UserGroups.ADMIN.value))
 
         self.project = Project.objects.create(name="Test project")
 
         leader = get_user_model().objects.create(
             email="leader@test.test", is_staff=True
         )
-        leader.groups.add(Group.objects.get(name=UserGroups.PARTICIPANT.value))
         self.project.participation_set.create(
             user=leader,
             is_leader=True,
         )
 
         member = get_user_model().objects.create(email="member@test.test")
-        member.groups.add(Group.objects.get(name=UserGroups.PARTICIPANT.value))
         self.member_participation = self.project.participation_set.create(
             user=member,
             is_leader=False,

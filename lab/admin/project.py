@@ -12,8 +12,9 @@ from euphro_auth.models import User
 from lab.widgets import LeaderReadonlyWidget
 
 from ..forms import BaseParticipationForm, LeaderParticipationForm
-from ..lib import is_lab_admin, is_project_leader
 from ..models import BeamTimeRequest, Participation, Project
+from ..permissions import is_lab_admin, is_project_leader
+from .mixins import LabPermission, LabPermissionMixin, LabRole
 
 
 class ParticipationFormSet(BaseInlineFormSet):
@@ -45,9 +46,18 @@ class ParticipationFormSet(BaseInlineFormSet):
         return super().get_queryset().order_by("-is_leader")
 
 
-class ParticipationInline(admin.TabularInline):
+class ParticipationInline(LabPermissionMixin, admin.TabularInline):
     model = Participation
     verbose_name = _("Project member")
+
+    lab_permissions = LabPermission(
+        add_permission=LabRole.PROJECT_LEADER,
+        change_permission=LabRole.PROJECT_LEADER,
+        view_permission=LabRole.PROJECT_MEMBER,
+    )
+
+    def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
+        return obj
 
     def get_formset(
         self,
@@ -70,30 +80,31 @@ class ParticipationInline(admin.TabularInline):
         return formset
 
 
-class BeamTimeRequestInline(admin.StackedInline):
+class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
     model = BeamTimeRequest
     fields = ("request_type", "request_id", "form_type", "problem_statement")
 
-    def has_change_permission(
-        self, request: HttpRequest, obj: Optional[Project] = ...
-    ) -> bool:
-        return obj and (
-            is_lab_admin(request.user) or is_project_leader(request.user, obj)
-        )
+    lab_permissions = LabPermission(
+        add_permission=LabRole.PROJECT_MEMBER,
+        change_permission=LabRole.PROJECT_MEMBER,
+        view_permission=LabRole.PROJECT_MEMBER,
+    )
 
-    def has_add_permission(
-        self, request: HttpRequest, obj: Optional[Project] = ...
-    ) -> bool:
-        return obj and (
-            is_lab_admin(request.user) or is_project_leader(request.user, obj)
-        )
+    def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
+        return obj
 
 
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Project)
-class ProjectAdmin(ModelAdmin):
+class ProjectAdmin(LabPermissionMixin, ModelAdmin):
     list_display = ("name", "leader_user", "status")
     readonly_fields = ("members", "status", "editable_leader_user", "leader_user")
+
+    lab_permissions = LabPermission(
+        add_permission=LabRole.ANY_STAFF_USER,
+        change_permission=LabRole.PROJECT_MEMBER,
+        view_permission=LabRole.PROJECT_MEMBER,
+    )
 
     @staticmethod
     @admin.display(description=_("Leader"))
@@ -114,30 +125,8 @@ class ProjectAdmin(ModelAdmin):
             )
         )
 
-    def has_view_permission(self, request: HttpRequest, obj: Optional[Project] = None):
-        return (
-            is_lab_admin(request.user)
-            or not obj
-            or obj.participation_set.filter(user_id=request.user.id).exists()
-        ) and super().has_view_permission(request, obj)
-
-    def has_change_permission(
-        self, request: HttpRequest, obj: Optional[Project] = None
-    ):
-        return (
-            is_lab_admin(request.user)
-            or not obj
-            or obj.members.filter(id=request.user.id).exists()
-        ) and super().has_change_permission(request, obj)
-
-    def has_delete_permission(
-        self, request: HttpRequest, obj: Optional[Project] = None
-    ):
-        return (
-            is_lab_admin(request.user)
-            or not obj
-            or is_project_leader(request.user, obj)
-        ) and super().has_delete_permission(request, obj)
+    def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
+        return obj
 
     def get_fieldsets(
         self, request: HttpRequest, obj: Optional[Project] = ...
@@ -172,9 +161,6 @@ class ProjectAdmin(ModelAdmin):
         if not is_lab_admin(request.user):
             # Leader
             readonly_fields = readonly_fields + ("admin", "run_date")
-            if obj and not is_project_leader(request.user, obj):
-                # Participant on change
-                readonly_fields = readonly_fields + ("name", "comments")
         return readonly_fields
 
     def get_queryset(self, request: HttpRequest):
