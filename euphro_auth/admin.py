@@ -84,9 +84,18 @@ class UserAdmin(DjangoUserAdmin):
 
 
 class UserInvitationAdmin(ModelAdmin):
-    list_display = ("email", "invitation_completed_at")
+    list_display = ("email", "invitation_completed", "invitation_completed_at")
     fields = ("email",)
     actions = ("view", "add")
+
+    # pylint: disable=no-self-use
+    @admin.display(
+        description=_("Invitation completed"),
+        boolean=True,
+        ordering="invitation_completed_at",
+    )
+    def invitation_completed(self, instance: UserInvitation):
+        return instance.invitation_completed_at is not None
 
     def save_model(
         self,
