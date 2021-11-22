@@ -1,12 +1,20 @@
+from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import Client, TestCase
+from django.test.client import RequestFactory
 from django.urls import reverse
+
+from euphro_auth.models import UserInvitation
+
+from ...admin import UserInvitationAdmin
 
 
 class TestUserInvitationAdmin(TestCase):
     def setUp(self):
+        self.request_factory = RequestFactory()
         self.client = Client()
+        self.model_admin = UserInvitationAdmin(UserInvitation, AdminSite())
         self.admin_user = get_user_model().objects.create_user(
             email="admin_user@test.com",
             password="admin_user",
@@ -25,3 +33,18 @@ class TestUserInvitationAdmin(TestCase):
         self.client.post(self.view_url, data={"email": "test@test.test"})
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].subject, "[Euphrosyne] Invitation to register")
+
+    def test_admin_user_can_view_invitations(self):
+        request = self.request_factory.get(self.view_url)
+        request.user = self.admin_user
+        assert self.model_admin.has_module_permission(request)
+        assert self.model_admin.has_view_permission(request, obj=None)
+
+    def test_staff_user_can_not_view_invitations(self):
+        user = get_user_model()(
+            email="member@test.test", is_staff=True, is_lab_admin=False
+        )
+        request = self.request_factory.get(self.view_url)
+        request.user = user
+        assert not self.model_admin.has_module_permission(request)
+        assert not self.model_admin.has_view_permission(request, obj=None)

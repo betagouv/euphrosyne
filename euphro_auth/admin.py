@@ -9,7 +9,7 @@ from django.http.request import HttpRequest
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
-from euphro_auth.mixins import StaffUserAllowedMixin
+from lab.permissions import is_lab_admin
 
 from .emails import send_invitation_email
 from .forms import UserChangeForm, UserCreationForm
@@ -78,7 +78,7 @@ class UserAdmin(DjangoUserAdmin):
         return fieldsets
 
 
-class UserInvitationAdmin(StaffUserAllowedMixin, ModelAdmin):
+class UserInvitationAdmin(ModelAdmin):
     list_display = ("email", "invitation_completed", "invitation_completed_at")
     fields = ("email",)
     actions = ("view", "add")
@@ -107,6 +107,14 @@ class UserInvitationAdmin(StaffUserAllowedMixin, ModelAdmin):
             send_invitation_email(email=obj.email, user_id=obj.pk, token=token)
             return obj
         return super().save_model(request, obj, form, change)
+
+    def has_module_permission(self, request: HttpRequest) -> bool:
+        return request.user.is_staff and is_lab_admin(request.user)
+
+    def has_view_permission(
+        self, request: HttpRequest, obj: Optional[UserInvitation] = None
+    ):
+        return request.user.is_staff and is_lab_admin(request.user)
 
     def has_add_permission(self, request: HttpRequest) -> bool:
         return request.user.is_staff
