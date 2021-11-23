@@ -46,7 +46,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         runs_queryset = super().get_queryset(request)
         if is_lab_admin(request.user):
             return runs_queryset
-        return runs_queryset.filter(project__members__id=request.user.id)
+        return runs_queryset.filter(project__members__id=request.user.id).distinct()
 
     def formfield_for_foreignkey(  # pylint: disable=arguments-differ
         self, db_field, request: HttpRequest, queryset: QuerySet[Run] = None, **kwargs
