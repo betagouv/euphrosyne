@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-01 12:01+0100\n"
+"POT-Creation-Date: 2021-12-01 12:06+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -137,14 +137,22 @@ msgstr "Se connecter avec ORCID"
 msgid "Project member"
 msgstr "Membre du projet"
 
+#, fuzzy
+#| msgid "Embargo date"
+msgid "Embargo"
+msgstr "Date d'embargo"
+
+msgid "Experimental conditions"
+msgstr "Conditions expérimentales"
+
+msgid "Methods"
+msgstr "Méthodes"
+
 msgid "Leader"
 msgstr "Chef de projet"
 
 msgid "Basic information"
 msgstr "Information sessentielles"
-
-msgid "Experimental conditions"
-msgstr "Conditions expérimentales"
 
 #, fuzzy
 #| msgid "Projects"

@@ -21,7 +21,6 @@ from ..forms import (
 from ..models import BeamTimeRequest, Participation, Project, Run
 from ..permissions import is_lab_admin, is_project_leader
 from .mixins import LabPermission, LabPermissionMixin, LabRole
-from .run import BASE_RUN_FIELDSETS
 
 
 class ParticipationFormSet(BaseInlineFormSet):
@@ -101,12 +100,20 @@ class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
         return obj
 
 
-class RunInline(LabPermissionMixin, admin.StackedInline):
+class RunInline(LabPermissionMixin, admin.TabularInline):
     model = Run
     extra = 0
     show_change_link = True
     readonly_fields = RunDetailsForm.Meta.fields
-    fieldsets = BASE_RUN_FIELDSETS
+    fieldsets = (
+        (None, {"fields": ("start_date", "end_date")}),
+        (_("Embargo"), {"fields": ("embargo_date",)}),
+        (
+            _("Experimental conditions"),
+            {"fields": ("particle_type", "energy_in_keV", "beamline")},
+        ),
+        (_("Methods"), {"fields": ("methods",)}),
+    )
     template = "admin/edit_inline/stacked_run_in_project.html"
 
     lab_permissions = LabPermission(

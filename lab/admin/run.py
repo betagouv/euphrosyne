@@ -11,17 +11,6 @@ from ..models import Project, Run
 from ..permissions import LabRole, get_user_permission_group, is_lab_admin
 from .mixins import LabPermission, LabPermissionMixin
 
-BASE_RUN_FIELDSETS = (
-    (
-        None,
-        {"fields": ("label", "status", "start_date", "end_date", "embargo_date")},
-    ),
-    (
-        _("Experimental conditions"),
-        {"fields": ("particle_type", "energy_in_keV", "beamline")},
-    ),
-)
-
 
 @admin.register(Run)
 class RunAdmin(LabPermissionMixin, ModelAdmin):
@@ -29,7 +18,17 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
     form = RunDetailsForm
     list_display = ("project", "label", "start_date", "end_date")
     readonly_fields = ("status",)
-    fieldsets = ((_("Project"), {"fields": ("project",)}),) + BASE_RUN_FIELDSETS
+    fieldsets = (
+        (_("Project"), {"fields": ("project",)}),
+        (
+            None,
+            {"fields": ("label", "status", "start_date", "end_date", "embargo_date")},
+        ),
+        (
+            _("Experimental conditions"),
+            {"fields": ("particle_type", "energy_in_keV", "beamline")},
+        ),
+    )
 
     lab_permissions = LabPermission(
         add_permission=LabRole.ANY_STAFF_USER,

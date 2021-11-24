@@ -146,6 +146,7 @@ class RunDetailsForm(ModelForm):
             "end_date",
             "embargo_date",
             "beamline",
+            "methods",
         )
         widgets = {
             "project": widgets.ProjectWidgetWrapper(
