@@ -27,6 +27,7 @@ def test_form_cleans_the_multiple_inputs_into_one():
     form = RunDetailsForm(
         data={
             "label": "I am mandatory",
+            "methods": {"me": "too"},
             "energy_in_keV_Proton": 1,
             "energy_in_keV_Alpha particle": 2,
             "energy_in_keV_Deuton": 3,
@@ -43,6 +44,7 @@ def test_form_allows_empty_value():
     form = RunDetailsForm(
         data={
             "label": "I am mandatory",
+            "methods": {"me": "too"},
             "energy_in_keV_Proton": 1,
             "energy_in_keV_Alpha particle": 2,
             "energy_in_keV_Deuton": "",
@@ -59,6 +61,7 @@ def test_form_stores_empty_controlled_value_if_controller_is_empty():
     form = RunDetailsForm(
         data={
             "label": "I am mandatory",
+            "methods": {"me": "too"},
             "energy_in_keV_Proton": 1,
             "energy_in_keV_Alpha particle": 2,
             "energy_in_keV_Deuton": 3,
@@ -74,6 +77,7 @@ def test_form_fails_gracefully_with_incoherent_controller_input():
     form = RunDetailsForm(
         data={
             "label": "I am mandatory",
+            "methods": {"me": "too"},
             "energy_in_keV_Proton": 1,
             "energy_in_keV_Alpha particle": 2,
             "energy_in_keV_Deuton": "",
@@ -88,6 +92,7 @@ def test_form_doesnt_raise_for_energy_when_other_errors():
     form = RunDetailsForm(
         data={
             "label": "I am mandatory",
+            "methods": {"me": "too"},
             "energy_in_keV_Proton": 1,
             "energy_in_keV_Alpha particle": 2,
             "energy_in_keV_Deuton": "",
