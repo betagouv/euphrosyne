@@ -1,7 +1,9 @@
 set -e
 
-BASEDIR=$(dirname "$0")
-source $(dirname $BASEDIR)/.env
-branch_db_name="$DB_NAME""_""$($BASEDIR/db_suffix_for_branch.sh)"
+SCRIPTS_DIR="$(dirname "$0")"
+PROJECT_DIR="$(dirname $SCRIPTS_DIR)"
+
+source "$PROJECT_DIR"/.env
+branch_db_name="$DB_NAME""_""$($SCRIPTS_DIR/db_suffix_for_branch.sh)"
 psql postgres --host $DB_HOST --user $DB_USER -c "CREATE DATABASE $branch_db_name with template $DB_NAME;"
 echo "🐣 Created new database $branch_db_name from template $DB_NAME."
