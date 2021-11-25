@@ -1,19 +1,18 @@
 {% include "forms/widgets/datalist.html" %}
 <script async>
-django.jQuery(document).ready(() => {
-  const $ = django.jQuery
+(() => {
   const toggleDatalistInput = (controlValue) => {
-    $('input[name^="{{ widget.controlled_name_prefix }}"]').hide()
+    document.querySelectorAll('input[name^="{{ widget.controlled_name_prefix }}"]').forEach((el) => {el.style.display = 'none'})
     if (typeof controlValue !== 'undefined') {
-      $(`input[name="{{ widget.controlled_name_prefix}}${controlValue}"]`).show()
+      document.querySelectorAll(`input[name="{{ widget.controlled_name_prefix}}${controlValue}"]`).forEach((el) => {el.style.display = 'inline-block'})
     }
   }
-  const initValue = $('select[name="{{ controller_field_name }}"]').get(0).value
+  const initValue = document.querySelector('select[name="{{ controller_field_name }}"]').value
   toggleDatalistInput(initValue)
 
-  $('select[name="{{ controller_field_name }}"]').on('change', (e) => {
+  document.querySelector('select[name="{{ controller_field_name }}"]').addEventListener('change', (e) => {
     const newValue = e.target.value
     toggleDatalistInput(newValue)
   })
-})
+})()
 </script>

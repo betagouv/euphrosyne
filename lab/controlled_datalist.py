@@ -58,16 +58,6 @@ class MultiDatalistWidget(MultiWidget):
 
     controller_field_name: str
 
-    class Media:
-        # pylint: disable=line-too-long
-        # Raincoat: pypi package: django==4.0a1 path: django/contrib/admin/widgets.py element: AutocompleteMixin
-        extra = "" if settings.DEBUG else ".min"
-        js = (
-            "admin/js/vendor/jquery/jquery%s.js" % extra,
-            "admin/js/vendor/select2/select2.full%s.js" % extra,
-            "admin/js/jquery.init.js",
-        )
-
     def __init__(
         self,
         controller_field_name: str,
