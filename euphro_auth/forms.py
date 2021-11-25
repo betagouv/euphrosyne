@@ -44,7 +44,10 @@ class UserInvitationRegistrationForm(DjangoSetPasswordForm):
         if self.user and self.user.email == self.cleaned_data["email"]:
             return self.cleaned_data["email"]
         if User.objects.filter(email=self.cleaned_data["email"]).exists():
-            raise ValidationError(_("An account with this email already exists."))
+            raise ValidationError(
+                _("An account with this email already exists."),
+                code="invitation_email_already_exists",
+            )
         return self.cleaned_data["email"]
 
     def save(self, commit: bool = True) -> AbstractBaseUser:

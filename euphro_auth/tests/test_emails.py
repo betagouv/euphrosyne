@@ -3,6 +3,7 @@ from django.core import mail
 from django.test.testcases import SimpleTestCase
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from django.utils.translation import gettext
 
 from ..emails import send_invitation_email
 
@@ -19,7 +20,9 @@ class InvitationEmailTests(SimpleTestCase):
             token=token,
         )
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, "[Euphrosyne] Invitation to register")
+        self.assertEqual(
+            mail.outbox[0].subject, gettext("[Euphrosyne] Invitation to register")
+        )
         self.assertIn(
             f"{settings.SITE_URL}/registration/{uid}/{token}/", mail.outbox[0].body
         )
