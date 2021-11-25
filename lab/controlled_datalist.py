@@ -6,13 +6,10 @@ Controller must be a text field rendered as a select.
 """
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Union
 
-from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.forms.fields import Field, IntegerField
 from django.forms.models import ModelFormMetaclass
 from django.forms.widgets import MultiWidget, Select, Widget
 from django.utils import formats
-from django.utils.translation import gettext_lazy as _
 
 
 class Datalist(Select):
