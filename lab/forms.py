@@ -114,17 +114,6 @@ class ChangeLeaderForm(Form):
         self.fields["leader_participation"].queryset = project.participation_set
 
 
-# [XXX] Replace this by RunDetailsForm._meta.fields
-RUN_DETAILS_FIELDS = (
-    "label",
-    "start_date",
-    "end_date",
-    "embargo_date",
-    "particle_type",
-    "energy_in_keV",
-    "beamline",
-)
-
 RECOMMENDED_ENERGY_LEVELS = {
     models.Run.ParticleType.PROTON: [1000, 1500, 2000, 2500, 3000, 3500, 3800, 4000],
     models.Run.ParticleType.ALPHA: [3000, 4000, 5000, 6000],
@@ -151,8 +140,12 @@ def _get_energy_levels_choices(
 class RunDetailsForm(ModelForm):
     class Meta:
         model = models.Run
-        fields = tuple(
-            set(RUN_DETAILS_FIELDS) - set(("particle_type", "energy_in_keV"))
+        fields = (
+            "label",
+            "start_date",
+            "end_date",
+            "embargo_date",
+            "beamline",
         )
         widgets = {
             "project": widgets.ProjectWidgetWrapper(
@@ -204,7 +197,9 @@ class RunStatusBaseForm(ModelForm):
 
         if cleaned_status and cleaned_status != models.Run.Status.NEW:
             missing_fields = [
-                rf for rf in RUN_DETAILS_FIELDS if not getattr(self.instance, rf)
+                rf
+                for rf in RunDetailsForm.Meta.fields
+                if not getattr(self.instance, rf)
             ]
             missing_fields_verbose = [
                 str(_(models.Run._meta.get_field(field_name).verbose_name))
