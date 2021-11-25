@@ -4,6 +4,7 @@ from django.core import mail
 from django.test import Client, TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+from django.utils.translation import gettext
 
 from euphro_auth.models import UserInvitation
 
@@ -32,7 +33,9 @@ class TestUserInvitationAdmin(TestCase):
     def test_add_user_invitation_sends_invitation_email(self):
         self.client.post(self.view_url, data={"email": "test@test.test"})
         self.assertEqual(len(mail.outbox), 1)
-        self.assertEqual(mail.outbox[0].subject, "[Euphrosyne] Invitation to register")
+        self.assertEqual(
+            mail.outbox[0].subject, gettext("[Euphrosyne] Invitation to register")
+        )
 
     def test_admin_user_can_view_invitations(self):
         request = self.request_factory.get(self.view_url)
