@@ -166,9 +166,9 @@ class MultiDatalistWidget(MultiWidget):
     control_field_name: str
 
     class Media:
-        # See django/contrib/admin/widgets.py:AutocompleteMixin
-        # [TODO] Add raincoat comment
         extra = "" if settings.DEBUG else ".min"
+        # pylint: disable=line-too-long
+        # Raincoat: pypi package: django==4.0a1 path: django/contrib/admin/widgets.py element: AutocompleteMixin
         js = (
             "admin/js/vendor/jquery/jquery%s.js" % extra,
             "admin/js/vendor/select2/select2.full%s.js" % extra,
