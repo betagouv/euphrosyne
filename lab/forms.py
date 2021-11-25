@@ -198,9 +198,12 @@ class RunDetailsForm(ModelForm):
             cleaned_data["energy_in_keV"] = None
         else:
             # [XXX] Test that order is kept from PaticleTypes to energies
-            cleaned_data["energy_in_keV"] = cleaned_energies[
-                list(models.Run.ParticleType).index(cleaned_particle_type)
-            ]
+            cleaned_data["energy_in_keV"] = (
+                cleaned_energies[
+                    list(models.Run.ParticleType).index(cleaned_particle_type)
+                ]
+                or None
+            )
 
         if errors:
             raise ValidationError(errors)
