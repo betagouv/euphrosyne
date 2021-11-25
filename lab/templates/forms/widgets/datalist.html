@@ -4,6 +4,7 @@
   {% include option.template_name with widget=option %}{% endfor %}{% if group_name %}
   </optgroup>{% endif %}{% endfor %}
 </datalist>
+{# [XXX] move the script to controlled_datalist.html #}
 <script async>
 django.jQuery(document).ready(() => {
   const $ = django.jQuery

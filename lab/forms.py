@@ -13,7 +13,8 @@ from django.utils.translation import gettext_lazy as _
 from euphro_auth.models import User
 from lab.emails import send_project_invitation_email
 
-from . import fields, models, widgets
+from . import models, widgets
+from .controlled_datalist import controlled_datalist_form
 
 # [TODO] Rewrite
 with open(Path(__file__).parent / "models" / "run-choices-config.yaml") as f:
@@ -113,6 +114,7 @@ class ChangeLeaderForm(Form):
         self.fields["leader_participation"].queryset = project.participation_set
 
 
+# [XXX] Replace this by RunDetailsForm._meta.fields
 RUN_DETAILS_FIELDS = (
     "label",
     "start_date",
@@ -130,7 +132,7 @@ RECOMMENDED_ENERGY_LEVELS = {
 }
 
 
-def get_energy_levels_choices(
+def _get_energy_levels_choices(
     particle_type: str,
 ) -> List[Tuple[str, str]]:
     return [
@@ -138,10 +140,21 @@ def get_energy_levels_choices(
     ]
 
 
+@controlled_datalist_form(
+    controller_field_name="particle_type",
+    controlled_field_name="energy_in_keV",
+    choices={
+        particle_type: _get_energy_levels_choices(particle_type)
+        for particle_type in models.Run.ParticleType
+    },
+    controller_verbose_name=_("Particle type"),
+)
 class RunDetailsForm(ModelForm):
     class Meta:
         model = models.Run
-        fields = RUN_DETAILS_FIELDS
+        fields = tuple(
+            set(RUN_DETAILS_FIELDS) - set(("particle_type", "energy_in_keV"))
+        )
         widgets = {
             "project": widgets.ProjectWidgetWrapper(
                 widgets.DisabledSelectWithHidden(),
@@ -149,27 +162,11 @@ class RunDetailsForm(ModelForm):
             )
         }
 
-    energy_in_keV = fields.MultiDatalistIntegerField(
-        widget=widgets.MultiDatalistWidget(
-            control_field_name="particle_type",
-            widgets={
-                particle_type: widgets.ControlledDatalist(
-                    field_name="energy_in_keV",
-                    control_value=particle_type,
-                    choices=get_energy_levels_choices(particle_type),
-                )
-                for particle_type in models.Run.ParticleType
-            },
-        ),
-    )
-
     def clean(self):
         cleaned_data = super().clean()
         cleaned_start_date = cleaned_data.get("start_date")
         cleaned_end_date = cleaned_data.get("end_date")
         cleaned_embargo_date = cleaned_data.get("embargo_date")
-        cleaned_energies = cleaned_data.get("energy_in_keV")
-        cleaned_particle_type = cleaned_data.get("particle_type")
 
         errors = {}
 
@@ -192,19 +189,6 @@ class RunDetailsForm(ModelForm):
                 _("The embargo date must be after the end date"),
                 code="end_date_after_embargo_date",
             )
-
-        # Get the right energy level depending on particle_type
-        if not cleaned_particle_type:
-            cleaned_data["energy_in_keV"] = None
-        else:
-            # [XXX] Test that order is kept from PaticleTypes to energies
-            cleaned_data["energy_in_keV"] = (
-                cleaned_energies[
-                    list(models.Run.ParticleType).index(cleaned_particle_type)
-                ]
-                or None
-            )
-
         if errors:
             raise ValidationError(errors)
         return cleaned_data
