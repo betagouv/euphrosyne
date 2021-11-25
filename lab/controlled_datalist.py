@@ -34,6 +34,7 @@ class Datalist(Select):
 class ControlledDatalist(Datalist):
     field_name: str
     controller_value: str
+    template_name = "forms/widgets/controlled_datalist.html"
 
     def __init__(
         self,
