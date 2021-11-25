@@ -109,19 +109,18 @@ def controlled_datalist_form(
 ):
     def wrap_in_subclass(cls):
         def clean(self):  # pylint: disable=unused-argument
-            cleaned_data = cls.clean(self)
-            controller_cleaned_value = cleaned_data.get(controller_field_name)
-            controlled_cleaned_values = cleaned_data.get(controlled_field_name)
+            controller_cleaned_value = self.cleaned_data.get(controller_field_name)
+            controlled_cleaned_values = self.cleaned_data.get(controlled_field_name)
             if not controller_cleaned_value:
-                cleaned_data[controlled_field_name] = None
+                self.cleaned_data[controlled_field_name] = None
             else:
-                cleaned_data[controlled_field_name] = (
+                self.cleaned_data[controlled_field_name] = (
                     controlled_cleaned_values[
                         list(choices.keys()).index(controller_cleaned_value)
                     ]
                     or None
                 )
-            return cleaned_data
+            return cls.clean(self)
 
         class Meta(cls.Meta):
             fields = tuple(cls.Meta.fields) + (

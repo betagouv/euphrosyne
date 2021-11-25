@@ -82,3 +82,21 @@ def test_form_fails_gracefully_with_incoherent_controller_input():
     )
     with patch.object(QuerySet, "exists", return_value=False):
         assert form.has_error("particle_type", code="invalid_choice")
+
+
+def test_form_doesnt_raise_for_energy_when_other_errors():
+    form = RunDetailsForm(
+        data={
+            "label": "I am mandatory",
+            "energy_in_keV_Proton": 1,
+            "energy_in_keV_Alpha particle": 2,
+            "energy_in_keV_Deuton": "",
+            "particle_type": "Gotcha",
+            "start_date": "2021-01-01",
+            "end_date": "2020-01-01",
+        }
+    )
+    with patch.object(QuerySet, "exists", return_value=False):
+        assert not form.is_valid()
+    assert form.has_error("end_date")
+    assert not form.has_error("energy_in_keV")
