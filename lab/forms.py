@@ -147,7 +147,6 @@ def _get_energy_levels_choices(
         particle_type: _get_energy_levels_choices(particle_type)
         for particle_type in models.Run.ParticleType
     },
-    controller_verbose_name=_("Particle type"),
 )
 class RunDetailsForm(ModelForm):
     class Meta:

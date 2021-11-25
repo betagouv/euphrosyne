@@ -5,7 +5,6 @@ import pytest
 from django.db.models.query import QuerySet
 
 from ..forms import RunDetailsForm
-from ..models.run import Run
 from .factories import RunFactory
 
 # [TODO] Test the front-end behavior with Cypress for example

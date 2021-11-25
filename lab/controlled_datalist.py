@@ -106,7 +106,6 @@ def controlled_datalist_form(
     controller_field_name: str,
     controlled_field_name: str,
     choices: Dict[str, List[Tuple[str, str]]],
-    controller_verbose_name: str,
 ):
     def wrap_in_subclass(cls):
         def clean(self):  # pylint: disable=unused-argument
