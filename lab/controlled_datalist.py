@@ -1,8 +1,8 @@
 """
 Use the decorator to wrap the ModelForm.
 Useful to have two fields play together: one controller, one controlled.
-Controlled field must be a nullable integer field. Controller must be a text
-field.
+Controlled field must be a nullable integer field.
+Controller must be a text field rendered as a select.
 """
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Union
 
@@ -35,9 +35,6 @@ class ControlledDatalist(Datalist):
     field_name: str
     controller_value: str
 
-    def _build_controlled_datalist_label(self, controller_value: str):
-        return f"{self.field_name}__{controller_value}"
-
     def __init__(
         self,
         field_name: str,
@@ -47,28 +44,18 @@ class ControlledDatalist(Datalist):
     ):
         self.field_name = field_name
         self.controller_value = controller_value
-        super().__init__(
-            choices=choices,
-            attrs={
-                "controlled-datalist-label": self._build_controlled_datalist_label(
-                    controller_value
-                ),
-                **(attrs if attrs else {}),
-            },
-        )
+        super().__init__(choices=choices, attrs=attrs)
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        context["widget"][
-            "controlled_datalist_label_prefix"
-        ] = self._build_controlled_datalist_label("")
+        context["widget"]["controlled_name_prefix"] = f"{self.field_name}_"
         return context
 
 
 class MultiDatalistWidget(MultiWidget):
     """Show the datalist widget corresponding to a given form input value"""
 
-    control_field_name: str
+    controller_field_name: str
 
     class Media:
         # pylint: disable=line-too-long
@@ -87,13 +74,13 @@ class MultiDatalistWidget(MultiWidget):
         attrs: Optional[Any] = None,
     ) -> None:
         super().__init__(widgets, attrs)
-        self.control_field_name = controller_field_name
+        self.controller_field_name = controller_field_name
 
     def get_context(
         self, name: str, value: Any, attrs: Optional[Any]
     ) -> Dict[str, Any]:
         return {
-            "control_field_name": self.control_field_name,
+            "controller_field_name": self.controller_field_name,
             **super().get_context(name, value, attrs),
         }
 
@@ -129,28 +116,12 @@ def controlled_datalist_form(
             if not controller_cleaned_value:
                 cleaned_data[controlled_field_name] = None
             else:
-                try:
-                    cleaned_data[controlled_field_name] = (
-                        controlled_cleaned_values[
-                            list(choices.keys()).index(controller_cleaned_value)
-                        ]
-                        or None
-                    )
-                except ValueError as exc:
-                    raise ValidationError(
-                        {
-                            controller_field_name: ValidationError(
-                                _(
-                                    "{controller_verbose_name} value must correspond "
-                                    "to choices {choices}"
-                                ).format(
-                                    controller_verbose_name=controller_verbose_name,
-                                    choices=list(choices.keys()),
-                                ),
-                                code="controller_index_incoherent",
-                            )
-                        }
-                    ) from exc
+                cleaned_data[controlled_field_name] = (
+                    controlled_cleaned_values[
+                        list(choices.keys()).index(controller_cleaned_value)
+                    ]
+                    or None
+                )
             return cleaned_data
 
         class Meta(cls.Meta):
