@@ -38,3 +38,7 @@ class User(AbstractUser):
 class UserInvitation(User):
     class Meta:
         proxy = True
+
+    def clean(self):
+        if not self.pk:
+            self.is_staff = True

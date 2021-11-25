@@ -100,9 +100,7 @@ class UserInvitationAdmin(ModelAdmin):
         change: bool,
     ) -> None:
         if not change:
-            obj.is_staff = True
             obj.save()
-
             token = default_token_generator.make_token(obj)
             send_invitation_email(email=obj.email, user_id=obj.pk, token=token)
             return obj
