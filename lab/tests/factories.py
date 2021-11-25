@@ -1,4 +1,5 @@
 import factory
+import factory.fuzzy
 from django.contrib.auth import get_user_model
 
 from ..models import Participation, Project, Run
@@ -48,3 +49,5 @@ class RunFactory(factory.django.DjangoModelFactory):
 
     label = factory.Faker("name")
     project = factory.SubFactory(ProjectFactory)
+    energy_in_keV = factory.fuzzy.FuzzyInteger(0, high=10000, step=500)
+    particle_type = factory.fuzzy.FuzzyChoice(Run.ParticleType)
