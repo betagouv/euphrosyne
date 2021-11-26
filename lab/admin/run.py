@@ -7,9 +7,9 @@ from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
 from ..forms import RunDetailsForm
-from ..models import Project, Run
+from ..models import ObjectGroup, Project, Run
 from ..permissions import LabRole, get_user_permission_group, is_lab_admin
-from .mixins import LabPermission, LabPermissionMixin
+from .mixins import LabPermission, LabPermissionMixin, LabRole
 
 BASE_RUN_FIELDSETS = (
     (
@@ -29,7 +29,11 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
     form = RunDetailsForm
     list_display = ("project", "label", "start_date", "end_date")
     readonly_fields = ("status",)
-    fieldsets = ((_("Project"), {"fields": ("project",)}),) + BASE_RUN_FIELDSETS
+    fieldsets = (
+        (_("Project"), {"fields": ("project",)}),
+        *BASE_RUN_FIELDSETS,
+        (_("Object groups"), {"fields": ("run_object_groups",)}),
+    )
 
     lab_permissions = LabPermission(
         add_permission=LabRole.ANY_STAFF_USER,
