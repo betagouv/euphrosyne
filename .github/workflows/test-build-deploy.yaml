@@ -167,6 +167,7 @@ jobs:
           name: euphrosyne-build-${{ github.sha }}
           path: /tmp/euphrosyne-build.tar.gz
           retention-days: 1
+
   
             #   deploy-pr:
             #     needs:
