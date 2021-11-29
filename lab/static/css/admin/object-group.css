@@ -1,0 +1,3 @@
+#objects-group tr:first-child .inline-deletelink {
+  display: none !important;
+}
