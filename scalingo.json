@@ -9,32 +9,24 @@
       "generator": "secret"
     },
     "EMAIL_HOST": {
-      "required": true
     },
     "EMAIL_PORT": {
-      "required": true
     },
     "EMAIL_HOST_USER": {
-      "required": true
     },
     "EMAIL_HOST_PASSWORD": {
-      "required": true
     },
     "DEFAULT_FROM_EMAIL": {
-      "required": true
     },
     "ORCID_USE_SANDBOX": {
-      "required": false
     },
     "SITE_URL": {
       "generator": "url",
       "template": "%URL"
     },
     "SOCIAL_AUTH_ORCID_KEY": {
-      "required": true
     },
     "SOCIAL_AUTH_ORCID_SECRET": {
-      "required": true
     }
   },
   "formation": {
