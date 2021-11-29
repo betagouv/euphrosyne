@@ -36,15 +36,5 @@
     "SOCIAL_AUTH_ORCID_SECRET": {
       "required": true
     }
-  },
-  "formation": {
-    "web": {
-      "quantity": 1
-    }
-  },
-  "addons": [
-    {
-      "plan": "postgresql-sandbox"
-    }
-  ]
+  }
 }
