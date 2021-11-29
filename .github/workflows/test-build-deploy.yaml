@@ -126,6 +126,7 @@ jobs:
 
   build:
     runs-on: ubuntu-18.04
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v2
 
@@ -168,160 +169,6 @@ jobs:
           path: /tmp/euphrosyne-build.tar.gz
           retention-days: 1
   
-            #   deploy-pr:
-            #     needs:
-            #       - lint-and-checks
-            #       - test
-            #       - build
-            #     if: github.event_name == 'pull_request'
-            #     runs-on: ubuntu-18.04
-            #     steps:
-            #       - uses: actions/checkout@v2
-            # 
-            #       - name: Use the cached python install
-            #         uses: actions/cache@v2
-            #         with:
-            #           path: /opt/hostedtoolcache/Python/3.9.2
-            #           key: ${{ runner.os }}-python-3.9.2
-            #       - uses: actions/setup-python@v2
-            #         with:
-            #           python-version: '3.9.2'
-            # 
-            #       - name: Download build artifact
-            #         uses: actions/download-artifact@v2
-            #         with:
-            #           name: euphrosyne-build-${{ github.sha }}
-            #           path: /tmp/
-            # 
-            #       - name: Auth to Scalingo
-            #         id: scalingo-bearer-token
-            #         run: |
-            #           token=$(
-            #             curl --fail -H "Accept: application/json" -H "Content-Type: application/json" -u ":${{ secrets.SCALINGO_API_TOKEN }}" \
-            #              -X POST https://auth.scalingo.com/v1/tokens/exchange \
-            #             | jq -r .token
-            #           ) 
-            #           echo "::set-output name=token::$token"
-            #       - name: Create child app
-            #         id: scalingo-child-app
-            #         run: |
-            #           url=$(
-            #             curl -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
-            #               -H "Accept: application/json" -H "Content-Type: application/json" \
-            #               -X POST https://api.osc-fr1.scalingo.com/v1/apps/euphrosyne-staging/child_apps -d \
-            #               '{
-            #                 "app": {
-            #                   "name": "euphrosyne-child-${{ github.event.pull_request.number }}"
-            #                 }
-            #               }' \
-            #               | jq -r .app.url
-            #           )
-            #           [ "$url" = "null" ] && url=$(
-            #             curl --fail -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
-            #               -H "Accept: application/json" -H "Content-Type: application/json" \
-            #               -X GET https://api.osc-fr1.scalingo.com/v1/apps/euphrosyne-child-${{ github.event.pull_request.number }} \
-            #               | jq -r .app.url
-            #           )
-            #           echo "::set-output name=url::$url"
-            #       - name: Invite all collaborators to child app
-            #         run: |
-            #           staging_collaborators=$(
-            #             curl --fail -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
-            #              -X GET "https://api.osc-fr1.scalingo.com/v1/apps/euphrosyne-child-${{ github.event.pull_request.number }}/collaborators" \
-            #              | jq -rc '{collaborator: .collaborators[] | with_entries(select(.key == "email"))}'
-            #           )
-            #           while read collaborator_json
-            #           do
-            #             curl -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
-            #               -X POST "https://api.osc-fr1.scalingo.com/v1/apps/euphrosyne-child-23/collaborators" \
-            #               -d "$collaborator_json"
-            #           done <<<$staging_collaborators
-            #       - name: Define child app environment variables
-            #         run: |
-            #           # Get environment variables:
-            #           old_vars=$(
-            #             curl --fail -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
-            #              -X GET "https://api.osc-fr1.scalingo.com/v1/apps/euphrosyne-child-${{ github.event.pull_request.number }}/variables" \
-            #              | jq -r '.variables | if length == 0 then {} else (map( { (.name|tostring): .value } ) | add) end'
-            #           )
-            #           default_vars=$(./scripts/scalingo_default_env.py)
-            #           staging_vars=$(
-            #             curl --fail -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
-            #              -X GET https://api.osc-fr1.scalingo.com/v1/apps/euphrosyne-staging/variables \
-            #              | jq -r '.variables | if length == 0 then {} else (map( { (.name|tostring): .value } ) | add) end'
-            #           )
-            #           # Merge vars dict with preference: old vars, default vars, staging vars:
-            #           vars=$(jq -rs '.[2] * .[1] * .[0]' <(echo "$old_vars") <(echo "$default_vars") <(echo "$staging_vars"))
-            #           # Validate that nothing is missing:
-            #           ./scripts/scalingo_validate_env.py "$vars"
-            #           # Build the right scalingo API object:
-            #           api_vars=$(<<<$vars jq -r '{variables: to_entries | map({name: .key, value: .value})}' )
-            #           # PUT it:
-            #           curl --fail -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
-            #            -H "Accept: application/json" -H "Content-Type: application/json" \
-            #            -X PUT "https://api.osc-fr1.scalingo.com/v1/apps/euphrosyne-child-${{ github.event.pull_request.number }}/variables" \
-            #            -d "$api_vars"
-            #       - name: Provision child app addons
-            #         run: |
-            #           # Loop through all addon plans from scalingo.json:
-            #           <scalingo.json jq -r '.addons[].plan' | while read plan_name; do
-            #             # Fetch corresponding provider ID and plan ID:
-            #             provider_and_plan=$(
-            #               curl --fail -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
-            #                -H "Content-Type: application/json" \
-            #                -X GET https://api.osc-fr1.scalingo.com/v1/addon_providers  \
-            #                | jq -r '.addon_providers[] | select(.plans[].name=="'"$plan_name"'") | "\(.id) \(.plans[] | select(.name=="'"$plan_name"'") | .id)"'
-            #             )
-            #             provider_id=$(<<<$provider_and_plan cut -d ' ' -f 1)
-            #             plan_id=$(<<<$provider_and_plan cut -d ' ' -f 2)
-            #             # Provision the plan in the app:
-            #             curl -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
-            #              -H "Content-Type: application/json" \
-            #              -X POST "https://api.osc-fr1.scalingo.com/v1/apps/euphrosyne-child-${{ github.event.pull_request.number }}/addons" \
-            #              -d '{"addon":{"plan_id": "'"$plan_id"'", "addon_provider_id": "'"$provider_id"'"}}'
-            #           done
-            #       - name: Get Scalingo upload URL
-            #         id: scalingo-upload
-            #         run: |
-            #           json=$(
-            #             curl --fail -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
-            #              -X POST https://api.osc-fr1.scalingo.com/v1/sources/
-            #           )
-            #           echo "::set-output name=upload_url::$(echo $json | jq -r .source.upload_url)"
-            #           echo "::set-output name=download_url::$(echo $json | jq -r .source.download_url)"
-            #       - name: Upload to Scalingo archive
-            #         id: scalingo-archive
-            #         run: |
-            #           curl --fail -L -H 'Content-Type: application/x-gzip' \
-            #            -X PUT --upload-file /tmp/euphrosyne-build.tar.gz '${{ steps.scalingo-upload.outputs.upload_url }}'
-            #       - name: Launch build
-            #         run: |
-            #           curl --fail -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
-            #            -H "Accept: application/json" -H "Content-Type: application/json" \
-            #            -X POST "https://api.osc-fr1.scalingo.com/v1/apps/euphrosyne-child-${{ github.event.pull_request.number }}/deployments" -d \
-            #            '{
-            #              "deployment": {
-            #                "git_ref": "${{ github.sha }}",
-            #                "source_url": "${{ steps.scalingo-upload.outputs.download_url }}"
-            #              }
-            #            }'
-            # 
-            #       - name: Find Comment
-            #         uses: peter-evans/find-comment@v1
-            #         id: find-deploy-comment
-            #         with:
-            #           issue-number: ${{ github.event.pull_request.number }} #e.g. 1
-            #           comment-author: 'github-actions[bot]'
-            #           body-includes: scalingo 
-            #       - name: Create comment
-            #         uses: peter-evans/create-or-update-comment@v1
-            #         with:
-            #           comment-id: ${{ steps.find-deploy-comment.outputs.comment-id }}
-            #           issue-number: ${{ github.event.pull_request.number }}
-            #           edit-mode: replace
-            #           body: |
-            #             🚀 La PR est déployée sur ${{ steps.scalingo-child-app.outputs.url }}
-
   deploy-staging:
     needs:
       - lint-and-checks
@@ -356,16 +203,6 @@ jobs:
             | jq -r .token
           ) 
           echo "::set-output name=token::$token"
-      - name: Check environment variables
-        run: |
-          # Get environment variables:
-          staging_vars=$(
-            curl --fail -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
-             -X GET https://api.osc-fr1.scalingo.com/v1/apps/euphrosyne-staging/variables \
-             | jq -r '.variables | if length == 0 then {} else (map( { (.name|tostring): .value } ) | add) end'
-          )
-          # Validate that nothing is missing:
-          ./scripts/scalingo_validate_env.py "$staging_vars"
       - name: Get Scalingo upload URL
         id: scalingo-upload
         run: |
