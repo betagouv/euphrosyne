@@ -1,8 +1,9 @@
-from typing import List, Optional, Tuple, Union
+from typing import Any, List, Mapping, Optional, Tuple, Union
 
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.db.models.query import QuerySet
+from django.forms.models import inlineformset_factory
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
@@ -23,6 +24,39 @@ BASE_RUN_FIELDSETS = (
 )
 
 
+class ObjectGroupInline(admin.TabularInline):
+    model = ObjectGroup
+    verbose_name = _("Object")
+    fields = ("representation",)
+    show_change_link = True
+
+    @admin.display(description=_("Object group"))
+    def representation(self, obj: Optional[ObjectGroup]) -> str:
+        return str(obj)
+
+    def get_readonly_fields(
+        self, request: HttpRequest, obj: Optional[ObjectGroup] = ...
+    ) -> Union[List[str], Tuple]:
+        return ("representation",)
+
+    def get_formset(
+        self,
+        request: HttpRequest,
+        obj: Optional[Project] = None,
+        **kwargs: Mapping[str, Any]
+    ):
+        formset = inlineformset_factory(
+            Run, ObjectGroup, exclude=[], min_num=1, extra=0
+        )
+        return formset
+
+    def has_view_permission(
+        self, request: HttpRequest, obj: Optional[Run] = ...
+    ) -> bool:
+        return True
+
+
+# Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Run)
 class RunAdmin(LabPermissionMixin, ModelAdmin):
 

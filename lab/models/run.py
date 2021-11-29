@@ -80,6 +80,16 @@ class ObjectGroup(models.Model):
     )
     collection = models.CharField(_("Collection"), max_length=255, blank=True)
 
+    def __str__(self) -> str:
+        label = (
+            self.object_set.first().label
+            if self.object_set.count() == 1
+            else self.label
+        )
+        materials = ", ".join(self.materials)
+
+        return f"{label} - {self.dating} - {materials}"
+
 
 class Object(models.Model):
     group = models.ForeignKey(
