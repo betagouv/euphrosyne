@@ -12,15 +12,5 @@
       "generator": "url",
       "template": "%URL"
     }
-  },
-  "formation": {
-    "web": {
-      "quantity": 1
-    }
-  },
-  "addons": [
-    {
-      "plan": "postgresql-sandbox"
-    }
-  ]
+  }
 }
