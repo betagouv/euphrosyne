@@ -8,25 +8,9 @@
     "DJANGO_SECRET_KEY": {
       "generator": "secret"
     },
-    "EMAIL_HOST": {
-    },
-    "EMAIL_PORT": {
-    },
-    "EMAIL_HOST_USER": {
-    },
-    "EMAIL_HOST_PASSWORD": {
-    },
-    "DEFAULT_FROM_EMAIL": {
-    },
-    "ORCID_USE_SANDBOX": {
-    },
     "SITE_URL": {
       "generator": "url",
       "template": "%URL"
-    },
-    "SOCIAL_AUTH_ORCID_KEY": {
-    },
-    "SOCIAL_AUTH_ORCID_SECRET": {
     }
   },
   "formation": {
