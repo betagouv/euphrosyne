@@ -68,12 +68,11 @@ class ObjectGroup(models.Model):
     label = models.CharField(
         _("Group label"), max_length=255, blank=True, help_text=_("")
     )
-    dating = models.CharField(_("Dating"), max_length=255, blank=True)
+    dating = models.CharField(_("Dating"), max_length=255)
     materials = ArrayField(
         models.CharField(max_length=255),
         verbose_name=_("Materials"),
         default=list,
-        blank=True,
     )
     discovery_place = models.CharField(
         _("Place of discovery"), max_length=255, blank=True
@@ -82,9 +81,9 @@ class ObjectGroup(models.Model):
 
     def __str__(self) -> str:
         label = (
-            self.object_set.first().label
-            if self.object_set.count() == 1
-            else self.label
+            self.objects.first().label
+            if self.objects.count() == 1
+            else f"(Group) {self.label}"
         )
         materials = ", ".join(self.materials)
 
@@ -95,7 +94,7 @@ class Object(models.Model):
     group = models.ForeignKey(
         ObjectGroup, on_delete=models.CASCADE, related_name="objects"
     )
-    label = models.CharField(_("Label"), max_length=255, blank=True)
+    label = models.CharField(_("Label"), max_length=255)
     differentiation_information = models.CharField(
         _("Differentiation information"), max_length=255, blank=True
     )

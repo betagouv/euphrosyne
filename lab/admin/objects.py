@@ -1,9 +1,10 @@
 import enum
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from django import forms
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
+from django.core.exceptions import ValidationError
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
@@ -27,6 +28,24 @@ class ObjectGroupForm(forms.ModelForm):
     class Meta:
         model = ObjectGroup
         fields = ("add_type", "label", "materials", "dating")
+
+    def clean(self) -> Dict[str, Any]:
+        cleaned_data = super().clean()
+        add_type = cleaned_data["add_type"]
+        if add_type == ObjectGroupAddChoices.OBJECT_GROUP.value[0]:
+            if not cleaned_data.get("label"):
+                raise ValidationError(
+                    {
+                        "label": ValidationError(
+                            _(
+                                "Group label must be specified "
+                                "when adding multiple objects"
+                            ),
+                            code="label-required-for-mulitple-objects",
+                        )
+                    }
+                )
+        return cleaned_data
 
 
 class ObjectInline(admin.TabularInline):
