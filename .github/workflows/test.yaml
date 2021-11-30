@@ -1,9 +1,9 @@
-name: Build
+name: Test
 on:
   pull_request:
     types: [opened, reopened, synchronize, edited]
-  push:
-    branches: [main]
+  workflow_call:
+
 env:
   DJANGO_SECRET_KEY: n0t5os3cre7-${{ github.sha }}
   EMAIL_HOST: localhost
@@ -12,7 +12,6 @@ env:
   EMAIL_HOST_PASSWORD:
   EMAIL_USE_TLS: false
   DEFAULT_FROM_EMAIL: h@ll.o
-  PR_NUMBER: ${{ github.event.pull_request.number }}
   SITE_URL: http://localhost:8000
   
 
@@ -124,107 +123,3 @@ jobs:
           DB_PASSWORD: password
           DB_NAME: euphrosyne
 
-  build:
-    runs-on: ubuntu-18.04
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Use the cached python install
-        uses: actions/cache@v2
-        with:
-          path: /opt/hostedtoolcache/Python/3.9.2
-          key: ${{ runner.os }}-python-3.9.2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.9.2'
-
-      - name: Get pip cache dir
-        id: pip-cache
-        run: |
-          echo "::set-output name=dir::$(pip cache dir)"
-
-      - name: Use the cached pip cache for production requirements
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/prod.txt') }}
-      - name: Install prod requirements
-        run: pip install --user -r requirements/prod.txt
-
-      - name: Install GNU gettext
-        run: sudo apt install gettext
-
-      - name: Compile gettext messages
-        run: python manage.py compilemessages
-      - name: Collect static files
-        run: python manage.py collectstatic --clear --noinput
-      - name: Build archive
-        run: tar --exclude='./euphrosyne/.git' -czf /tmp/euphrosyne-build.tar.gz euphrosyne
-        working-directory: ..
-      - name: Upload archive artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: euphrosyne-build-${{ github.sha }}
-          path: /tmp/euphrosyne-build.tar.gz
-          retention-days: 1
-  
-  deploy-staging:
-    needs:
-      - lint-and-checks
-      - test
-      - build
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Use the cached python install
-        uses: actions/cache@v2
-        with:
-          path: /opt/hostedtoolcache/Python/3.9.2
-          key: ${{ runner.os }}-python-3.9.2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.9.2'
-
-      - name: Download build artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: euphrosyne-build-${{ github.sha }}
-          path: /tmp/
-
-      - name: Auth to Scalingo
-        id: scalingo-bearer-token
-        run: |
-          token=$(
-            curl --fail -H "Accept: application/json" -H "Content-Type: application/json" -u ":${{ secrets.SCALINGO_API_TOKEN }}" \
-             -X POST https://auth.scalingo.com/v1/tokens/exchange \
-            | jq -r .token
-          ) 
-          echo "::set-output name=token::$token"
-      - name: Get Scalingo upload URL
-        id: scalingo-upload
-        run: |
-          json=$(
-            curl --fail -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
-             -X POST https://api.osc-fr1.scalingo.com/v1/sources/
-          )
-          echo "::set-output name=upload_url::$(echo $json | jq -r .source.upload_url)"
-          echo "::set-output name=download_url::$(echo $json | jq -r .source.download_url)"
-      - name: Upload to Scalingo archive
-        id: scalingo-archive
-        run: |
-          curl --fail -L -H 'Content-Type: application/x-gzip' \
-           -X PUT --upload-file /tmp/euphrosyne-build.tar.gz '${{ steps.scalingo-upload.outputs.upload_url }}'
-      - name: Launch build
-        run: |
-          curl --fail -H "Authorization: Bearer ${{ steps.scalingo-bearer-token.outputs.token }}" \
-           -H "Accept: application/json" -H "Content-Type: application/json" \
-           -X POST "https://api.osc-fr1.scalingo.com/v1/apps/euphrosyne-staging/deployments" -d \
-           '{
-             "deployment": {
-               "git_ref": "${{ github.sha }}",
-               "source_url": "${{ steps.scalingo-upload.outputs.download_url }}"
-             }
-           }'
