@@ -28,7 +28,7 @@
     },
     "SITE_URL": {
       "generator": "url",
-      "template": "%URL"
+      "template": "%URL%"
     },
     "SOCIAL_AUTH_ORCID_KEY": {
       "required": true
