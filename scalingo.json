@@ -5,6 +5,9 @@
     "DISABLE_COLLECTSTATIC": {
       "value": "1"
     },
+    "DJANGO_DEBUG": {
+      "value": ""
+    },
     "DJANGO_SECRET_KEY": {
       "generator": "secret"
     },
