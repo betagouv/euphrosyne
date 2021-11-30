@@ -10,7 +10,7 @@
     },
     "SITE_URL": {
       "generator": "url",
-      "template": "%URL"
+      "template": "%URL%"
     }
   }
 }
