@@ -3,7 +3,7 @@
   "stack": "scalingo-18",
   "env": {
     "DISABLE_COLLECTSTATIC": {
-      "value": "1"
+      "value": ""
     },
     "DJANGO_DEBUG": {
       "value": ""
