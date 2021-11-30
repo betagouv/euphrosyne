@@ -18,5 +18,15 @@
     "ALLOWED_HOSTS": {
       "value": ".scalingo.io"
     }
-  }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "addons": [
+    {
+      "plan": "postgresql-sandbox"
+    }
+  ]
 }
