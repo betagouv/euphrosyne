@@ -3,7 +3,7 @@
     {% if fieldset.description %}
         <div class="description">{{ fieldset.description|safe }}</div>
     {% endif %}
-    <div style="display: flex">
+    <div class="flex-container">
         {% for line in fieldset %}
             <div class="form-row{% if line.fields|length_is:'1' and line.errors %} errors{% endif %}{% if not line.has_visible_field %} hidden{% endif %}{% for field in line %}{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% endfor %}">
                 {% if line.fields|length_is:'1' %}{{ line.errors }}{% endif %}
