@@ -1,9 +1,10 @@
 from typing import Any, Dict, List, Optional, Tuple
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.tokens import default_token_generator
+from django.db.models.query import QuerySet
 from django.forms.models import ModelForm
 from django.http.request import HttpRequest
 from django.utils.translation import gettext
@@ -81,7 +82,7 @@ class UserAdmin(DjangoUserAdmin):
 class UserInvitationAdmin(ModelAdmin):
     list_display = ("email", "invitation_completed", "invitation_completed_at")
     fields = ("email",)
-    actions = ("view", "add")
+    actions = ("send_invitation_mail_action",)
 
     # pylint: disable=no-self-use
     @admin.display(
@@ -91,6 +92,36 @@ class UserInvitationAdmin(ModelAdmin):
     )
     def invitation_completed(self, instance: UserInvitation):
         return instance.invitation_completed_at is not None
+
+    @admin.action(description=_("Send invitation e-mail again"))
+    def send_invitation_mail_action(
+        self, request: HttpRequest, queryset: QuerySet[UserInvitation]
+    ):
+        users = queryset.filter(invitation_completed_at=None)
+        if users:
+            for user in users:
+                token = default_token_generator.make_token(user)
+                send_invitation_email(email=user.email, user_id=user.id, token=token)
+            message = _(
+                "Invitations sent to : {}.",
+            ).format(", ".join([user.email for user in users]))
+            self.message_user(
+                request,
+                message,
+                messages.SUCCESS,
+            )
+
+        completed_registration_users = queryset.exclude(invitation_completed_at=None)
+        if completed_registration_users:
+            message = _(
+                "Invitations were not sent to the following accounts, "
+                "the registrations have already been completed : {}",
+            ).format(", ".join([user.email for user in completed_registration_users]))
+            self.message_user(
+                request,
+                message,
+                messages.WARNING,
+            )
 
     def save_model(
         self,

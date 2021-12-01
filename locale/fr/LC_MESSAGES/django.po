@@ -21,6 +21,19 @@ msgstr "Superutilisateur"
 msgid "Invitation completed"
 msgstr "Invitation complétée"
 
+msgid "Send invitation e-mail again"
+msgstr "Ré-envoyer les invitations"
+
+msgid "Invitations sent to : {}."
+msgstr "Invitations envoyées à : {}."
+
+msgid ""
+"Invitations were not sent to the following accounts, the registrations have "
+"already been completed : {}"
+msgstr ""
+"Les invitations n'ont pas été envoyées à ces comptes car l'enregistrement a "
+"déjà été effectué : {}"
+
 msgid "[Euphrosyne] Invitation to register"
 msgstr "[Euphrosyne] Invitation à s'inscrire"
 
