@@ -1,0 +1,18 @@
+div#runs-group > fieldset {
+  background-color: var(--darkened-bg);
+}
+
+.dynamic-runs {
+  margin-top: 14px;
+  width: calc(50% - 14px);
+  min-width: 450px;
+  float: left;
+  padding: 0 7px;
+}
+.dynamic-runs h3 {
+  background: var(--body-bg);
+}
+
+div#runs-group .add-row {
+  clear: both;
+}

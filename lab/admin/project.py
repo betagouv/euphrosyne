@@ -161,6 +161,9 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
         view_permission=LabRole.PROJECT_MEMBER,
     )
 
+    class Media:
+        css = {"all": ("css/admin/project-admin.css",)}
+
     @staticmethod
     @admin.display(description=_("Leader"))
     def leader_user(obj: Optional[Project]) -> Optional[User]:
