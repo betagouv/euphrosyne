@@ -10,6 +10,7 @@ from .factories import RunFactory
 # [TODO] Test the front-end behavior with Cypress for example
 
 
+@pytest.mark.django_db
 def test_shows_datalists():
     form = RunDetailsForm()
     assert "<datalist" in str(form)

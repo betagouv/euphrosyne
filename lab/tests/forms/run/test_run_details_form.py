@@ -1,9 +1,21 @@
+from unittest.mock import patch
+
+import pytest
+from django.db.models import QuerySet
+
 from .... import forms
 
 
-def test_beamline_must_be_in_config_file():
-    form = forms.RunDetailsForm(data={"beamline": "phony"})
-    assert form.has_error("beamline")
+@pytest.fixture(scope="module", autouse=True)
+def patch_queryset_exists():
+    with patch.object(QuerySet, "exists", return_value=False) as _fixture:
+        yield _fixture
+
+
+def test_beamline_is_ignored():
+    form = forms.RunDetailsForm(data={"label": "needed", "beamline": "phony"})
+    run = form.save(commit=False)
+    assert run.beamline == "Microbeam"
 
 
 def test_run_dates_are_coherent():
@@ -18,3 +30,8 @@ def test_embargo_date_must_be_after_end_date():
         data={"end_date": "2020-01-01", "embargo_date": "2000-01-01"}
     )
     assert form.has_error("embargo_date", code="end_date_after_embargo_date")
+
+
+def test_beamline_is_rendered_with_disabled_microbeam():
+    form = forms.RunDetailsForm()
+    assert '<select name="beamline" disabled id="id_beamline">' in str(form)
