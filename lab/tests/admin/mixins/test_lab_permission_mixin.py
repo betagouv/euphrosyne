@@ -10,7 +10,7 @@ from ....admin.mixins import LabPermission, LabPermissionMixin, LabRole
 from ....models import Project
 
 
-class TestModelAdmin(LabPermissionMixin, ModelAdmin):
+class DummyModelAdmin(LabPermissionMixin, ModelAdmin):
     def get_related_project(self, obj: Project = None) -> Optional[Project]:
         return obj
 
@@ -20,7 +20,7 @@ class TestLabPermissionMixin(SimpleTestCase):
         self.project = Project(name="Test project")
 
         self.request_factory = RequestFactory()
-        self.model_admin = TestModelAdmin(model=Project, admin_site=AdminSite())
+        self.model_admin = DummyModelAdmin(model=Project, admin_site=AdminSite())
 
     def test_admin_default_to_admin_permissions(self):
         assert self.model_admin.lab_permissions.add_permission == LabRole.LAB_ADMIN
