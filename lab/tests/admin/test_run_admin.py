@@ -155,7 +155,7 @@ class TestRunAdminViewAsAdmin(TestCase):
             data={
                 "label": "dummy",
                 "project": self.admin_project_2.id,
-                "beamline": list(Run.BEAMLINE_NAMES.keys())[0],
+                "beamline": "Microbeam",
             }
         )
         assert "project" not in form.fields

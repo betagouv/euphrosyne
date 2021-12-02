@@ -1,7 +1,5 @@
-from pathlib import Path
 from typing import List, Tuple
 
-import yaml
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms.forms import Form
@@ -15,10 +13,6 @@ from lab.emails import send_project_invitation_email
 
 from . import models, widgets
 from .controlled_datalist import controlled_datalist_form
-
-# [TODO] Rewrite
-with open(Path(__file__).parent / "models" / "run-choices-config.yaml") as f:
-    RUN_CHOICES = yaml.safe_load(f.read())
 
 
 class BaseParticipationForm(ModelForm):
@@ -146,14 +140,18 @@ class RunDetailsForm(ModelForm):
             "end_date",
             "embargo_date",
             "beamline",
-            "methods",
         )
+
         widgets = {
             "project": widgets.ProjectWidgetWrapper(
                 widgets.DisabledSelectWithHidden(),
                 models.Run.project.field.remote_field,  # pylint: disable=no-member
-            )
+            ),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["beamline"].disabled = True
 
     def clean(self):
         cleaned_data = super().clean()
@@ -199,7 +197,7 @@ class RunStatusBaseForm(ModelForm):
         if cleaned_status and cleaned_status != models.Run.Status.NEW:
             missing_fields = [
                 rf
-                for rf in RunDetailsForm.Meta.fields
+                for rf in RunDetailsForm.base_fields  # pylint: disable=no-member
                 if not getattr(self.instance, rf)
             ]
             missing_fields_verbose = [

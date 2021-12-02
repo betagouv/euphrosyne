@@ -110,12 +110,19 @@ def controlled_datalist_form(
                 )
             return cls.clean(self)
 
-        class Meta(cls.Meta):
-            fields = (
-                *cls.Meta.fields,
-                controller_field_name,
-                controlled_field_name,
-            )
+        if cls.Meta.fields == "__all__":
+
+            class Meta(cls.Meta):
+                pass
+
+        else:
+
+            class Meta(cls.Meta):
+                fields = (
+                    *cls.Meta.fields,
+                    controller_field_name,
+                    controlled_field_name,
+                )
 
         return ModelFormMetaclass(
             f"ControlledDatalistFormFor{cls.__name__}",
