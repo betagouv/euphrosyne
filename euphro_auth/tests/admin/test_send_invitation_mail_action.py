@@ -35,7 +35,9 @@ class TestSendInvitationMailAction(TestCase):
         self.registered_user = get_user_model().objects.create(
             email="registered@test.test",
             is_staff=True,
-            invitation_completed_at=timezone.datetime(2021, 11, 22),
+            invitation_completed_at=timezone.datetime(
+                2021, 11, 22, tzinfo=timezone.utc
+            ),
         )
 
     def test_send_email_to_non_registered_users(self):
