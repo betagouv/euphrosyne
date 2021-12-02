@@ -1,0 +1,21 @@
+.method-container {
+  margin: 1em;
+  padding: 1em;
+}
+
+.detector-container {
+  margin: 0.5em 1em;
+  padding: 0.5em;
+}
+
+.filter-container {
+  margin: 0.25em 1em;
+  padding: 0.25em;
+}
+
+.other-select {
+  margin-right: 2em;
+}
+.other-input {
+  display: inline-block;
+}

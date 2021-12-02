@@ -1,0 +1,1 @@
+{% load i18n %}{% if widget.value == OTHER_VALUE %}<option class='other-option' value="{{ widget.value|stringformat:'s' }}"{% if value_is_other %} selected{% endif %}>{% translate "Other" %}</option>{% else %}<option value="{{ widget.value|stringformat:'s' }}"{% include "django/forms/widgets/attrs.html" %}>{{ widget.label }}</option>{% endif %}

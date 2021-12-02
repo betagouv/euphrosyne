@@ -63,6 +63,9 @@ class ObjectGroupInline(admin.TabularInline):
 
 @admin.register(Run)
 class RunAdmin(LabPermissionMixin, ModelAdmin):
+    class Media:
+        js = ("js/admin/methods.js",)
+        css = {"all": ("css/admin/methods.css",)}
 
     form = RunDetailsForm
     list_display = ("project", "label", "start_date", "end_date")
@@ -77,8 +80,17 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
             _("Experimental conditions"),
             {"fields": ("particle_type", "energy_in_keV", "beamline")},
         ),
+        (
+            "METHODS",
+            {
+                "fields": (
+                    *[f.name for f in Run.get_method_fields()],
+                    *[f.name for f in Run.get_detector_fields()],
+                    *[f.name for f in Run.get_filters_fields()],
+                )
+            },
+        ),
     )
-
     lab_permissions = LabPermission(
         add_permission=LabRole.ANY_STAFF_USER,
         view_permission=LabRole.PROJECT_MEMBER,

@@ -113,7 +113,6 @@ class RunInline(LabPermissionMixin, admin.TabularInline):
             _("Experimental conditions"),
             {"fields": ("particle_type", "energy_in_keV", "beamline")},
         ),
-        (_("Methods"), {"fields": ("methods",)}),
     )
     template = "admin/edit_inline/stacked_run_in_project.html"
 

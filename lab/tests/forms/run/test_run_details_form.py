@@ -12,10 +12,9 @@ def patch_queryset_exists():
         yield _fixture
 
 
-def test_beamline_is_ignored():
+def test_beamline_is_validated():
     form = forms.RunDetailsForm(data={"label": "needed", "beamline": "phony"})
-    run = form.save(commit=False)
-    assert run.beamline == "Microbeam"
+    assert form.has_error("beamline")
 
 
 def test_run_dates_are_coherent():
@@ -30,8 +29,3 @@ def test_embargo_date_must_be_after_end_date():
         data={"end_date": "2020-01-01", "embargo_date": "2000-01-01"}
     )
     assert form.has_error("embargo_date", code="end_date_after_embargo_date")
-
-
-def test_beamline_is_rendered_with_disabled_microbeam():
-    form = forms.RunDetailsForm()
-    assert '<select name="beamline" disabled id="id_beamline">' in str(form)
