@@ -1,8 +1,9 @@
 import enum
-from typing import Any, Dict, List, Mapping, Tuple
+from typing import Any, Dict, Mapping
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.forms.fields import BooleanField
 from django.forms.forms import Form
 from django.forms.models import ModelForm
 from django.forms.utils import ErrorList
@@ -15,6 +16,7 @@ from lab.models.run import ObjectGroup
 
 from . import models, widgets
 from .controlled_datalist import controlled_datalist_form
+from .methods import OTHER_VALUE, SelectWithFreeOther
 
 
 class BaseParticipationForm(ModelForm):
@@ -119,7 +121,7 @@ RECOMMENDED_ENERGY_LEVELS = {
 
 def _get_energy_levels_choices(
     particle_type: str,
-) -> List[Tuple[str, str]]:
+) -> list[tuple[str, str]]:
     return [
         (level, f"{level} keV") for level in RECOMMENDED_ENERGY_LEVELS[particle_type]
     ]
@@ -142,6 +144,9 @@ class RunDetailsForm(ModelForm):
             "end_date",
             "embargo_date",
             "beamline",
+            *[f.name for f in models.Run.get_method_fields()],
+            *[f.name for f in models.Run.get_detector_fields()],
+            *[f.name for f in models.Run.get_filters_fields()],
         )
 
         widgets = {
@@ -149,19 +154,33 @@ class RunDetailsForm(ModelForm):
                 widgets.DisabledSelectWithHidden(),
                 models.Run.project.field.remote_field,  # pylint: disable=no-member
             ),
+            **{
+                filter_fieldname: Select(choices=[(c, c) for c in ["", *choices]])
+                if OTHER_VALUE not in choices
+                else SelectWithFreeOther(choices=[(c, c) for c in ["", *choices]])
+                for filter_fieldname, choices in [
+                    (field.name, field.filters)
+                    for field in models.Run.get_filters_fields()
+                ]
+            },
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["beamline"].disabled = True
 
     def clean(self):
         cleaned_data = super().clean()
+        errors = {}
+
+        cleaned_data, errors = self._clean_dates(cleaned_data, errors)
+        cleaned_data, errors = self._clean_methods(cleaned_data, errors)
+
+        if errors:
+            raise ValidationError(errors)
+        return cleaned_data
+
+    @staticmethod
+    def _clean_dates(cleaned_data, errors):
         cleaned_start_date = cleaned_data.get("start_date")
         cleaned_end_date = cleaned_data.get("end_date")
         cleaned_embargo_date = cleaned_data.get("embargo_date")
-
-        errors = {}
 
         if (
             cleaned_start_date
@@ -182,25 +201,49 @@ class RunDetailsForm(ModelForm):
                 _("The embargo date must be after the end date"),
                 code="end_date_after_embargo_date",
             )
-        if errors:
-            raise ValidationError(errors)
-        return cleaned_data
+
+        return cleaned_data, errors
+
+    def _clean_methods(self, cleaned_data, errors):
+        # Reset detectors whose method is not selected:
+        for method_field, detector_field in models.Run.get_method_detector_fields():
+            if not cleaned_data.get(method_field.name):
+                cleaned_data[detector_field.name] = (
+                    False
+                    if isinstance(self.fields[detector_field.name], BooleanField)
+                    else ""
+                )
+        for (
+            method_field,
+            detector_field,
+            filters_field,
+        ) in models.Run.get_method_detector_filters_fields():
+            # Reset filter whose detector is not selected:
+            if not cleaned_data.get(detector_field.name):
+                cleaned_data[filters_field.name] = ""
+            # Validate filter choice if no freeform allowed
+            if (
+                cleaned_data.get(filters_field.name)
+                and cleaned_data[filters_field.name] not in filters_field.filters
+                and OTHER_VALUE not in filters_field.filters
+            ):
+                errors[filters_field.name] = ValidationError(
+                    _("Invalid filter choice"), code="invalid-filters-choice"
+                )
+        return cleaned_data, errors
 
 
 class RunStatusBaseForm(ModelForm):
+    MANDATORY_FIELDS = ("label", "start_date", "end_date", "embargo_date", "beamline")
+
     class Meta:
         model = models.Run
         fields = ("status",)
 
-    def clean(self):
-        cleaned_data = super().clean()
-        cleaned_status = cleaned_data.get("status")
-
+    def _clean_status_not_new_mandatory_fields(self, cleaned_status):
         if cleaned_status and cleaned_status != models.Run.Status.NEW:
             missing_fields = [
-                rf
-                for rf in RunDetailsForm.base_fields  # pylint: disable=no-member
-                if not getattr(self.instance, rf)
+                rf for rf in self.MANDATORY_FIELDS if not getattr(self.instance, rf)
             ]
             missing_fields_verbose = [
                 str(_(models.Run._meta.get_field(field_name).verbose_name))
@@ -214,6 +257,24 @@ class RunStatusBaseForm(ModelForm):
                     ).format(fields=", ".join(missing_fields_verbose)),
                     code="missing_field_for_run_start",
                 )
+
+    def _clean_status_not_new_1_method_required(self, cleaned_status):
+        if cleaned_status and cleaned_status != models.Run.Status.NEW:
+            if all(
+                not getattr(self.instance, f.name)
+                for f in models.Run.get_method_fields()
+            ):
+                raise ValidationError(
+                    _("The run can't start while no method is selected."),
+                    code="ask_exec_not_allowed_if_no_method",
+                )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        cleaned_status = cleaned_data.get("status")
+
+        self._clean_status_not_new_mandatory_fields(cleaned_status)
+        self._clean_status_not_new_1_method_required(cleaned_status)
 
         return cleaned_data
 

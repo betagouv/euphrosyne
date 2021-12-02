@@ -1,0 +1,48 @@
+{% load i18n methods %} 
+<fieldset id="METHODS" class="module aligned {{ fieldset.classes }}">
+    <h2>{% translate "Methods" %}</h2>
+
+    <div class="method-fields">
+
+        {% for method_field in adminform|method_fields %}
+            <div class="method-container">
+                <div class="method-field-wrapper">
+                    {% if not method_field.is_readonly %}{{ method_field.errors }}{% endif %}
+                    {% if method_field.is_checkbox %}
+                        {{ method_field.field }}{{ method_field.label_tag }}
+                    {% else %}
+                        {{ method_field.label_tag }}
+                        {% if method_field.is_readonly %}
+                            <div class="readonly">{{ method_field.contents }}</div>
+                        {% else %}
+                            {{ method_field.field }}
+                        {% endif %}
+                    {% endif %}
+                </div>
+                {# <h3>{% translate "Detectors" %}</h3> #}
+                <div class="detector-fields">
+                    {% for detector_field in adminform|detector_fields:method_field.field.name %}
+                        <div class="detector-container">
+                            <div class="detector-field-wrapper">
+                                {% if not detector_field.is_readonly %}{{ detector_field.errors }}{% endif %}
+                                {% if detector_field.is_checkbox %}
+                                    {{ detector_field.field }}{{ detector_field.label_tag }}
+                                {% else %}
+                                    {{ detector_field.label_tag }}
+                                    {% if detector_field.is_readonly %}
+                                        <div class="readonly">{{ detector_field.contents }}</div>
+                                    {% else %}
+                                        {{ detector_field.field }}
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            {% if adminform|filters_field:detector_field.field.name %}
+                                {% include "./filters_field.html" with filters_field=adminform|filters_field:detector_field.field.name %}
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</fieldset>

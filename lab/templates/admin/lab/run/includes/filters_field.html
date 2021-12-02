@@ -1,0 +1,16 @@
+{# <h4>{% translate "Filters" %}</h4> #}
+<div class="filter-fields">
+    <div class="filter-container filter-field-wrapper">
+        {% if not filters_field.is_readonly %}{{ filters_field.errors }}{% endif %}
+        {% if filters_field.is_checkbox %}
+            {{ filters_field.field }}{{ filters_field.label_tag }}
+        {% else %}
+            {{ filters_field.label_tag }}
+            {% if filters_field.is_readonly %}
+                <div class="readonly">{{ filters_field.contents }}</div>
+            {% else %}
+                {{ filters_field.field }}
+            {% endif %}
+        {% endif %}
+    </div>
+</div>

@@ -159,3 +159,29 @@ class TestRunAdminViewAsAdmin(TestCase):
             }
         )
         assert "project" not in form.fields
+
+
+class TestRunAdminMethodFieldset(TestCase):
+    def setUp(self):
+        self.request = RequestFactory().get(
+            reverse(
+                "admin:lab_run_add",
+            )
+        )
+        self.admin_user = factories.LabAdminUserFactory()
+        self.request.user = self.admin_user
+        self.run_admin = RunAdmin(Run, admin_site=AdminSite())
+        self.admin_form = self.run_admin.get_form(self.request, obj=None, change=False)
+
+    def test_methods_fieldset_is_defined(self):
+        assert "METHODS" in [
+            fieldset_name
+            for fieldset_name, fieldset_options in self.run_admin.get_fieldsets(
+                self.request
+            )
+        ]
+
+    def test_methods_fieldset_is_rendered(self):
+        resp = self.run_admin.add_view(self.request)
+        resp.render()
+        assert '<fieldset id="METHODS"' in resp.content.decode()

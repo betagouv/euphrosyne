@@ -4,8 +4,10 @@ from django.utils.translation import gettext_lazy as _
 
 from shared.models import TimestampedModel
 
+from ..methods import MethodModel
 
-class Run(TimestampedModel):
+
+class Run(TimestampedModel, MethodModel):
     class Status(models.TextChoices):
         NEW = "New", _("New")
         ASK_FOR_EXECUTION = "Ask for execution", _("Ask for execution")
@@ -50,8 +52,6 @@ class Run(TimestampedModel):
         choices=Beamline.choices,
         default=Beamline.MICROBEAM,
     )
-
-    methods = models.JSONField(null=True)
 
     run_object_groups = models.ManyToManyField(
         "lab.ObjectGroup", verbose_name=_("Object groups"), related_name="runs"

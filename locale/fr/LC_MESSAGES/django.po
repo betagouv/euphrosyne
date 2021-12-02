@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-07 19:41+0100\n"
+"POT-Creation-Date: 2022-01-12 17:47+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -148,9 +148,6 @@ msgstr "Date d'embargo"
 msgid "Experimental conditions"
 msgstr "Conditions expérimentales"
 
-msgid "Methods"
-msgstr "Méthodes"
-
 msgid "Leader"
 msgstr "Chef de projet"
 
@@ -176,9 +173,21 @@ msgstr "La date de fin doit être après la date de début"
 msgid "The embargo date must be after the end date"
 msgstr "La date d'embargo doit être après la date de fin"
 
+msgid "Invalid filter choice"
+msgstr "Choix de filtre invalide"
+
 #, python-brace-format
 msgid ""
 "The run can't start while the following Run fields aren't defined: {fields}."
+msgstr ""
+"Le run ne peut démarrer tant que les champs suivants ne sont pas remplis: "
+"{fields}."
+
+#, fuzzy
+#| msgid ""
+#| "The run can't start while the following Run fields aren't defined: "
+#| "{fields}."
+msgid "The run can't start while no method is selected."
 msgstr ""
 "Le run ne peut démarrer tant que les champs suivants ne sont pas remplis: "
 "{fields}."
@@ -204,6 +213,21 @@ msgstr "Séparez chaque matériel par une virgule"
 msgid "Group label must be specified when adding multiple objects"
 msgstr ""
 "L'intitulé de groupe doit etre spécifié lors d'un ajout de plusieurs objets"
+
+msgid "{} analysis technique"
+msgstr "technique d'analyse {}"
+
+msgid "other detector"
+msgstr "autre détecteur"
+
+msgid "{} / {} detector"
+msgstr "détecteur {} / {}"
+
+msgid "{} filters"
+msgstr "filtres {}"
+
+msgid "{} / {} filters choice"
+msgstr "choix de filtres {} / {}"
 
 msgid "To schedule"
 msgstr "A planifier"
@@ -346,6 +370,12 @@ msgstr "Voir sur le site"
 
 msgid "Add new run"
 msgstr "Ajouter un nouveau run"
+
+msgid "Methods"
+msgstr "Méthodes"
+
+msgid "Other"
+msgstr "Autre"
 
 #, python-format
 msgid "You've been invited to join %(project_name)s on Euphrosyne."

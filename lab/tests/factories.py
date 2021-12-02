@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta, timezone
+
 import factory
 import factory.fuzzy
 from django.contrib.auth import get_user_model
@@ -5,6 +7,8 @@ from django.contrib.auth import get_user_model
 from lab.models.run import Object, ObjectGroup
 
 from ..models import Participation, Project, Run
+
+NOW = datetime.now(tz=timezone.utc)
 
 
 class StaffUserFactory(factory.django.DjangoModelFactory):
@@ -53,6 +57,33 @@ class RunFactory(factory.django.DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     energy_in_keV = factory.fuzzy.FuzzyInteger(0, high=10000, step=500)
     particle_type = factory.fuzzy.FuzzyChoice(Run.ParticleType)
+    start_date = factory.fuzzy.FuzzyDateTime(
+        start_dt=NOW, end_dt=NOW + timedelta(days=1)
+    )
+    end_date = factory.fuzzy.FuzzyDateTime(
+        start_dt=NOW + timedelta(days=7), end_dt=NOW + timedelta(days=8)
+    )
+    embargo_date = factory.fuzzy.FuzzyDate(
+        start_date=NOW.date() + timedelta(days=15),
+        end_date=NOW.date() + timedelta(days=21),
+    )
+    beamline = "Microbeam"
+
+
+class RunForceNoMethodFactory(RunFactory):
+    @classmethod
+    def _adjust_kwargs(cls, **kwargs):
+        method_fieldnames = [f.name for f in Run.get_method_fields()]
+        return {
+            fieldname: value
+            for fieldname, value in kwargs.items()
+            if fieldname not in method_fieldnames
+        }
+
+
+class RunReadyToAskExecFactory(RunFactory):
+    status = Run.Status.NEW
+    method_PIXE = True
 
 
 class ObjectFactory(factory.django.DjangoModelFactory):
