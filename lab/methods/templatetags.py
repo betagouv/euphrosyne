@@ -13,9 +13,7 @@ def _get_adminfield_name(admin_field: AdminField) -> str:
     )
 
 
-def _get_adminfields(
-    adminform: AdminForm, select: list[str] = None
-) -> list[AdminField]:
+def _get_adminfields(adminform: AdminForm, select: list[str]) -> list[AdminField]:
     """Get fields from an AdminForm based on a selected list of field names
 
     `select` must be ordered.
