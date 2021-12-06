@@ -134,6 +134,9 @@ msgstr "Déconnexion"
 msgid "Log in with ORCID"
 msgstr "Se connecter avec ORCID"
 
+msgid "Object"
+msgstr "Objet"
+
 msgid "Project member"
 msgstr "Membre du projet"
 
@@ -152,10 +155,11 @@ msgid "Leader"
 msgstr "Chef de projet"
 
 msgid "Basic information"
-msgstr "Information sessentielles"
+msgstr "Informations essentielles"
 
-#, fuzzy
-#| msgid "Projects"
+msgid "Object group"
+msgstr "Groupe d'objets"
+
 msgid "Project"
 msgstr "Projet"
 
@@ -184,6 +188,22 @@ msgstr "Seuls les utilisateurs Admin peuvent valider et exécuter des runs."
 
 msgid "Only Admin users might rewind runs."
 msgstr "Seuls les utilisateurs Admin peuvent remettre un run en arrière."
+
+msgid "Group of objects"
+msgstr "Group d'objets"
+
+msgid "One object"
+msgstr "Objet unique"
+
+msgid "Number of objects"
+msgstr "Nombre d'objets"
+
+msgid "Separate each material with a comma"
+msgstr "Séparez chaque matériel par une virgule"
+
+msgid "Group label must be specified when adding multiple objects"
+msgstr ""
+"L'intitulé de groupe doit etre spécifié lors d'un ajout de plusieurs objets"
 
 msgid "To schedule"
 msgstr "A planifier"
@@ -275,6 +295,33 @@ msgstr "Microbeam"
 
 msgid "Beamline"
 msgstr "Ligne de faisceau"
+
+msgid "Object groups"
+msgstr ""
+
+msgid "Group label"
+msgstr "Libellé du groupe"
+
+msgid "Inventory"
+msgstr "Inventaire"
+
+msgid "Dating"
+msgstr "Datation"
+
+msgid "Materials"
+msgstr "Matériaux"
+
+msgid "Place of discovery"
+msgstr "Leu de découverte"
+
+msgid "Collection"
+msgstr "Collection"
+
+msgid "Label"
+msgstr "Libellé"
+
+msgid "Differentiation information"
+msgstr "Information de différentation"
 
 msgid "Home"
 msgstr "Accueil"
