@@ -8,20 +8,25 @@ beamlines:
             filters:
               - Helium
               - Air
-          HE1: &HE-filters
-            - "100 µm Be"
-            - "100 µm Mylar"
-            - "200 µm Mylar"
-            - "50 µm Al"
-            - "100 µm Al"
-            - "150 µm Al"
-            - "200 µm Al"
-            - "13 µm Cr + 50 µm Al"
-            - "50 µm Cu"
-            - "75 µm Cu"
-          HE2: *HE-filters
-          HE3: *HE-filters
-          HE4: *HE-filters
+          HE1:
+            filters: &HE-filters
+              - "100 µm Be"
+              - "100 µm Mylar"
+              - "200 µm Mylar"
+              - "50 µm Al"
+              - "100 µm Al"
+              - "150 µm Al"
+              - "200 µm Al"
+              - "13 µm Cr + 50 µm Al"
+              - "50 µm Cu"
+              - "75 µm Cu"
+              - _
+          HE2:
+            filters: *HE-filters
+          HE3:
+            filters: *HE-filters
+          HE4:
+            filters: *HE-filters
       PIGE:
         detectors:
           HPGe-20:
