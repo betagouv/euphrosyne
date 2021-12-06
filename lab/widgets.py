@@ -5,7 +5,7 @@ from django.contrib.admin import site
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.forms.renderers import get_default_renderer
-from django.forms.widgets import HiddenInput, Select
+from django.forms.widgets import HiddenInput, Input, Select
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -107,3 +107,11 @@ class ProjectWidgetWrapper(RelatedFieldWidgetWrapper):
             can_delete_related=False,
             can_view_related=False,
         )
+
+
+class TagsInput(Input):
+    template_name = "widgets/tags_input.html"
+
+    class Media:
+        js = ("js/widgets/tags-input.js",)
+        css = {"all": ("css/widgets/tags-input.css",)}

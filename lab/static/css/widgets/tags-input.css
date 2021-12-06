@@ -1,0 +1,41 @@
+.tags-input {
+  display: inline-block;
+  cursor: text;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 5px 6px;
+  margin-top: 0;
+  color: var(--body-fg);
+  background-color: var(--body-bg);
+  width: 20.5em;
+}
+input.tags-input__input {
+  border: none;
+  padding: 0.3rem 0;
+  outline: none;
+  padding: 0;
+  min-height: 24px;
+}
+.tags-input__tag {
+  display: inline-block;
+  border: 1px solid var(--border-color);
+  padding: 0.1rem 0.5rem;
+  border-radius: 0.4rem;
+  margin: 0 0.2rem 0.2rem 0.2rem;
+}
+label.tags-input__tag-name {
+  width: auto;
+  float: none;
+  display: unset;
+  font-size: 12px;
+}
+.tags-input__remove {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--border-color);
+  margin-left: 0.3rem;
+  cursor: pointer;
+}
+.tags-input__remove:hover {
+  color: var(--close-button-hover-bg);
+}

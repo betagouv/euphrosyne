@@ -1,4 +1,5 @@
-from typing import List, Tuple
+import enum
+from typing import Any, Dict, List, Mapping, Tuple
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -10,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
 from lab.emails import send_project_invitation_email
+from lab.models.run import ObjectGroup
 
 from . import models, widgets
 from .controlled_datalist import controlled_datalist_form
@@ -241,3 +243,47 @@ class RunStatusMemberForm(RunStatusBaseForm):
                 code="run_rewinding_not_allowed_to_members",
             )
         return status
+
+
+class ObjectGroupAddChoices(enum.Enum):
+    OBJECT_GROUP = "OBJECT_GROUP", _("Group of objects")
+    SINGLE_OBJECT = "SINGLE_OBJECT", _("One object")
+
+    @classmethod
+    def to_choices(cls):
+        return (choice.value for choice in cls)
+
+
+class ObjectGroupForm(forms.ModelForm):
+    add_type = forms.ChoiceField(
+        label=_("Number of objects"), choices=ObjectGroupAddChoices.to_choices()
+    )
+
+    class Meta:
+        model = ObjectGroup
+        fields = ("add_type", "label", "materials", "dating", "inventory", "collection")
+        help_texts = {"materials": _("Separate each material with a comma")}
+
+    def __init__(self, **kwargs: Mapping[str, Any]) -> None:
+        super().__init__(**kwargs)
+        if self.instance.id:
+            self.fields["add_type"].disabled = True
+
+    def clean(self) -> Dict[str, Any]:
+        cleaned_data = super().clean()
+        add_type = cleaned_data["add_type"]
+        if add_type == ObjectGroupAddChoices.OBJECT_GROUP.value[
+            0
+        ] and not cleaned_data.get("label"):
+            raise ValidationError(
+                {
+                    "label": ValidationError(
+                        _(
+                            "Group label must be specified "
+                            "when adding multiple objects"
+                        ),
+                        code="label-required-for-mulitple-objects",
+                    )
+                }
+            )
+        return cleaned_data

@@ -2,6 +2,8 @@ import factory
 import factory.fuzzy
 from django.contrib.auth import get_user_model
 
+from lab.models.run import Object, ObjectGroup
+
 from ..models import Participation, Project, Run
 
 
@@ -51,3 +53,23 @@ class RunFactory(factory.django.DjangoModelFactory):
     project = factory.SubFactory(ProjectFactory)
     energy_in_keV = factory.fuzzy.FuzzyInteger(0, high=10000, step=500)
     particle_type = factory.fuzzy.FuzzyChoice(Run.ParticleType)
+
+
+class ObjectFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Object
+
+    label = factory.Faker("words")
+
+
+class ObjectGroupFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ObjectGroup
+
+    label = factory.Faker("words")
+    dating = factory.fuzzy.FuzzyChoice(["XXe", "XIXe", "XVIIIe", "XVIIe"])
+    materials = factory.fuzzy.FuzzyChoice(["wood", "stone", "glass", "metal"], list)
+
+    @factory.post_generation
+    def objects(self, *args, **kwargs):
+        return ObjectFactory.create_batch(3, group_id=self.id)

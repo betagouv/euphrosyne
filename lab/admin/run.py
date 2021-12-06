@@ -1,15 +1,64 @@
-from typing import List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Type, Union
 
 from django.contrib import admin
-from django.contrib.admin import ModelAdmin
+from django.contrib.admin import ModelAdmin, widgets
+from django.contrib.admin.options import InlineModelAdmin
 from django.db.models.query import QuerySet
+from django.forms.widgets import Select
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
+from ..fields import ObjectGroupChoiceField
 from ..forms import RunDetailsForm
 from ..models import Project, Run
 from ..permissions import LabRole, get_user_permission_group, is_lab_admin
 from .mixins import LabPermission, LabPermissionMixin
+
+
+class ObjectGroupInline(admin.TabularInline):
+    parent_instance: Run
+    model = Run.run_object_groups.through
+    verbose_name = _("Object group")
+    extra = 0
+
+    def has_view_permission(
+        self, request: HttpRequest, obj: Optional[Run] = None
+    ) -> bool:
+        return True
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: Optional[Run] = None
+    ) -> bool:
+        return False
+
+    def has_add_permission(
+        self, request: HttpRequest, obj: Optional[Run] = None
+    ) -> bool:
+        return True
+
+    def has_delete_permission(
+        self, request: HttpRequest, obj: Optional[Run] = None
+    ) -> bool:
+        return True
+
+    def formfield_callback(self, field, **kwargs):
+        if field.name == "objectgroup":
+            # pylint: disable=no-member
+            return ObjectGroupChoiceField(
+                project_id=self.parent_instance.project_id,
+                widget=widgets.RelatedFieldWidgetWrapper(
+                    Select(),
+                    Run.run_object_groups.rel,
+                    admin_site=self.admin_site,
+                    can_add_related=True,
+                ),
+            )
+        return field.formfield(**kwargs)
+
+    def get_formset(self, request: Any, obj: Optional[Run] = None, **kwargs: Any):
+        return super().get_formset(
+            request, obj=obj, formfield_callback=self.formfield_callback, **kwargs
+        )
 
 
 @admin.register(Run)
@@ -72,6 +121,23 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
                 readonly_fields += ("start_date", "end_date")
 
         return readonly_fields
+
+    def get_inlines(
+        self, request: HttpRequest, obj: Optional[Run] = None
+    ) -> List[Type[InlineModelAdmin]]:
+        if obj:
+            return [ObjectGroupInline]
+        return []
+
+    def get_inline_instances(
+        self, request: HttpRequest, obj: Optional[Run] = None
+    ) -> List[InlineModelAdmin]:
+        inlines = super().get_inline_instances(request, obj=obj)
+        if obj:
+            for inline in inlines:
+                if isinstance(inline, ObjectGroupInline):
+                    inline.parent_instance = obj
+        return inlines
 
     def get_queryset(self, request: HttpRequest):
         runs_queryset = super().get_queryset(request)
