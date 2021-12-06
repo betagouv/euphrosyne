@@ -61,6 +61,10 @@ jobs:
           missing_translations=$(sed '$a\\' locale/*/LC_MESSAGES/django.po | tac | sed '/^$/N;/\nmsgstr ""$/,/^msgid/!d' | tac)
           [ $(wc -l <(echo $missing_translations) | cut -d ' ' -f1) = '1' ]
 
+      - name: Run mypy on selected folders
+        run: |
+          python -m mypy
+
   test:
     runs-on: ubuntu-18.04
     services:
