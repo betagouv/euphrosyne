@@ -1,4 +1,4 @@
-from typing import Any, Mapping, Optional
+from typing import Optional
 
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
@@ -8,7 +8,6 @@ from django.utils.translation import gettext_lazy as _
 from ..forms import ObjectGroupForm
 from ..models import Object, ObjectGroup
 from ..permissions import is_lab_admin
-from ..widgets import TagsInput
 
 
 class ObjectInline(admin.TabularInline):
@@ -28,6 +27,11 @@ class ObjectInline(admin.TabularInline):
         return True
 
     def has_add_permission(
+        self, request: HttpRequest, obj: Optional[ObjectGroup] = None
+    ) -> bool:
+        return True
+
+    def has_delete_permission(
         self, request: HttpRequest, obj: Optional[ObjectGroup] = None
     ) -> bool:
         return True
