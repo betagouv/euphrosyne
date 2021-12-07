@@ -263,6 +263,7 @@ class ObjectGroupForm(forms.ModelForm):
         model = ObjectGroup
         fields = ("add_type", "label", "materials", "dating", "inventory", "collection")
         help_texts = {"materials": _("Separate each material with a comma")}
+        widgets = {"materials": widgets.TagsInput()}
 
     def __init__(self, **kwargs: Mapping[str, Any]) -> None:
         super().__init__(**kwargs)

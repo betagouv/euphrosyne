@@ -52,18 +52,3 @@ class ObjectGroupAdmin(ModelAdmin):
         return is_lab_admin(request.user) or (
             obj and obj.runs.filter(project__members=request.user.id).exists()
         )
-
-    def get_form(
-        self,
-        request: Any,
-        obj: Optional[ObjectGroup] = None,
-        change: bool = False,
-        **kwargs: Mapping[str, Any]
-    ):
-        return super().get_form(
-            request,
-            obj=obj,
-            change=change,
-            widgets={"materials": TagsInput()},
-            **kwargs
-        )
