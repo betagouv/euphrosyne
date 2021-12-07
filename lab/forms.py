@@ -265,14 +265,20 @@ class ObjectGroupForm(forms.ModelForm):
         help_texts = {"materials": _("Separate each material with a comma")}
         widgets = {"materials": widgets.TagsInput()}
 
-    def __init__(self, **kwargs: Mapping[str, Any]) -> None:
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs: Mapping[str, Any]) -> None:
+        super().__init__(*args, **kwargs)
         if self.instance.id:
-            self.fields["add_type"].disabled = True
+            self.fields["add_type"].required = False
+            self.fields["add_type"].widget.attrs["disabled"] = "disabled"
+            self.fields["add_type"].initial = (
+                ObjectGroupAddChoices.OBJECT_GROUP.value[0]
+                if self.instance.object_set.count() > 1
+                else ObjectGroupAddChoices.SINGLE_OBJECT.value[0]
+            )
 
     def clean(self) -> Dict[str, Any]:
         cleaned_data = super().clean()
-        add_type = cleaned_data["add_type"]
+        add_type = cleaned_data.get("add_type")
         if add_type == ObjectGroupAddChoices.OBJECT_GROUP.value[
             0
         ] and not cleaned_data.get("label"):
