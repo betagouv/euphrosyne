@@ -12,8 +12,7 @@ def test_empty_label_group_for_object_group_raise_validation():
             "dating": "XIXe",
         }
     )
-    form.full_clean()
-    assert form.has_error("label")
+    assert form.has_error("label", code="label-required-for-mulitple-objects")
 
 
 def test_empty_label_group_for_single_object_is_allowed():
@@ -25,8 +24,7 @@ def test_empty_label_group_for_single_object_is_allowed():
             "dating": "XIXe",
         }
     )
-    form.full_clean()
-    assert not form.has_error("label")
+    assert not form.has_error("label", code="label-required-for-mulitple-objectss")
 
 
 def test_update_object_has_disabled_add_type_field():
