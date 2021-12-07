@@ -13,6 +13,7 @@ env:
   EMAIL_USE_TLS: false
   DEFAULT_FROM_EMAIL: h@ll.o
   SITE_URL: http://localhost:8000
+  PYTHON_VERSION: 3.9.2
 
 jobs:
   lint-and-checks:
@@ -21,26 +22,18 @@ jobs:
       # -- block install --
       - uses: actions/checkout@v2
 
-      - name: Use the cached python install
+      - name: Use the cached python install for dev requirements
         uses: actions/cache@v2
+        id: python-cache
         with:
-          path: /opt/hostedtoolcache/Python/3.9.2
-          key: ${{ runner.os }}-python-3.9.2
+          path: /opt/hostedtoolcache/Python/${{ env.PYTHON_VERSION }}
+          key: ${{ runner.os }}-python-${{ env.PYTHON_VERSION }}-${{ hashFiles('requirements/dev.txt', 'requirements/base.txt') }}
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.9.2"
-
-      - name: Get pip cache dir
-        id: pip-cache
-        run: |
-          echo "::set-output name=dir::$(pip cache dir)"
-      - name: Use the cached pip cache for dev requirements
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/dev.txt') }}
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: Install dev requirements
-        run: pip install --user -r requirements/dev.txt
+        if: steps.python-cache.outputs.cache-hit != 'true'
+        run: pip install -r requirements/dev.txt
       # -- endblock install --
 
       - name: Install GNU gettext
@@ -88,26 +81,18 @@ jobs:
       # -- block install --
       - uses: actions/checkout@v2
 
-      - name: Use the cached python install
+      - name: Use the cached python install for dev requirements
         uses: actions/cache@v2
+        id: python-cache
         with:
-          path: /opt/hostedtoolcache/Python/3.9.2
-          key: ${{ runner.os }}-python-3.9.2
+          path: /opt/hostedtoolcache/Python/${{ env.PYTHON_VERSION }}
+          key: ${{ runner.os }}-python-${{ env.PYTHON_VERSION }}-${{ hashFiles('requirements/dev.txt', 'requirements/base.txt') }}
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.9.2"
-
-      - name: Get pip cache dir
-        id: pip-cache
-        run: |
-          echo "::set-output name=dir::$(pip cache dir)"
-      - name: Use the cached pip cache for dev requirements
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/dev.txt') }}
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: Install dev requirements
-        run: pip install --user -r requirements/dev.txt
+        if: steps.python-cache.outputs.cache-hit != 'true'
+        run: pip install -r requirements/dev.txt
 
       - uses: actions/setup-node@v2
         with:
@@ -117,7 +102,6 @@ jobs:
         run: npm install --only=prod
       - name: Build files with webpack
         run: npm run build
-
       # -- endblock install --
 
       - name: Collect static files
