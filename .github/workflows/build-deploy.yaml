@@ -12,6 +12,7 @@ env:
   EMAIL_USE_TLS: false
   DEFAULT_FROM_EMAIL: h@ll.o
   SITE_URL: http://localhost:8000
+  PYTHON_VERSION: 3.9.2
   
 
 jobs:
@@ -23,26 +24,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Use the cached python install
+      - name: Use the cached python install for prod requirements
         uses: actions/cache@v2
+        id: python-site-packages-cache
         with:
-          path: /opt/hostedtoolcache/Python/3.9.2
-          key: ${{ runner.os }}-python-3.9.2
+          path: ${{ env.pythonLocation }}/lib/python${{ env.PYTHON_VERSION }}/site-packages/*
+          key: ${{ runner.os }}-python-sp-${{ env.PYTHON_VERSION }}-${{ hashFiles('requirements/prod.txt') }}
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.9.2'
-
-      - name: Get pip cache dir
-        id: pip-cache
-        run: |
-          echo "::set-output name=dir::$(pip cache dir)"
-
-      - name: Use the cached pip cache for production requirements
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.pip-cache.outputs.dir }}
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/prod.txt') }}
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: Install prod requirements
+        if: steps.python-site-packages-cache.outputs.cache-hit != 'true'
         run: pip install --user -r requirements/prod.txt
 
       - name: Install GNU gettext
@@ -68,15 +60,6 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
-
-      - name: Use the cached python install
-        uses: actions/cache@v2
-        with:
-          path: /opt/hostedtoolcache/Python/3.9.2
-          key: ${{ runner.os }}-python-3.9.2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.9.2'
 
       - name: Download build artifact
         uses: actions/download-artifact@v2
