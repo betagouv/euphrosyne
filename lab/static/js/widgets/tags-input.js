@@ -1,3 +1,6 @@
+/**
+ * Inspired by Jun Tarnate snippet available on Code Pen at https://codepen.io/jeytii/pen/RyZpvo
+ */
 "use strict";
 (function () {
   const getTags = (tagsInputNode) =>
