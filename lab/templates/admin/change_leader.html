@@ -1,8 +1,6 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_urls static %}
 
-{% block title %}{{ title }}{% endblock %}
-
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">{% endblock %}
 
 {% block coltype %}colM{% endblock %}
@@ -19,8 +17,6 @@
 {% endblock %}
 
 {% block content %}
-<h1>{% translate 'Change leader' %}</h1>
-<h2>{{ project.name }}</h2>
 <div id="content-main">
     <form action="{% url 'admin:lab_project_leader_participation_change' project.id %}" method="post">
         {% csrf_token %}

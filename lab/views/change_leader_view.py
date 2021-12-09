@@ -1,28 +1,31 @@
 from typing import Any, Dict
 
 from django.contrib.admin import site
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http.request import HttpRequest
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import FormView
+
+from lab.permissions import is_lab_admin
+from shared.view_mixins import StaffUserRequiredMixin
 
 from ..forms import ChangeLeaderForm
 from ..models import Project
-from ..permissions import is_lab_admin
 
 
-class ChangeLeaderView(LoginRequiredMixin, FormView):
+class ChangeLeaderView(StaffUserRequiredMixin, FormView):
     template_name = "admin/change_leader.html"
     form_class = ChangeLeaderForm
+
+    project: Project
 
     # pylint: disable=arguments-differ
     def dispatch(self, request: HttpRequest, project_id: int, *args, **kwargs):
         if not is_lab_admin(request.user):
             raise PermissionDenied()
-        # pylint: disable=attribute-defined-outside-init
         self.project = get_object_or_404(Project, pk=project_id)
         return super().dispatch(request, *args, **kwargs)
 
@@ -48,5 +51,6 @@ class ChangeLeaderView(LoginRequiredMixin, FormView):
         return {
             **super().get_context_data(**kwargs),
             **site.each_context(self.request),
+            "subtitle": "{} | {}".format(self.project.name, _("Change leader")),
             "project": self.project,
         }

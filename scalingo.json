@@ -17,6 +17,10 @@
     },
     "ALLOWED_HOSTS": {
       "value": ".scalingo.io"
+    },
+    "S3_BUCKET_NAME": {
+      "generator": "template",
+      "template": "%APP%"
     }
   },
   "formation": {
