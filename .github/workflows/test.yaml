@@ -55,6 +55,9 @@ jobs:
           ./manage.py makemessages --all --verbosity 0 --no-location --no-obsolete
           git diff -I'^"PO' --exit-code locale/*/LC_MESSAGES/django.po  # Fail if any change apart from headers.
           git checkout -- locale/*/LC_MESSAGES/django.po
+          ./manage.py makemessages --all --verbosity 0 --no-location --no-obsolete -d djangojs
+          git diff -I'^"PO' --exit-code locale/*/LC_MESSAGES/djangojs.po  # Fail if any change apart from headers.
+          git checkout -- locale/*/LC_MESSAGES/djangojs.po
       - name: Check no translation is empty
         run: |
           # Inspired from https://blog.erw.dk/2015/06/06/checks-for-your-django-project/

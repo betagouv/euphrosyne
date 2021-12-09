@@ -133,3 +133,10 @@ ul.messagelist li span.close {
 [href] {
   box-shadow: none;
 }
+
+/* Fix while we do import DSFR checkbox component. Prevents checkboxes from disappearing. */
+input[type="checkbox"] {
+  appearance: auto;
+  -webkit-appearance: auto;
+  -moz-appearance: auto;
+}

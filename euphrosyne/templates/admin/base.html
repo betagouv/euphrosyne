@@ -13,3 +13,8 @@
 {% block userlinks %}
     <a href="{% url 'admin:logout' %}" id="logout-link">{% translate 'Log out' %}</a>
 {% endblock %}
+
+{% block footer %}
+{{ block.super }}
+<script src="{% static 'main.js' %}"></script>
+{% endblock %}

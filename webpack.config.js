@@ -1,12 +1,17 @@
-const path = require("path");
-const glob = require("glob");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+import path from "path";
+import glob from "glob";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
-module.exports = {
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
+
+export default {
   entry: {
     main: [
-      "./node_modules/@gouvfr/dsfr/dist/core/core.min.css",
+      "promise-polyfill/src/polyfill",
+      "whatwg-fetch",
+      "@gouvfr/dsfr/dist/core/core.min.css",
       "./euphrosyne/assets/css/base.css",
     ],
     ...Object.assign(
@@ -22,7 +27,10 @@ module.exports = {
     ),
   },
   output: {
-    path: path.resolve(__dirname, "euphrosyne/assets/dist"),
+    path: path.resolve(
+      dirname(fileURLToPath(import.meta.url)),
+      "euphrosyne/assets/dist"
+    ),
     publicPath: "/static/",
     filename: "[name].js",
   },

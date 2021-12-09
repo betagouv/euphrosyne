@@ -149,14 +149,25 @@ msgstr "Chef de projet"
 msgid "Basic information"
 msgstr "Informations essentielles"
 
+msgid "Documents"
+msgstr "Documents"
+
+msgid "View project documents"
+msgstr "Afficher les documents du projet"
+
 msgid "Object group"
 msgstr "Lot d'objets"
 
 msgid "Object groups"
 msgstr "Lots d'objets"
 
+#, fuzzy
+#| msgid "Projects"
 msgid "Project"
 msgstr "Projet"
+
+msgid "Upload documents"
+msgstr "Téléverser des documents"
 
 #, python-brace-format
 msgid "[Euphrosyne] Invitation to join project {project.name}"
@@ -385,6 +396,38 @@ msgstr "Méthodes"
 
 msgid "Other"
 msgstr "Autre"
+
+#, python-format
+msgid ""
+"\n"
+"Project %(project_name)s documents\n"
+msgstr ""
+"\n"
+"Documents du projet %(project_name)s\n"
+
+msgid "Add files"
+msgstr "Ajouter des fichiers"
+
+msgid "Max size allowed : 30 Mo. Multiple files allowed."
+msgstr "Max size allowed : 30 Mo. Multiple files allowed."
+
+msgid "Allowed files: images, documents and archives."
+msgstr "Fichiers supportés : images, documents et archives."
+
+msgid "Upload"
+msgstr "Téléverser"
+
+msgid "File name"
+msgstr "Fichier"
+
+msgid "Last modified"
+msgstr "Modifié le"
+
+msgid "Size"
+msgstr "Taille"
+
+msgid "No document yet"
+msgstr "Aucun document ajouté"
 
 #, python-format
 msgid "You've been invited to join %(project_name)s on Euphrosyne."
