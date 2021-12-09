@@ -5,6 +5,7 @@ from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import InlineModelAdmin
 from django.forms.models import BaseInlineFormSet, ModelForm, inlineformset_factory
 from django.http.request import HttpRequest
+from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
@@ -203,6 +204,15 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
                         else "leader_user",
                         "members",
                     )
+                },
+            ),
+            (
+                _("Documents"),
+                {
+                    "fields": (),
+                    "description": '<a href="{}">Click here</a> to view the project documents.'.format(
+                        reverse("admin:lab_project_documents", args=[obj.id])
+                    ),
                 },
             ),
         ]

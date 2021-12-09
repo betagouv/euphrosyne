@@ -1,0 +1,22 @@
+.no-document {
+  height: 250px;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+form {
+  margin-bottom: 30px;
+}
+
+#upload-button {
+  float: none;
+}
+
+.documents-wrapper {
+  clear: both;
+}
+
+input[type="file"] {
+  cursor: pointer;
+}
