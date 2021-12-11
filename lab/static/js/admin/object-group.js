@@ -35,9 +35,11 @@
         "tr.dynamic-object_set"
       );
       if (newObjectRows.length > 1) {
-        for (let i = 1; i <= newObjectRows.length; i++) {
-          newObjectRows[i].querySelector("a.inline-deletelink").click();
-        }
+        newObjectRows.forEach((row, index) => {
+          if (index > 0) {
+            row.querySelector("a.inline-deletelink").click();
+          }
+        });
       }
     } else if (value === "OBJECT_GROUP") {
       groupLabelRow.style.display = null;
