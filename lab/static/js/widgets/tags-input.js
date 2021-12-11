@@ -25,19 +25,17 @@
       .join(",");
   }
 
-  function modifyTags(e) {
-    if (e.key === ",") {
-      if (isInvalid(getTags(e.target.parentNode), e.target.value)) {
-        e.target.value = "";
-        return;
-      }
-
-      addTag(e.target.parentElement, e.target.value);
-      setHiddenInputValue(
-        e.target.parentNode.querySelector("input[type='hidden']")
-      );
-      e.target.value = "";
+  function modifyTags(event) {
+    if (isInvalid(getTags(event.target.parentNode), event.target.value)) {
+      event.target.value = "";
+      return;
     }
+
+    addTag(event.target.parentElement, event.target.value);
+    setHiddenInputValue(
+      event.target.parentNode.querySelector("input[type='hidden']")
+    );
+    event.target.value = "";
   }
 
   function addTag(tagsInputEl, textValue) {
@@ -94,6 +92,16 @@
     }
   }
 
+  function onKeyUp(event) {
+    if (event.key === ",") {
+      modifyTags(event);
+    }
+  }
+
+  function onBlur(event) {
+    modifyTags(event);
+  }
+
   function setup() {
     const tagInputs = document.querySelectorAll(".tags-input");
 
@@ -116,7 +124,10 @@
         .addEventListener("keyup", resizeInput);
       document
         .querySelector(".tags-input input")
-        .addEventListener("keyup", modifyTags);
+        .addEventListener("keyup", onKeyUp);
+      document
+        .querySelector(".tags-input input")
+        .addEventListener("blur", onBlur);
     }
   }
 
