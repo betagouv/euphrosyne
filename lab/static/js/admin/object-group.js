@@ -24,8 +24,10 @@
      * adding multiple objects.
      */
     const value = event.target.selectedOptions[0].value;
+    const groupLabelRow = getGroupLabelRow();
     if (value === "SINGLE_OBJECT") {
-      getGroupLabelRow().style.display = "none";
+      groupLabelRow.style.display = "none";
+      groupLabelRow.querySelector("input").disabled = true;
       groupLabelHiddenInput.disabled = false;
 
       getObjectsInline().querySelector(".add-row").style.display = "none";
@@ -38,7 +40,8 @@
         }
       }
     } else if (value === "OBJECT_GROUP") {
-      getGroupLabelRow().style.display = null;
+      groupLabelRow.style.display = null;
+      groupLabelRow.querySelector("input").disabled = false;
       groupLabelHiddenInput.disabled = true;
 
       getObjectsInline().querySelector(".add-row").style.display = null;
