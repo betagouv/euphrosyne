@@ -65,7 +65,6 @@ jobs:
   deploy-staging:
     needs:
       - build
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
