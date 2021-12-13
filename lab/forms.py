@@ -275,6 +275,8 @@ class ObjectGroupForm(forms.ModelForm):
                 if self.instance.object_set.count() > 1
                 else ObjectGroupAddChoices.SINGLE_OBJECT.value[0]
             )
+            if self.instance.object_set.count() == 1:
+                self.fields["label"].widget = forms.HiddenInput()
 
     def clean(self) -> Dict[str, Any]:
         cleaned_data = super().clean()

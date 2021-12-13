@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Mapping, Optional
 
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
@@ -35,6 +35,16 @@ class ObjectInline(admin.TabularInline):
         self, request: HttpRequest, obj: Optional[ObjectGroup] = None
     ) -> bool:
         return True
+
+    def get_max_num(
+        self,
+        request: HttpRequest,
+        obj: Optional[ObjectGroup] = None,
+        **kwargs: Mapping[str, Any]
+    ) -> Optional[int]:
+        if obj and obj.object_set.count() == 1:
+            return 1
+        return super().get_max_num(request, obj=obj, **kwargs)
 
 
 @admin.register(ObjectGroup)
