@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-07 19:41+0100\n"
+"POT-Creation-Date: 2021-12-20 10:52+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -154,6 +154,9 @@ msgstr "Chef de projet"
 msgid "Basic information"
 msgstr "Information sessentielles"
 
+msgid "Documents"
+msgstr "Commentaires"
+
 #, fuzzy
 #| msgid "Projects"
 msgid "Project"
@@ -301,6 +304,21 @@ msgid "Add new run"
 msgstr "Ajouter un nouveau run"
 
 #, python-format
+msgid ""
+"\n"
+"Project %(project_name)s documents\n"
+msgstr ""
+
+msgid "Upload documents"
+msgstr ""
+
+msgid "Upload"
+msgstr ""
+
+msgid "No document yet"
+msgstr ""
+
+#, python-format
 msgid "You've been invited to join %(project_name)s on Euphrosyne."
 msgstr ""
 "Vous avez été invité à rejoindre le projet %(project_name)s sur Euphrosyne"
@@ -325,3 +343,6 @@ msgstr "Modifié"
 
 msgid "Date this entry was most recently changed."
 msgstr "Date de la dernière modification de cette entrée"
+
+msgid "Total file sizes must not exceed 30 MB."
+msgstr "La taille totale des fichiers ne doit pas dépasser 30 MB."
