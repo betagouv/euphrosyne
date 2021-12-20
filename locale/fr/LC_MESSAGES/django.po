@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-20 10:52+0100\n"
+"POT-Creation-Date: 2021-12-20 16:42+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -155,12 +155,18 @@ msgid "Basic information"
 msgstr "Information sessentielles"
 
 msgid "Documents"
-msgstr "Commentaires"
+msgstr "Documents"
+
+msgid "View project documents"
+msgstr "Afficher les documents du projet"
 
 #, fuzzy
 #| msgid "Projects"
 msgid "Project"
 msgstr "Projet"
+
+msgid "Upload documents"
+msgstr "Téléverser des documents"
 
 #, python-brace-format
 msgid "[Euphrosyne] Invitation to join project {project.name}"
@@ -307,16 +313,19 @@ msgstr "Ajouter un nouveau run"
 msgid ""
 "\n"
 "Project %(project_name)s documents\n"
-msgstr ""
+msgstr "\nDocuments du projet %(project_name)s\n"
 
-msgid "Upload documents"
-msgstr ""
+msgid "Add files"
+msgstr "Ajouter des fichiers"
+
+msgid "Max size allowed : 30 Mo. Multiple files allowed."
+msgstr "Max size allowed : 30 Mo. Multiple files allowed."
 
 msgid "Upload"
-msgstr ""
+msgstr "Téléverser"
 
 msgid "No document yet"
-msgstr ""
+msgstr "Aucun document ajouté"
 
 #, python-format
 msgid "You've been invited to join %(project_name)s on Euphrosyne."
@@ -343,6 +352,3 @@ msgstr "Modifié"
 
 msgid "Date this entry was most recently changed."
 msgstr "Date de la dernière modification de cette entrée"
-
-msgid "Total file sizes must not exceed 30 MB."
-msgstr "La taille totale des fichiers ne doit pas dépasser 30 MB."

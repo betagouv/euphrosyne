@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-20 11:13+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2021-12-20 14:12+0100\n"
+"PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -15,3 +15,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #, javascript-format
+msgid "Total file sizes must not exceed %s."
+msgstr "La taille totale des fichiers ne doit pas dépasser %s."
+
+msgid ""
+"An error has occured while generating the presigned URL. Please contact the "
+"support team."
+msgstr ""
+"Une erreur s'est produite lors de la génération de l'URL présignée. Veuillez "
+"contacter l'équipe support."
+
+#, javascript-format
+msgid "File %s could not be uploaded."
+msgstr "Le fichier %s n'a pas pu être sauvegardé."

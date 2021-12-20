@@ -4,7 +4,8 @@ from django.contrib import admin
 from django.urls import path
 from django.urls.resolvers import URLResolver
 
-from lab.views import ChangeLeaderView, ProjectDocumentsUploadView, ProjectDocumentsView
+from lab.documents.views import ProjectDocumentsView
+from lab.views import ChangeLeaderView
 
 
 class AdminSite(admin.AdminSite):
@@ -25,11 +26,6 @@ class AdminSite(admin.AdminSite):
                 "admin/lab/project/<project_id>/documents",
                 self.admin_view(ProjectDocumentsView.as_view()),
                 name="lab_project_documents",
-            ),
-            path(
-                "admin/lab/project/<project_id>/documents/upload",
-                self.admin_view(ProjectDocumentsUploadView.as_view()),
-                name="lab_project_documents_upload",
             ),
             *super().get_urls(),
         ]

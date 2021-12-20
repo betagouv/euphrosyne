@@ -5,12 +5,13 @@
   justify-content: center;
 }
 
-form {
+form#upload-form {
   margin-bottom: 30px;
 }
 
 #upload-button {
   float: none;
+  margin-top: 15px;
 }
 
 .documents-wrapper {
@@ -18,5 +19,16 @@ form {
 }
 
 input[type="file"] {
+  cursor: pointer;
+}
+
+ul.messagelist.uploadmessages li {
+  cursor: pointer;
+}
+
+ul.messagelist.uploadmessages li span.close {
+  float: right;
+  font-weight: 800;
+  color: var(--body-quiet-color);
   cursor: pointer;
 }

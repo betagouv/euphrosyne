@@ -1,3 +1,2 @@
+from ..documents.views import ProjectDocumentsView
 from .change_leader_view import ChangeLeaderView
-from .project_documents_upload_view import ProjectDocumentsUploadView
-from .project_documents_view import ProjectDocumentsView

@@ -1,9 +1,12 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_urls static %}
 
-{% block title %}{{ title }}{% endblock %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "css/admin/project-documents.css" %}">{% endblock %}
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "css/admin/project-documents.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "dsfr/dsfr/component/upload/upload.min.css" %}">
+{% endblock %}
 
 {% block coltype %}colM{% endblock %}
 
@@ -24,24 +27,23 @@ Project {{ project_name }} documents
 {% endblocktranslate %}</h1>
 
 <div id="content-main">
-    <div>
+    <ul class="messagelist uploadmessages">
+    </ul>
     <h2>{% translate 'Upload documents' %}</h2>
-    <form enctype="multipart/form-data" method="post">
-        {% csrf_token %}
-        <fieldset class="module aligned">
-            <div class="form-row">
-            {{ form }}
-            </div>
-        </fieldset>
-        <div class="submit-row">
-            <input type="submit" value="{% translate 'Upload' %}" class="default" id="upload-button" name="_save">
+    <form id="upload-form">
+        <div class="fr-upload-group">
+            <label class="fr-label" for="file-upload">{% translate 'Add files' %}
+                <span class="fr-hint-text">{% translate 'Max size allowed : 30 Mo. Multiple files allowed.' %}</span>
+            </label>
+            <input class="fr-upload" type="file" id="file-upload" name="files" multiple required>
         </div>
+        <input value="{% translate 'Upload' %}" class="button" type="submit" id="upload-button">
     </form>
     <div class="documents-wrapper">
         <h2>{% translate 'Documents' %}</h2>
         {% if documents %}
         <div>
-            Documents
+            {{documents}}
         </div>
         {% else %}
         <div class="no-document">
@@ -50,4 +52,11 @@ Project {{ project_name }} documents
         {% endif %}
     </div>
 </div>
+
+<script type="text/javascript">
+    const projectId = "{{ project.id }}";
+</script>
+<script src="{% url 'javascript-catalog' %}"></script>
+<script src="{% static 'js/admin/project-documents.js' %}"></script>
+
 {% endblock %}

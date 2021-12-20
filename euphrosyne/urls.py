@@ -56,6 +56,7 @@ urlpatterns = [
         UserCompleteAccountView.as_view(),
         name="complete_registration_orcid",
     ),
+    path("api/", include("euphrosyne.api_urls")),
     path("", include("social_django.urls")),
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
     path("", lambda request: redirect("/admin/")),

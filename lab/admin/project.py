@@ -190,7 +190,7 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
     def get_fieldsets(
         self, request: HttpRequest, obj: Optional[Project] = ...
     ) -> List[Tuple[Optional[str], Dict[str, Any]]]:
-        return [
+        fieldsets = [
             (
                 _("Basic information"),
                 {
@@ -206,16 +206,21 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
                     )
                 },
             ),
-            (
-                _("Documents"),
-                {
-                    "fields": (),
-                    "description": '<a href="{}">Click here</a> to view the project documents.'.format(
-                        reverse("admin:lab_project_documents", args=[obj.id])
-                    ),
-                },
-            ),
         ]
+        if obj:
+            fieldsets += (
+                (
+                    _("Documents"),
+                    {
+                        "fields": (),
+                        "description": '<a href="{}">{}</a>'.format(
+                            reverse("admin:lab_project_documents", args=[obj.id]),
+                            _("View project documents"),
+                        ),
+                    },
+                ),
+            )
+        return fieldsets
 
     def get_exclude(self, request: HttpRequest, obj: Optional[Project] = None):
         excluded = super().get_exclude(request, obj)
