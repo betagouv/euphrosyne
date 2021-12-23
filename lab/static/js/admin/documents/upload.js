@@ -50,6 +50,10 @@
         );
         responses.forEach((response) => {
           displayResponseMessage(response);
+          const { status } = response;
+          if (status >= 200 && status < 300) {
+            form.dispatchEvent(new Event("uploadCompleted"));
+          }
         });
         form.reset();
       } else {

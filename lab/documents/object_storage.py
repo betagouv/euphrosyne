@@ -26,6 +26,18 @@ def create_presigned_document_upload_post(project_id: int):
     )
 
 
+def create_presigned_document_list_url(project_id: int):
+    client = _get_client()
+    return client.generate_presigned_url(
+        "list_objects_v2",
+        Params={
+            "Bucket": settings.S3_BUCKET_NAME,
+            "Prefix": f"projects/{project_id}/documents/",
+        },
+        ExpiresIn=1800,
+    )
+
+
 def upload_project_document(fileobj, project_id: int):
     client = _get_client()
     client.upload_fileobj(

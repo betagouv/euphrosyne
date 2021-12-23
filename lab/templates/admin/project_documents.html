@@ -27,8 +27,7 @@ Project {{ project_name }} documents
 {% endblocktranslate %}</h1>
 
 <div id="content-main">
-    <ul class="messagelist uploadmessages">
-    </ul>
+    <ul class="messagelist uploadmessages"></ul>
     <h2>{% translate 'Upload documents' %}</h2>
     <form id="upload-form">
         <div class="fr-upload-group">
@@ -41,22 +40,46 @@ Project {{ project_name }} documents
     </form>
     <div class="documents-wrapper">
         <h2>{% translate 'Documents' %}</h2>
-        {% if documents %}
         <div>
-            {{documents}}
+            <table id="document_list">
+                <thead>
+                    <tr>  
+                        <th scope="col" class="column-name">
+                            <div class="text">{% trans "File name" %}</div>
+                            <div class="clear"></div>
+                        </th>
+                        <th scope="col" class="column-name">
+                                <div class="text">{% trans "Last modified" %}</div>
+                                <div class="clear"></div>
+                        </th>
+                        <th scope="col" class="column-name">
+                                <div class="text">{% trans "Size" %}</div>
+                                <div class="clear"></div>
+                        </th>
+                        <th scope="col" class="column-name"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="no_data" style="display:none">
+                        <td colspan="4">{% translate 'No document yet' %}</td>
+                    </tr>
+                    <tr class="loading">
+                        <td><div>&nbsp;</div></td>
+                        <td><div>&nbsp;</div></td>
+                        <td><div>&nbsp;</div></td>
+                        <td><div>&nbsp;</div></td>
+                    </tr>
+                </tbody>
+                </table>
         </div>
-        {% else %}
-        <div class="no-document">
-            {% translate 'No document yet' %}
-        </div>
-        {% endif %}
     </div>
 </div>
+<script src="{% url 'javascript-catalog' %}"></script>
 
 <script type="text/javascript">
     const projectId = "{{ project.id }}";
 </script>
-<script src="{% url 'javascript-catalog' %}"></script>
-<script src="{% static 'js/admin/project-documents.js' %}"></script>
+<script src="{% static 'js/admin/documents/document.js' %}"></script>
+<script src="{% static 'js/admin/documents/upload.js' %}"></script>
 
 {% endblock %}
