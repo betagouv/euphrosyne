@@ -57,3 +57,14 @@ tr.loading td div {
     background-position: 140px;
   }
 }
+
+table#document_list td {
+  vertical-align: middle;
+}
+table#document_list td button.download-btn,
+table#document_list td button.delete-btn {
+  margin-bottom: 0;
+}
+table#document_list ul.fr-btns-group {
+  margin: 0;
+}

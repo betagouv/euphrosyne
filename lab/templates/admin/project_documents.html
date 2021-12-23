@@ -4,12 +4,14 @@
 
 {% block extrastyle %}
     {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "dsfr/component/component.min.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "dsfr/component/upload/upload.min.css" %}">
     <link rel="stylesheet" type="text/css" href="{% static "css/admin/project-documents.css" %}">
-    <link rel="stylesheet" type="text/css" href="{% static "dsfr/dsfr/component/upload/upload.min.css" %}">
 {% endblock %}
 
 {% block coltype %}colM{% endblock %}
 
+{% block content_subtitle %}{% endblock %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
@@ -25,10 +27,8 @@
 <h1>{% blocktranslate with project_name=project.name %}
 Project {{ project_name }} documents
 {% endblocktranslate %}</h1>
-
 <div id="content-main">
     <ul class="messagelist uploadmessages"></ul>
-    <h2>{% translate 'Upload documents' %}</h2>
     <form id="upload-form">
         <div class="fr-upload-group">
             <label class="fr-label" for="file-upload">{% translate 'Add files' %}
