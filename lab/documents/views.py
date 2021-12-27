@@ -10,7 +10,6 @@ from shared.view_mixins import StaffUserRequiredMixin
 
 from ..models import Project
 from ..permissions import is_lab_admin
-from .object_storage import list_project_documents
 
 
 class ProjectDocumentsView(StaffUserRequiredMixin, TemplateView):
@@ -31,11 +30,9 @@ class ProjectDocumentsView(StaffUserRequiredMixin, TemplateView):
         return response
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        documents = list_project_documents(self.project.id)
         return {
             **super().get_context_data(**kwargs),
             **site.each_context(self.request),
             "subtitle": "{} | {}".format(self.project.name, _("Upload documents")),
             "project": self.project,
-            "documents": documents,
         }

@@ -38,24 +38,25 @@ def create_presigned_document_list_url(project_id: int):
     )
 
 
-def upload_project_document(fileobj, project_id: int):
+def create_presigned_document_download_url(key: str):
     client = _get_client()
-    client.upload_fileobj(
-        fileobj,
-        settings.S3_BUCKET_NAME,
-        f"projects/{project_id}/documents/{fileobj.name}",
+    return client.generate_presigned_url(
+        "get_object",
+        Params={
+            "Bucket": settings.S3_BUCKET_NAME,
+            "Key": key,
+        },
+        ExpiresIn=1800,
     )
 
 
-def list_project_documents(project_id: int):
+def create_presigned_document_delete_url(key: str):
     client = _get_client()
-    try:
-        response = client.list_objects_v2(
-            Bucket=settings.S3_BUCKET_NAME, Prefix=f"projects/{project_id}/documents"
-        )
-        if "Contents" in response:
-            documents = [obj["Key"].split("/")[-1] for obj in response["Contents"]]
-            return documents
-        return []
-    except ClientError:
-        return []
+    return client.generate_presigned_url(
+        "delete_object",
+        Params={
+            "Bucket": settings.S3_BUCKET_NAME,
+            "Key": key,
+        },
+        ExpiresIn=1800,
+    )

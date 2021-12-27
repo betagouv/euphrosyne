@@ -28,7 +28,7 @@
 Project {{ project_name }} documents
 {% endblocktranslate %}</h1>
 <div id="content-main">
-    <ul class="messagelist uploadmessages"></ul>
+    <ul class="messagelist"></ul>
     <form id="upload-form">
         <div class="fr-upload-group">
             <label class="fr-label" for="file-upload">{% translate 'Add files' %}
@@ -79,6 +79,7 @@ Project {{ project_name }} documents
 <script type="text/javascript">
     const projectId = "{{ project.id }}";
 </script>
+<script src="{% static 'js/admin/utils.js' %}"></script>
 <script src="{% static 'js/admin/documents/document.js' %}"></script>
 <script src="{% static 'js/admin/documents/upload.js' %}"></script>
 

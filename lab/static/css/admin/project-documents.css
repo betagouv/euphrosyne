@@ -15,17 +15,6 @@ input[type="file"] {
   cursor: pointer;
 }
 
-ul.messagelist.uploadmessages li {
-  cursor: pointer;
-}
-
-ul.messagelist.uploadmessages li span.close {
-  float: right;
-  font-weight: 800;
-  color: var(--body-quiet-color);
-  cursor: pointer;
-}
-
 table#document_list {
   width: 100%;
 }

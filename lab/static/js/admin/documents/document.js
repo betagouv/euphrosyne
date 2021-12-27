@@ -65,10 +65,79 @@
 
   function onDownloadButtonClick(event) {
     const key = event.target.dataset.key;
+    const request = new XMLHttpRequest();
+    request.onreadystatechange = (event) => {
+      const { readyState, status, response } = event.target;
+      if (readyState == 4 && status == 200) {
+        window.open(JSON.parse(response).url, "_blank");
+      }
+    };
+    request.open(
+      "GET",
+      `/api/project/${projectId}/documents/presigned_download_url?key=${key}`,
+      true
+    );
+    request.send();
   }
 
   function onDeleteButtonClick(event) {
-    const key = event.target.dataset.key;
+    const { key } = event.target.dataset;
+    if (
+      !window.confirm(
+        interpolate(gettext("Delete the document %s ?"), [key.split("/").pop()])
+      )
+    ) {
+      return;
+    }
+    toggleLoading(true);
+    new Promise((resolve, reject) => {
+      const request = new XMLHttpRequest();
+      request.onreadystatechange = (event) => {
+        const { readyState, status, response } = event.target;
+        if (readyState == 4) {
+          if (status == 200) {
+            const request = new XMLHttpRequest();
+            request.onreadystatechange = (event) => {
+              const { readyState, status } = event.target;
+              if (readyState == 4) {
+                if (status == 204) {
+                  resolve();
+                } else {
+                  reject(event.target);
+                }
+              }
+            };
+            request.open("DELETE", JSON.parse(response).url, true);
+            request.send();
+          } else {
+            reject(event.target);
+          }
+        }
+      };
+      request.open(
+        "GET",
+        `/api/project/${projectId}/documents/presigned_delete_url?key=${key}`,
+        true
+      );
+      request.send();
+    })
+      .then(() => {
+        fetchDocuments(projectId);
+        displayMessage(
+          interpolate(gettext("File %s has been removed."), [
+            key.split("/").pop(),
+          ]),
+          "success"
+        );
+      })
+      .catch((response) => {
+        displayMessage(
+          interpolate(gettext("File %s could not be removed."), [
+            key.split("/").pop(),
+          ]),
+          "error"
+        );
+      });
   }
 
   function toggleLoading(active) {
@@ -106,7 +175,7 @@
     buttons[1].setAttribute("title", gettext("Delete file"));
     buttons[1].setAttribute("title", gettext("Download file"));
     buttons[1].setAttribute("data-key", key);
-    buttons[1].addEventListener("download", onDeleteButtonClick);
+    buttons[1].addEventListener("click", onDeleteButtonClick);
     return actionsEl.body.firstElementChild;
   }
 
