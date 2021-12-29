@@ -1,6 +1,8 @@
 "use strict";
 
 import { formatBytes, displayMessage } from "../utils";
+import { fetchDownloadPresignedURL } from "./presigned-url-service";
+import { listObjectsV2, deleteObject } from "./s3-service";
 
 export function toggleLoading(active) {
   if (active) {
@@ -11,24 +13,22 @@ export function toggleLoading(active) {
       "table#document_list tbody tr.loading"
     ).style.display = "";
   } else {
-    document
-      .querySelectorAll("table#document_list tbody tr:not(.loading)")
-      .forEach((el) => (el.style.display = ""));
+    const tableRows = document.querySelectorAll(
+      "table#document_list tbody tr:not(.loading)"
+    );
+    tableRows.forEach((el) => (el.style.display = ""));
+    if (tableRows.length > 1) {
+      document.querySelector("tr.no_data").style.display = "none";
+    }
     document.querySelector(
       "table#document_list tbody tr.loading"
     ).style.display = "none";
   }
 }
 
-export function fetchDocuments(projectId) {
-  const request = new XMLHttpRequest();
-  request.onreadystatechange = handlePresignedURLResponse;
-  request.open(
-    "GET",
-    `/api/project/${projectId}/documents/presigned_list_url`,
-    true
-  );
-  request.send();
+export async function fetchDocuments(projectId) {
+  const keys = await listObjectsV2(projectId);
+  displayProjectDocuments(keys);
 }
 
 function displayProjectDocuments(documentXMLEls) {
@@ -67,42 +67,32 @@ function displayProjectDocuments(documentXMLEls) {
     document.querySelector("tr.no_data").style.display = "";
   }
 }
-function handleListObjectV2Response(event) {
-  if (event.target.readyState == 4 && event.target.status == 200) {
-    const { response } = event.target;
-    const xml = new DOMParser().parseFromString(response, "application/xml");
-    const keys = xml.querySelectorAll("Contents");
-    displayProjectDocuments(keys);
-  }
-}
-function handlePresignedURLResponse(event) {
-  if (event.target.readyState == 4 && event.target.status == 200) {
-    const { url } = JSON.parse(event.target.response);
-    const request = new XMLHttpRequest();
-    request.onreadystatechange = handleListObjectV2Response;
-    request.open("GET", url, true);
-    request.send();
-  }
-}
 
-function onDownloadButtonClick(event) {
+async function onDownloadButtonClick(event) {
   const key = event.target.dataset.key;
-  const request = new XMLHttpRequest();
-  request.onreadystatechange = (event) => {
-    const { readyState, status, response } = event.target;
-    if (readyState == 4 && status == 200) {
-      window.open(JSON.parse(response).url, "_blank");
-    }
-  };
-  request.open(
-    "GET",
-    `/api/project/${projectId}/documents/presigned_download_url?key=${key}`,
-    true
-  );
-  request.send();
+  const url = await fetchDownloadPresignedURL(projectId, key);
+  window.open(url, "_blank");
 }
 
-function onDeleteButtonClick(event) {
+function handleDeleteError(key) {
+  displayMessage(
+    interpolate(gettext("File %s could not be removed."), [
+      key.split("/").pop(),
+    ]),
+    "error"
+  );
+  toggleLoading(false);
+}
+
+function handleDeleteSuccess(projectId, key) {
+  fetchDocuments(projectId);
+  displayMessage(
+    interpolate(gettext("File %s has been removed."), [key.split("/").pop()]),
+    "success"
+  );
+}
+
+async function onDeleteButtonClick(event) {
   const { key } = event.target.dataset;
   if (
     !window.confirm(
@@ -112,54 +102,13 @@ function onDeleteButtonClick(event) {
     return;
   }
   toggleLoading(true);
-  new Promise((resolve, reject) => {
-    const request = new XMLHttpRequest();
-    request.onreadystatechange = (event) => {
-      const { readyState, status, response } = event.target;
-      if (readyState == 4) {
-        if (status == 200) {
-          const request = new XMLHttpRequest();
-          request.onreadystatechange = (event) => {
-            const { readyState, status } = event.target;
-            if (readyState == 4) {
-              if (status == 204) {
-                resolve();
-              } else {
-                reject(event.target);
-              }
-            }
-          };
-          request.open("DELETE", JSON.parse(response).url, true);
-          request.send();
-        } else {
-          reject(event.target);
-        }
-      }
-    };
-    request.open(
-      "GET",
-      `/api/project/${projectId}/documents/presigned_delete_url?key=${key}`,
-      true
-    );
-    request.send();
-  })
-    .then(() => {
-      fetchDocuments(projectId);
-      displayMessage(
-        interpolate(gettext("File %s has been removed."), [
-          key.split("/").pop(),
-        ]),
-        "success"
-      );
-    })
-    .catch((response) => {
-      displayMessage(
-        interpolate(gettext("File %s could not be removed."), [
-          key.split("/").pop(),
-        ]),
-        "error"
-      );
-    });
+  try {
+    await deleteObject(projectId, key);
+    handleDeleteSuccess(projectId, key);
+  } catch (error) {
+    handleDeleteError(key);
+    return;
+  }
 }
 
 function createActionCell(key) {

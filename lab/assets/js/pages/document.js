@@ -1,6 +1,6 @@
 "use strict";
 
-import { validateFileInput, getPresignedUrl } from "../document/upload";
+import { validateFileInput, uploadDocuments } from "../document/upload";
 import { toggleLoading, fetchDocuments } from "../document/table";
 
 import "@gouvfr/dsfr/dist/component/component.min.css";
@@ -27,5 +27,5 @@ document
   .addEventListener("submit", (event) => {
     event.preventDefault();
     event.target.querySelector("input[type='submit']").disabled = true;
-    getPresignedUrl(projectId);
+    uploadDocuments(projectId);
   });
