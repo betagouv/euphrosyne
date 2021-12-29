@@ -9,8 +9,8 @@ from ...models import Project
 from ..factories import LabAdminUserFactory, StaffUserFactory
 
 
-@patch("lab.models.Project.objects")
-def test_admin_user_passes_check(project_mocked):
+@patch("lab.models.Project.objects", MagicMock())
+def test_admin_user_passes_check():
     view_func = MagicMock()
     decorated_view_func = project_membership_required(view_func=view_func)
     request = RequestFactory().get(

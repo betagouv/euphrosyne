@@ -22,6 +22,7 @@ class ChangeLeaderView(StaffUserRequiredMixin, FormView):
 
     project: Project
 
+    # pylint: disable=arguments-differ
     def dispatch(self, request: HttpRequest, project_id: int, *args, **kwargs):
         if not is_lab_admin(request.user):
             raise PermissionDenied()

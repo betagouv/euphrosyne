@@ -1,6 +1,5 @@
 from boto3.session import Session
 from botocore.config import Config
-from botocore.exceptions import ClientError
 from django.conf import settings
 
 

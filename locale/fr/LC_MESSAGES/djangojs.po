@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-20 14:12+0100\n"
+"POT-Creation-Date: 2021-12-29 18:13+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,9 +14,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
+msgid "File %s could not be removed."
+msgstr "Le fichier %s n'a pas pu être supprimé."
+
 #, javascript-format
-msgid "Total file sizes must not exceed %s."
-msgstr "La taille totale des fichiers ne doit pas dépasser %s."
+msgid "File %s has been removed."
+msgstr "Le fichier %s a été supprimé."
+
+#, javascript-format
+msgid "Delete the document %s ?"
+msgstr "Supprimer le document %s ?"
+
+msgid "Download file"
+msgstr "Télécharger le fichier"
+
+msgid "Delete file"
+msgstr "Supprimer le fichier"
 
 msgid ""
 "An error has occured while generating the presigned URL. Please contact the "
@@ -25,6 +38,11 @@ msgstr ""
 "Une erreur s'est produite lors de la génération de l'URL présignée. Veuillez "
 "contacter l'équipe support."
 
-#, javascript-format
+msgid "Total file sizes must not exceed %s."
+msgstr "La taille totale des fichiers ne doit pas dépasser %s."
+
+msgid "File %s has been uploaded."
+msgstr "Le fichier %s a été téléversé."
+
 msgid "File %s could not be uploaded."
 msgstr "Le fichier %s n'a pas pu être sauvegardé."
