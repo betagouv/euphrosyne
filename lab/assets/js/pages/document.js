@@ -1,3 +1,7 @@
+"use strict";
+
+import { displayMessage } from "../utils";
+
 (function (projectId) {
   function displayProjectDocuments(documentXMLEls) {
     toggleLoading(false);
@@ -184,14 +188,13 @@
      * Format bytes int size.
      * Taken from this SO answer : https://stackoverflow.com/a/18650828/7433420
      */
-    with (Math) {
-      let d = floor(log(a) / log(k));
-      return 0 == a
-        ? "0 Bytes"
-        : parseFloat((a / pow(k, d)).toFixed(max(0, b))) +
-            " " +
-            ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d];
-    }
+    const { floor, log, pow, max } = Math;
+    let d = floor(log(a) / log(k));
+    return 0 == a
+      ? "0 Bytes"
+      : parseFloat((a / pow(k, d)).toFixed(max(0, b))) +
+          " " +
+          ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d];
   }
   window.addEventListener("DOMContentLoaded", (event) => {
     toggleLoading(true);

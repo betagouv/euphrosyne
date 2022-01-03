@@ -1,6 +1,9 @@
 /**
  * Handles file upload to s3 bucket
  */
+"use strict";
+import { displayMessage } from "../utils";
+
 (function (projectId) {
   const FILES_MAX_SIZE = 30 * 1024 * 1000; // 30 MB
   const MAX_SIZE_FORMATTED = "30 MB";

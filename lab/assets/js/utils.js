@@ -18,3 +18,5 @@ function displayMessage(message, tag) {
   );
   document.querySelector("ul.messagelist").appendChild(messageElement);
 }
+
+export { displayMessage };
