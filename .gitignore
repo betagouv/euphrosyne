@@ -5,3 +5,6 @@ __pycache__
 venv*
 .vscode
 local.*
+node_modules
+
+euphrosyne/assets/dist/

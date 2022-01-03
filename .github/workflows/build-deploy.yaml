@@ -12,7 +12,6 @@ env:
   EMAIL_USE_TLS: false
   DEFAULT_FROM_EMAIL: h@ll.o
   SITE_URL: http://localhost:8000
-  
 
 jobs:
   call-worfklow-test:
@@ -30,7 +29,11 @@ jobs:
           key: ${{ runner.os }}-python-3.9.2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.9.2'
+          python-version: "3.9.2"
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16.13
+          cache: "npm"
 
       - name: Get pip cache dir
         id: pip-cache
@@ -44,6 +47,11 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements/prod.txt') }}
       - name: Install prod requirements
         run: pip install --user -r requirements/prod.txt
+
+      - name: Install frontend prod requirements
+        run: npm install --production
+      - name: Compile JavaScript modules (Webpack)
+        run: npm run build
 
       - name: Install GNU gettext
         run: sudo apt install gettext
@@ -61,7 +69,7 @@ jobs:
           name: euphrosyne-build-${{ github.sha }}
           path: /tmp/euphrosyne-build.tar.gz
           retention-days: 1
-  
+
   deploy-staging:
     needs:
       - build
@@ -76,7 +84,7 @@ jobs:
           key: ${{ runner.os }}-python-3.9.2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.9.2'
+          python-version: "3.9.2"
 
       - name: Download build artifact
         uses: actions/download-artifact@v2
