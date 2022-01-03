@@ -1,14 +1,6 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_urls static %}
 
-
-{% block extrastyle %}
-    {{ block.super }}
-    <link rel="stylesheet" type="text/css" href="{% static "dsfr/component/component.min.css" %}">
-    <link rel="stylesheet" type="text/css" href="{% static "dsfr/component/upload/upload.min.css" %}">
-    <link rel="stylesheet" type="text/css" href="{% static "css/admin/project-documents.css" %}">
-{% endblock %}
-
 {% block coltype %}colM{% endblock %}
 
 {% block content_subtitle %}{% endblock %}
@@ -80,6 +72,5 @@ Project {{ project_name }} documents
     const projectId = "{{ project.id }}";
 </script>
 <script src="{% static 'pages/document.js' %}"></script>
-<script src="{% static 'pages/upload.js' %}"></script>
 
 {% endblock %}

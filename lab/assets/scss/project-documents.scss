@@ -1,10 +1,9 @@
 form#upload-form {
   margin-bottom: 30px;
-}
-
-#upload-button {
-  float: none;
-  margin-top: 15px;
+  #upload-button {
+    float: none;
+    margin-top: 15px;
+  }
 }
 
 .documents-wrapper {
@@ -17,10 +16,9 @@ input[type="file"] {
 
 table#document_list {
   width: 100%;
-}
-
-table tr.no_data {
-  text-align: center;
+  tr.no_data {
+    text-align: center;
+  }
 }
 
 tr.loading td div {
@@ -49,11 +47,12 @@ tr.loading td div {
 
 table#document_list td {
   vertical-align: middle;
-}
-table#document_list td button.download-btn,
-table#document_list td button.delete-btn {
-  margin-bottom: 0;
-}
-table#document_list ul.fr-btns-group {
-  margin: 0;
+
+  button.download-btn,
+  button.delete-btn {
+    margin-bottom: 0;
+  }
+  ul.fr-btns-group {
+    margin: 0;
+  }
 }
