@@ -1,65 +1,50 @@
 @font-face {
   font-family: "Marianne";
   src: local("Marianne"),
-    url("/static/fonts/Marianne/Marianne-Regular.woff") format("woff"),
-    url("/static/fonts/Marianne/Marianne-Regular.woff2") format("woff2");
+    url("~@gouvfr/dsfr/dist/fonts/Marianne-Regular.woff") format("woff"),
+    url("~@gouvfr/dsfr/dist/fonts/Marianne-Regular.woff2") format("woff2");
   font-weight: 400;
 }
 
 @font-face {
   font-family: "Marianne";
   src: local("Marianne_Italic"),
-    url("/static/fonts/Marianne/Marianne-Regular_Italic.woff") format("woff"),
-    url("/static/fonts/Marianne/Marianne-Regular_Italic.woff2") format("woff2");
+    url("~@gouvfr/dsfr/dist/fonts/Marianne-Regular_Italic.woff") format("woff"),
+    url("~@gouvfr/dsfr/dist/fonts/Marianne-Regular_Italic.woff2")
+      format("woff2");
   font-weight: 400;
   font-style: italic;
 }
 
 @font-face {
   font-family: "Marianne";
-  src: local("Marianne"),
-    url("/static/fonts/Marianne/Marianne-Medium.woff") format("woff"),
-    url("/static/fonts/Marianne/Marianne-Medium.woff2") format("woff2");
-  font-weight: 500;
-}
-
-@font-face {
-  font-family: "Marianne";
   src: local("Marianne-Bold"),
-    url("/static/fonts/Marianne/Marianne-Bold.woff") format("woff"),
-    url("/static/fonts/Marianne/Marianne-Bold.woff2") format("woff2");
+    url("~@gouvfr/dsfr/dist/fonts/Marianne-Bold.woff") format("woff"),
+    url("~@gouvfr/dsfr/dist/fonts/Marianne-Bold.woff2") format("woff2");
   font-weight: 700;
 }
 @font-face {
   font-family: "Marianne";
   src: local("Marianne-Bold_Italic"),
-    url("/static/fonts/Marianne/Marianne-Bold_Italic.woff") format("woff"),
-    url("/static/fonts/Marianne/Marianne-Bold_Italic.woff2") format("woff2");
+    url("~@gouvfr/dsfr/dist/fonts/Marianne-Bold_Italic.woff") format("woff"),
+    url("~@gouvfr/dsfr/dist/fonts/Marianne-Bold_Italic.woff2") format("woff2");
   font-weight: 700;
   font-style: italic;
 }
 
 @font-face {
   font-family: "Marianne";
-  src: local("Marianne-ExtraBold"),
-    url("/static/fonts/Marianne/Marianne-ExtraBold.woff") format("woff"),
-    url("/static/fonts/Marianne/Marianne-ExtraBold.woff2") format("woff2");
-  font-weight: 800;
-}
-
-@font-face {
-  font-family: "Marianne";
   src: local("Marianne-Light"),
-    url("/static/fonts/Marianne/Marianne-Thin.woff") format("woff"),
-    url("/static/fonts/Marianne/Marianne-Thin.woff2") format("woff2");
+    url("~@gouvfr/dsfr/dist/fonts/Marianne-Light.woff") format("woff"),
+    url("~@gouvfr/dsfr/dist/fonts/Marianne-Light.woff2") format("woff2");
   font-weight: 300;
 }
 
 @font-face {
   font-family: "Marianne";
   src: local("Marianne-Light_Italic"),
-    url("/static/fonts/Marianne/Marianne-Thin_Italic.woff") format("woff"),
-    url("/static/fonts/Marianne/Marianne-Thin_Italic.woff2") format("woff2");
+    url("~@gouvfr/dsfr/dist/fonts/Marianne-Light_Italic.woff") format("woff"),
+    url("~@gouvfr/dsfr/dist/fonts/Marianne-Light_Italic.woff2") format("woff2");
   font-weight: 300;
   font-style: italic;
 }
@@ -95,29 +80,35 @@ body {
   color: var(--black-euphro);
   font-weight: bold;
 }
-
 #user-tools {
   font-weight: 400;
+  a {
+    &:link {
+      color: var(--black-euphro);
+    }
+    &:visited {
+      color: var(--black-euphro);
+    }
+  }
+  #logout-link {
+    color: var(--delete-button-bg);
+  }
 }
-#user-tools a:link,
-#user-tools a:visited {
-  color: var(--black-euphro);
-}
-
-#user-tools #logout-link {
-  color: var(--delete-button-bg);
-}
-
-.module caption {
-  background-color: white;
-}
-.module caption a.section:link,
-.module caption a.section:visited {
-  color: var(--black-euphro);
-}
-
-.module th {
-  font-weight: 400;
+.module {
+  caption {
+    background-color: white;
+    a.section {
+      &:link {
+        color: var(--black-euphro);
+      }
+      &:visited {
+        color: var(--black-euphro);
+      }
+    }
+  }
+  th {
+    font-weight: 400;
+  }
 }
 
 tr:nth-child(2n + 1),
@@ -133,4 +124,22 @@ tr:nth-child(2n + 1) + .row-form-errors .errorlist {
 
 .inline-group h2 {
   text-transform: inherit;
+}
+
+ul.messagelist {
+  li {
+    cursor: pointer;
+    span.close {
+      float: right;
+      font-weight: 800;
+      color: var(--body-quiet-color);
+      cursor: pointer;
+    }
+  }
+}
+
+/* DSRF overrides */
+
+[href] {
+  box-shadow: none;
 }
