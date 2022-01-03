@@ -1,3 +1,5 @@
+"use strict";
+
 export function displayMessage(message, tag) {
   /**
    * Displays a message, Django message style.

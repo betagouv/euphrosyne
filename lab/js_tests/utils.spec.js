@@ -1,7 +1,7 @@
 "use strict";
 
-const { expect } = require("@jest/globals");
-const { displayMessage } = require("../../static/js/admin/utils");
+import { displayMessage } from "../assets/js/utils";
+import { expect } from "@jest/globals";
 
 test("displays message", () => {
   document.body.innerHTML = '<ul class="messagelist"></ul>';
