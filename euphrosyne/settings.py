@@ -191,6 +191,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 STATICFILES_DIRS = [
     BASE_DIR / "euphrosyne/static",
+    BASE_DIR / "euphrosyne/assets/dist",
 ]
 
 # Default primary key field type

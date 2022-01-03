@@ -1,0 +1,27 @@
+{
+  "name": "euphrosyne",
+  "version": "1.0.0",
+  "description": "Ouvrir les données de NewAglaé, l’Accélérateur Grand Louvre d'Analyses Elémentaires",
+  "scripts": {
+    "test": "jest",
+    "build": "NODE_ENV=${NODE_ENV:-production} webpack --mode=production",
+    "start": "webpack-dev-server --mode development"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/betagouv/euphrosyne.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/betagouv/euphrosyne/issues"
+  },
+  "homepage": "https://github.com/betagouv/euphrosyne#readme",
+  "devDependencies": {
+    "jest": "^27.4.5",
+    "ts-node": "^10.4.0",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.7.1"
+  }
+}
