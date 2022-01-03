@@ -29,3 +29,21 @@ npm install
 ```
 npm run start
 ```
+
+### Frontend
+
+#### Gestion des modules javascript par Webpack
+
+Webpack cherche les fichiers javascript présent dans les noms de dossiers `./**/assets/js/pages/*.js`.
+Pour chaque fichier, un fichier javascript sera compilé et accessible dans un template django avec la balise `static` :
+
+```
+<script src="{% static 'pages/<filename>.js' %}"></script>
+```
+
+Si des fichiers de style (css, scss, ...) sont importés dans le code javascript, un fichier `<filename.css>` sera créé qui regroupera ces fichiers de style.
+Il est possible d'y faire référence de la manière suivante :
+
+```
+<link rel="stylesheet" type="text/css" href="{% static "<filename>.css" %}">
+```
