@@ -1,21 +1,29 @@
 const path = require("path");
 const glob = require("glob");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+
 module.exports = {
   entry: {
-    main: {
-      import: "./euphrosyne/assets/js/main.js",
-      filename: "../[name].js",
-    },
+    main: [
+      "./node_modules/@gouvfr/dsfr/dist/core/core.min.css",
+      "./euphrosyne/assets/scss/base.scss",
+    ],
     ...Object.assign(
       {},
       ...glob.sync("./**/assets/js/pages/*.js").map((file) => {
-        return { [file.split("/").pop().split(".").shift()]: file };
+        return {
+          [file.split("/").pop().split(".").shift()]: {
+            import: file,
+            filename: "./pages/[name].js",
+          },
+        };
       })
     ),
   },
   output: {
-    path: path.resolve(__dirname, "euphrosyne/assets/dist/pages"),
-    publicPath: "/static/pages/",
+    path: path.resolve(__dirname, "euphrosyne/assets/dist"),
+    publicPath: "/static/",
     filename: "[name].js",
     chunkFilename: "[id]-[chunkhash].js",
   },
@@ -29,12 +37,23 @@ module.exports = {
     rules: [
       {
         test: /\.css$/i,
-        use: ["style-loader", "css-loader"],
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       {
         test: /\.s[ac]ss$/i,
-        use: ["style-loader", "css-loader", "sass-loader"],
+        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+      },
+      {
+        test: /\.(woff(2)?|ttf|eot)$/,
+        type: "asset/resource",
+        generator: {
+          filename: "./fonts/[name][ext]",
+        },
       },
     ],
   },
+  optimization: {
+    minimizer: [new CssMinimizerPlugin()],
+  },
+  plugins: [new MiniCssExtractPlugin()],
 };

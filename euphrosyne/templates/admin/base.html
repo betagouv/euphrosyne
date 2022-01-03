@@ -2,6 +2,7 @@
 {% load i18n static %}
 {% block extrastyle %}
 <link rel="stylesheet" type="text/css" href="{% static "admin/css/base.css" %}">
+<link rel="stylesheet" type="text/css" href="{% static "main.css"%}"></link>
 {% endblock %}
 
 {% block welcome-msg %}
@@ -11,9 +12,4 @@
 
 {% block userlinks %}
     <a href="{% url 'admin:logout' %}" id="logout-link">{% translate 'Log out' %}</a>
-{% endblock %}
-
-{% block footer %}
-{{ super }}
-<script type="text/javascript" src="{% static "main.js"%}"></script>
 {% endblock %}

@@ -1,3 +1,22 @@
+:root {
+  --blue-france: #000091;
+  --blue-france-300: #9a9aff;
+  --blue-france-hover: #1414b2;
+  --black-euphro: #383838;
+  --g-100: #f8f8f8;
+
+  --primary: var(--blue-france);
+
+  --header-bg: white;
+  --header-color: var(--black-euphro);
+
+  --button-bg: var(--primary);
+  --button-hover-bg: var(--blue-france-hover);
+  --link-fg: var(--primary);
+  --default-button-bg: var(--blue-france-300);
+  --default-button-hover-bg: var(--blue-france-hover);
+}
+
 @font-face {
   font-family: "Marianne";
   src: local("Marianne"),
@@ -47,25 +66,6 @@
     url("~@gouvfr/dsfr/dist/fonts/Marianne-Light_Italic.woff2") format("woff2");
   font-weight: 300;
   font-style: italic;
-}
-
-:root {
-  --blue-france: #000091;
-  --blue-france-300: #9a9aff;
-  --blue-france-hover: #1414b2;
-  --black-euphro: #383838;
-  --g-100: #f8f8f8;
-
-  --primary: var(--blue-france);
-
-  --header-bg: white;
-  --header-color: var(--black-euphro);
-
-  --button-bg: var(--primary);
-  --button-hover-bg: var(--blue-france-hover);
-  --link-fg: var(--primary);
-  --default-button-bg: var(--blue-france-300);
-  --default-button-hover-bg: var(--blue-france-hover);
 }
 
 body {
