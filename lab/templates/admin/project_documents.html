@@ -5,6 +5,10 @@
 
 {% block content_subtitle %}{% endblock %}
 
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "document.css" %}">
+{% endblock %}
+
 {% block breadcrumbs %}
 <div class="breadcrumbs">
 <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>

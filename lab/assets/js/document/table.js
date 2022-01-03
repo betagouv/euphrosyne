@@ -1,8 +1,8 @@
 "use strict";
 
-import { formatBytes, displayMessage } from "../utils";
-import { fetchDownloadPresignedURL } from "./presigned-url-service";
-import { listObjectsV2, deleteObject } from "./s3-service";
+import { formatBytes, displayMessage } from "../utils.js";
+import { fetchDownloadPresignedURL } from "./presigned-url-service.js";
+import { listObjectsV2, deleteObject } from "./s3-service.js";
 
 export function toggleLoading(active) {
   if (active) {

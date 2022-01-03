@@ -1,7 +1,7 @@
 "use strict";
 
-import { validateFileInput, uploadDocuments } from "../document/upload";
-import { toggleLoading, fetchDocuments } from "../document/table";
+import { validateFileInput, uploadDocuments } from "../document/upload.js";
+import { toggleLoading, fetchDocuments } from "../document/table.js";
 
 import "@gouvfr/dsfr/dist/component/component.min.css";
 import "@gouvfr/dsfr/dist/component/upload/upload.min.css";

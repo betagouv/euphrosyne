@@ -2,9 +2,9 @@
  * Handles file upload to s3 bucket
  */
 "use strict";
-import { fetchUploadPresignedUrl } from "./presigned-url-service";
-import { uploadObject } from "./s3-service";
-import { displayMessage } from "../utils";
+import { fetchUploadPresignedUrl } from "./presigned-url-service.js";
+import { uploadObject } from "./s3-service.js";
+import { displayMessage } from "../utils.js";
 
 const FILES_MAX_SIZE = 30 * 1024 * 1000; // 30 MB
 const MAX_SIZE_FORMATTED = "30 MB";

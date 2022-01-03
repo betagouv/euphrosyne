@@ -1,9 +1,12 @@
-const path = require("path");
-const glob = require("glob");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+import path from "path";
+import glob from "glob";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
-module.exports = {
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
+
+export default {
   entry: {
     main: [
       "./node_modules/@gouvfr/dsfr/dist/core/core.min.css",
@@ -12,6 +15,7 @@ module.exports = {
     ...Object.assign(
       {},
       ...glob.sync("./**/assets/js/pages/*.js").map((file) => {
+        console.log(file);
         return {
           [file.split("/").pop().split(".").shift()]: {
             import: file,
@@ -22,7 +26,10 @@ module.exports = {
     ),
   },
   output: {
-    path: path.resolve(__dirname, "euphrosyne/assets/dist"),
+    path: path.resolve(
+      dirname(fileURLToPath(import.meta.url)),
+      "euphrosyne/assets/dist"
+    ),
     publicPath: "/static/",
     filename: "[name].js",
     chunkFilename: "[id]-[chunkhash].js",

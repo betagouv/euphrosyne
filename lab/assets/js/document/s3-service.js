@@ -1,7 +1,7 @@
 import {
   fetchDeletePresignedURL,
   fetchListPresignedUrl,
-} from "./presigned-url-service";
+} from "./presigned-url-service.js";
 
 export function listObjectsV2(projectId) {
   return new Promise(async (resolve, reject) => {
