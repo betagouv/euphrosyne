@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Ouvrir les données de NewAglaé, l’Accélérateur Grand Louvre d'Analyses Elémentaires",
   "scripts": {
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "build": "NODE_ENV=${NODE_ENV:-production} webpack --mode=production",
     "start": "webpack-dev-server --mode development"
   },
