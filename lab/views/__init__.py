@@ -1,2 +1,2 @@
-from ..documents.views import ProjectDocumentsView
-from .change_leader_view import ChangeLeaderView
+from ..documents.views import ProjectDocumentsView  # noqa: F401
+from .change_leader_view import ChangeLeaderView  # noqa: F401
