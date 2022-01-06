@@ -152,7 +152,7 @@ class RunInline(LabPermissionMixin, admin.TabularInline):
 # Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Project)
 class ProjectAdmin(LabPermissionMixin, ModelAdmin):
-    list_display = ("name", "leader_user", "status")
+    list_display = ("name", "leader_user", "status", "toremove")
     readonly_fields = ("members", "status", "editable_leader_user", "leader_user")
 
     lab_permissions = LabPermission(
@@ -194,6 +194,7 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
                 _("Basic information"),
                 {
                     "fields": (
+                        "toremove",
                         "name",
                         "status",
                         "admin",

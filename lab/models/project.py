@@ -28,6 +28,7 @@ class BeamTimeRequestFormType(models.TextChoices):
 
 class Project(TimestampedModel):
     """A project is a collection of runs done by the same team"""
+    toremove = models.CharField("TO remove", max_length=255)
 
     name = models.CharField(_("Project name"), max_length=255, unique=True)
 
