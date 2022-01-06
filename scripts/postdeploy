@@ -2,5 +2,4 @@ python manage.py migrate
  DJANGO_SUPERUSER_PASSWORD=$(openssl rand -base64 64) python manage.py createsuperuser --email alexandre.hajjar@beta.gouv.fr --noinput || true
  DJANGO_SUPERUSER_PASSWORD=$(openssl rand -base64 64) python manage.py createsuperuser --email witold.wroblewski@beta.gouv.fr --noinput || true
 
-npm i --only=production
 npm run build
