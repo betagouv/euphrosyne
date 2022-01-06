@@ -15,7 +15,8 @@ from ..factories import LabAdminUserFactory
 
 @patch("lab.models.Project.objects", MagicMock())
 @patch(
-    "lab.documents.object_storage.create_presigned_document_upload_post", MagicMock()
+    "lab.documents.api_views.create_presigned_document_upload_post",
+    MagicMock(return_value=""),
 )
 def test_presigned_document_upload_url_successful_response():
     request = RequestFactory().get(
@@ -29,7 +30,10 @@ def test_presigned_document_upload_url_successful_response():
 
 
 @patch("lab.models.Project.objects", MagicMock())
-@patch("lab.documents.object_storage.create_presigned_document_list_url", MagicMock())
+@patch(
+    "lab.documents.api_views.create_presigned_document_list_url",
+    MagicMock(return_value=""),
+)
 def test_presigned_document_list_url_successful_response():
     request = RequestFactory().get(reverse("api:presigned_document_list_url", args=[1]))
     request.user = LabAdminUserFactory.build()
@@ -41,7 +45,8 @@ def test_presigned_document_list_url_successful_response():
 
 @patch("lab.models.Project.objects", MagicMock())
 @patch(
-    "lab.documents.object_storage.create_presigned_document_download_url", MagicMock()
+    "lab.documents.api_views.create_presigned_document_download_url",
+    MagicMock(return_value=""),
 )
 def test_presigned_presigned_document_download_url_successful_response():
     request = RequestFactory().get(
@@ -58,7 +63,8 @@ def test_presigned_presigned_document_download_url_successful_response():
 
 @patch("lab.models.Project.objects", MagicMock())
 @patch(
-    "lab.documents.object_storage.create_presigned_document_download_url", MagicMock()
+    "lab.documents.api_views.create_presigned_document_download_url",
+    MagicMock(return_value=""),
 )
 def test_presigned_presigned_document_download_url_no_key_sends_bad_requests():
     request = RequestFactory().get(
@@ -73,7 +79,8 @@ def test_presigned_presigned_document_download_url_no_key_sends_bad_requests():
 
 @patch("lab.models.Project.objects", MagicMock())
 @patch(
-    "lab.documents.object_storage.create_presigned_document_download_url", MagicMock()
+    "lab.documents.api_views.create_presigned_document_download_url",
+    MagicMock(return_value=""),
 )
 def test_presigned_presigned_document_download_url_wrong_key_sends_bad_requests():
     request = RequestFactory().get(
@@ -89,7 +96,10 @@ def test_presigned_presigned_document_download_url_wrong_key_sends_bad_requests(
 
 
 @patch("lab.models.Project.objects", MagicMock())
-@patch("lab.documents.object_storage.create_presigned_document_delete_url", MagicMock())
+@patch(
+    "lab.documents.api_views.create_presigned_document_delete_url",
+    MagicMock(return_value=""),
+)
 def test_presigned_document_delete_url_successful_response():
     request = RequestFactory().get(
         "{}/?key=projects/{}/documents/".format(
@@ -104,7 +114,10 @@ def test_presigned_document_delete_url_successful_response():
 
 
 @patch("lab.models.Project.objects", MagicMock())
-@patch("lab.documents.object_storage.create_presigned_document_delete_url", MagicMock())
+@patch(
+    "lab.documents.api_views.create_presigned_document_delete_url",
+    MagicMock(return_value=""),
+)
 def test_presigned_document_delete_url_no_key_sends_bad_requests():
     request = RequestFactory().get(
         reverse("api:presigned_document_delete_url", args=[1])
@@ -117,7 +130,10 @@ def test_presigned_document_delete_url_no_key_sends_bad_requests():
 
 
 @patch("lab.models.Project.objects", MagicMock())
-@patch("lab.documents.object_storage.create_presigned_document_delete_url", MagicMock())
+@patch(
+    "lab.documents.api_views.create_presigned_document_delete_url",
+    MagicMock(return_value=""),
+)
 def test_presigned_document_delete_url_wrong_key_sends_bad_requests():
     request = RequestFactory().get(
         "{}/?key=projects/{}/documents/".format(
