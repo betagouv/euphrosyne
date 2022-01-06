@@ -71,10 +71,6 @@ Project {{ project_name }} documents
     </div>
 </div>
 <script src="{% url 'javascript-catalog' %}"></script>
-
-<script type="text/javascript">
-    const projectId = "{{ project.id }}";
-</script>
 <script src="{% static 'pages/document.js' %}"></script>
 
 {% endblock %}

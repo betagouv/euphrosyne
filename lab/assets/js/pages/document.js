@@ -7,6 +7,8 @@ import "@gouvfr/dsfr/dist/component/component.min.css";
 import "@gouvfr/dsfr/dist/component/upload/upload.min.css";
 import "../../scss/project-documents.scss";
 
+const projectId = parseInt(document.URL.split("/").reverse()[1]);
+
 window.addEventListener("DOMContentLoaded", (event) => {
   toggleLoading(true);
   fetchDocuments(projectId);
