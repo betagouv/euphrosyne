@@ -59,6 +59,7 @@ async function handlePresignedURLResponse(response) {
       form.dispatchEvent(new Event("uploadCompleted"));
     }
   });
+  form.querySelector("input[type='submit']").disabled = false;
   form.reset();
 }
 
