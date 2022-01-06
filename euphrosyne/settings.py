@@ -123,8 +123,10 @@ def build_development_db_name(base_db_name):
 
 _djdb_config = dj_database_url.config()
 if _djdb_config:
+    print("Database URL loaded from environment")
     DATABASES["default"] = _djdb_config
 elif os.getenv("DB_HOST"):
+    print("Database URL loaded from DB_HOST environment variable")
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.postgresql",
         "USER": os.getenv("DB_USER"),
@@ -135,6 +137,7 @@ elif os.getenv("DB_HOST"):
         "CONN_MAX_AGE": 60,
     }
 else:  # Use sqlite by default, for ci
+    print("⚠️  No postgres database, running on SQLite")
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": "mydatabase",
