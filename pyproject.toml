@@ -1,16 +1,10 @@
 [tool.black]
-exclude = '''
-/(
-  | migrations
-  | venv
-  | .direnv
-)/
-
-'''
+extend_exclude = "/migrations/"
 
 [tool.isort]
 profile = "black"
 multi_line_output = 3
+extend_skip_glob = "*migrations*"
 
 [tool.mypy]
 ignore_missing_imports = true
