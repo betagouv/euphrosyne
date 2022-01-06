@@ -23,10 +23,5 @@
     "web": {
       "quantity": 1
     }
-  },
-  "addons": [
-    {
-      "plan": "postgresql-sandbox"
-    }
-  ]
+  }
 }
