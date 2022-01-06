@@ -135,6 +135,7 @@ elif os.getenv("DB_HOST"):
         "CONN_MAX_AGE": 60,
     }
 else:  # Use sqlite by default, for ci
+    print("⚠️  No postgres database, running on SQLite")
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": "mydatabase",
