@@ -60,6 +60,7 @@ class ParticipationInline(LabPermissionMixin, admin.TabularInline):
         add_permission=LabRole.PROJECT_LEADER,
         change_permission=LabRole.PROJECT_LEADER,
         view_permission=LabRole.PROJECT_MEMBER,
+        delete_permission=LabRole.PROJECT_LEADER,
     )
 
     def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
