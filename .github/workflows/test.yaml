@@ -16,7 +16,7 @@ env:
   PYTHON_VERSION: 3.9.2
 
 jobs:
-  lint-and-checks:
+  python-checks:
     runs-on: ubuntu-18.04
     steps:
       # -- block install --
@@ -68,7 +68,7 @@ jobs:
         run: |
           python -m mypy
 
-  test:
+  python-tests:
     runs-on: ubuntu-18.04
     services:
       postgres:
@@ -123,7 +123,7 @@ jobs:
           DB_PASSWORD: password
           DB_NAME: euphrosyne
 
-  frontend-test:
+  frontend-tests:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -133,5 +133,10 @@ jobs:
           cache: "npm"
       - name: Install modules
         run: npm install
+
+      - name: Run eslint
+        run: npx eslint .
+      - name: Check Prettier
+        run: npx prettier -c $(git ls-files | grep -E '\.(js|json|yaml)$')
       - name: Run tests
         run: npm run test
