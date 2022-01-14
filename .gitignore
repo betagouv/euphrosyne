@@ -6,5 +6,4 @@ venv*
 .vscode
 local.*
 node_modules
-
-euphrosyne/assets/dist/
+**/assets/dist/
