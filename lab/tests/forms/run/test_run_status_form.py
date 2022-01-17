@@ -22,7 +22,7 @@ def test_status_can_move_after_new_if_fields_are_defined(status):
 
 
 @pytest.mark.parametrize(
-    "mandatory_field", ["label", "start_date", "end_date", "embargo_date", "beamline"]
+    "mandatory_field", ["label", "start_date", "end_date", "beamline"]
 )
 @pytest.mark.parametrize(
     "status",
