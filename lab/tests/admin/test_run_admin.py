@@ -57,9 +57,9 @@ class TestRunAdminParams(TestCase):
     def setUp(self):
         self.run_admin = RunAdmin(model=Run, admin_site=AdminSite())
         self.project = factories.ProjectWithLeaderFactory()
-        self.leader_user = get_user_model().objects.get(
-            participation__project=self.project, participation__is_leader=True
-        )
+        self.leader_user = self.project.leader.user
+        self.member_user = factories.StaffUserFactory()
+        self.project.members.add(self.member_user)
         self.lab_admin_user = factories.LabAdminUserFactory()
         self.run = factories.RunFactory(project=self.project)
 
@@ -90,14 +90,15 @@ class TestRunAdminParams(TestCase):
         request = RequestFactory().get(
             reverse("admin:lab_run_change", args=[self.run.id])
         )
-        request.user = self.leader_user
+        request.user = self.member_user
         other_run = factories.RunFactory()
-        assert (
-            other_run.project
-            not in self.run_admin.formfield_for_foreignkey(
-                Run._meta.get_field("project"), request
-            ).choices
-        )
+
+        project_field_choices = self.run_admin.formfield_for_foreignkey(
+            Run._meta.get_field("project"), request
+        ).choices
+        project_field_choices_names = [choices[1] for choices in project_field_choices]
+        assert self.project.name in project_field_choices_names
+        assert other_run.project.name not in project_field_choices_names
 
 
 class TestRunAdminViewAsLeader(TestCase):
