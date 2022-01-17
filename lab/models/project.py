@@ -29,10 +29,14 @@ class BeamTimeRequestFormType(models.TextChoices):
 class Project(TimestampedModel):
     """A project is a collection of runs done by the same team"""
 
+    class Meta:
+        verbose_name = _("Project")
+        verbose_name_plural = _("Projects")
+
     name = models.CharField(_("Project name"), max_length=255, unique=True)
 
     members = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, through="lab.Participation"
+        settings.AUTH_USER_MODEL, through="lab.Participation", verbose_name=_("Members")
     )
     admin = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -46,6 +50,7 @@ class Project(TimestampedModel):
     comments = models.TextField(_("Comments"), blank=True)
 
     status = models.IntegerField(
+        _("Status"),
         choices=ProjectStatus.choices,
         default=ProjectStatus.TO_SCHEDULE,
     )
@@ -63,6 +68,10 @@ class Project(TimestampedModel):
 
 class BeamTimeRequest(TimestampedModel):
     """A request to use AGLAE. The request can be related to an external form."""
+
+    class Meta:
+        verbose_name = _("Beam time request")
+        verbose_name_plural = _("Beam time requests")
 
     project = models.OneToOneField("lab.Project", on_delete=models.CASCADE)
 

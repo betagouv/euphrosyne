@@ -1,10 +1,8 @@
-#
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-12 17:47+0100\n"
+"POT-Creation-Date: 2022-01-13 09:19+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -40,13 +38,9 @@ msgstr "[Euphrosyne] Invitation à s'inscrire"
 msgid "Email"
 msgstr "Email"
 
-#, fuzzy
-#| msgid "first name"
 msgid "First name"
 msgstr "Prénom"
 
-#, fuzzy
-#| msgid "last name"
 msgid "Last name"
 msgstr "Nom"
 
@@ -140,10 +134,11 @@ msgstr "Objet"
 msgid "Project member"
 msgstr "Membre du projet"
 
-#, fuzzy
-#| msgid "Embargo date"
+msgid "Project members"
+msgstr "Membres du projet"
+
 msgid "Embargo"
-msgstr "Date d'embargo"
+msgstr "Embargo"
 
 msgid "Experimental conditions"
 msgstr "Conditions expérimentales"
@@ -155,7 +150,10 @@ msgid "Basic information"
 msgstr "Informations essentielles"
 
 msgid "Object group"
-msgstr "Groupe d'objets"
+msgstr "Lot d'objets"
+
+msgid "Object groups"
+msgstr "Lots d'objets"
 
 msgid "Project"
 msgstr "Projet"
@@ -163,6 +161,12 @@ msgstr "Projet"
 #, python-brace-format
 msgid "[Euphrosyne] Invitation to join project {project.name}"
 msgstr "[Euphrosyne] Invitation à rejoindre le projet {project.name}"
+
+msgid "User"
+msgstr "Utilisateur"
+
+msgid "Institution"
+msgstr "Institution"
 
 msgid "No leader"
 msgstr "Aucun chef de projet"
@@ -238,16 +242,29 @@ msgstr "Français"
 msgid "European"
 msgstr "Européen"
 
-#, fuzzy
-#| msgid "first name"
+msgid "Projects"
+msgstr "Projet"
+
 msgid "Project name"
-msgstr "prénom"
+msgstr "Nom du projet"
+
+msgid "Members"
+msgstr "Membres"
 
 msgid "Administrator"
 msgstr "Administrateur"
 
 msgid "Comments"
 msgstr "Commentaires"
+
+msgid "Status"
+msgstr "Statut"
+
+msgid "Beam time request"
+msgstr "Demande de temps de faisceau"
+
+msgid "Beam time requests"
+msgstr "Demandes de temps de faisceau"
 
 msgid "Request type"
 msgstr "Type de requête"
@@ -294,10 +311,8 @@ msgstr "Deuton"
 msgid "Run label"
 msgstr "Libellé du run"
 
-#, fuzzy
-#| msgid "Run date"
 msgid "Run status"
-msgstr "Date du run"
+msgstr "Statut du run"
 
 msgid "Run start of period"
 msgstr "Début de période du run"
@@ -319,9 +334,6 @@ msgstr "Microbeam"
 
 msgid "Beamline"
 msgstr "Ligne de faisceau"
-
-msgid "Object groups"
-msgstr ""
 
 msgid "Group label"
 msgstr "Libellé du groupe"
@@ -349,9 +361,6 @@ msgstr "Information de différentation"
 
 msgid "Home"
 msgstr "Accueil"
-
-msgid "Projects"
-msgstr "Projet"
 
 msgid "Change leader"
 msgstr "Modification du chef de projet"
