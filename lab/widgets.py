@@ -6,7 +6,7 @@ from django.contrib.admin import site
 from django.contrib.admin.widgets import AdminSplitDateTime, RelatedFieldWidgetWrapper
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.forms.renderers import get_default_renderer
-from django.forms.widgets import HiddenInput, Input, Select
+from django.forms.widgets import HiddenInput, Input, Select, Textarea
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -137,3 +137,10 @@ class SplitDateTimeWithDefaultTime(AdminSplitDateTime):
         ):
             context["widget"]["subwidgets"][1]["value"] = self.default_time_value
         return context
+
+
+class CounterTextarea(Textarea):
+    template_name = "widgets/counter_textarea.html"
+
+    class Media:
+        js = ("js/widgets/counter-textarea.js",)
