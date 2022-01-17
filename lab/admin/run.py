@@ -164,7 +164,6 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         if not is_lab_admin(request.user) and db_field.name == "project":
             queryset = Project.objects.filter(
                 participation__user_id=request.user.id,
-                participation__is_leader=True,
             )
 
         if queryset is not None:
