@@ -70,13 +70,28 @@ class TestRunAdminParams(TestCase):
         request.user = self.lab_admin_user
         assert "project" in self.run_admin.get_readonly_fields(request, self.run)
 
-    def test_dates_are_readonly_when_change_as_leader(self):
+    def test_dates_are_readonly_when_change_as_non_admin(self):
         request = RequestFactory().get(
             reverse("admin:lab_run_change", args=[self.run.id])
         )
         request.user = self.leader_user
         assert "start_date" in self.run_admin.get_readonly_fields(request, self.run)
         assert "end_date" in self.run_admin.get_readonly_fields(request, self.run)
+
+        request.user = self.lab_admin_user
+        assert "start_date" not in self.run_admin.get_readonly_fields(request, self.run)
+        assert "end_date" not in self.run_admin.get_readonly_fields(request, self.run)
+
+    def test_dates_are_readonly_when_add_as_non_admin(self):
+        request = RequestFactory().get(reverse("admin:lab_run_add"))
+
+        request.user = self.leader_user
+        assert "start_date" in self.run_admin.get_readonly_fields(request)
+        assert "end_date" in self.run_admin.get_readonly_fields(request)
+
+        request.user = self.lab_admin_user
+        assert "start_date" not in self.run_admin.get_readonly_fields(request)
+        assert "end_date" not in self.run_admin.get_readonly_fields(request)
 
     def test_get_queryset_exludes_non_member_projects(self):
         request = RequestFactory().get(

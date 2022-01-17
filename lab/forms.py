@@ -123,9 +123,7 @@ RECOMMENDED_ENERGY_LEVELS = {
 def _get_energy_levels_choices(
     particle_type: str,
 ) -> list[tuple[str, str]]:
-    return [
-        (level, f"{level} keV") for level in RECOMMENDED_ENERGY_LEVELS[particle_type]
-    ]
+    return [(level, level) for level in RECOMMENDED_ENERGY_LEVELS[particle_type]]
 
 
 @controlled_datalist_form(
@@ -143,7 +141,6 @@ class RunDetailsForm(ModelForm):
             "label",
             "start_date",
             "end_date",
-            "embargo_date",
             "beamline",
             *[f.name for f in models.Run.get_method_fields()],
             *[f.name for f in models.Run.get_detector_fields()],
@@ -181,7 +178,6 @@ class RunDetailsForm(ModelForm):
     def _clean_dates(cleaned_data, errors):
         cleaned_start_date = cleaned_data.get("start_date")
         cleaned_end_date = cleaned_data.get("end_date")
-        cleaned_embargo_date = cleaned_data.get("embargo_date")
 
         if (
             cleaned_start_date
@@ -191,16 +187,6 @@ class RunDetailsForm(ModelForm):
             errors["end_date"] = ValidationError(
                 _("The end date must be after the start date"),
                 code="start_date_after_end_date",
-            )
-
-        if (
-            cleaned_end_date
-            and cleaned_embargo_date
-            and cleaned_embargo_date < cleaned_end_date.date()
-        ):
-            errors["embargo_date"] = ValidationError(
-                _("The embargo date must be after the end date"),
-                code="end_date_after_embargo_date",
             )
 
         return cleaned_data, errors
@@ -235,7 +221,7 @@ class RunDetailsForm(ModelForm):
 
 
 class RunStatusBaseForm(ModelForm):
-    MANDATORY_FIELDS = ("label", "start_date", "end_date", "embargo_date", "beamline")
+    MANDATORY_FIELDS = ("label", "start_date", "end_date", "beamline")
 
     class Meta:
         model = models.Run

@@ -1,8 +1,9 @@
+from datetime import time
 from typing import Any, Optional, Tuple
 
 from django import forms
 from django.contrib.admin import site
-from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
+from django.contrib.admin.widgets import AdminSplitDateTime, RelatedFieldWidgetWrapper
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.forms.renderers import get_default_renderer
 from django.forms.widgets import HiddenInput, Input, Select
@@ -115,3 +116,24 @@ class TagsInput(Input):
     class Media:
         js = ("js/widgets/tags-input.js",)
         css = {"all": ("css/widgets/tags-input.css",)}
+
+
+class SplitDateTimeWithDefaultTime(AdminSplitDateTime):
+    def __init__(
+        self,
+        attrs: Optional[dict[str, str]] = None,
+        default_time_value: time = None,
+    ) -> None:
+        self.default_time_value = default_time_value
+        super().__init__(attrs)
+
+    def get_context(
+        self, name: str, value: Any, attrs: Optional[dict[str, str]]
+    ) -> dict[str, Any]:
+        context = super().get_context(name, value, attrs)
+        if (
+            not context["widget"]["value"]
+            and not context["widget"]["subwidgets"][1]["value"]
+        ):
+            context["widget"]["subwidgets"][1]["value"] = self.default_time_value
+        return context

@@ -110,7 +110,6 @@ class RunInline(LabPermissionMixin, admin.TabularInline):
     readonly_fields = RunDetailsForm.Meta.fields
     fieldsets = (
         (None, {"fields": ("start_date", "end_date")}),
-        (_("Embargo"), {"fields": ("embargo_date",)}),
         (
             _("Experimental conditions"),
             {"fields": ("particle_type", "energy_in_keV", "beamline")},

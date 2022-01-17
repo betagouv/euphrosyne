@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-17 12:04+0100\n"
+"POT-Creation-Date: 2022-01-21 12:08+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -137,9 +137,6 @@ msgstr "Membre du projet"
 msgid "Project members"
 msgstr "Membres du projet"
 
-msgid "Embargo"
-msgstr "Embargo"
-
 msgid "Experimental conditions"
 msgstr "Conditions expérimentales"
 
@@ -182,9 +179,6 @@ msgstr "Aucun chef de projet"
 
 msgid "The end date must be after the start date"
 msgstr "La date de fin doit être après la date de début"
-
-msgid "The embargo date must be after the end date"
-msgstr "La date d'embargo doit être après la date de fin"
 
 msgid "Invalid filter choice"
 msgstr "Choix de filtre invalide"

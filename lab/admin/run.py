@@ -1,3 +1,4 @@
+from datetime import time
 from typing import Any, List, Optional, Tuple, Type, Union
 
 from django.contrib import admin
@@ -11,7 +12,8 @@ from django.utils.translation import gettext_lazy as _
 from ..fields import ObjectGroupChoiceField
 from ..forms import RunDetailsForm
 from ..models import Project, Run
-from ..permissions import LabRole, get_user_permission_group, is_lab_admin
+from ..permissions import LabRole, is_lab_admin
+from ..widgets import SplitDateTimeWithDefaultTime
 from .mixins import LabPermission, LabPermissionMixin
 
 
@@ -77,7 +79,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         (_("Project"), {"fields": ("project",)}),
         (
             None,
-            {"fields": ("label", "status", "start_date", "end_date", "embargo_date")},
+            {"fields": ("label", "status", "start_date", "end_date")},
         ),
         (
             _("Experimental conditions"),
@@ -129,11 +131,9 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         readonly_fields = super().get_readonly_fields(request, obj)
         if obj:
             readonly_fields += ("project",)
-            if (
-                obj.project
-                and get_user_permission_group(request, obj.project) < LabRole.LAB_ADMIN
-            ):
-                readonly_fields += ("start_date", "end_date")
+
+        if not is_lab_admin(request.user):
+            readonly_fields += ("start_date", "end_date")
 
         return readonly_fields
 
@@ -159,6 +159,18 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         if is_lab_admin(request.user):
             return runs_queryset
         return runs_queryset.filter(project__members__id=request.user.id).distinct()
+
+    def formfield_for_dbfield(  # pylint: disable=arguments-differ
+        self, db_field, request: HttpRequest, **kwargs
+    ):
+        # Widget edit here because form fields are overriden by admin
+        # & SplitDateTimeWithDefaultTime is an admin widget and cannot be used directly
+        # in a ModelForm (it returns a 2-n list as value instead of a 1-n list).
+        if db_field.name == "start_date":
+            kwargs["widget"] = SplitDateTimeWithDefaultTime(default_time_value=time(9))
+        if db_field.name == "end_date":
+            kwargs["widget"] = SplitDateTimeWithDefaultTime(default_time_value=time(18))
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
 
     def formfield_for_foreignkey(  # pylint: disable=arguments-differ
         self, db_field, request: HttpRequest, queryset: QuerySet[Run] = None, **kwargs
