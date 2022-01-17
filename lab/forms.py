@@ -344,3 +344,10 @@ class ObjectGroupForm(forms.ModelForm):
                 }
             )
         return cleaned_data
+
+
+class BeamTimeRequestForm(ModelForm):
+    class Meta:
+        model = models.BeamTimeRequest
+        fields = ("request_type", "request_id", "form_type", "problem_statement")
+        widgets = {"problem_statement": widgets.CounterTextarea()}

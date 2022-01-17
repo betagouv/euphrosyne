@@ -14,6 +14,7 @@ from lab.widgets import LeaderReadonlyWidget
 
 from ..forms import (
     BaseParticipationForm,
+    BeamTimeRequestForm,
     LeaderParticipationForm,
     RunDetailsForm,
     RunStatusAdminForm,
@@ -71,7 +72,7 @@ class ParticipationInline(LabPermissionMixin, admin.TabularInline):
     def get_formset(
         self,
         request: HttpRequest,
-        obj: Optional[Project] = ...,
+        obj: Optional[Project] = None,
         **kwargs: Mapping[str, Any]
     ):
         form = BaseParticipationForm if obj else LeaderParticipationForm
@@ -91,6 +92,7 @@ class ParticipationInline(LabPermissionMixin, admin.TabularInline):
 
 class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
     model = BeamTimeRequest
+    form = BeamTimeRequestForm
     fields = ("request_type", "request_id", "form_type", "problem_statement")
 
     lab_permissions = LabPermission(

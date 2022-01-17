@@ -22,7 +22,7 @@ class BeamTimeRequestType(models.TextChoices):
 
 class BeamTimeRequestFormType(models.TextChoices):
     SCIENCESCALL = "Sciencescall"
-    HYPERION = "Hyperion"
+    HYPERION = "IPERION"
     OSCAR = "OSCAR"
 
 
@@ -86,7 +86,7 @@ class BeamTimeRequest(TimestampedModel):
         help_text=_("ID appearing on the official form"),
     )
 
-    problem_statement = models.CharField(
+    problem_statement = models.TextField(
         _("Problem statement"),
         max_length=350,
         blank=True,
