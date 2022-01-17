@@ -21,19 +21,23 @@ dumpfile=dump-"$datetime".pgsql
 
 
 
-echo "🚇 Opening tunnel to staging db"
-scalingo --app euphrosyne-staging db-tunnel SCALINGO_POSTGRESQL_URL &
+echo "🚇🟢 Opening tunnel to staging db"
+scalingo --app euphrosyne-staging db-tunnel SCALINGO_POSTGRESQL_URL >/dev/null &>/dev/null &
 tunnel_pid=$!
 sleep 2
-echo "⬇️  Dumping from staging db into file $dumpfile …"
+echo "⬇️  Dumping from staging db into file $dumpfile"
 pg_dump --clean --if-exists --format c --dbname $local_staging_db_url --no-owner --no-privileges --no-comments --exclude-schema 'information_schema' --exclude-schema '^pg_*' --file "$dumpfile"
 kill $tunnel_pid
-echo "… 🚇 ⬇️  done."
+echo "⬇️ ✅ 🚇🔴"
 
-scalingo --app euphrosyne-staging-pr$pr_number db-tunnel SCALINGO_POSTGRESQL_URL &
+echo "🚇 🟢 Opening tunnel to review app pr$pr_number db"
+scalingo --app euphrosyne-staging-pr$pr_number db-tunnel SCALINGO_POSTGRESQL_URL >/dev/null &>/dev/null &
 tunnel_pid=$!
 sleep 2
-echo "⬆️  Restoring to PR $pr_number review app out of $dumpfile …"
+echo "⬆️  Restoring to pr$pr_number review app out of $dumpfile"
 pg_restore --clean --if-exists --no-owner --no-privileges --no-comments --dbname $local_reviewapp_db_url "$dumpfile"
 kill $tunnel_pid
-echo "… 🚇 ⬆️  done."
+echo "⬇️ ✅ 🚇🔴."
+
+echo "🗑  Deleting $dumpfile"
+rm -rf "$dumpfile"
