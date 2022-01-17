@@ -19,6 +19,7 @@ class ObjectGroupInline(admin.TabularInline):
     parent_instance: Run
     model = Run.run_object_groups.through
     verbose_name = _("Object group")
+    verbose_name_plural = _("Object groups")
     extra = 0
 
     def has_view_permission(

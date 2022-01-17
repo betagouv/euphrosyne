@@ -43,6 +43,7 @@ class BaseParticipationForm(ModelForm):
                 Select(), models.Institution.participation_set.rel
             ),
         }
+        labels = {"user": _("User"), "institution": _("Institution")}
 
 
 class LeaderParticipationForm(BaseParticipationForm):

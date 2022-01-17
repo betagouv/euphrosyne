@@ -55,6 +55,7 @@ class ParticipationFormSet(BaseInlineFormSet):
 class ParticipationInline(LabPermissionMixin, admin.TabularInline):
     model = Participation
     verbose_name = _("Project member")
+    verbose_name_plural = _("Project members")
 
     lab_permissions = LabPermission(
         add_permission=LabRole.PROJECT_LEADER,
