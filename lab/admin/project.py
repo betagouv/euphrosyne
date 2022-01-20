@@ -266,3 +266,16 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
         obj.save()
         if not change and not is_lab_admin(request.user):
             obj.participation_set.create(user_id=request.user.id, is_leader=True)
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        return super().changeform_view(
+            request,
+            object_id,
+            form_url,
+            {
+                **(extra_context if extra_context else {}),
+                "show_save_as_new": False,
+                "show_save_and_add_another": False,
+                "show_save": False,
+            },
+        )
