@@ -142,3 +142,7 @@ textarea {
   -webkit-appearance: auto;
   -moz-appearance: auto;
 }
+
+label.required:after {
+  content: " *" !important;
+}
