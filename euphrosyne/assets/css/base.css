@@ -135,7 +135,9 @@ ul.messagelist li span.close {
 }
 
 /* Fix while we do import DSFR checkbox component. Prevents checkboxes from disappearing. */
-input[type="checkbox"] {
+input,
+select,
+textarea {
   appearance: auto;
   -webkit-appearance: auto;
   -moz-appearance: auto;

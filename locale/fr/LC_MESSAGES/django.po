@@ -240,7 +240,7 @@ msgid "European"
 msgstr "Européen"
 
 msgid "Projects"
-msgstr "Projet"
+msgstr "Projets"
 
 msgid "Project name"
 msgstr "Nom du projet"
