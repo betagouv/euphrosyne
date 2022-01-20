@@ -68,6 +68,8 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         js = ("js/admin/methods.js",)
         css = {"all": ("css/admin/methods.css",)}
 
+    HIDE_ADD_SIDEBAR = True
+
     form = RunDetailsForm
     list_display = ("project", "label", "start_date", "end_date")
     readonly_fields = ("status",)

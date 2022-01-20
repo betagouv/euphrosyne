@@ -29,3 +29,12 @@ class AdminSite(admin.AdminSite):
             ),
             *super().get_urls(),
         ]
+
+    def get_app_list(self, request):
+        app_list = super().get_app_list(request)
+        for app in app_list:
+            for model_dict in app["models"]:
+                model_admin = self._registry[model_dict["model"]]
+                if getattr(model_admin, "HIDE_ADD_SIDEBAR", None):
+                    model_dict["add_url"] = None
+        return app_list
