@@ -171,3 +171,16 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
             kwargs["queryset"] = queryset
 
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        return super().changeform_view(
+            request,
+            object_id,
+            form_url,
+            {
+                **(extra_context if extra_context else {}),
+                "show_save_as_new": False,
+                "show_save_and_add_another": False,
+                "show_save": False,
+            },
+        )
