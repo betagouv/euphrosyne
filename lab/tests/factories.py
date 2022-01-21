@@ -49,6 +49,21 @@ class ProjectWithLeaderFactory(ProjectFactory):
     )
 
 
+class ProjectWithMultipleParticipationsFactory(ProjectWithLeaderFactory):
+    member_1 = factory.RelatedFactory(
+        ParticipationFactory, factory_related_name="project", is_leader=False
+    )
+    member_2 = factory.RelatedFactory(
+        ParticipationFactory, factory_related_name="project", is_leader=False
+    )
+    member_3 = factory.RelatedFactory(
+        ParticipationFactory, factory_related_name="project", is_leader=False
+    )
+    member_4 = factory.RelatedFactory(
+        ParticipationFactory, factory_related_name="project", is_leader=False
+    )
+
+
 class RunFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Run

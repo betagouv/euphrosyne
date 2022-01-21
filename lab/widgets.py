@@ -5,10 +5,17 @@ from django import forms
 from django.contrib.admin import site
 from django.contrib.admin.widgets import AdminSplitDateTime, RelatedFieldWidgetWrapper
 from django.db.models.fields.reverse_related import ForeignObjectRel
-from django.forms.renderers import get_default_renderer
-from django.forms.widgets import ChoiceWidget, HiddenInput, Input, Select, Textarea
+from django.forms.widgets import (
+    ChoiceWidget,
+    HiddenInput,
+    Input,
+    Select,
+    Textarea,
+    Widget,
+)
 from django.urls import reverse
-from django.utils.safestring import mark_safe
+
+from euphro_auth.models import User
 
 
 class UserWidgetWrapper(RelatedFieldWidgetWrapper):
@@ -60,12 +67,24 @@ class InstitutionWidgetWrapper(RelatedFieldWidgetWrapper):
         )
 
 
-class LeaderReadonlyWidget:
+class LeaderReadonlyWidget(Widget):
     template_name = "widgets/leader_readonly.html"
 
-    def render(self, context, renderer=None):
-        renderer = get_default_renderer()
-        return mark_safe(renderer.render(self.template_name, context))
+    class Media:
+        js = ("js/admin/ViewObjectLookups.js",)
+
+    def __init__(self, project_id: int, user: User = None, attrs=None):
+        self.user = user
+        self.project_id = project_id
+        super().__init__(attrs)
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        return {
+            **context,
+            "user": self.user,
+            "project_id": self.project_id,
+        }
 
 
 class DisabledSelectWithHidden(Select):

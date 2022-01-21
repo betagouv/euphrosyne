@@ -6,7 +6,6 @@ from django.contrib.admin.options import InlineModelAdmin
 from django.forms.models import BaseInlineFormSet, ModelForm, inlineformset_factory
 from django.http.request import HttpRequest
 from django.urls import reverse
-from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
@@ -152,7 +151,6 @@ class RunInline(LabPermissionMixin, admin.TabularInline):
         return super().get_formset(request, obj, **kwargs)
 
 
-# Allowance: ADMIN:lab admin, EDITOR:project leader, VIEWER:project member
 @admin.register(Project)
 class ProjectAdmin(LabPermissionMixin, ModelAdmin):
     list_display = ("name", "leader_user", "status")
@@ -177,14 +175,11 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
     @staticmethod
     @admin.display(description=_("Leader"))
     def editable_leader_user(obj: Optional[Project]) -> str:
-        return format_html(
-            LeaderReadonlyWidget().render(
-                context={
-                    "user": obj.leader.user if obj.leader else None,
-                    "project_id": obj.id,
-                }
-            )
-        )
+        user = obj.leader.user if obj.leader else None
+        widget = LeaderReadonlyWidget(project_id=obj.id, user=user)
+        content = widget.render("change_id_leader", user)
+        media = str(widget.media)  # pylint: disable=no-member
+        return content + media
 
     def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
         return obj
