@@ -20,6 +20,7 @@
 <div id="content-main">
     <form action="{% url 'admin:lab_project_leader_participation_change' project.id %}" method="post">
         {% csrf_token %}
+        {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
         <fieldset class="module aligned">
             <div class="form-row">
             {{ form }}

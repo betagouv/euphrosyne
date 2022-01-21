@@ -452,6 +452,9 @@ msgstr "Taille"
 msgid "No document yet"
 msgstr "Aucun document ajouté"
 
+msgid "Popup closing…"
+msgstr "Popup en cours de fermeture…"
+
 msgid "Other"
 msgstr "Autre"
 

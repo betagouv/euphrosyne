@@ -1,8 +1,9 @@
 {% load i18n static %}
-{% if user %} {{ user }} {% else %} {% translate 'No leader' %} {% endif %}
+<span id="id_leader">{% if user %} {{ user }} {% else %} {% translate 'No leader' %} {% endif %}</span>
 <a
-  class="change-related"
-  href="{% url 'admin:lab_project_leader_participation_change' project_id %}"
+  id="view_id_leader"
+  class="change-related popup-view-link"
+  href="{% url 'admin:lab_project_leader_participation_change' project_id %}?_popup=1"
   title="{% blocktranslate %}Change leader{% endblocktranslate %}"
   data-test="change-leader-link"
 >
