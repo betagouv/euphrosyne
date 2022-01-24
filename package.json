@@ -24,8 +24,9 @@
   "homepage": "https://github.com/betagouv/euphrosyne#readme",
   "devDependencies": {
     "@types/jest": "^27.4.0",
-    "jest": "^27.4.5",
     "eslint": "^8.6.0",
+    "eslint-plugin-jest": "^26.0.0",
+    "jest": "^27.4.5",
     "prettier": "^2.5.1"
   },
   "dependencies": {
@@ -41,6 +42,9 @@
   },
   "eslintConfig": {
     "root": true,
+    "extends": [
+      "eslint:recommended"
+    ],
     "ignorePatterns": [
       "_static/**",
       "**/assets/dist/**"
@@ -48,6 +52,17 @@
     "parserOptions": {
       "sourceType": "module",
       "ecmaVersion": "latest"
+    },
+    "plugins": [
+      "jest"
+    ],
+    "globals": {
+      "django": false
+    },
+    "env": {
+      "browser": true,
+      "es6": true,
+      "jest/globals": true
     }
   }
 }

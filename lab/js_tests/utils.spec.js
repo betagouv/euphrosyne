@@ -22,7 +22,7 @@ test("formatBytes function", () => {
     [1073741824, "1 GB"],
     [5374677263, "5.01 GB"],
   ];
-  const results = inputOutputMapping.map(([input, _]) => [
+  const results = inputOutputMapping.map(([input]) => [
     input,
     formatBytes(input),
   ]);

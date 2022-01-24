@@ -50,7 +50,7 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", function (_) {
+  document.addEventListener("DOMContentLoaded", function () {
     setupGroupLabelHiddenInput();
     document
       .querySelector("input#id_add_type")

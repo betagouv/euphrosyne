@@ -74,7 +74,7 @@ async function downloadDocument(projectId, key) {
 
 function handleDeleteError(key) {
   displayMessage(
-    interpolate(gettext("File %s could not be removed."), [
+    window.interpolate(window.gettext("File %s could not be removed."), [
       key.split("/").pop(),
     ]),
     "error"
@@ -85,7 +85,9 @@ function handleDeleteError(key) {
 function handleDeleteSuccess(projectId, key) {
   fetchDocuments(projectId);
   displayMessage(
-    interpolate(gettext("File %s has been removed."), [key.split("/").pop()]),
+    window.interpolate(window.gettext("File %s has been removed."), [
+      key.split("/").pop(),
+    ]),
     "success"
   );
 }
@@ -93,7 +95,9 @@ function handleDeleteSuccess(projectId, key) {
 async function deleteDocument(projectId, key) {
   if (
     !window.confirm(
-      interpolate(gettext("Delete the document %s ?"), [key.split("/").pop()])
+      window.interpolate(window.gettext("Delete the document %s ?"), [
+        key.split("/").pop(),
+      ])
     )
   ) {
     return;
@@ -117,14 +121,14 @@ function createActionCell(projectId, key) {
     "text/html"
   );
   const [downloadButton, deleteButton] = actionsEl.querySelectorAll("button");
-  downloadButton.textContent = gettext("Download file");
-  downloadButton.setAttribute("title", gettext("Download file"));
+  downloadButton.textContent = window.gettext("Download file");
+  downloadButton.setAttribute("title", window.gettext("Download file"));
   downloadButton.addEventListener("click", () =>
     downloadDocument(projectId, key)
   );
-  deleteButton.textContent = gettext("Delete file");
-  deleteButton.setAttribute("title", gettext("Delete file"));
-  deleteButton.setAttribute("title", gettext("Download file"));
+  deleteButton.textContent = window.gettext("Delete file");
+  deleteButton.setAttribute("title", window.gettext("Delete file"));
+  deleteButton.setAttribute("title", window.gettext("Download file"));
   deleteButton.addEventListener("click", () => deleteDocument(projectId, key));
   return actionsEl.body.firstElementChild;
 }
