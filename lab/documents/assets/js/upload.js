@@ -50,7 +50,7 @@ export async function uploadDocuments(projectId) {
     response = await fetchUploadPresignedUrl(projectId);
   } catch (error) {
     displayMessage(
-      gettext(
+      window.gettext(
         "An error has occured while generating the presigned URL. Please contact the support team."
       ),
       "error"
@@ -72,9 +72,10 @@ export function validateFileInput(event) {
 
   if (totalSize > FILES_MAX_SIZE) {
     fileInput.setCustomValidity(
-      interpolate(gettext("Total file sizes must not exceed %s."), [
-        MAX_SIZE_FORMATTED,
-      ])
+      window.interpolate(
+        window.gettext("Total file sizes must not exceed %s."),
+        [MAX_SIZE_FORMATTED]
+      )
     );
     return;
   } else {
@@ -85,9 +86,10 @@ export function validateFileInput(event) {
     .filter((format) => ALLOWED_FILE_FORMATS.indexOf(format) === -1);
   if (notSupportedFormats.length > 0) {
     fileInput.setCustomValidity(
-      interpolate(gettext("The following file formats are not accepted : %s"), [
-        notSupportedFormats.join(", "),
-      ])
+      window.interpolate(
+        window.gettext("The following file formats are not accepted : %s"),
+        [notSupportedFormats.join(", ")]
+      )
     );
     return;
   } else {
@@ -130,12 +132,16 @@ function displayResponseMessage(success = true, filename) {
    */
   if (success) {
     displayMessage(
-      interpolate(gettext("File %s has been uploaded."), [filename]),
+      window.interpolate(window.gettext("File %s has been uploaded."), [
+        filename,
+      ]),
       "success"
     );
   } else {
     displayMessage(
-      interpolate(gettext("File %s could not be uploaded."), [filename]),
+      window.interpolate(window.gettext("File %s could not be uploaded."), [
+        filename,
+      ]),
       "error"
     );
   }

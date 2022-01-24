@@ -1,3 +1,4 @@
+/*global global*/
 import { jest } from "@jest/globals";
 
 import { getCSRFToken, fetchURL } from "../assets/js/presigned-url-service";

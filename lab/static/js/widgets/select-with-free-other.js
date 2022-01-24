@@ -11,7 +11,7 @@
       otherInput.style.display = "none";
     }
   }
-  document.addEventListener("DOMContentLoaded", function (_) {
+  document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".other-select").forEach(function (otherSelect) {
       const container = otherSelect.parentElement;
       toggleOtherInput(container);

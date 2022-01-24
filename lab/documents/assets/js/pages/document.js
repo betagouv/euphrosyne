@@ -9,14 +9,14 @@ import "../../css/project-documents.css";
 
 const projectId = parseInt(document.URL.split("/").reverse()[1]);
 
-window.addEventListener("DOMContentLoaded", (event) => {
+window.addEventListener("DOMContentLoaded", () => {
   toggleLoading(true);
   fetchDocuments(projectId);
 });
 
 document
   .getElementById("upload-form")
-  .addEventListener("uploadCompleted", (event) => {
+  .addEventListener("uploadCompleted", () => {
     toggleLoading(true);
     fetchDocuments(projectId);
   });

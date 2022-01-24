@@ -1,7 +1,7 @@
 (function () {
   function setCounter(target) {
     target.parentElement.querySelector(".countertextarea-counter").innerHTML =
-      interpolate(gettext("Characters left: %s"), [
+      window.interpolate(window.gettext("Characters left: %s"), [
         target.getAttribute("maxlength") - target.value.length,
       ]);
   }

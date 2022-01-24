@@ -1,7 +1,5 @@
-/*global SelectBox, interpolate*/
 // Inspired from django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js
-"use strict";
-{
+(function () {
   const $ = django.jQuery;
 
   function showAdminPopup(triggeringLink, name_regexp, add_popup) {
@@ -22,9 +20,8 @@
     return showAdminPopup(triggeringLink, /^(change|add|delete)_/, false);
   }
 
-  function dismissViewObjectPopup(win, newRepr, newId) {
+  function dismissViewObjectPopup(win, newRepr) {
     const id = win.name.replace(/^view_/, "");
-    const selectsSelector = interpolate("#%s, #%s_from, #%s_to", [id, id, id]);
     $("#" + id).text(newRepr);
     win.close();
   }
@@ -42,4 +39,4 @@
       }
     });
   });
-}
+})();
