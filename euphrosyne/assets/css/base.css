@@ -128,6 +128,10 @@ ul.messagelist li span.close {
   cursor: pointer;
 }
 
+label.required:after {
+  content: " *" !important;
+}
+
 /* DSRF overrides */
 
 [href] {
@@ -143,6 +147,6 @@ textarea {
   -moz-appearance: auto;
 }
 
-label.required:after {
-  content: " *" !important;
+.submit-row .deletelink-box a.deletelink {
+  height: auto;
 }
