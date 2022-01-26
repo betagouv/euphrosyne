@@ -1,13 +1,10 @@
-.dark-bg {
-  background-color: var(--darkened-bg);
-}
 .two-boxes-inline-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-evenly;
   margin: 10px;
 }
-.two-boxes-inline-container .inline-related{
+.two-boxes-inline-container .inline-related {
   flex: 1;
   min-width: 350px;
   max-width: 600px;
