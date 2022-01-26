@@ -14,7 +14,7 @@
     );
 
     return (
-      !/^[A-Za-z0-9]{3,}/.test(stringInput) ||
+      !/^[A-Za-zÀ-ÖØ-öø-ÿ]{3,}/.test(stringInput) ||
       inputs.some((name) => name === removeComma(stringInput))
     );
   };

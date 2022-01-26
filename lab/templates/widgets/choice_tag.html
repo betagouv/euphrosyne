@@ -1,0 +1,14 @@
+<ul class="fr-tag-list">
+<input type="hidden" name="{{ widget.name }}" value="{{ widget.value.0 }}" {% include "django/forms/widgets/attrs.html" %} />
+{% for group_name, group_choices, group_index in widget.optgroups %}
+{% for option in group_choices %}
+    <button type="button" 
+            class="fr-tag choice-tag" 
+            aria-pressed="{% if option.value == widget.value.0 %}true{% else %}false{% endif %}" 
+            data-value="{{ option.value }}" 
+            {% if widget.attrs.disabled and option.value != widget.value.0 %} disabled="" {% endif %}>
+        {{ option.label|stringformat:'s' }}
+    </button>
+{% endfor %}
+{% endfor %}
+</ul>

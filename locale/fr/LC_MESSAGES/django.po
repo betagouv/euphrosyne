@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 11:58+0100\n"
+"POT-Creation-Date: 2022-01-26 15:18+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -140,6 +140,17 @@ msgstr "Se connecter avec ORCID"
 msgid "Object"
 msgstr "Objet"
 
+msgid ""
+"An object group can contain multiple objects                         or just "
+"one object. You can specify collection                        and inventory "
+"at the group level or per object.                        Use the total "
+"number field in the case of multiple                         similar objects."
+msgstr ""
+"Un lot d'objet peut contenir plusieurs objets ou un seul uniquement. Il est "
+"possible de spécifier la collection et l'inventaire au niveau du group ou "
+"pour chaque objet. Le champ dédié au nombre total par objet est utilse lors "
+"d'un ajout de plusieurs objets similaires."
+
 msgid "Project member"
 msgstr "Membre du projet"
 
@@ -161,10 +172,10 @@ msgstr "Documents"
 msgid "View project documents"
 msgstr "Afficher les documents du projet"
 
-msgid "Object group"
+msgid "Batch of objects"
 msgstr "Lot d'objets"
 
-msgid "Object groups"
+msgid "Batches of objects"
 msgstr "Lots d'objets"
 
 msgid "Project"
@@ -209,16 +220,13 @@ msgid "Only Admin users might rewind runs."
 msgstr "Seuls les utilisateurs Admin peuvent remettre un run en arrière."
 
 msgid "Group of objects"
-msgstr "Group d'objets"
+msgstr "Groupe d'objets"
 
 msgid "One object"
 msgstr "Objet unique"
 
-msgid "Number of objects"
-msgstr "Nombre d'objets"
-
 msgid "Separate each material with a comma"
-msgstr "Séparez chaque matériel par une virgule"
+msgstr "Séparez chaque matériau par une virgule"
 
 msgid "Group label must be specified when adding multiple objects"
 msgstr ""
@@ -341,6 +349,11 @@ msgstr "Microbeam"
 msgid "Beamline"
 msgstr "Ligne de faisceau"
 
+#, fuzzy
+#| msgid "Select an object group"
+msgid "Object groups"
+msgstr "Type de lot d'objets"
+
 msgid "Group label"
 msgstr "Libellé du groupe"
 
@@ -365,6 +378,14 @@ msgstr "Libellé"
 msgid "Differentiation information"
 msgstr "Information de différentation"
 
+msgid "Total number"
+msgstr "Nombre total"
+
+#, fuzzy
+#| msgid "Number of objects"
+msgid "Number of objects if more than one"
+msgstr "Nombre d'objets si plus d'un"
+
 msgid "Home"
 msgstr "Accueil"
 
@@ -385,6 +406,12 @@ msgstr "Voir sur le site"
 
 msgid "Add new run"
 msgstr "Ajouter un nouveau run"
+
+msgid "Add another object group"
+msgstr "Ajouter un autre lot"
+
+msgid "Delete?"
+msgstr "Supprimer ?"
 
 #, python-format
 msgid "Add %(name)s"
@@ -438,6 +465,9 @@ msgstr "Vous pouvez accéder à l'invitation ici :"
 
 msgid "Join project"
 msgstr "Rejoindre le projet"
+
+msgid "Select an object group"
+msgstr "Choisissez un lot d'objets"
 
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"

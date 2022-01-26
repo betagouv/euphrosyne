@@ -1,4 +1,4 @@
-from typing import Any, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
@@ -13,7 +13,13 @@ from ..permissions import is_lab_admin
 class ObjectInline(admin.TabularInline):
     model = Object
     verbose_name = _("Object")
-    fields = ("label", "differentiation_information")
+    fields = (
+        "label",
+        "total_number",
+        "differentiation_information",
+        "inventory",
+        "collection",
+    )
     extra = 1
 
     def has_view_permission(
@@ -66,3 +72,22 @@ class ObjectGroupAdmin(ModelAdmin):
         return is_lab_admin(request.user) or (
             obj and obj.runs.filter(project__members=request.user.id).exists()
         )
+
+    def get_fieldsets(
+        self, request: HttpRequest, obj: Optional[ObjectGroup] = None
+    ) -> List[Tuple[Optional[str], Dict[str, Any]]]:
+        return [
+            (
+                None,
+                {
+                    "fields": self.get_fields(request, obj),
+                    "description": _(
+                        "An object group can contain multiple objects \
+                        or just one object. You can specify collection\
+                        and inventory at the group level or per object.\
+                        Use the total number field in the case of multiple \
+                        similar objects."
+                    ),
+                },
+            )
+        ]
