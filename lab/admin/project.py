@@ -192,21 +192,22 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
     def get_fieldsets(
         self, request: HttpRequest, obj: Optional[Project] = ...
     ) -> List[Tuple[Optional[str], Dict[str, Any]]]:
+        basic_fields = (
+            (
+                "name",
+                "status",
+                "admin",
+                "comments",
+                "editable_leader_user" if is_lab_admin(request.user) else "leader_user",
+                "members",
+            )
+            if obj
+            else ("name", "status", "admin", "members")
+        )
         fieldsets = [
             (
                 _("Basic information"),
-                {
-                    "fields": (
-                        "name",
-                        "status",
-                        "admin",
-                        "comments",
-                        "editable_leader_user"
-                        if is_lab_admin(request.user)
-                        else "leader_user",
-                        "members",
-                    )
-                },
+                {"fields": basic_fields},
             ),
         ]
         if obj:
