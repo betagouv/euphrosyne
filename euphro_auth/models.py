@@ -38,6 +38,8 @@ class User(AbstractUser):
 class UserInvitation(User):
     class Meta:
         proxy = True
+        verbose_name = _("User invitation")
+        verbose_name_plural = _("User invitations")
 
     def clean(self):
         if not self.pk:
