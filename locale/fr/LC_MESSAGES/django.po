@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 09:47+0100\n"
+"POT-Creation-Date: 2022-01-26 11:58+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -385,6 +385,10 @@ msgstr "Voir sur le site"
 
 msgid "Add new run"
 msgstr "Ajouter un nouveau run"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "Ajouter %(name)s"
 
 msgid "Methods"
 msgstr "Méthodes"
