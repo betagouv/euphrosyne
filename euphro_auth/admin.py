@@ -6,6 +6,7 @@ from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.tokens import default_token_generator
 from django.db.models.query import QuerySet
 from django.forms.models import ModelForm
+from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -83,6 +84,15 @@ class UserInvitationAdmin(ModelAdmin):
     list_display = ("email", "invitation_completed", "invitation_completed_at")
     fields = ("email",)
     actions = ("send_invitation_mail_action",)
+
+    def add_view(
+        self,
+        request: HttpRequest,
+        form_url: str = "",
+        extra_context: dict[str, Any] = None,
+    ) -> HttpResponse:
+        extra_context = {"title": _("Invite new user")}
+        return super().add_view(request, form_url, extra_context)
 
     # pylint: disable=no-self-use
     @admin.display(

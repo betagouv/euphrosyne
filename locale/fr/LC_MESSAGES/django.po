@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-21 12:08+0100\n"
+"POT-Creation-Date: 2022-01-26 09:47+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -15,6 +15,9 @@ msgstr "Profil"
 
 msgid "Superuser"
 msgstr "Superutilisateur"
+
+msgid "Invite new user"
+msgstr "Inviter un utilisateur"
 
 msgid "Invitation completed"
 msgstr "Invitation complétée"
@@ -70,6 +73,12 @@ msgstr "invitation complétée le"
 
 msgid "is Euphrosyne admin"
 msgstr "admin Euphrosyne"
+
+msgid "User invitation"
+msgstr "Invitation utilisateur"
+
+msgid "User invitations"
+msgstr "Invitations utilisateur"
 
 msgid ""
 "First, enter an email and password. Then, you'll be able to edit more user "
