@@ -5,7 +5,6 @@ from django.contrib import admin
 from django.contrib.admin import ModelAdmin, widgets
 from django.contrib.admin.options import InlineModelAdmin
 from django.db.models.query import QuerySet
-from django.forms.widgets import Select
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
@@ -13,15 +12,16 @@ from ..fields import ObjectGroupChoiceField
 from ..forms import RunDetailsForm
 from ..models import Project, Run
 from ..permissions import LabRole, is_lab_admin
-from ..widgets import SplitDateTimeWithDefaultTime
+from ..widgets import PlaceholderSelect, SplitDateTimeWithDefaultTime
 from .mixins import LabPermission, LabPermissionMixin
 
 
 class ObjectGroupInline(admin.TabularInline):
+    template = "admin/edit_inline/tabular_objectgroup_in_run.html"
     parent_instance: Run
     model = Run.run_object_groups.through
-    verbose_name = _("Object group")
-    verbose_name_plural = _("Object groups")
+    verbose_name = _("Batch of objects")
+    verbose_name_plural = _("Batches of objects")
     extra = 0
 
     def has_view_permission(
@@ -50,7 +50,7 @@ class ObjectGroupInline(admin.TabularInline):
             return ObjectGroupChoiceField(
                 project_id=self.parent_instance.project_id,
                 widget=widgets.RelatedFieldWidgetWrapper(
-                    Select(),
+                    PlaceholderSelect(),
                     Run.run_object_groups.rel,
                     admin_site=self.admin_site,
                     can_add_related=True,

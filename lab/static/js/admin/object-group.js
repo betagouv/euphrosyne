@@ -23,7 +23,7 @@
      * one, and the button to add a new one is hidden to prevent
      * adding multiple objects.
      */
-    const value = event.target.selectedOptions[0].value;
+    const value = event.target.value;
     const groupLabelRow = getGroupLabelRow();
     if (value === "SINGLE_OBJECT") {
       groupLabelRow.style.display = "none";
@@ -53,7 +53,7 @@
   document.addEventListener("DOMContentLoaded", function (_) {
     setupGroupLabelHiddenInput();
     document
-      .getElementById("id_add_type")
+      .querySelector("input#id_add_type")
       .addEventListener("change", handleNumObjectsChange);
   });
 })();

@@ -12,6 +12,8 @@ export default {
       "promise-polyfill/src/polyfill",
       "whatwg-fetch",
       "@gouvfr/dsfr/dist/core/core.min.css",
+      "@gouvfr/dsfr/dist/component/link/link.min.css",
+      "@gouvfr/dsfr/dist/component/tag/tag.min.css",
       "./euphrosyne/assets/css/base.css",
     ],
     ...Object.assign(

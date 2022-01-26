@@ -304,7 +304,9 @@ class ObjectGroupAddChoices(enum.Enum):
 
 class ObjectGroupForm(forms.ModelForm):
     add_type = forms.ChoiceField(
-        label=_("Number of objects"), choices=ObjectGroupAddChoices.to_choices()
+        label="",
+        choices=ObjectGroupAddChoices.to_choices(),
+        widget=widgets.ChoiceTag(),
     )
 
     class Meta:
@@ -325,6 +327,10 @@ class ObjectGroupForm(forms.ModelForm):
             )
             if self.instance.object_set.count() == 1:
                 self.fields["label"].widget = forms.HiddenInput()
+        else:
+            self.fields["add_type"].initial = ObjectGroupAddChoices.OBJECT_GROUP.value[
+                0
+            ]
 
     def clean(self) -> Dict[str, Any]:
         cleaned_data = super().clean()

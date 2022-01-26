@@ -6,7 +6,7 @@ from django.contrib.admin import site
 from django.contrib.admin.widgets import AdminSplitDateTime, RelatedFieldWidgetWrapper
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.forms.renderers import get_default_renderer
-from django.forms.widgets import HiddenInput, Input, Select, Textarea
+from django.forms.widgets import ChoiceWidget, HiddenInput, Input, Select, Textarea
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -144,3 +144,14 @@ class CounterTextarea(Textarea):
 
     class Media:
         js = ("js/widgets/counter-textarea.js",)
+
+
+class PlaceholderSelect(Select):
+    template_name = "widgets/placeholder_select.html"
+
+
+class ChoiceTag(ChoiceWidget):
+    template_name = "widgets/choice_tag.html"
+
+    class Media:
+        js = ("js/widgets/choice-tag.js",)

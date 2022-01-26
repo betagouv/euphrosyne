@@ -1,4 +1,5 @@
 from django.contrib.postgres.fields import ArrayField
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -102,10 +103,33 @@ class ObjectGroup(models.Model):
 
         return f"{label} - {self.dating} - {materials}"
 
+    class Meta:
+        verbose_name = _("Batch of objects")
+        verbose_name_plural = _("Batches of objects")
+
 
 class Object(models.Model):
     group = models.ForeignKey(ObjectGroup, on_delete=models.CASCADE)
     label = models.CharField(_("Label"), max_length=255)
     differentiation_information = models.CharField(
-        _("Differentiation information"), max_length=255, blank=True
+        _("Differentiation information"),
+        max_length=255,
+        blank=True,
+    )
+    inventory = models.CharField(
+        _("Inventory"),
+        max_length=255,
+        blank=True,
+    )
+    collection = models.CharField(
+        _("Collection"),
+        max_length=255,
+        blank=True,
+    )
+    total_number = models.IntegerField(
+        _("Total number"),
+        null=True,
+        blank=True,
+        help_text=_("Number of objects if more than one"),
+        validators=[MinValueValidator(1)],
     )
