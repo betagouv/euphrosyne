@@ -78,7 +78,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
     fieldsets = (
         (_("Project"), {"fields": ("project",)}),
         (
-            None,
+            _("Basic information"),
             {"fields": ("label", "status", "start_date", "end_date")},
         ),
         (

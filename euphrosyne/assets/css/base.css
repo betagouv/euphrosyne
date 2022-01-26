@@ -1,3 +1,6 @@
+@import url("./dsrf-overrides.css");
+@import url("./components/fieldset.css");
+
 :root {
   --blue-france: #000091;
   --blue-france-300: #9a9aff;
@@ -130,23 +133,4 @@ ul.messagelist li span.close {
 
 label.required:after {
   content: " *" !important;
-}
-
-/* DSRF overrides */
-
-[href] {
-  box-shadow: none;
-}
-
-/* Fix while we do import DSFR checkbox component. Prevents checkboxes from disappearing. */
-input,
-select,
-textarea {
-  appearance: auto;
-  -webkit-appearance: auto;
-  -moz-appearance: auto;
-}
-
-.submit-row .deletelink-box a.deletelink {
-  height: auto;
 }

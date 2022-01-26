@@ -1,0 +1,10 @@
+fieldset {
+  background: #ffffff;
+  box-shadow: 0px 2px 9px rgba(206, 206, 206, 0.4);
+}
+
+.module h2 {
+  font-size: 20px;
+  background-color: unset;
+  color: var(--text-title-grey);
+}

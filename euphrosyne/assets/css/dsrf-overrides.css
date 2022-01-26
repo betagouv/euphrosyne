@@ -1,0 +1,33 @@
+[href] {
+  box-shadow: none;
+}
+
+/* Fix while we do import DSFR checkbox component. Prevents checkboxes from disappearing. */
+input,
+select,
+textarea {
+  appearance: auto;
+  -webkit-appearance: auto;
+  -moz-appearance: auto;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="url"],
+input[type="number"],
+input[type="tel"],
+textarea,
+select,
+.vTextField {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 5px 6px;
+  margin-top: 0;
+  color: var(--body-fg);
+  background-color: var(--body-bg);
+}
+
+.submit-row .deletelink-box a.deletelink {
+  height: auto;
+}
