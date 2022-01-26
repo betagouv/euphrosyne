@@ -134,3 +134,11 @@ ul.messagelist li span.close {
 label.required:after {
   content: " *" !important;
 }
+
+.change-list .object-tools {
+  margin-top: -128px;
+}
+
+.change-form .object-tools {
+  margin-top: -55px;
+}
