@@ -186,6 +186,11 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        project = None
+        if object_id:
+            project = self.get_object(request, object_id).project
+        elif "project" in request.GET:
+            project = Project.objects.get(id=request.GET["project"])
         return super().changeform_view(
             request,
             object_id,
@@ -195,5 +200,6 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
                 "show_save_as_new": False,
                 "show_save_and_add_another": False,
                 "show_save": False,
+                "project": project,
             },
         )
