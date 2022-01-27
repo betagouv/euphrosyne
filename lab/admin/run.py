@@ -1,11 +1,16 @@
+import datetime
+import json
+import locale
 from datetime import time
 from typing import Any, List, Optional, Tuple, Type, Union
 
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin, widgets
-from django.contrib.admin.options import InlineModelAdmin
+from django.contrib.admin.options import IS_POPUP_VAR, TO_FIELD_VAR, InlineModelAdmin
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
+from django.template.response import TemplateResponse
+from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
 from ..fields import ObjectGroupChoiceField
@@ -203,3 +208,85 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
                 "project": project,
             },
         )
+
+    @staticmethod
+    def _serialized_data(request, obj):
+        current_locale = (translation.to_locale(request.LANGUAGE_CODE), "UTF-8")
+        locale.setlocale(locale.LC_ALL, locale=current_locale)
+
+        def _serialize(field_name):
+            field = getattr(obj, field_name)
+            if isinstance(field, datetime.datetime):
+                return field.strftime("%d %B %Y %H:%S")
+            return str(field)
+
+        return {field.name: _serialize(field.name) for field in obj._meta.get_fields()}
+
+    def response_add(self, request, obj, post_url_continue=None):
+        if IS_POPUP_VAR in request.POST:
+            to_field = request.POST.get(TO_FIELD_VAR)
+            if to_field:
+                attr = str(to_field)
+            else:
+                attr = obj._meta.pk.attname
+            value = obj.serializable_value(attr)
+            popup_response_data = json.dumps(
+                {
+                    "action": "add",
+                    "value": str(value),
+                    "obj": str(obj),
+                    "data": self._serialized_data(request, obj),
+                }
+            )
+            return TemplateResponse(
+                request,
+                "admin/run_popup_response.html",
+                {
+                    "popup_response_data": popup_response_data,
+                },
+            )
+
+        return super().response_add(request, obj, post_url_continue)
+
+    def response_change(self, request, obj):
+        if IS_POPUP_VAR in request.POST:
+            opts = obj._meta
+            to_field = request.POST.get(TO_FIELD_VAR)
+            attr = str(to_field) if to_field else opts.pk.attname
+            value = request.resolver_match.kwargs["object_id"]
+            new_value = obj.serializable_value(attr)
+            popup_response_data = json.dumps(
+                {
+                    "action": "change",
+                    "value": str(value),
+                    "obj": str(obj),
+                    "new_value": str(new_value),
+                    "new_data": self._serialized_data(request, obj),
+                }
+            )
+            return TemplateResponse(
+                request,
+                "admin/run_popup_response.html",
+                {
+                    "popup_response_data": popup_response_data,
+                },
+            )
+        return super().response_change(request, obj)
+
+    def response_delete(self, request, obj_display, obj_id):
+        if IS_POPUP_VAR in request.POST:
+            popup_response_data = json.dumps(
+                {
+                    "action": "delete",
+                    "value": str(obj_id),
+                }
+            )
+            return TemplateResponse(
+                request,
+                "admin/run_popup_response.html",
+                {
+                    "popup_response_data": popup_response_data,
+                },
+            )
+
+        return super().response_delete(request, obj_display, obj_id)

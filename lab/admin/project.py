@@ -105,6 +105,10 @@ class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
 
 
 class RunInline(LabPermissionMixin, admin.TabularInline):
+    class Media:
+        js = ("js/admin/RelatedRunLookups.js",)
+        css = {"all": ("css/admin/run-inline.css",)}
+
     model = Run
     extra = 0
     show_change_link = True
@@ -125,14 +129,6 @@ class RunInline(LabPermissionMixin, admin.TabularInline):
 
     def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
         return obj
-
-    def has_add_permission(
-        self, request: HttpRequest, obj: Optional[Project] = ...
-    ) -> bool:
-        """Disable adding a new run through the inline, force the user to go
-        through the Run admin page
-        """
-        return False
 
     def has_delete_permission(
         self, request: HttpRequest, obj: Optional[Project] = ...
