@@ -1,9 +1,10 @@
+import json
 from datetime import time
 from typing import Any, List, Optional, Tuple, Type, Union
 
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin, widgets
-from django.contrib.admin.options import InlineModelAdmin
+from django.contrib.admin.options import IS_POPUP_VAR, InlineModelAdmin
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
@@ -12,6 +13,7 @@ from ..fields import ObjectGroupChoiceField
 from ..forms import RunDetailsForm
 from ..models import Project, Run
 from ..permissions import LabRole, is_lab_admin
+from ..serializers import convert_for_ui
 from ..widgets import PlaceholderSelect, SplitDateTimeWithDefaultTime
 from .mixins import LabPermission, LabPermissionMixin
 
@@ -191,6 +193,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
             project = self.get_object(request, object_id).project
         elif "project" in request.GET:
             project = Project.objects.get(id=request.GET["project"])
+        is_popup = "_popup" in request.GET
         return super().changeform_view(
             request,
             object_id,
@@ -199,7 +202,52 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
                 **(extra_context if extra_context else {}),
                 "show_save_as_new": False,
                 "show_save_and_add_another": False,
-                "show_save": False,
+                "show_save": is_popup,
                 "project": project,
             },
         )
+
+    @staticmethod
+    def _add_serialized_data_context(context_data, request, obj) -> str:
+        popup_response_data = context_data["popup_response_data"]
+        popup_response_data = json.loads(popup_response_data)
+        return {
+            **context_data,
+            "popup_response_data": json.dumps(
+                {
+                    **popup_response_data,
+                    "data": convert_for_ui(
+                        request,
+                        obj,
+                        [
+                            "id",
+                            "label",
+                            "start_date",
+                            "end_date",
+                            "particle_type",
+                            "energy_in_keV",
+                            "beamline",
+                        ],
+                    ),
+                }
+            ),
+        }
+
+    def response_add(self, request, obj, post_url_continue=None):
+        response = super().response_add(request, obj, post_url_continue)
+
+        if IS_POPUP_VAR in request.POST:
+            response.context_data = self._add_serialized_data_context(
+                response.context_data, request, obj
+            )
+        return response
+
+    def response_change(self, request, obj):
+        response = super().response_change(request, obj)
+
+        if IS_POPUP_VAR in request.POST:
+            response.context_data = self._add_serialized_data_context(
+                response.context_data, request, obj
+            )
+
+        return response

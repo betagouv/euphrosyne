@@ -105,6 +105,10 @@ class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
 
 
 class RunInline(LabPermissionMixin, admin.TabularInline):
+    class Media:
+        js = ("pages/run-inline.js",)
+        css = {"all": ("css/admin/run-inline.css",)}
+
     model = Run
     extra = 0
     show_change_link = True
@@ -126,23 +130,16 @@ class RunInline(LabPermissionMixin, admin.TabularInline):
     def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
         return obj
 
-    def has_add_permission(
-        self, request: HttpRequest, obj: Optional[Project] = ...
-    ) -> bool:
-        """Disable adding a new run through the inline, force the user to go
-        through the Run admin page
-        """
-        return False
-
     def has_delete_permission(
-        self, request: HttpRequest, obj: Optional[Project] = ...
+        self, request: HttpRequest, obj: Optional[Project] = None
     ) -> bool:
+        """Delete is performed through the RunAdmin itself"""
         return False
 
     def get_formset(
         self,
         request: HttpRequest,
-        obj: Optional[Project] = ...,
+        obj: Optional[Project] = None,
         **kwargs: Mapping[str, Any]
     ):
         self.form = (
@@ -272,6 +269,5 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
                 **(extra_context if extra_context else {}),
                 "show_save_as_new": False,
                 "show_save_and_add_another": False,
-                "show_save": False,
             },
         )

@@ -1,0 +1,7 @@
+#runs-group #runs .add-row {
+  display: none !important;
+}
+
+#runs-group #runs .inline-deletelink {
+  display: none !important;
+}

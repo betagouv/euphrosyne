@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 15:18+0100\n"
+"POT-Creation-Date: 2022-02-11 20:17+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -349,8 +349,6 @@ msgstr "Microbeam"
 msgid "Beamline"
 msgstr "Ligne de faisceau"
 
-#, fuzzy
-#| msgid "Select an object group"
 msgid "Object groups"
 msgstr "Type de lot d'objets"
 
@@ -381,8 +379,6 @@ msgstr "Information de différentation"
 msgid "Total number"
 msgstr "Nombre total"
 
-#, fuzzy
-#| msgid "Number of objects"
 msgid "Number of objects if more than one"
 msgstr "Nombre d'objets si plus d'un"
 
@@ -417,8 +413,55 @@ msgstr "Supprimer ?"
 msgid "Add %(name)s"
 msgstr "Ajouter %(name)s"
 
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"La suppression de %(object_name)s '%(escaped_object)s' résultera en la "
+"suppression d'objets liés, mais votre compte n'a pas les permissions pour "
+"supprimer les objets des types suivants :"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"La suppression des objets %(object_name)s '%(escaped_object)s' nécessiterait "
+"la suppression des objets protégés suivants :"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Êtes-vous sûr(e) de vouloir supprimer l'objet %(object_name)s "
+"\"%(escaped_object)s\" ? Tous les objets liés suivants vont être supprimés :"
+
+msgid "Objects"
+msgstr "Objets"
+
+msgid "Yes, I’m sure"
+msgstr "Oui, je suis sûr(e)"
+
+msgid "No, close the window"
+msgstr "Non, fermer la fenêtre"
+
 msgid "Methods"
 msgstr "Méthodes"
+
+msgid "Popup closing…"
+msgstr "Fenêtre pop-up en cours de fermeture…"
+
+msgid "Delete"
+msgstr "Supprimer"
+
+msgid "Save and continue editing"
+msgstr "Sauvegarder et continuer l'édition"
+
+msgid "Save and view"
+msgstr "Sauvegarder et voir"
 
 #, python-format
 msgid ""
@@ -451,9 +494,6 @@ msgstr "Taille"
 
 msgid "No document yet"
 msgstr "Aucun document ajouté"
-
-msgid "Popup closing…"
-msgstr "Popup en cours de fermeture…"
 
 msgid "Other"
 msgstr "Autre"
