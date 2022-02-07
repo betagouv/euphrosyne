@@ -15,7 +15,7 @@ def test_run_admin_seriazlied_data():
     request = RequestFactory().post(
         reverse("admin:lab_run_add"),
     )
-    request.LANGUAGE_CODE = "fr-fr"
+    request.LANGUAGE_CODE = "en-US"
     run = Run(
         id=42,
         label="42label",
@@ -28,8 +28,8 @@ def test_run_admin_seriazlied_data():
     assert run_admin.RunAdmin._serialized_data(request, run) == {
         "id": "42",
         "label": "42label",
-        "start_date": "01 janvier 2022 00:00",
-        "end_date": "02 février 2022 00:00",
+        "start_date": "01 January 2022 00:00",
+        "end_date": "02 February 2022 00:00",
         "particle_type": "Proton",
         "energy_in_keV": "1000",
         "beamline": "Microbeam",
