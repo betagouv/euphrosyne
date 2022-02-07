@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-26 15:18+0100\n"
+"POT-Creation-Date: 2022-02-07 21:37+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -417,8 +417,65 @@ msgstr "Supprimer ?"
 msgid "Add %(name)s"
 msgstr "Ajouter %(name)s"
 
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"La suppression de %(object_name)s '%(escaped_object)s' résultera en la "
+"suppression d'objets liés, mais votre compte n'a pas les permissions pour "
+"supprimer les objets des types suivants :"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"La suppression des objets %(object_name)s '%(escaped_object)s' nécessiterait la"
+" suppression des objets protégés suivants :"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Êtes-vous sûr(e) de vouloir supprimer l'objet %(object_name)s \"%(escaped_object)s\" ? "
+"Tous les objets liés suivants vont être supprimés :"
+
+#, fuzzy
+#| msgid "Object"
+msgid "Objects"
+msgstr "Objet"
+
+msgid "Yes, I’m sure"
+msgstr "Oui, je suis sûr(e)"
+
+msgid "No, close the window"
+msgstr "Non, fermer la fenêtre"
+
 msgid "Methods"
 msgstr "Méthodes"
+
+#, fuzzy
+#| msgid "Delete?"
+msgid "Delete"
+msgstr "Supprimer ?"
+
+msgid "Save as new"
+msgstr "Sauvegarder comme nouveau"
+
+msgid "Save and add another"
+msgstr "Sauvegarder et ajouter un nouveau"
+
+msgid "Save and continue editing"
+msgstr "Sauvegarder et continuer l'édition"
+
+msgid "Save and view"
+msgstr "Sauvegarder et voir"
+
+msgid "Close"
+msgstr "Fermer"
 
 #, python-format
 msgid ""
