@@ -1,3 +1,4 @@
+/* global global */
 import { jest } from "@jest/globals";
 
 import handleInitData from "../assets/js/run-popup-response-handler.js";

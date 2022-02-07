@@ -265,6 +265,6 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
                 **(extra_context if extra_context else {}),
                 "show_save_as_new": False,
                 "show_save_and_add_another": False,
-                "show_save": False,  # No effect, would need a change in submit_line.html
+                "show_save": False,  # Noop, would need a change in submit_line.html
             },
         )

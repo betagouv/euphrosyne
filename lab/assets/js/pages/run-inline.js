@@ -1,3 +1,4 @@
+/* global $ */
 "use strict";
 
 import "../../css/run-inline.css";
