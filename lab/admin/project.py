@@ -105,9 +105,6 @@ class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
 
 
 class RunInline(LabPermissionMixin, admin.TabularInline):
-    class Media:
-        js = ("js/admin/RelatedRunLookups.js",)
-        css = {"all": ("css/admin/run-inline.css",)}
 
     model = Run
     extra = 0
@@ -268,6 +265,6 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
                 **(extra_context if extra_context else {}),
                 "show_save_as_new": False,
                 "show_save_and_add_another": False,
-                "show_save": False,
+                "show_save": False,  # No effect, would need a change in submit_line.html
             },
         )
