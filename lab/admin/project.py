@@ -150,7 +150,14 @@ class RunInline(LabPermissionMixin, admin.TabularInline):
 
 @admin.register(Project)
 class ProjectAdmin(LabPermissionMixin, ModelAdmin):
-    list_display = ("name", "leader_user", "status")
+    list_display = (
+        "name",
+        "admin",
+        "leader_user",
+        "first_run_date",
+        "number_of_runs",
+        "status",
+    )
     readonly_fields = ("members", "status", "editable_leader_user", "leader_user")
 
     lab_permissions = LabPermission(
@@ -177,6 +184,26 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
         content = widget.render("change_id_leader", user)
         media = str(widget.media)  # pylint: disable=no-member
         return content + media
+
+    @staticmethod
+    @admin.display(description=_("First run"))
+    def first_run_date(obj: Optional[Project]):
+        if obj:
+            run_dates = (
+                obj.runs.filter(start_date__isnull=False)
+                .order_by("start_date")
+                .values_list("start_date", flat=True)
+            )
+            if run_dates:
+                return run_dates[0]
+        return None
+
+    @staticmethod
+    @admin.display(description=_("Runs"))
+    def number_of_runs(obj: Optional[Project]) -> Optional[int]:
+        if obj:
+            return obj.runs.count()
+        return None
 
     def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
         return obj

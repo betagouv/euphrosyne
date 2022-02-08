@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-11 20:17+0100\n"
+"POT-Creation-Date: 2022-02-18 02:12+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -163,6 +163,12 @@ msgstr "Conditions expérimentales"
 msgid "Leader"
 msgstr "Chef de projet"
 
+msgid "First run"
+msgstr "Premier run"
+
+msgid "Runs"
+msgstr "Runs"
+
 msgid "Basic information"
 msgstr "Informations essentielles"
 
@@ -250,6 +256,15 @@ msgstr "choix de filtres {} / {}"
 msgid "To schedule"
 msgstr "A planifier"
 
+msgid "Scheduled"
+msgstr "Planifié"
+
+msgid "Ongoing"
+msgstr "En cours"
+
+msgid "Finished"
+msgstr "Terminé"
+
 msgid "French"
 msgstr "Français"
 
@@ -309,9 +324,6 @@ msgstr "Planifié"
 
 msgid "Started"
 msgstr "Démarré"
-
-msgid "Finished"
-msgstr "Terminé"
 
 msgid "Proton"
 msgstr "Proton"
@@ -408,6 +420,18 @@ msgstr "Ajouter un autre lot"
 
 msgid "Delete?"
 msgstr "Supprimer ?"
+
+msgid "Please correct the error below."
+msgstr "Merci de corriger l'erreur ci-dessous"
+
+msgid "Please correct the errors below."
+msgstr "Merci de corriger les erreurs ci-dessous"
+
+msgid "Filter"
+msgstr "Filtrer"
+
+msgid "Clear all filters"
+msgstr "Effacer tous les filtres"
 
 #, python-format
 msgid "Add %(name)s"
