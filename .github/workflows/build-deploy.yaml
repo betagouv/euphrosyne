@@ -61,6 +61,7 @@ jobs:
 
   deploy-staging:
     needs:
+      - call-workflow-test
       - build
     runs-on: ubuntu-18.04
     steps:
