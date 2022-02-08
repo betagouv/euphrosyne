@@ -12,7 +12,7 @@ env:
   EMAIL_USE_TLS: false
   DEFAULT_FROM_EMAIL: h@ll.o
   SITE_URL: http://localhost:8000
-  PYTHON_VERSION: 3.9.2
+  PYTHON_VERSION: 3.10.1
 
 jobs:
   call-worfklow-test:
