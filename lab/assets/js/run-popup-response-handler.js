@@ -4,7 +4,7 @@ export default function (initData) {
       opener.dismissChangeRelatedRunPopup(window, initData.data);
       break;
     case "delete":
-      opener.dismissDeleteRelatedRunPopup(window, initData.id);
+      opener.dismissDeleteRelatedRunPopup(window, initData.value);
       break;
     default:
       opener.dismissAddRelatedRunPopup(window, initData.data);

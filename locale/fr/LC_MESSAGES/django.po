@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-08 11:29+0100\n"
+"POT-Creation-Date: 2022-02-11 20:17+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -349,8 +349,6 @@ msgstr "Microbeam"
 msgid "Beamline"
 msgstr "Ligne de faisceau"
 
-#, fuzzy
-#| msgid "Select an object group"
 msgid "Object groups"
 msgstr "Type de lot d'objets"
 
@@ -381,8 +379,6 @@ msgstr "Information de différentation"
 msgid "Total number"
 msgstr "Nombre total"
 
-#, fuzzy
-#| msgid "Number of objects"
 msgid "Number of objects if more than one"
 msgstr "Nombre d'objets si plus d'un"
 
@@ -443,8 +439,6 @@ msgstr ""
 "Êtes-vous sûr(e) de vouloir supprimer l'objet %(object_name)s "
 "\"%(escaped_object)s\" ? Tous les objets liés suivants vont être supprimés :"
 
-#, fuzzy
-#| msgid "Object"
 msgid "Objects"
 msgstr "Objet"
 
@@ -457,25 +451,17 @@ msgstr "Non, fermer la fenêtre"
 msgid "Methods"
 msgstr "Méthodes"
 
-#, fuzzy
-#| msgid "Delete?"
+msgid "Popup closing…"
+msgstr "Popup en cours de fermeture…"
+
 msgid "Delete"
-msgstr "Supprimer ?"
-
-msgid "Save as new"
-msgstr "Sauvegarder comme nouveau"
-
-msgid "Save and add another"
-msgstr "Sauvegarder et ajouter un nouveau"
+msgstr "Supprimer"
 
 msgid "Save and continue editing"
 msgstr "Sauvegarder et continuer l'édition"
 
 msgid "Save and view"
 msgstr "Sauvegarder et voir"
-
-msgid "Close"
-msgstr "Fermer"
 
 #, python-format
 msgid ""
@@ -508,9 +494,6 @@ msgstr "Taille"
 
 msgid "No document yet"
 msgstr "Aucun document ajouté"
-
-msgid "Popup closing…"
-msgstr "Popup en cours de fermeture…"
 
 msgid "Other"
 msgstr "Autre"

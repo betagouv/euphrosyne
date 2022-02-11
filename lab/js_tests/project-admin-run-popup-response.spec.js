@@ -22,7 +22,7 @@ describe("handleInitData", () => {
   });
   it("properly calls dismissDeleteRelatedRunPopup on add action", () => {
     global.opener = { dismissDeleteRelatedRunPopup: jest.fn() };
-    handleInitData({ action: "delete", id: "some id" });
+    handleInitData({ action: "delete", value: "some id" });
     expect(global.opener.dismissDeleteRelatedRunPopup).toHaveBeenCalledWith(
       window,
       "some id"

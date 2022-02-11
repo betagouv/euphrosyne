@@ -1,6 +1,4 @@
-import datetime
 import json
-import locale
 from datetime import time
 from typing import Any, List, Optional, Tuple, Type, Union
 
@@ -9,14 +7,13 @@ from django.contrib.admin import ModelAdmin, widgets
 from django.contrib.admin.options import IS_POPUP_VAR, InlineModelAdmin
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
-from django.template.response import TemplateResponse
-from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
 from ..fields import ObjectGroupChoiceField
 from ..forms import RunDetailsForm
 from ..models import Project, Run
 from ..permissions import LabRole, is_lab_admin
+from ..serializers import convert_for_ui
 from ..widgets import PlaceholderSelect, SplitDateTimeWithDefaultTime
 from .mixins import LabPermission, LabPermissionMixin
 
@@ -206,82 +203,51 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
                 "show_save_as_new": False,
                 "show_save_and_add_another": False,
                 "show_save": is_popup,
-                "force_hide_close": True,
                 "project": project,
             },
         )
 
     @staticmethod
-    def _serialized_data(request, obj):
-        current_locale = (translation.to_locale(request.LANGUAGE_CODE), "UTF-8")
-        locale.setlocale(locale.LC_ALL, locale=current_locale)
-
-        fieldnames = [
-            "id",
-            "label",
-            "start_date",
-            "end_date",
-            "particle_type",
-            "energy_in_keV",
-            "beamline",
-        ]
-
-        def _serialize(field_name):
-            field = getattr(obj, field_name)
-            if isinstance(field, datetime.datetime):
-                return field.strftime("%d %B %Y %H:%S")
-            return str(field)
-
+    def _add_serialized_data_context(context_data, request, obj) -> str:
+        popup_response_data = context_data["popup_response_data"]
+        popup_response_data = json.loads(popup_response_data)
         return {
-            field.name: _serialize(field.name)
-            for field in obj._meta.get_fields()
-            if field.name in fieldnames
+            **context_data,
+            "popup_response_data": json.dumps(
+                {
+                    **popup_response_data,
+                    "data": convert_for_ui(
+                        request,
+                        obj,
+                        [
+                            "id",
+                            "label",
+                            "start_date",
+                            "end_date",
+                            "particle_type",
+                            "energy_in_keV",
+                            "beamline",
+                        ],
+                    ),
+                }
+            ),
         }
 
     def response_add(self, request, obj, post_url_continue=None):
-        if IS_POPUP_VAR in request.POST:
-            popup_response_data = json.dumps(
-                {
-                    "action": "add",
-                    "data": self._serialized_data(request, obj),
-                }
-            )
-            return TemplateResponse(
-                request,
-                "admin/run_popup_response.html",
-                {
-                    "popup_response_data": popup_response_data,
-                },
-            )
+        response = super().response_add(request, obj, post_url_continue)
 
-        return super().response_add(request, obj, post_url_continue)
+        if IS_POPUP_VAR in request.POST:
+            response.context_data = self._add_serialized_data_context(
+                response.context_data, request, obj
+            )
+        return response
 
     def response_change(self, request, obj):
-        if IS_POPUP_VAR in request.POST:
-            popup_response_data = json.dumps(
-                {
-                    "action": "change",
-                    "data": self._serialized_data(request, obj),
-                }
-            )
-            return TemplateResponse(
-                request,
-                "admin/run_popup_response.html",
-                {
-                    "popup_response_data": popup_response_data,
-                },
-            )
-        return super().response_change(request, obj)
+        response = super().response_change(request, obj)
 
-    def response_delete(self, request, obj_display, obj_id):
         if IS_POPUP_VAR in request.POST:
-            popup_response_data = json.dumps({"action": "delete", "id": obj_id})
-            return TemplateResponse(
-                request,
-                "admin/run_popup_response.html",
-                {
-                    "popup_response_data": popup_response_data,
-                },
+            response.context_data = self._add_serialized_data_context(
+                response.context_data, request, obj
             )
 
-        return super().response_delete(request, obj_display, obj_id)
+        return response
