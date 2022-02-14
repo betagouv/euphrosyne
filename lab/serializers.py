@@ -27,7 +27,6 @@ def convert_for_ui(
         return str(field)
 
     return {
-        field.name: _default_converter(getattr(obj, field.name))
-        for field in obj._meta.get_fields()
-        if field.name in fieldnames
+        fieldname: _default_converter(getattr(obj, fieldname))
+        for fieldname in fieldnames
     }

@@ -1,6 +1,5 @@
 "use strict";
 
-import "../../css/run-inline.css";
 import {
   dismissAddRelatedRunPopup,
   dismissChangeRelatedRunPopup,
@@ -12,8 +11,6 @@ document.addEventListener("DOMContentLoaded", function () {
   window.dismissAddRelatedRunPopup = dismissAddRelatedRunPopup;
   window.dismissChangeRelatedRunPopup = dismissChangeRelatedRunPopup;
   window.dismissDeleteRelatedRunPopup = dismissDeleteRelatedRunPopup;
-
-  const $ = django.jQuery;
 
   function showAdminPopup(triggeringLink, name_regexp, add_popup) {
     const name = triggeringLink.id.replace(name_regexp, "");
@@ -34,14 +31,17 @@ document.addEventListener("DOMContentLoaded", function () {
     return showAdminPopup(triggeringLink, /^(change|add|delete)_/, false);
   }
 
-  $("body").on("click", ".related-run-link", function (e) {
-    e.preventDefault();
-    if (this.href) {
-      const event = $.Event("django:show-related", { href: this.href });
-      $(this).trigger(event);
-      if (!event.isDefaultPrevented()) {
-        showRelatedRunPopup(this);
+  document.querySelectorAll(".related-run-link").forEach((linkEl) => {
+    linkEl.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (this.href) {
+        const event = new Event("django:show-related");
+        event.href = this.href;
+        document.dispatchEvent(event);
+        if (!event.defaultPrevented) {
+          showRelatedRunPopup(this);
+        }
       }
-    }
+    });
   });
 });
