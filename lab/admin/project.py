@@ -106,7 +106,6 @@ class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
 
 class RunInline(LabPermissionMixin, admin.TabularInline):
     class Media:
-        css = {"js": ("pages/run-inline.js",)}
         css = {"all": ("css/admin/run-inline.css",)}
 
     model = Run

@@ -440,7 +440,7 @@ msgstr ""
 "\"%(escaped_object)s\" ? Tous les objets liés suivants vont être supprimés :"
 
 msgid "Objects"
-msgstr "Objet"
+msgstr "Objets"
 
 msgid "Yes, I’m sure"
 msgstr "Oui, je suis sûr(e)"
@@ -452,7 +452,7 @@ msgid "Methods"
 msgstr "Méthodes"
 
 msgid "Popup closing…"
-msgstr "Popup en cours de fermeture…"
+msgstr "Fenêtre pop-up en cours de fermeture…"
 
 msgid "Delete"
 msgstr "Supprimer"
