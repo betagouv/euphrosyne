@@ -18,3 +18,7 @@
   display: flex;
   justify-content: space-between;
 }
+
+.fr-tag.a-planifier {
+  background: #fcdf41;
+}
