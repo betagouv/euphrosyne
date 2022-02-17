@@ -1,0 +1,14 @@
+#changelist {
+  background: unset;
+}
+
+.mt-30 {
+  margin-top: 30px;
+}
+.run-card__actions {
+  margin-top: 12px;
+}
+
+#change-link {
+  padding: 5px;
+}

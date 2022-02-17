@@ -135,18 +135,6 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         )
         assert ParticipationInline in inlines
 
-    def test_get_content_has_change_leader_link(self):
-        project = Project.objects.create(name="some project name")
-        project.participation_set.create(
-            user=self.project_participant_user,
-            is_leader=True,
-            institution=self.base_institution,
-        )
-        change_view_url = reverse("admin:lab_project_change", args=[project.id])
-        response = self.client.get(change_view_url)
-
-        assert "change-leader-link" in response.content.decode()
-
 
 class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
     def setUp(self):

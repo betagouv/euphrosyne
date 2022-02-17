@@ -115,32 +115,27 @@ class TestRunAdminParams(TestCase):
         assert self.project.name in project_field_choices_names
         assert other_run.project.name not in project_field_choices_names
 
-    def test_project_is_added_to_context_when_editing(self):
+    def test_get_project_when_editing(self):
         request = RequestFactory().get(
             reverse("admin:lab_run_change", args=[self.run.id])
         )
         request.user = self.member_user
-        changeform_view_context = self.run_admin.changeform_view(
-            request, str(self.run.id)
-        ).context_data
-        assert "project" in changeform_view_context
-        assert changeform_view_context["project"] == self.run.project
+        # pylint: disable=protected-access
+        assert self.run_admin._get_project(request, self.run.id) == self.run.project
 
-    def test_project_is_added_to_context_when_adding_from_project(self):
+    def test_project_when_adding_from_project(self):
         project = factories.ProjectFactory()
         add_url = reverse("admin:lab_run_add")
         request = RequestFactory().get(f"{add_url}?project={project.id}")
         request.user = factories.StaffUserFactory()
-        changeform_view_context = self.run_admin.changeform_view(request).context_data
-        assert "project" in changeform_view_context
-        assert changeform_view_context["project"] == project
+        # pylint: disable=protected-access
+        assert self.run_admin._get_project(request) == project
 
-    def test_project_is_none_in_context_when_adding(self):
+    def test_project_is_none_when_adding(self):
         request = RequestFactory().get(reverse("admin:lab_run_add"))
         request.user = factories.StaffUserFactory()
-        changeform_view_context = self.run_admin.changeform_view(request).context_data
-        assert "project" in changeform_view_context
-        assert changeform_view_context["project"] is None
+        # pylint: disable=protected-access
+        assert self.run_admin._get_project(request) is None
 
 
 class TestRunAdminViewAsLeader(TestCase):

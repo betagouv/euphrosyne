@@ -1,5 +1,6 @@
 @import url("./dsrf-overrides.css");
 @import url("./components/fieldset.css");
+@import url("./utils.css");
 
 :root {
   --blue-france: #000091;
@@ -77,6 +78,11 @@ body {
   background-color: var(--g-100);
 }
 
+.content h1 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
 #branding h1,
 #branding h1 a:link,
 #branding h1 a:visited {
@@ -140,5 +146,44 @@ label.required:after {
 }
 
 .change-form .object-tools {
-  margin-top: -55px;
+  margin-top: -64px;
+}
+
+.project-tabs {
+  margin-bottom: 30px;
+}
+
+.project-tabs ul {
+  display: flex;
+  padding: 0;
+  border-bottom: 1px solid rgb(235, 236, 240);
+}
+.project-tabs li {
+  list-style-type: none;
+  margin-right: 1rem;
+}
+.project-tabs a {
+  font-size: 1.15rem;
+  color: var(--text-title-grey);
+}
+
+.project-tabs a:hover {
+  color: var(--link-fg);
+}
+
+.project-tabs li.active a {
+  color: var(--link-fg);
+  font-weight: bold;
+}
+
+.project-tabs li.active a:hover {
+  color: var(--text-title-grey);
+}
+
+.project-tabs span.underline {
+  height: 2px;
+  width: 100%;
+  background-color: var(--link-fg);
+  display: block;
+  margin-top: 5px;
 }

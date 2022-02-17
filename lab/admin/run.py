@@ -1,10 +1,9 @@
-import json
 from datetime import time
 from typing import Any, List, Optional, Tuple, Type, Union
 
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin, widgets
-from django.contrib.admin.options import IS_POPUP_VAR, InlineModelAdmin
+from django.contrib.admin.options import InlineModelAdmin
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
@@ -13,7 +12,6 @@ from ..fields import ObjectGroupChoiceField
 from ..forms import RunDetailsForm
 from ..models import Project, Run
 from ..permissions import LabRole, is_lab_admin
-from ..serializers import convert_for_ui
 from ..widgets import PlaceholderSelect, SplitDateTimeWithDefaultTime
 from .mixins import LabPermission, LabPermissionMixin
 
@@ -70,7 +68,12 @@ class ObjectGroupInline(admin.TabularInline):
 class RunAdmin(LabPermissionMixin, ModelAdmin):
     class Media:
         js = ("js/admin/methods.js",)
-        css = {"all": ("css/admin/methods.css",)}
+        css = {
+            "all": (
+                "css/admin/methods.css",
+                "css/admin/run.css",
+            )
+        }
 
     HIDE_ADD_SIDEBAR = True
 
@@ -125,7 +128,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         )
 
     def has_module_permission(self, request: HttpRequest) -> bool:
-        return is_lab_admin(request.user)
+        return False
 
     def get_readonly_fields(
         self, request: HttpRequest, obj: Optional[Run] = None
@@ -188,11 +191,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
-        project = None
-        if object_id:
-            project = self.get_object(request, object_id).project
-        elif "project" in request.GET:
-            project = Project.objects.get(id=request.GET["project"])
+        project = self._get_project(request, object_id)
         is_popup = "_popup" in request.GET
         return super().changeform_view(
             request,
@@ -207,47 +206,21 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
             },
         )
 
-    @staticmethod
-    def _add_serialized_data_context(context_data, request, obj) -> str:
-        popup_response_data = context_data["popup_response_data"]
-        popup_response_data = json.loads(popup_response_data)
-        return {
-            **context_data,
-            "popup_response_data": json.dumps(
-                {
-                    **popup_response_data,
-                    "data": convert_for_ui(
-                        request,
-                        obj,
-                        [
-                            "id",
-                            "label",
-                            "start_date",
-                            "end_date",
-                            "particle_type",
-                            "energy_in_keV",
-                            "beamline",
-                        ],
-                    ),
-                }
-            ),
-        }
+    def changelist_view(
+        self, request: HttpRequest, extra_context: Optional[dict[str, str]] = None
+    ):
+        project = self._get_project(request)
+        return super().changelist_view(
+            request,
+            {
+                **(extra_context if extra_context else {}),
+                "project": project,
+            },
+        )
 
-    def response_add(self, request, obj, post_url_continue=None):
-        response = super().response_add(request, obj, post_url_continue)
-
-        if IS_POPUP_VAR in request.POST:
-            response.context_data = self._add_serialized_data_context(
-                response.context_data, request, obj
-            )
-        return response
-
-    def response_change(self, request, obj):
-        response = super().response_change(request, obj)
-
-        if IS_POPUP_VAR in request.POST:
-            response.context_data = self._add_serialized_data_context(
-                response.context_data, request, obj
-            )
-
-        return response
+    def _get_project(self, request, object_id=None) -> Optional[Project]:
+        if object_id:
+            return self.get_object(request, object_id).project
+        if "project" in request.GET:
+            return Project.objects.get(id=request.GET["project"])
+        return None

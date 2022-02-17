@@ -1,0 +1,17 @@
+.mb-0 {
+  margin-bottom: 0;
+}
+
+.px-0 {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+}
