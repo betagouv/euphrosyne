@@ -233,3 +233,11 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
                 "show_save_and_add_another": False,
             },
         )
+
+    def changelist_view(
+        self, request: HttpRequest, extra_context: Optional[Dict[str, str]] = None
+    ):
+        return super().changelist_view(
+            request,
+            {**(extra_context if extra_context else {}), "title": _("Projects")},
+        )

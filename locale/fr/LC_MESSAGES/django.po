@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 20:28+0100\n"
+"POT-Creation-Date: 2022-02-17 12:41+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -169,6 +169,9 @@ msgstr "Runs"
 msgid "Basic information"
 msgstr "Informations essentielles"
 
+msgid "Projects"
+msgstr "Projets"
+
 msgid "Batch of objects"
 msgstr "Lot d'objets"
 
@@ -248,9 +251,6 @@ msgstr "Français"
 
 msgid "European"
 msgstr "Européen"
-
-msgid "Projects"
-msgstr "Projets"
 
 msgid "Project name"
 msgstr "Nom du projet"
