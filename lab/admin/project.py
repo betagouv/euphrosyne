@@ -5,21 +5,13 @@ from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import InlineModelAdmin
 from django.forms.models import BaseInlineFormSet, ModelForm, inlineformset_factory
 from django.http.request import HttpRequest
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
 from lab.widgets import LeaderReadonlyWidget
 
-from ..forms import (
-    BaseParticipationForm,
-    BeamTimeRequestForm,
-    LeaderParticipationForm,
-    RunDetailsForm,
-    RunStatusAdminForm,
-    RunStatusMemberForm,
-)
-from ..models import BeamTimeRequest, Participation, Project, Run
+from ..forms import BaseParticipationForm, BeamTimeRequestForm, LeaderParticipationForm
+from ..models import BeamTimeRequest, Participation, Project
 from ..permissions import is_lab_admin, is_project_leader
 from .mixins import LabPermission, LabPermissionMixin, LabRole
 
@@ -104,50 +96,6 @@ class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
         return obj
 
 
-class RunInline(LabPermissionMixin, admin.TabularInline):
-    class Media:
-        js = ("pages/run-inline.js",)
-        css = {"all": ("css/admin/run-inline.css",)}
-
-    model = Run
-    extra = 0
-    show_change_link = True
-    readonly_fields = RunDetailsForm.Meta.fields
-    fieldsets = (
-        (None, {"fields": ("start_date", "end_date")}),
-        (
-            _("Experimental conditions"),
-            {"fields": ("particle_type", "energy_in_keV", "beamline")},
-        ),
-    )
-    template = "admin/edit_inline/stacked_run_in_project.html"
-
-    lab_permissions = LabPermission(
-        change_permission=LabRole.PROJECT_MEMBER,
-        view_permission=LabRole.PROJECT_MEMBER,
-    )
-
-    def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
-        return obj
-
-    def has_delete_permission(
-        self, request: HttpRequest, obj: Optional[Project] = None
-    ) -> bool:
-        """Delete is performed through the RunAdmin itself"""
-        return False
-
-    def get_formset(
-        self,
-        request: HttpRequest,
-        obj: Optional[Project] = None,
-        **kwargs: Mapping[str, Any]
-    ):
-        self.form = (
-            RunStatusAdminForm if is_lab_admin(request.user) else RunStatusMemberForm
-        )
-        return super().get_formset(request, obj, **kwargs)
-
-
 @admin.register(Project)
 class ProjectAdmin(LabPermissionMixin, ModelAdmin):
     list_display = (
@@ -229,19 +177,6 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
                 {"fields": basic_fields},
             ),
         ]
-        if obj:
-            fieldsets += (
-                (
-                    _("Documents"),
-                    {
-                        "fields": (),
-                        "description": '<a href="{}">{}</a>'.format(
-                            reverse("admin:lab_project_documents", args=[obj.id]),
-                            _("View project documents"),
-                        ),
-                    },
-                ),
-            )
         return fieldsets
 
     def get_exclude(self, request: HttpRequest, obj: Optional[Project] = None):
@@ -271,7 +206,7 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
         if is_lab_admin(request.user) or (obj and is_project_leader(request.user, obj)):
             inlines += [ParticipationInline]
         if obj:
-            inlines += [BeamTimeRequestInline, RunInline]
+            inlines += [BeamTimeRequestInline]
         return inlines
 
     def save_model(

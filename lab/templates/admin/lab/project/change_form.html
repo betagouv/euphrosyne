@@ -1,0 +1,9 @@
+{% extends "admin/change_form.html" %}
+{% load projects %}
+
+{% block content %}
+{% if not add %}
+{% project_tabs object_id request %}
+{% endif %}
+{{ block.super }}
+{% endblock %}

@@ -70,7 +70,12 @@ class ObjectGroupInline(admin.TabularInline):
 class RunAdmin(LabPermissionMixin, ModelAdmin):
     class Media:
         js = ("js/admin/methods.js",)
-        css = {"all": ("css/admin/methods.css",)}
+        css = {
+            "all": (
+                "css/admin/methods.css",
+                "css/admin/run.css",
+            )
+        }
 
     HIDE_ADD_SIDEBAR = True
 
@@ -188,11 +193,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
-        project = None
-        if object_id:
-            project = self.get_object(request, object_id).project
-        elif "project" in request.GET:
-            project = Project.objects.get(id=request.GET["project"])
+        project = self._get_project(request, object_id)
         is_popup = "_popup" in request.GET
         return super().changeform_view(
             request,
@@ -203,6 +204,18 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
                 "show_save_as_new": False,
                 "show_save_and_add_another": False,
                 "show_save": is_popup,
+                "project": project,
+            },
+        )
+
+    def changelist_view(
+        self, request: HttpRequest, extra_context: Optional[dict[str, str]] = None
+    ):
+        project = self._get_project(request)
+        return super().changelist_view(
+            request,
+            {
+                **(extra_context if extra_context else {}),
                 "project": project,
             },
         )
@@ -251,3 +264,10 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
             )
 
         return response
+
+    def _get_project(self, request, object_id=None) -> Optional[Project]:
+        if object_id:
+            return self.get_object(request, object_id).project
+        if "project" in request.GET:
+            return Project.objects.get(id=request.GET["project"])
+        return None

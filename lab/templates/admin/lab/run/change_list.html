@@ -1,0 +1,40 @@
+{% extends "admin/change_list.html" %}
+{% load projects run_list admin_urls i18n admin_list %}
+
+{% block content_title %}{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url "admin:index" %}">{% translate "Home" %}</a>
+{% if project %}
+&rsaquo; <a href="{% url "admin:lab_project_changelist" %}">{% translate "Projects" %}</a>
+&rsaquo; <a href="{% url "admin:lab_project_change" project.id %}">{{ project.name }}</a>
+{% endif %}
+&rsaquo; <a href="{% url 'admin:app_list' app_label=cl.opts.app_label %}">{{ cl.opts.app_config.verbose_name }}</a>
+&rsaquo; {{ cl.opts.verbose_name_plural|capfirst }}
+</div>
+{% endblock %}
+{% endif %}
+
+{% block content %}
+{% if project %}
+{% project_tabs project.id request %}
+{% endif %}
+{{ block.super }}
+{% endblock %}
+
+{% block result_list %}
+{% if action_form and actions_on_top and cl.show_admin_actions %}{% admin_actions %}{% endif %}
+
+<div class="add-row align-right mt-30">
+  <a id="add_runs" class="fr-link" href="{% url 'admin:lab_run_add' %}?project={{ project.id }}">
+    {% translate "Create a run"%}
+  </a>
+</div>
+
+{% show_run_list cl %}
+
+{% endblock %}
+
+{% block pagination %}{% endblock %}
