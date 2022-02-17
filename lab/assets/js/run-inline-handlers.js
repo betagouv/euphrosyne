@@ -1,9 +1,36 @@
+export function onRelatedRunLinkClick(e) {
+  const showAdminPopup = (triggeringLink, name_regexp, add_popup) => {
+    const name = triggeringLink.id.replace(name_regexp, "");
+    const href = new URL(triggeringLink.href);
+    if (add_popup) {
+      href.searchParams.set("_popup", 1);
+    }
+    const win = window.open(
+      href,
+      name,
+      "height=500,width=800,resizable=yes,scrollbars=yes"
+    );
+    win.focus();
+    return false;
+  };
+
+  e.preventDefault();
+  if (e.target.href) {
+    const event = new Event("django:show-related");
+    event.href = e.target.href;
+    document.dispatchEvent(event);
+    if (!event.defaultPrevented) {
+      return showAdminPopup(e.target, /^(change|add|delete)_/, false);
+    }
+  }
+}
+
 export function dismissAddRelatedRunPopup(win, data) {
   document.querySelector("#runs > .add-row > a").click();
   const inlines = document.querySelectorAll("#runs-group .inline-related");
   const newInline = inlines[inlines.length - 2];
   newInline.querySelector(".inline_label").childNodes[0].data = data.label;
-  newInline.querySelector(".inline_label").appendChild(
+  const relatedRunLink = newInline.querySelector(".inline_label").appendChild(
     new DOMParser().parseFromString(
       `
     <a href="/admin/lab/run/${data.id}/change/?_popup=1" class="inlinechangelink related-run-link">Modification</a>
@@ -11,6 +38,8 @@ export function dismissAddRelatedRunPopup(win, data) {
       "text/html"
     ).body.firstElementChild
   );
+
+  relatedRunLink.addEventListener("click", onRelatedRunLinkClick);
 
   Object.entries(data)
     .filter(([fieldName]) => fieldName != "id" && fieldName != "label")

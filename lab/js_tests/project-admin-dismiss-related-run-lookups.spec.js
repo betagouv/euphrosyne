@@ -6,6 +6,28 @@ import {
 
 import template from "./project-admin-runs.html";
 
+describe("dismissAddRelatedRunPopup", () => {
+  it("updates the indexes", () => {
+    const mockWindow = {
+      close: jest.fn(),
+    };
+    document.body.innerHTML = template;
+
+    dismissChangeRelatedRunPopup(mockWindow, {
+      id: "92",
+      label: "new label",
+      beamline: "new beamline",
+    });
+
+    expect(document.querySelector(".label-test-class").textContent).toMatch(
+      /^new label/
+    );
+    expect(document.querySelector(".beamline-test-class").textContent).toMatch(
+      /^\s*new beamline\s*$/
+    );
+  });
+});
+
 describe("dismissChangeRelatedRunPopup", () => {
   it("updates the indexes", () => {
     const mockWindow = {
