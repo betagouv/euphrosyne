@@ -12,9 +12,9 @@ from django.urls import reverse
 
 from lab.widgets import DisabledSelectWithHidden
 
-from ..admin.run import RunAdmin
-from ..models import Run
-from ..templatetags.methods import (
+from ...admin.run import RunAdmin
+from ...models import Run
+from ...templatetags.methods import (
     _get_adminfield_name,
     detector_fields,
     filters_field,
