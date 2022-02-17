@@ -18,7 +18,10 @@ def convert_for_ui(
     """Prepare for serialization of the object with pretty datetimes"""
 
     current_locale = (translation.to_locale(request.LANGUAGE_CODE), "UTF-8")
-    locale.setlocale(locale.LC_ALL, locale=current_locale)
+    try:
+        locale.setlocale(locale.LC_ALL, locale=current_locale)
+    except locale.Error:
+        locale.setlocale(locale.LC_ALL, locale="en_US")
 
     def _serialize(field_name):
         field = getattr(obj, field_name)
