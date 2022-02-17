@@ -130,7 +130,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         )
 
     def has_module_permission(self, request: HttpRequest) -> bool:
-        return is_lab_admin(request.user)
+        return False
 
     def get_readonly_fields(
         self, request: HttpRequest, obj: Optional[Run] = None
