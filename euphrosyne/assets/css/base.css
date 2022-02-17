@@ -160,7 +160,7 @@ label.required:after {
 }
 .project-tabs li {
   list-style-type: none;
-  margin-right: 0.75rem;
+  margin-right: 1rem;
 }
 .project-tabs a {
   font-size: 1.15rem;
