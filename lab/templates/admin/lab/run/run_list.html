@@ -1,0 +1,40 @@
+{% load admin_urls i18n %}
+<div class="fr-container--fluid fr-container mt-30 px-0">
+  <div class="fr-grid-row fr-grid-row--gutters">
+    {% for run in runs %}
+    <div class="fr-col-6">
+      <div class="fr-card fr-card--no-arrow" id="runs-{{ run.id }}">
+        <div class="fr-card__body">      
+        <h4 class="fr-card__title flex-container">
+          {{ run.label }}
+          <input type="checkbox" name="_selected_action" value="{{ run.id }}" class="action-select">
+        </h4>
+        <div class="fr-card__desc">
+  
+          <div class="flex-container fr-text--sm">
+            <div>{{ run.start_date }}</div>
+            <div>{{ run.end_date }}</div>
+          </div>
+
+          <div class="fr-text--xs mb-0">{% translate "Experimental conditions" %}</div>
+          <div class="flex-container fr-text--sm">
+            <div>{{ run.particle_type|default:"-" }}</div>
+            <div>{{ run.energy_in_keV|default:"-" }}</div>
+            <div>{{ run.beamline|default:"-" }}</div>
+          </div>
+        </div>
+
+        <div class="fr-text--xs mb-0">{% translate "Methods" %}</div>
+  
+        <div class="run-card__actions align-right">
+          <a href="{% url "admin:lab_run_change" run.id %}" title="{% translate "Change" %}" id="change-link">
+            <span class="fr-fi-edit-line" aria-hidden="true"></span>
+            <span class="fr-sr-only" rel="noopener noreferrer">{% translate "Change" %}</span>
+          </a>
+      </div>
+    </div>
+  </div>
+</div>
+  {% endfor %}
+  </div>
+</div>

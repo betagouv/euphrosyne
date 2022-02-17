@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_urls static %}
+{% load i18n admin_urls static projects %}
 
 {% block coltype %}colM{% endblock %}
 
@@ -20,9 +20,10 @@
 {% endblock %}
 
 {% block content %}
-<h1>{% blocktranslate with project_name=project.name %}
-Project {{ project_name }} documents
-{% endblocktranslate %}</h1>
+
+{% project_tabs project.id request %}
+
+
 <div id="content-main">
     <ul class="messagelist"></ul>
     <form id="upload-form" class="fr-mb-4w">
