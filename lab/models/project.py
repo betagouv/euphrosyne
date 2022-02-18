@@ -11,6 +11,9 @@ from .participation import Participation
 
 class ProjectStatus(models.IntegerChoices):
     TO_SCHEDULE = 1, _("To schedule")
+    SCHEDULED = 11, _("Scheduled")
+    ONGOING = 21, _("Ongoing")
+    FINISHED = 31, _("Finished")
 
 
 class BeamTimeRequestType(models.TextChoices):
