@@ -14,7 +14,9 @@ class TestRunAdminPermissions(TestCase):
         self.run_admin = RunAdmin(model=Run, admin_site=AdminSite())
         self.project = factories.ProjectWithLeaderFactory()
         self.member = get_user_model().objects.get(participation__project=self.project)
-        self.new_run = factories.RunFactory(status=Run.Status.NEW, project=self.project)
+        self.new_run = factories.RunFactory(
+            status=Run.Status.CREATED, project=self.project
+        )
         self.ask_run = factories.RunFactory(
             status=Run.Status.ASK_FOR_EXECUTION, project=self.project
         )

@@ -1,9 +1,9 @@
-from ..models.project import Project, ProjectStatus
+from ..models.project import Project
 from ..templatetags.list_results import project_results
 
 
 def test_custom_result_list():
-    project = Project(status=ProjectStatus.ONGOING)
+    project = Project(status=Project.Status.ONGOING)
 
     assert project_results(0, [project], [["old status repr"]]) == [
         [
