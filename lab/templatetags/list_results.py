@@ -10,12 +10,11 @@ from ..models.project import ProjectStatus
 register = template.Library()
 
 
-def custom_result_list(changelist):
-    result_list_dict = result_list(changelist)
-    _results = result_list_dict["results"]
-
-    list_display_status_index = changelist.list_display.index("status")
-
+def project_results(
+    list_display_status_index: int,
+    _result_list: list[Project],
+    results: list[list[str]],
+):
     def update_result(project: Project, result: list[str]) -> list[str]:
         choice_identifier = ProjectStatus.names[
             ProjectStatus.values.index(project.status)
@@ -31,12 +30,19 @@ def custom_result_list(changelist):
         )
         return result
 
-    custom_results = [
+    return [
         update_result(_project, _result)
-        for _project, _result in zip(changelist.result_list, _results)
+        for _project, _result in zip(_result_list, results)
     ]
 
-    result_list_dict["results"] = custom_results
+
+def project_result_list(changelist):
+    result_list_dict = result_list(changelist)
+    result_list_dict["results"] = project_results(
+        changelist.list_display.index("status"),
+        changelist.result_list,
+        result_list_dict["results"],
+    )
     return result_list_dict
 
 
@@ -45,7 +51,7 @@ def project_result_list_tag(parser, token):
     return InclusionAdminNode(
         parser,
         token,
-        func=custom_result_list,
+        func=project_result_list,
         template_name="change_list_results.html",
         takes_context=False,
     )

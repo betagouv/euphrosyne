@@ -1,25 +1,14 @@
-import html
-
-from django.template import Context, Template
-
-
-def test_prettify_tag_doesnt_change_random_field():
-    template = Template(
-        "{% load list_results %}{% prettify %}{{ item }}{% endprettify %}"
-    )
-    item_html = '<td class="field-whatever">A planifier</td>'
-    context = Context({"item": item_html})
-    assert html.unescape(template.render(context)) == item_html
+from ..models.project import Project, ProjectStatus
+from ..templatetags.list_results import project_results
 
 
-def test_prettify_tag_changes_field_status():
-    template = Template(
-        "{% load list_results %}{% prettify %}{{ item }}{% endprettify %}"
-    )
-    item_html = '<td class="field-status">à planifier comme ça</td>'
-    context = Context({"item": item_html})
-    assert html.unescape(template.render(context)) == (
-        '<td class="field-status"><span class="a-planifier-comme-ca">'
-        "à planifier comme ça"
-        "</span></td>"
-    )
+def test_custom_result_list():
+    project = Project(status=ProjectStatus.ONGOING)
+
+    assert project_results(0, [project], [["old status repr"]]) == [
+        [
+            '<td class="field-status"><span class="fr-tag ongoing">'
+            "A planifier"
+            "</span></td>"
+        ]
+    ]
