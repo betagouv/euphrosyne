@@ -5,14 +5,33 @@
 .mt-30 {
   margin-top: 30px;
 }
-.run-card__actions {
-  margin-top: 12px;
+
+.action-select {
+  display: none;
 }
 
-.run-card__actions a {
-  box-shadow: none;
+.actions {
+  display: none;
 }
 
-#change-link {
-  padding: 5px;
+.run-clickable-card {
+  cursor: pointer;
+  padding: 6px;
+}
+
+.run-clickable-card__selected {
+  border: 3px solid var(--breadcrumbs-bg);
+  padding: 3px;
+}
+
+.run-footer {
+  position: sticky;
+  bottom: 0;
+  width: 102%;
+  margin-left: -1%;
+  background-color: var(--g-100);
+  border-top: 1px solid rgb(235, 236, 240);
+  margin-top: 1em;
+  height: 5em;
+  padding: 1em;
 }
