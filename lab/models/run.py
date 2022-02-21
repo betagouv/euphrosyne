@@ -9,12 +9,11 @@ from ..methods import MethodModel
 
 
 class Run(TimestampedModel, MethodModel):
-    class Status(models.TextChoices):
-        NEW = "New", _("New")
-        ASK_FOR_EXECUTION = "Ask for execution", _("Ask for execution")
-        PLANNED = "Planned", _("Planned")
-        STARTED = "Started", _("Started")
-        FINISHED = "Finished", _("Finished")
+    class Status(models.IntegerChoices):
+        CREATED = 1, _("Created")
+        ASK_FOR_EXECUTION = 11, _("Ask for execution")
+        ONGOING = 21, _("Ongoing")
+        FINISHED = 31, _("Finished")
 
     class ParticleType(models.TextChoices):
         PROTON = "Proton", _("Proton")
@@ -30,7 +29,7 @@ class Run(TimestampedModel, MethodModel):
         _("Run status"),
         max_length=45,
         choices=Status.choices,
-        default=Status.NEW,
+        default=Status.CREATED,
     )
 
     start_date = models.DateTimeField(_("Run start of period"), null=True, blank=True)

@@ -117,14 +117,14 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         self, request: HttpRequest, obj: Optional[Run] = None
     ) -> bool:
         return super().has_change_permission(request, obj) and (
-            not obj or obj.status == Run.Status.NEW
+            not obj or obj.status == Run.Status.CREATED
         )
 
     def has_delete_permission(
         self, request: HttpRequest, obj: Optional[Run] = None
     ) -> bool:
         return super().has_delete_permission(request, obj) and (
-            not obj or obj.status == Run.Status.NEW
+            not obj or obj.status == Run.Status.CREATED
         )
 
     def has_module_permission(self, request: HttpRequest) -> bool:

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-24 22:43+0100\n"
+"POT-Creation-Date: 2022-02-21 19:57+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -246,12 +246,28 @@ msgstr "En cours"
 msgid "Finished"
 msgstr "Terminé"
 
+<<<<<<< HEAD
 msgid "French"
 msgstr "Français"
 
 msgid "European"
 msgstr "Européen"
 
+||||||| parent of f846b1b (📝 Update Run statuses)
+msgid "French"
+msgstr "Français"
+
+msgid "European"
+msgstr "Européen"
+
+msgid "Projects"
+msgstr "Projets"
+
+=======
+msgid "Projects"
+msgstr "Projets"
+
+>>>>>>> f846b1b (📝 Update Run statuses)
 msgid "Project name"
 msgstr "Nom du projet"
 
@@ -266,6 +282,12 @@ msgstr "Commentaires"
 
 msgid "Status"
 msgstr "Statut"
+
+msgid "French"
+msgstr "Français"
+
+msgid "European"
+msgstr "Européen"
 
 msgid "Beam time request"
 msgstr "Demande de temps de faisceau"
@@ -291,17 +313,11 @@ msgstr "Description de a problématique étudiée par analyse de faisceau"
 msgid "Form type"
 msgstr "Type du formulaire"
 
-msgid "New"
-msgstr "Nouveau"
+msgid "Created"
+msgstr "Créé"
 
 msgid "Ask for execution"
 msgstr "Demande d'exécution"
-
-msgid "Planned"
-msgstr "Planifié"
-
-msgid "Started"
-msgstr "Démarré"
 
 msgid "Proton"
 msgstr "Proton"
@@ -500,9 +516,6 @@ msgstr "Run(s)"
 
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"
-
-msgid "Created"
-msgstr "Créé"
 
 msgid "Date this entry was first created"
 msgstr "Date de création de cette entrée"

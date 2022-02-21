@@ -9,28 +9,14 @@ from shared.models import TimestampedModel
 from .participation import Participation
 
 
-class ProjectStatus(models.IntegerChoices):
-    TO_SCHEDULE = 1, _("To schedule")
-    SCHEDULED = 11, _("Scheduled")
-    ONGOING = 21, _("Ongoing")
-    FINISHED = 31, _("Finished")
-
-
-class BeamTimeRequestType(models.TextChoices):
-    FRENCH = "French", _("French")
-    EUROPEAN = "European", _("European")
-    C2RMF = "C2RMF"
-    AGLAE = "AGLAE"
-
-
-class BeamTimeRequestFormType(models.TextChoices):
-    SCIENCESCALL = "Sciencescall"
-    HYPERION = "IPERION"
-    OSCAR = "OSCAR"
-
-
 class Project(TimestampedModel):
     """A project is a collection of runs done by the same team"""
+
+    class Status(models.IntegerChoices):
+        TO_SCHEDULE = 1, _("To schedule")
+        SCHEDULED = 11, _("Scheduled")
+        ONGOING = 21, _("Ongoing")
+        FINISHED = 31, _("Finished")
 
     class Meta:
         verbose_name = _("Project")
@@ -54,8 +40,8 @@ class Project(TimestampedModel):
 
     status = models.IntegerField(
         _("Status"),
-        choices=ProjectStatus.choices,
-        default=ProjectStatus.TO_SCHEDULE,
+        choices=Status.choices,
+        default=Status.TO_SCHEDULE,
     )
 
     def __str__(self):
@@ -72,6 +58,17 @@ class Project(TimestampedModel):
 class BeamTimeRequest(TimestampedModel):
     """A request to use AGLAE. The request can be related to an external form."""
 
+    class RequestType(models.TextChoices):
+        FRENCH = "French", _("French")
+        EUROPEAN = "European", _("European")
+        C2RMF = "C2RMF"
+        AGLAE = "AGLAE"
+
+    class FormType(models.TextChoices):
+        SCIENCESCALL = "Sciencescall"
+        HYPERION = "IPERION"
+        OSCAR = "OSCAR"
+
     class Meta:
         verbose_name = _("Beam time request")
         verbose_name_plural = _("Beam time requests")
@@ -79,7 +76,7 @@ class BeamTimeRequest(TimestampedModel):
     project = models.OneToOneField("lab.Project", on_delete=models.CASCADE)
 
     request_type = models.CharField(
-        _("Request type"), max_length=45, choices=BeamTimeRequestType.choices
+        _("Request type"), max_length=45, choices=RequestType.choices
     )
 
     request_id = models.CharField(
@@ -102,7 +99,7 @@ class BeamTimeRequest(TimestampedModel):
         _("Form type"),
         max_length=45,
         blank=True,
-        choices=BeamTimeRequestFormType.choices,
+        choices=FormType.choices,
     )
 
     def __str__(self) -> str:
