@@ -30,9 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   onCloseModal
-    .querySelector('[aria-controls="fr-modal-prdformclose-cancel"]')
+    ?.querySelector('[aria-controls="fr-modal-prdformclose-cancel"]')
     .addEventListener("click", () => handleModalClose(onCloseModal));
   onCloseModal
-    .querySelector('[aria-controls="fr-modal-prdformclose-confirm"]')
+    ?.querySelector('[aria-controls="fr-modal-prdformclose-confirm"]')
     .addEventListener("click", () => handleModalConfirm(onCloseModal));
 });

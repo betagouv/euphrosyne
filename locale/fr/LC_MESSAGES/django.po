@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-14 12:56+0100\n"
+"POT-Creation-Date: 2022-03-14 17:39+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -182,6 +182,37 @@ msgstr "Projet"
 msgid "Experimental conditions"
 msgstr "Conditions expérimentales"
 
+#, python-brace-format
+msgid ""
+"The run can't start while the following Run fields aren't defined: {fields}."
+msgstr ""
+"Le run ne peut démarrer tant que les champs suivants ne sont remplis: "
+"{fields}."
+
+msgid "The run can't start while no method is selected."
+msgstr "Le run ne peut démarrer tant qu'aucune méthode n'est sélectionnée"
+
+msgid "Impossible to change the state of a finished Run"
+msgstr "Impossible de modifier le statut d'un Run terminé"
+
+msgid "Only Admin users might validate and execute runs."
+msgstr "Seuls les utilisateurs Admin peuvents valider et éxécuter les runs."
+
+msgid "Change state"
+msgstr "Modification du chef de projet"
+
+msgid "Run {} successfully moved to status: {}."
+msgstr "Le Run {} a maintenant le statut: {}."
+
+msgid "Ask for execution"
+msgstr "Demande d'exécution"
+
+msgid "Start Run"
+msgstr "Démarrer le Run"
+
+msgid "Finish Run"
+msgstr "Terminé"
+
 msgid "Upload documents"
 msgstr "Téléverser des documents"
 
@@ -210,19 +241,6 @@ msgstr "La date de fin doit être après la date de début"
 
 msgid "Invalid filter choice"
 msgstr "Choix de filtre invalide"
-
-#, python-brace-format
-msgid ""
-"The run can't start while the following Run fields aren't defined: {fields}."
-msgstr ""
-"Le run ne peut démarrer tant que les champs suivants ne sont pas remplis: "
-"{fields}."
-
-msgid "The run can't start while no method is selected."
-msgstr "Le run ne peut démarrer tant qu'aucune méthode n'est remplie. "
-
-msgid "Only Admin users might validate and execute runs."
-msgstr "Seuls les utilisateurs Admin peuvent valider et exécuter des runs."
 
 msgid "Only Admin users might rewind runs."
 msgstr "Seuls les utilisateurs Admin peuvent remettre un run en arrière."
@@ -254,12 +272,6 @@ msgstr "En cours"
 msgid "Finished"
 msgstr "Terminé"
 
-msgid "French"
-msgstr "Français"
-
-msgid "European"
-msgstr "Européen"
-
 msgid "Project name"
 msgstr "Nom du projet"
 
@@ -274,6 +286,12 @@ msgstr "Commentaires"
 
 msgid "Status"
 msgstr "Statut"
+
+msgid "French"
+msgstr "Français"
+
+msgid "European"
+msgstr "Européen"
 
 msgid "Beam time request"
 msgstr "Demande de temps de faisceau"
@@ -299,17 +317,8 @@ msgstr "Description de a problématique étudiée par analyse de faisceau"
 msgid "Form type"
 msgstr "Type du formulaire"
 
-msgid "New"
-msgstr "Nouveau"
-
-msgid "Ask for execution"
-msgstr "Demande d'exécution"
-
-msgid "Planned"
-msgstr "Planifié"
-
-msgid "Started"
-msgstr "Démarré"
+msgid "Created"
+msgstr "Créé"
 
 msgid "Proton"
 msgstr "Proton"
@@ -562,9 +571,6 @@ msgstr "Run(s)"
 
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"
-
-msgid "Created"
-msgstr "Créé"
 
 msgid "Date this entry was first created"
 msgstr "Date de création de cette entrée"

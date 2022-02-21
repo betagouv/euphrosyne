@@ -5,7 +5,6 @@ from django.contrib.admin.utils import display_for_field
 from django.utils.html import format_html
 
 from ..models import Project
-from ..models.project import ProjectStatus
 
 register = template.Library()
 
@@ -16,14 +15,14 @@ def project_results(
     results: list[list[str]],
 ):
     def update_result(project: Project, result: list[str]) -> list[str]:
-        choice_identifier = ProjectStatus.names[
-            ProjectStatus.values.index(project.status)
+        choice_identifier = Project.Status.names[
+            Project.Status.values.index(project.status)
         ]
         class_name = choice_identifier.lower()
         display = display_for_field(1, project._meta.get_field("status"), "")
         result[list_display_status_index] = format_html(
             '<td class="field-status">'
-            f'<span class="fr-tag {class_name}">'
+            f'<span class="fr-tag fr-tag--sm {class_name}">'
             f"{display}"
             "</span>"
             "</td>"

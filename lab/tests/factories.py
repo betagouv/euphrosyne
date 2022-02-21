@@ -16,7 +16,7 @@ class StaffUserFactory(factory.django.DjangoModelFactory):
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
     email = factory.LazyAttribute(
-        lambda u: "{}.{}@example.com".format(u.first_name, u.last_name).lower()
+        lambda u: f"{u.first_name}.{u.last_name}@example.com".lower()
     )
     password = factory.Faker("password")
     is_staff = True
@@ -95,7 +95,8 @@ class RunForceNoMethodFactory(RunFactory):
 
 
 class RunReadyToAskExecFactory(RunFactory):
-    status = Run.Status.NEW
+    # pylint: disable=no-member
+    status = Run.Status.CREATED.value
     method_PIXE = True
 
 

@@ -20,14 +20,18 @@
 }
 
 .fr-tag.to_schedule {
-  background: #fcdf41;
+  background: var(--background-contrast-yellow-tournesol);
 }
 .fr-tag.scheduled {
-  background: #f7bfc3;
+  background: var(--background-contrast-red-marianne);
 }
 .fr-tag.ongoing {
-  background: #00eb5e;
+  background: var(--background-contrast-green-bourgeon);
 }
 .fr-tag.finished {
-  background: #9a9aff;
+  background: var(--background-contrast-blue-ecume);
+}
+
+td.field-status {
+  white-space: nowrap;
 }

@@ -14,6 +14,7 @@ from ..objects.fields import ObjectGroupChoiceField
 from ..permissions import LabRole, is_lab_admin
 from ..widgets import RelatedObjectRunWidgetWrapper, SplitDateTimeWithDefaultTime
 from .mixins import LabPermission, LabPermissionMixin
+from .run_actions import change_state
 
 
 class ObjectGroupInline(admin.TabularInline):
@@ -69,7 +70,7 @@ class ObjectGroupInline(admin.TabularInline):
 @admin.register(Run)
 class RunAdmin(LabPermissionMixin, ModelAdmin):
     class Media:
-        js = ("js/admin/methods.js",)
+        js = ("pages/run.js",)
         css = {
             "all": (
                 "css/admin/methods.css",
@@ -78,10 +79,8 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         }
 
     HIDE_ADD_SIDEBAR = True
-
     form = RunDetailsForm
-    list_display = ("project", "label", "start_date", "end_date")
-    readonly_fields = ("status",)
+    actions = [change_state]
     fieldsets = (
         (_("Project"), {"fields": ("project",)}),
         (
@@ -122,14 +121,14 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         self, request: HttpRequest, obj: Optional[Run] = None
     ) -> bool:
         return super().has_change_permission(request, obj) and (
-            not obj or obj.status == Run.Status.NEW
+            not obj or obj.status == Run.Status.CREATED
         )
 
     def has_delete_permission(
         self, request: HttpRequest, obj: Optional[Run] = None
     ) -> bool:
         return super().has_delete_permission(request, obj) and (
-            not obj or obj.status == Run.Status.NEW
+            not obj or obj.status == Run.Status.CREATED
         )
 
     def has_module_permission(self, request: HttpRequest) -> bool:
@@ -138,7 +137,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
     def get_readonly_fields(
         self, request: HttpRequest, obj: Optional[Run] = None
     ) -> Union[List[str], Tuple]:
-        readonly_fields = super().get_readonly_fields(request, obj)
+        readonly_fields = (*super().get_readonly_fields(request, obj), "status")
         if obj:
             readonly_fields += ("project",)
 

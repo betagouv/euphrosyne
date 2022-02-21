@@ -14,12 +14,11 @@ class Run(TimestampedModel, MethodModel):
             )
         ]
 
-    class Status(models.TextChoices):
-        NEW = "New", _("New")
-        ASK_FOR_EXECUTION = "Ask for execution", _("Ask for execution")
-        PLANNED = "Planned", _("Planned")
-        STARTED = "Started", _("Started")
-        FINISHED = "Finished", _("Finished")
+    class Status(models.IntegerChoices):
+        CREATED = 1, _("Created")
+        ASK_FOR_EXECUTION = 11, _("Ask for execution")
+        ONGOING = 21, _("Ongoing")
+        FINISHED = 31, _("Finished")
 
     class ParticleType(models.TextChoices):
         PROTON = "Proton", _("Proton")
@@ -31,11 +30,10 @@ class Run(TimestampedModel, MethodModel):
     )
     label = models.CharField(_("Run label"), max_length=255)
 
-    status = models.CharField(
+    status = models.IntegerField(
         _("Run status"),
-        max_length=45,
         choices=Status.choices,
-        default=Status.NEW,
+        default=Status.CREATED,
     )
 
     start_date = models.DateTimeField(_("Start date"), null=True, blank=True)
@@ -65,3 +63,13 @@ class Run(TimestampedModel, MethodModel):
 
     def __str__(self):
         return self.label
+
+    def next_status(self) -> Status:
+        if self.status is None:
+            return list(Run.Status)[0]
+        idx = Run.Status.values.index(self.status)
+        try:
+            next_status = list(Run.Status)[idx + 1]
+        except IndexError as exception:
+            raise AttributeError("Run has no next status") from exception
+        return next_status

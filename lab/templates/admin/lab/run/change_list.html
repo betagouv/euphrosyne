@@ -27,14 +27,20 @@
 {% block result_list %}
 {% if action_form and actions_on_top and cl.show_admin_actions %}{% admin_actions %}{% endif %}
 
-<div class="add-row align-right mt-30">
+<div class="add-row align-right">
   <a id="add_runs" class="fr-link" href="{% url 'admin:lab_run_add' %}?project={{ project.id }}">
     {% translate "Create a run"%}
   </a>
 </div>
 
-{% show_run_list cl %}
+{% show_run_list request cl %}
 
+<div class="run-footer">
+  <div class="add-row align-right">
+    <button id="run-changestate-action" type="submit" class="fr-btn" name="index" value="0" style="display: none"></button>
+  </div>
+<div>
 {% endblock %}
 
+{% block object-tools %}{% endblock %}
 {% block pagination %}{% endblock %}
