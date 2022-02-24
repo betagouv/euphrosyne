@@ -112,7 +112,7 @@ jobs:
       # -- endblock install --
 
       - name: Collect static files
-        run: python manage.py collectstatic --clear --noinput
+        run: rm -rf _static && python manage.py collectstatic --clear --noinput
 
       - name: Pytest
         run: python -m pytest .
