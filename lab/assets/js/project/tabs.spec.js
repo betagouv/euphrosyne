@@ -1,10 +1,6 @@
 /*global global*/
 import { jest } from "@jest/globals";
-import {
-  tabClickHandler,
-  handleModalClose,
-  
-} from "./tabs.js";
+import { tabClickHandler, handleModalClose } from "./tabs.js";
 
 describe("Test tabClickHandler", () => {
   describe("Nothing has changed", () => {
