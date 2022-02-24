@@ -1,5 +1,5 @@
-import "@gouvfr/dsfr/dist/core/core.module.min.js";
-import "@gouvfr/dsfr/dist/component/modal/modal.module.min.js";
+import "@gouvfr/dsfr/dist/core/core.module.js";
+import "@gouvfr/dsfr/dist/component/modal/modal.module.js";
 import {
   tabClickHandler,
   handleModalClose,
