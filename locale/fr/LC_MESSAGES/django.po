@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-17 12:41+0100\n"
+"POT-Creation-Date: 2022-02-24 22:43+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -396,6 +396,27 @@ msgstr "Voir"
 msgid "View on site"
 msgstr "Voir sur le site"
 
+msgid "Close"
+msgstr "Fermer"
+
+msgid "Are you sure you want to close this form?"
+msgstr "Êtes-vous sûr(e) de vouloir fermer ce formulaire ?"
+
+msgid ""
+"There are unsaved changes in the form. Changing tab will lose all changes. "
+"If you are not sure, cancel this action, check the form and save it."
+msgstr ""
+"Le formulaire contient des modifications qui ne sont pas encore "
+"sauvegardées. Changer d'ongler vous fera perdre toutes ces modifications. Si "
+"vous n'êtes pas sûr(e), annulez cette action, vérifiez le formulaire et "
+"sauvegardez-le."
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Yes, abandon changes"
+msgstr "Oui, abandonner les modifications"
+
 msgid "Please correct the error below."
 msgstr "Merci de corriger l'erreur ci-dessous"
 
@@ -415,46 +436,8 @@ msgstr "Ajouter %(name)s"
 msgid "Create a run"
 msgstr "Créer un run"
 
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
-"related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
-msgstr ""
-"La suppression de %(object_name)s '%(escaped_object)s' résultera en la "
-"suppression d'objets liés, mais votre compte n'a pas les permissions pour "
-"supprimer les objets des types suivants :"
-
-#, python-format
-msgid ""
-"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
-"following protected related objects:"
-msgstr ""
-"La suppression des objets %(object_name)s '%(escaped_object)s' nécessiterait "
-"la suppression des objets protégés suivants :"
-
-#, python-format
-msgid ""
-"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
-msgstr ""
-"Êtes-vous sûr(e) de vouloir supprimer l'objet %(object_name)s "
-"\"%(escaped_object)s\" ? Tous les objets liés suivants vont être supprimés :"
-
-msgid "Objects"
-msgstr "Objets"
-
-msgid "Yes, I’m sure"
-msgstr "Oui, je suis sûr(e)"
-
-msgid "No, close the window"
-msgstr "Non, fermer la fenêtre"
-
 msgid "Methods"
 msgstr "Méthodes"
-
-msgid "Popup closing…"
-msgstr "Fenêtre pop-up en cours de fermeture…"
 
 msgid "Delete"
 msgstr "Supprimer"
@@ -491,6 +474,9 @@ msgstr "Taille"
 
 msgid "No document yet"
 msgstr "Aucun document ajouté"
+
+msgid "Popup closing…"
+msgstr "Fenêtre pop-up en cours de fermeture…"
 
 msgid "Other"
 msgstr "Autre"
