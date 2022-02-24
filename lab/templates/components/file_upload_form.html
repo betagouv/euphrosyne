@@ -1,0 +1,16 @@
+{% load i18n %}
+<form is="file-upload-form" {% if component.attrs %}{% include "attrs.html" with attrs=component.attrs %}{% endif %}>
+    <div class="fr-mb-4w">
+        <div class="fr-upload-group">
+            <label class="fr-label" for="file-upload">{% translate 'Add files' %}
+            {% if component.hint_text %}
+            <span class="fr-hint-text">
+                {{ component.hint_text }}
+            </span>
+            {% endif %}
+        </label>
+        <input class="fr-upload" type="file" name="files" multiple required>
+    </div>
+    <input value="{% translate 'Upload' %}" class="button fr-mt-2w" type="submit" id="upload-button">
+    </div>
+</form>

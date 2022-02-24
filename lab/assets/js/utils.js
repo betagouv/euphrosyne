@@ -18,7 +18,7 @@ export function displayMessage(message, tag) {
       : event.target.parentElement
     ).remove()
   );
-  document.querySelector("ul.messagelist").appendChild(messageElement);
+  document.querySelector("ul.messagelist")?.appendChild(messageElement);
 }
 
 export function formatBytes(a, b = 2, k = 1024) {
@@ -33,4 +33,20 @@ export function formatBytes(a, b = 2, k = 1024) {
     : parseFloat((a / pow(k, d)).toFixed(max(0, b))) +
         " " +
         ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][d];
+}
+
+export function getCSRFToken() {
+  // Get CSRF token from cookies
+  // https://docs.djangoproject.com/en/4.0/ref/csrf/#ajax
+  const cookieName = "csrftoken";
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, cookieName.length + 1) === cookieName + "=") {
+        return decodeURIComponent(cookie.substring(cookieName.length + 1));
+      }
+    }
+  }
+  return null;
 }

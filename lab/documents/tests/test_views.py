@@ -33,10 +33,7 @@ class TestProjectDocumentsView(TestCase):
         request.user = self.project.leader.user
         view = ProjectDocumentsView()
         view.request = request
-        view.dispatch(
-            request,
-            project_id=self.project.id,
-        )
+        view.dispatch(request, self.project.id)
 
     def test_staff_users_are_forbidden(self):
         request = RequestFactory().get(
@@ -46,7 +43,4 @@ class TestProjectDocumentsView(TestCase):
         view = ProjectDocumentsView()
         view.request = request
         with self.assertRaises(PermissionDenied):
-            view.dispatch(
-                request,
-                project_id=self.project.id,
-            )
+            view.dispatch(request, self.project.id)

@@ -34,6 +34,13 @@ def project_tabs(project_id: int, request: HttpRequest):
                     "is_active": request.resolver_match.url_name
                     == "lab_project_documents",
                 },
+                {
+                    "id": "workplace-tab",
+                    "name": _("Workplace"),
+                    "url": reverse("admin:lab_project_workplace", args=[project_id]),
+                    "is_active": request.resolver_match.url_name
+                    == "lab_project_workplace",
+                },
             )
         }
     return None

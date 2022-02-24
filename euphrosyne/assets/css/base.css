@@ -187,3 +187,7 @@ label.required:after {
   display: block;
   margin-top: 5px;
 }
+
+ul li {
+  list-style-type: none;
+}
