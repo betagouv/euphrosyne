@@ -47,7 +47,7 @@ def test_presigned_document_list_url_successful_response():
 
 @patch("lab.models.Project.objects", MagicMock())
 @patch(
-    "lab.documents.api_views.create_presigned_document_download_url",
+    "lab.documents.api_views.create_presigned_download_url",
     MagicMock(return_value=""),
 )
 def test_presigned_presigned_document_download_url_successful_response():
@@ -65,7 +65,7 @@ def test_presigned_presigned_document_download_url_successful_response():
 
 @patch("lab.models.Project.objects", MagicMock())
 @patch(
-    "lab.documents.api_views.create_presigned_document_download_url",
+    "lab.documents.api_views.create_presigned_download_url",
     MagicMock(return_value=""),
 )
 def test_presigned_presigned_document_download_url_no_key_sends_bad_requests():
@@ -81,7 +81,7 @@ def test_presigned_presigned_document_download_url_no_key_sends_bad_requests():
 
 @patch("lab.models.Project.objects", MagicMock())
 @patch(
-    "lab.documents.api_views.create_presigned_document_download_url",
+    "lab.documents.api_views.create_presigned_download_url",
     MagicMock(return_value=""),
 )
 def test_presigned_presigned_document_download_url_wrong_key_sends_bad_requests():
@@ -99,7 +99,7 @@ def test_presigned_presigned_document_download_url_wrong_key_sends_bad_requests(
 
 @patch("lab.models.Project.objects", MagicMock())
 @patch(
-    "lab.documents.api_views.create_presigned_document_delete_url",
+    "lab.documents.api_views.create_presigned_delete_url",
     MagicMock(return_value=""),
 )
 def test_presigned_document_delete_url_successful_response():
@@ -117,7 +117,7 @@ def test_presigned_document_delete_url_successful_response():
 
 @patch("lab.models.Project.objects", MagicMock())
 @patch(
-    "lab.documents.api_views.create_presigned_document_delete_url",
+    "lab.documents.api_views.create_presigned_delete_url",
     MagicMock(return_value=""),
 )
 def test_presigned_document_delete_url_no_key_sends_bad_requests():
@@ -133,7 +133,7 @@ def test_presigned_document_delete_url_no_key_sends_bad_requests():
 
 @patch("lab.models.Project.objects", MagicMock())
 @patch(
-    "lab.documents.api_views.create_presigned_document_delete_url",
+    "lab.documents.api_views.create_presigned_delete_url",
     MagicMock(return_value=""),
 )
 def test_presigned_document_delete_url_wrong_key_sends_bad_requests():

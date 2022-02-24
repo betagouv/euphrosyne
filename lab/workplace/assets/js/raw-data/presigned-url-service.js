@@ -1,10 +1,11 @@
 "use strict";
 
-import { getCSRFToken } from "../../../assets/js/utils.js";
+import { getCSRFToken } from "../../../../assets/js/utils.js";
 
-export class DocumentPresignedUrlService {
-  constructor(projectId) {
+export class RawDataPresignedUrlService {
+  constructor(projectId, runId) {
     this.projectId = projectId;
+    this.runId = runId;
   }
 
   fetchURL(url) {
@@ -18,28 +19,28 @@ export class DocumentPresignedUrlService {
 
   async fetchDownloadPresignedURL(key) {
     const response = await this.fetchURL(
-      `/api/project/${this.projectId}/documents/presigned_download_url?key=${key}`
+      `/api/project/${this.projectId}/workplace/raw_data/presigned_download_url?key=${key}`
     );
     return (await response.json()).url;
   }
 
   async fetchDeletePresignedURL(key) {
     const response = await this.fetchURL(
-      `/api/project/${this.projectId}/documents/presigned_delete_url?key=${key}`
+      `/api/project/${this.projectId}/workplace/raw_data/presigned_delete_url?key=${key}`
     );
     return (await response.json()).url;
   }
 
   async fetchListPresignedUrl() {
     const response = await this.fetchURL(
-      `/api/project/${this.projectId}/documents/presigned_list_url`
+      `/api/project/${this.projectId}/workplace/${this.runId}/raw_data/presigned_list_url`
     );
     return (await response.json()).url;
   }
 
   async fetchUploadPresignedUrl() {
     const response = await this.fetchURL(
-      `/api/project/${this.projectId}/documents/presigned_post`
+      `/api/project/${this.projectId}/workplace/${this.runId}/raw_data/presigned_post`
     );
     return (await response.json()).url;
   }

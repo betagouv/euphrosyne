@@ -6,6 +6,7 @@ from django.urls.resolvers import URLResolver
 
 from lab.documents.views import ProjectDocumentsView
 from lab.views import ChangeLeaderView
+from lab.workplace.views import WorkplaceView
 
 
 class AdminSite(admin.AdminSite):
@@ -18,14 +19,19 @@ class AdminSite(admin.AdminSite):
     def get_urls(self) -> List[URLResolver]:
         return [
             path(
-                "admin/lab/project/<project_id>/leader/change",
+                "lab/project/<project_id>/leader/change",
                 self.admin_view(ChangeLeaderView.as_view()),
                 name="lab_project_leader_participation_change",
             ),
             path(
-                "admin/lab/project/<project_id>/documents",
+                "lab/project/<project_id>/documents",
                 self.admin_view(ProjectDocumentsView.as_view()),
                 name="lab_project_documents",
+            ),
+            path(
+                "lab/project/<project_id>/workplace",
+                self.admin_view(WorkplaceView.as_view()),
+                name="lab_project_workplace",
             ),
             *super().get_urls(),
         ]

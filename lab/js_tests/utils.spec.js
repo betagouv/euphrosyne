@@ -1,6 +1,6 @@
 "use strict";
 
-import { displayMessage, formatBytes } from "../assets/js/utils";
+import { displayMessage, formatBytes, getCSRFToken } from "../assets/js/utils";
 
 test("displays message", () => {
   document.body.innerHTML = '<ul class="messagelist"></ul>';
@@ -27,4 +27,12 @@ test("formatBytes function", () => {
     formatBytes(input),
   ]);
   expect(results).toStrictEqual(inputOutputMapping);
+});
+
+describe("Test getCSRFToken", () => {
+  it("gets token from cookie", () => {
+    document.cookie = "csrftoken=TOKEN";
+    const token = getCSRFToken();
+    expect(token).toBe("TOKEN");
+  });
 });

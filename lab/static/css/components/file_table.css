@@ -1,19 +1,10 @@
-#upload-form #upload-button {
-  float: none;
-}
-.documents-wrapper {
-  clear: both;
-}
-input[type="file"] {
-  cursor: pointer;
-}
-table#document_list {
+.file-table {
   width: 100%;
 }
-table#document_list tr.no_data {
+.file-table tr.no_data {
   text-align: center;
 }
-tr.loading td div {
+.file-table tr.loading td div {
   max-width: 150px;
   background-image: linear-gradient(
     90deg,
@@ -35,13 +26,13 @@ tr.loading td div {
     background-position: 140px;
   }
 }
-table#document_list td {
+.file-table td {
   vertical-align: middle;
 }
-table#document_list td button.download-btn,
-table#document_list td button.delete-btn {
+.file-table td button.download-btn,
+.file-table td button.delete-btn {
   margin-bottom: 0;
 }
-table#document_list td ul.fr-btns-group {
+.file-table td ul.fr-btns-group {
   margin: 0;
 }
