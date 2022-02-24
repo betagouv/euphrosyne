@@ -189,7 +189,7 @@ LOCALE_PATHS = ["locale"]
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "_static")
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
 STATICFILES_DIRS = [
     BASE_DIR / "euphrosyne/assets/dist",
