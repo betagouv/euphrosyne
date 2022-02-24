@@ -3,8 +3,6 @@
 import { validateFileInput, uploadDocuments } from "../upload.js";
 import { toggleLoading, fetchDocuments } from "../table.js";
 
-import "@gouvfr/dsfr/dist/component/component.min.css";
-import "@gouvfr/dsfr/dist/component/upload/upload.min.css";
 import "../../css/project-documents.css";
 
 const projectId = parseInt(document.URL.split("/").reverse()[1]);

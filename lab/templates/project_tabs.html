@@ -2,8 +2,8 @@
 <div class="project-tabs">
     <ul>
         {% for tab in tabs %}
-        <li class="{% if tab.is_active %}active{% endif %}">
-            <a href="{{ tab.url }}">{{ tab.name }}</a>
+        <li id="{{ tab.id }}" class="{% if tab.is_active %}active{% endif %}">
+            <a href="{{ tab.url }}" data-fr-opened="false">{{ tab.name }}</a>
             {% if tab.is_active %}<span class="underline"></span>{% endif %}
         </li>
         {% endfor %}

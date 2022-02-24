@@ -16,6 +16,8 @@ export default {
       "@gouvfr/dsfr/dist/component/tag/tag.min.css",
       "@gouvfr/dsfr/dist/component/tab/tab.min.css",
       "@gouvfr/dsfr/dist/component/card/card.min.css",
+      "@gouvfr/dsfr/dist/component/modal/modal.min.css",
+      "@gouvfr/dsfr/dist/component/button/button.min.css",
       "./euphrosyne/assets/css/base.css",
     ],
     ...Object.assign(

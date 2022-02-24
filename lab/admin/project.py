@@ -115,6 +115,7 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
     )
 
     class Media:
+        js = ("pages/project.js",)
         css = {"all": ("css/admin/project-admin.css",)}
 
     @staticmethod

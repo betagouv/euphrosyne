@@ -58,7 +58,8 @@
       "jest"
     ],
     "globals": {
-      "django": false
+      "django": false,
+      "dsfr": false
     },
     "env": {
       "browser": true,
