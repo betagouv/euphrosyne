@@ -3,7 +3,7 @@ import { jest } from "@jest/globals";
 import {
   tabClickHandler,
   handleModalClose,
-  handleModalConfirm,
+  
 } from "./tabs.js";
 
 describe("Test tabClickHandler", () => {
