@@ -227,8 +227,8 @@ class RunStatusBaseForm(ModelForm):
         model = models.Run
         fields = ("status",)
 
-    def _clean_status_not_new_mandatory_fields(self, cleaned_status):
-        if cleaned_status and cleaned_status != models.Run.Status.CREATED:
+    def _clean_status_not_created_mandatory_fields(self, cleaned_status):
+        if cleaned_status and cleaned_status != models.Run.Status.CREATED.value:
             missing_fields = [
                 rf for rf in self.MANDATORY_FIELDS if not getattr(self.instance, rf)
             ]
@@ -245,8 +245,8 @@ class RunStatusBaseForm(ModelForm):
                     code="missing_field_for_run_start",
                 )
 
-    def _clean_status_not_new_1_method_required(self, cleaned_status):
-        if cleaned_status and cleaned_status != models.Run.Status.CREATED:
+    def _clean_status_not_created_1_method_required(self, cleaned_status):
+        if cleaned_status and cleaned_status != models.Run.Status.CREATED.value:
             if all(
                 not getattr(self.instance, f.name)
                 for f in models.Run.get_method_fields()
@@ -260,8 +260,8 @@ class RunStatusBaseForm(ModelForm):
         cleaned_data = super().clean()
         cleaned_status = cleaned_data.get("status")
 
-        self._clean_status_not_new_mandatory_fields(cleaned_status)
-        self._clean_status_not_new_1_method_required(cleaned_status)
+        self._clean_status_not_created_mandatory_fields(cleaned_status)
+        self._clean_status_not_created_1_method_required(cleaned_status)
 
         return cleaned_data
 
@@ -274,16 +274,16 @@ class RunStatusMemberForm(RunStatusBaseForm):
     def clean_status(self):
         status = self.cleaned_data["status"]
         if status not in [
-            models.Run.Status.CREATED,
-            models.Run.Status.ASK_FOR_EXECUTION,
+            models.Run.Status.CREATED.value,
+            models.Run.Status.ASK_FOR_EXECUTION.value,
         ]:
             raise ValidationError(
                 _("Only Admin users might validate and execute runs."),
                 code="run_execution_not_allowed_to_members",
             )
         if self.instance and self.instance.status not in [
-            models.Run.Status.CREATED,
-            models.Run.Status.ASK_FOR_EXECUTION,
+            models.Run.Status.CREATED.value,
+            models.Run.Status.ASK_FOR_EXECUTION.value,
         ]:
 
             raise ValidationError(

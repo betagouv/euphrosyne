@@ -6,13 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('lab', '0015_alter_project_status'),
+        ("lab", "0015_alter_project_status"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='run',
-            name='new_status',
-            field=models.CharField(choices=[(1, 'Created'), (11, 'Ask for execution'), (21, 'Ongoing'), (31, 'Finished')], default=1, max_length=45, verbose_name='Run status'),
+            model_name="run",
+            name="new_status",
+            field=models.IntegerField(
+                choices=[
+                    (1, "Created"),
+                    (11, "Ask for execution"),
+                    (21, "Ongoing"),
+                    (31, "Finished"),
+                ],
+                default=1,
+                verbose_name="Run status",
+            ),
         ),
     ]
