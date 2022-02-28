@@ -43,6 +43,11 @@ export default {
   module: {
     rules: [
       {
+        test: /\.js$/i,
+        enforce: "pre",
+        use: ["source-map-loader"],
+      },
+      {
         test: /\.css$/i,
         use: [MiniCssExtractPlugin.loader, "css-loader"],
       },

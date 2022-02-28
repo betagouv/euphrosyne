@@ -37,6 +37,7 @@
     "glob": "^7.2.0",
     "mini-css-extract-plugin": "^2.4.5",
     "promise-polyfill": "8.2.1",
+    "source-map-loader": "^3.0.1",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1",
     "whatwg-fetch": "^3.6.2"
