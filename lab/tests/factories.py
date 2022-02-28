@@ -97,7 +97,7 @@ class RunForceNoMethodFactory(RunFactory):
 
 
 class RunReadyToAskExecFactory(RunFactory):
-    status = Run.Status.CREATED
+    status = Run.Status.CREATED.value
     method_PIXE = True
 
 

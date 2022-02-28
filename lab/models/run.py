@@ -25,9 +25,8 @@ class Run(TimestampedModel, MethodModel):
     )
     label = models.CharField(_("Run label"), max_length=255, unique=True)
 
-    status = models.CharField(
+    status = models.IntegerField(
         _("Run status"),
-        max_length=45,
         choices=Status.choices,
         default=Status.CREATED,
     )
