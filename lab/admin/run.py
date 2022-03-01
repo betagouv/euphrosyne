@@ -67,7 +67,7 @@ class ObjectGroupInline(admin.TabularInline):
 @admin.register(Run)
 class RunAdmin(LabPermissionMixin, ModelAdmin):
     class Media:
-        js = ("js/admin/methods.js",)
+        js = ("pages/run.js",)
         css = {
             "all": (
                 "css/admin/methods.css",

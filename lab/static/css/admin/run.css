@@ -5,10 +5,11 @@
 .mt-30 {
   margin-top: 30px;
 }
-.run-card__actions {
-  margin-top: 12px;
+
+.action-select {
+  display: none;
 }
 
-#change-link {
-  padding: 5px;
+.actions {
+  display: none;
 }
