@@ -13,3 +13,20 @@
 .actions {
   display: none;
 }
+
+.run-clickable-card {
+  cursor: pointer;
+  padding: 6px;
+}
+
+.run-clickable-card__selected {
+  border: 4px solid var(--breadcrumbs-bg);
+  padding: 2px;
+}
+
+#run-changestate-action {
+  color: var(--primary-fg);
+  padding: 0.5em 1em;
+  font-weight: bold;
+  font-size: large;
+}

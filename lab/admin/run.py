@@ -14,6 +14,7 @@ from ..models import Project, Run
 from ..permissions import LabRole, is_lab_admin
 from ..widgets import PlaceholderSelect, SplitDateTimeWithDefaultTime
 from .mixins import LabPermission, LabPermissionMixin
+from .run_actions import change_state
 
 
 class ObjectGroupInline(admin.TabularInline):
@@ -76,10 +77,8 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         }
 
     HIDE_ADD_SIDEBAR = True
-
     form = RunDetailsForm
-    list_display = ("project", "label", "start_date", "end_date")
-    readonly_fields = ("status",)
+    actions = [change_state]
     fieldsets = (
         (_("Project"), {"fields": ("project",)}),
         (

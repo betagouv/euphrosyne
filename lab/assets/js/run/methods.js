@@ -1,3 +1,9 @@
+export function getMethodInputs() {
+  return document.querySelectorAll(
+    ".method-field-wrapper > input,.detector-field-wrapper > input"
+  );
+}
+
 function getSubFieldsElement(inputElement) {
   return inputElement.parentElement.nextElementSibling;
 }

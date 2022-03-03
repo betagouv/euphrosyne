@@ -33,8 +33,11 @@
   </a>
 </div>
 
-{% show_run_list cl %}
+{% show_run_list request cl %}
 
+<div class="add-row align-right">
+  <button id="run-changestate-action" type="submit" class="button fr-link" title="" name="index" value="0"></button>
+</div>
 {% endblock %}
 
 {% block object-tools %}{% endblock %}
