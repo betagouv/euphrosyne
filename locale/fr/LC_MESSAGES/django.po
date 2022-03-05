@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 19:57+0100\n"
+"POT-Creation-Date: 2022-03-05 17:44+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -184,6 +184,36 @@ msgstr "Projet"
 msgid "Experimental conditions"
 msgstr "Conditions expérimentales"
 
+#, python-brace-format
+msgid ""
+"The run can't start while the following Run fields aren't defined: {fields}."
+msgstr ""
+
+msgid "The run can't start while no method is selected."
+msgstr ""
+
+msgid "Impossible to change the state of a finished Run"
+msgstr ""
+
+msgid "Only Admin users might validate and execute runs."
+msgstr ""
+
+#, fuzzy
+#| msgid "Change leader"
+msgid "Change state"
+msgstr "Modification du chef de projet"
+
+msgid "Ask for execution"
+msgstr "Demande d'exécution"
+
+msgid "Start Run"
+msgstr ""
+
+#, fuzzy
+#| msgid "Finished"
+msgid "Finish Run"
+msgstr "Terminé"
+
 msgid "Upload documents"
 msgstr "Téléverser des documents"
 
@@ -246,28 +276,6 @@ msgstr "En cours"
 msgid "Finished"
 msgstr "Terminé"
 
-<<<<<<< HEAD
-msgid "French"
-msgstr "Français"
-
-msgid "European"
-msgstr "Européen"
-
-||||||| parent of f846b1b (📝 Update Run statuses)
-msgid "French"
-msgstr "Français"
-
-msgid "European"
-msgstr "Européen"
-
-msgid "Projects"
-msgstr "Projets"
-
-=======
-msgid "Projects"
-msgstr "Projets"
-
->>>>>>> f846b1b (📝 Update Run statuses)
 msgid "Project name"
 msgstr "Nom du projet"
 
@@ -315,9 +323,6 @@ msgstr "Type du formulaire"
 
 msgid "Created"
 msgstr "Créé"
-
-msgid "Ask for execution"
-msgstr "Demande d'exécution"
 
 msgid "Proton"
 msgstr "Proton"
