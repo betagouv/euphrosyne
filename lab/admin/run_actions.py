@@ -54,7 +54,7 @@ def send_message(request, message: str):
 
 
 @admin.action(description=_("Change state"))
-def change_state(modeladmin, request, queryset):
+def change_state(_modeladmin, request, queryset):
     """Change state forward"""
     try:
         for run in queryset:
@@ -62,8 +62,8 @@ def change_state(modeladmin, request, queryset):
             validate_mandatory_fields(run)
             validate_1_method_required(run)
             validate_execute_needs_admin(request.user, run)
-    except ValidationError as e:
-        send_message(request, e.message)
+    except ValidationError as exception:
+        send_message(request, exception.message)
 
 
 def get_change_state_text(labadmin: bool, run: Run) -> Optional[str]:

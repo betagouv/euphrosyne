@@ -1,3 +1,5 @@
+# pylint: disable=redefined-outer-name
+# pylint: disable=no-member
 from unittest import mock
 
 import pytest
@@ -64,7 +66,7 @@ def test_change_state_class_message(modeladmin, changelist_request):
     [s for s in Run.Status if s != Run.Status.FINISHED],
 )
 def test_not_last_state_can_change(status):
-    run = factories.RunReadyToAskExecFactory.build()
+    run = factories.RunReadyToAskExecFactory.build(status=status)
 
     run_actions.validate_not_last_state(run)
 

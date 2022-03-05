@@ -1,3 +1,4 @@
+# pylint: disable=consider-using-f-string
 from unittest.mock import MagicMock, patch
 
 from django.http.response import JsonResponse

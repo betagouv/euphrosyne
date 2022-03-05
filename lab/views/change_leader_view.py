@@ -85,7 +85,7 @@ class ChangeLeaderView(StaffUserRequiredMixin, FormView):
         return {
             **super().get_context_data(**kwargs),
             **site.each_context(self.request),
-            "subtitle": "{} | {}".format(self.project.name, _("Change leader")),
+            "subtitle": self.project.name + " | " + _("Change leader"),
             "project": self.project,
             "is_popup": IS_POPUP_VAR in self.request.GET,
             "is_popup_var": IS_POPUP_VAR,

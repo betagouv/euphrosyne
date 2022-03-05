@@ -21,8 +21,8 @@ def project_tabs(project_id: int, request: HttpRequest):
                 {
                     "id": "runs-tab",
                     "name": _("Run(s)"),
-                    "url": "{}?project={}".format(
-                        reverse("admin:lab_run_changelist"), project_id
+                    "url": (
+                        reverse("admin:lab_run_changelist") + f"?project={project_id}"
                     ),
                     "is_active": request.resolver_match.url_name
                     in ["lab_run_changelist", "lab_run_change", "lab_run_add"],

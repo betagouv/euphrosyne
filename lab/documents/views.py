@@ -33,6 +33,6 @@ class ProjectDocumentsView(StaffUserRequiredMixin, TemplateView):
         return {
             **super().get_context_data(**kwargs),
             **site.each_context(self.request),
-            "subtitle": "{} | {}".format(self.project.name, _("Upload documents")),
+            "subtitle": self.project.name + " | " + _("Upload documents"),
             "project": self.project,
         }
