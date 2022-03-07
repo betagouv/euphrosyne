@@ -3,7 +3,7 @@
   <div class="fr-grid-row fr-grid-row--gutters">
     {% for run in runs %}
     <div class="fr-col-6">
-      <div id="runs-{{ run.id }}" class="run-clickable-card fr-card fr-card--no-arrow" data-runid="{{ run.id }}" data-changestateaction="{{ run.change_state_action_name }}">
+      <div id="runs-{{ run.id }}" class="run-clickable-card fr-card fr-card--no-arrow" data-runid="{{ run.id }}" data-changestateaction="{% if run.change_state_action_name %}{{ run.change_state_action_name }}{% endif %}">
         <div class="fr-card__body">      
           <h4 class="fr-card__title flex-container">
             {{ run.label }}

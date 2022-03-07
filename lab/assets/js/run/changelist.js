@@ -35,12 +35,10 @@ export const toggleRunSelection = (card) => {
 
   if (card.dataset.changestateaction) {
     getRunChangeStateActionButton().style.display = null;
-    getRunChangeStateActionButton().title = card.dataset.changestateaction;
-    getRunChangeStateActionButton().innerHTML = card.dataset.changestateaction;
+    getRunChangeStateActionButton().innerText = card.dataset.changestateaction;
   } else {
     getRunChangeStateActionButton().style.display = "none";
-    getRunChangeStateActionButton().title = "";
-    getRunChangeStateActionButton().innerHTML = "";
+    getRunChangeStateActionButton().innerText = "";
   }
 };
 
