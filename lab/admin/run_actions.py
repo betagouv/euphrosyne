@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
@@ -49,8 +49,13 @@ def validate_execute_needs_admin(user: User, run: Run):
         )
 
 
-def send_message(request, message: str):
-    messages.error(request, message)
+def send_message(request, message: str, kind: Literal["error", "success"]):
+    getattr(messages, kind)(request, message)
+
+
+def change_status(run: Run):
+    run.status = run.next_status()
+    run.save()
 
 
 @admin.action(description=_("Change state"))
@@ -63,7 +68,17 @@ def change_state(_modeladmin, request, queryset):
             validate_1_method_required(run)
             validate_execute_needs_admin(request.user, run)
     except ValidationError as exception:
-        send_message(request, exception.message)
+        send_message(request, exception.message, "error")
+    else:
+        for run in queryset:
+            change_status(run)
+            send_message(
+                request,
+                _("Run {} successfully moved to status: {}.").format(
+                    run.id, run.status.label
+                ),
+                "success",
+            )
 
 
 def get_change_state_text(labadmin: bool, run: Run) -> Optional[str]:

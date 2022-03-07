@@ -59,6 +59,16 @@ class Run(TimestampedModel, MethodModel):
     def __str__(self):
         return self.label
 
+    def next_status(self) -> Status:
+        if self.status is None:
+            return list(Run.Status)[0]
+        idx = Run.Status.values.index(self.status)
+        try:
+            next_status = list(Run.Status)[idx + 1]
+        except IndexError as exception:
+            raise AttributeError("Run has no next status") from exception
+        return next_status
+
 
 class ObjectGroup(models.Model):
     label = models.CharField(

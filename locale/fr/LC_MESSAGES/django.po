@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-05 17:44+0100\n"
+"POT-Creation-Date: 2022-03-07 23:50+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -198,18 +198,19 @@ msgstr ""
 msgid "Only Admin users might validate and execute runs."
 msgstr ""
 
-#, fuzzy
 #| msgid "Change leader"
 msgid "Change state"
 msgstr "Modification du chef de projet"
+
+msgid "Run {} successfully moved to status: {}."
+msgstr "Le Run {} a maintenant le statut: {}."
 
 msgid "Ask for execution"
 msgstr "Demande d'exécution"
 
 msgid "Start Run"
-msgstr ""
+msgstr "Démarrer le Run"
 
-#, fuzzy
 #| msgid "Finished"
 msgid "Finish Run"
 msgstr "Terminé"

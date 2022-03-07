@@ -31,7 +31,10 @@ def changelist_request():
 @mock.patch.object(run_actions, "validate_not_last_state", mock.Mock())
 @mock.patch.object(run_actions, "validate_execute_needs_admin", mock.Mock())
 @mock.patch.object(run_actions, "send_message", mock.Mock())
-def test_change_state_calls_validators(modeladmin, changelist_request):
+@mock.patch.object(run_actions, "change_status", mock.Mock())
+def test_change_state_calls_validators_and_changes_status(
+    modeladmin, changelist_request
+):
     queryset = [Run()]
     changelist_request.user = None
 
@@ -41,6 +44,7 @@ def test_change_state_calls_validators(modeladmin, changelist_request):
     run_actions.validate_1_method_required.assert_called_once()
     run_actions.validate_not_last_state.assert_called_once()
     run_actions.validate_execute_needs_admin.assert_called_once()
+    run_actions.change_status.assert_called_once()
 
 
 @mock.patch.object(run_actions, "validate_mandatory_fields", mock.Mock())
@@ -52,13 +56,14 @@ def test_change_state_calls_validators(modeladmin, changelist_request):
     mock.Mock(side_effect=ValidationError("test")),
 )
 @mock.patch.object(run_actions, "send_message", mock.Mock())
+@mock.patch.object(run_actions, "change_status", mock.Mock())
 def test_change_state_class_message(modeladmin, changelist_request):
     queryset = [Run()]
     changelist_request.user = None
 
     run_actions.change_state(modeladmin, changelist_request, queryset)
 
-    run_actions.send_message.assert_called_with(changelist_request, "test")
+    run_actions.send_message.assert_called_with(changelist_request, "test", "error")
 
 
 @pytest.mark.parametrize(
