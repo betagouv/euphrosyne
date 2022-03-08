@@ -4,9 +4,7 @@ import factory
 import factory.fuzzy
 from django.contrib.auth import get_user_model
 
-from lab.models.run import Object, ObjectGroup
-
-from ..models import Participation, Project, Run
+from ..models import Object, ObjectGroup, Participation, Project, Run
 
 NOW = datetime.now(tz=timezone.utc)
 
@@ -115,6 +113,7 @@ class ObjectGroupFactory(factory.django.DjangoModelFactory):
     label = factory.Faker("words")
     dating = factory.fuzzy.FuzzyChoice(["XXe", "XIXe", "XVIIIe", "XVIIe"])
     materials = factory.fuzzy.FuzzyChoice(["wood", "stone", "glass", "metal"], list)
+    object_count = 3
 
     @factory.post_generation
     def objects(self, *args, **kwargs):

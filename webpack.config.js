@@ -14,11 +14,12 @@ export default {
       "@gouvfr/dsfr/dist/core/core.module.min.js",
       "@gouvfr/dsfr/dist/core/core.min.css",
       "@gouvfr/dsfr/dist/component/link/link.min.css",
+      "@gouvfr/dsfr/dist/component/button/button.min.css",
       "@gouvfr/dsfr/dist/component/tag/tag.min.css",
       "@gouvfr/dsfr/dist/component/tab/tab.min.css",
       "@gouvfr/dsfr/dist/component/card/card.min.css",
       "@gouvfr/dsfr/dist/component/modal/modal.min.css",
-      "@gouvfr/dsfr/dist/component/button/button.min.css",
+      "@gouvfr/dsfr/dist/component/accordion/accordion.min.css",
       "./euphrosyne/assets/css/base.css",
     ],
     ...Object.assign(
@@ -58,6 +59,15 @@ export default {
         generator: {
           filename: "./fonts/[name][ext]",
         },
+      },
+      {
+        test: /\.js$/,
+        enforce: "pre",
+        use: ["source-map-loader"],
+      },
+      {
+        test: /\.html$/i,
+        loader: "html-loader",
       },
     ],
   },

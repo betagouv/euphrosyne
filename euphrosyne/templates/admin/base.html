@@ -4,6 +4,10 @@
 <link rel="stylesheet" type="text/css" href="{% static "admin/css/base.css" %}">
 <link rel="stylesheet" type="text/css" href="{% static "main.css"%}"></link>
 {% endblock %}
+{% block extrahead %}
+{{ block.super }}
+<script type="text/javascript" src="{% static 'main.js' %}"></script>
+{% endblock %}
 
 {% block welcome-msg %}
     <strong>{% firstof user.get_full_name user.get_username %}</strong>
@@ -14,7 +18,3 @@
     <a href="{% url 'admin:logout' %}" id="logout-link">{% translate 'Log out' %}</a>
 {% endblock %}
 
-{% block footer %}
-{{ block.super }}
-<script src="{% static 'main.js' %}"></script>
-{% endblock %}
