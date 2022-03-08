@@ -1,6 +1,7 @@
 {% load i18n static %}
 <nav class="sidebar" id="euphrosyne-main-sidebar" role="navigation" aria-controls="main-sidebar"
     aria-label="{% translate 'Main menu' %}">
+    <h1 class="sidebar-title">{{ site_header|default:_("Django") }}</h1>
     <ul class="sidebar-menu">
         {% if request.user.is_lab_admin %}
             {% include "./nav_item.html" with href="/admin/" exact_path=True title=_("Dashboard") icon="<i class=\"ri-dashboard-line\" aria-hidden=\"true\"></i>" %}
