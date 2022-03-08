@@ -566,9 +566,6 @@ msgstr "Menu principal"
 msgid "Dashboard"
 msgstr "Dashboard"
 
-msgid "Projects"
-msgstr "Projets"
-
 msgid "Users"
 msgstr "Utilisateurs"
 
