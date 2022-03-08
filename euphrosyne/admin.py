@@ -1,4 +1,5 @@
 from typing import List
+from django.shortcuts import redirect
 
 from django.contrib import admin
 from django.urls import path
@@ -44,3 +45,9 @@ class AdminSite(admin.AdminSite):
                 if getattr(model_admin, "HIDE_ADD_SIDEBAR", None):
                     model_dict["add_url"] = None
         return app_list
+
+    def index(self, request, extra_context=None):
+        if not request.user.is_lab_admin and request.path == "/admin/":
+            return redirect("/admin/lab/project/")
+
+        return super().index(request, extra_context=extra_context)
