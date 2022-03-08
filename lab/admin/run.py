@@ -2,17 +2,17 @@ from datetime import time
 from typing import Any, List, Optional, Tuple, Type, Union
 
 from django.contrib import admin
-from django.contrib.admin import ModelAdmin, widgets
+from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import InlineModelAdmin
 from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
-from ..fields import ObjectGroupChoiceField
 from ..forms import RunDetailsForm
 from ..models import Project, Run
+from ..objects.fields import ObjectGroupChoiceField
 from ..permissions import LabRole, is_lab_admin
-from ..widgets import PlaceholderSelect, SplitDateTimeWithDefaultTime
+from ..widgets import RelatedObjectRunWidgetWrapper, SplitDateTimeWithDefaultTime
 from .mixins import LabPermission, LabPermissionMixin
 
 
@@ -20,9 +20,12 @@ class ObjectGroupInline(admin.TabularInline):
     template = "admin/edit_inline/tabular_objectgroup_in_run.html"
     parent_instance: Run
     model = Run.run_object_groups.through
-    verbose_name = _("Batch of objects")
-    verbose_name_plural = _("Batches of objects")
+    verbose_name = _("Object / Sample")
+    verbose_name_plural = _("Object(s) / Sample(s)")
     extra = 0
+
+    class Media:
+        js = ("pages/objectgroup-inline.js",)
 
     def has_view_permission(
         self, request: HttpRequest, obj: Optional[Run] = None
@@ -49,9 +52,8 @@ class ObjectGroupInline(admin.TabularInline):
             # pylint: disable=no-member
             return ObjectGroupChoiceField(
                 project_id=self.parent_instance.project_id,
-                widget=widgets.RelatedFieldWidgetWrapper(
-                    PlaceholderSelect(),
-                    Run.run_object_groups.rel,
+                widget=RelatedObjectRunWidgetWrapper(
+                    self.parent_instance,
                     admin_site=self.admin_site,
                     can_add_related=True,
                 ),
@@ -88,7 +90,10 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         ),
         (
             _("Experimental conditions"),
-            {"fields": ("particle_type", "energy_in_keV", "beamline")},
+            {
+                "fields": ("particle_type", "energy_in_keV", "beamline"),
+                "classes": ("mb-0",),
+            },
         ),
         (
             "METHODS",

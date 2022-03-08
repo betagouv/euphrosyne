@@ -1,6 +1,3 @@
-import enum
-from typing import Any, Dict, Mapping
-
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms.fields import BooleanField
@@ -12,7 +9,6 @@ from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
 from lab.emails import send_project_invitation_email
-from lab.models.run import ObjectGroup
 
 from . import models, widgets
 from .controlled_datalist import controlled_datalist_form
@@ -220,63 +216,77 @@ class RunDetailsForm(ModelForm):
         return cleaned_data, errors
 
 
-class ObjectGroupAddChoices(enum.Enum):
-    OBJECT_GROUP = "OBJECT_GROUP", _("Group of objects")
-    SINGLE_OBJECT = "SINGLE_OBJECT", _("One object")
-
-    @classmethod
-    def to_choices(cls):
-        return (choice.value for choice in cls)
-
-
-class ObjectGroupForm(forms.ModelForm):
-    add_type = forms.ChoiceField(
-        label="",
-        choices=ObjectGroupAddChoices.to_choices(),
-        widget=widgets.ChoiceTag(),
-    )
+class RunStatusBaseForm(ModelForm):
+    MANDATORY_FIELDS = ("label", "start_date", "end_date", "beamline")
 
     class Meta:
-        model = ObjectGroup
-        fields = ("add_type", "label", "materials", "dating", "inventory", "collection")
-        help_texts = {"materials": _("Separate each material with a comma")}
-        widgets = {"materials": widgets.TagsInput()}
+        model = models.Run
+        fields = ("status",)
 
-    def __init__(self, *args, **kwargs: Mapping[str, Any]) -> None:
-        super().__init__(*args, **kwargs)
-        if self.instance.id:
-            self.fields["add_type"].required = False
-            self.fields["add_type"].widget.attrs["disabled"] = "disabled"
-            self.fields["add_type"].initial = (
-                ObjectGroupAddChoices.OBJECT_GROUP.value[0]
-                if self.instance.object_set.count() > 1
-                else ObjectGroupAddChoices.SINGLE_OBJECT.value[0]
-            )
-            if self.instance.object_set.count() == 1:
-                self.fields["label"].widget = forms.HiddenInput()
-        else:
-            self.fields["add_type"].initial = ObjectGroupAddChoices.OBJECT_GROUP.value[
-                0
+    def _clean_status_not_new_mandatory_fields(self, cleaned_status):
+        if cleaned_status and cleaned_status != models.Run.Status.NEW:
+            missing_fields = [
+                rf for rf in self.MANDATORY_FIELDS if not getattr(self.instance, rf)
             ]
+            missing_fields_verbose = [
+                str(_(models.Run._meta.get_field(field_name).verbose_name))
+                for field_name in missing_fields
+            ]
+            if missing_fields:
+                raise ValidationError(
+                    _(
+                        "The run can't start while the following Run fields aren't "
+                        "defined: {fields}."
+                    ).format(fields=", ".join(missing_fields_verbose)),
+                    code="missing_field_for_run_start",
+                )
 
-    def clean(self) -> Dict[str, Any]:
+    def _clean_status_not_new_1_method_required(self, cleaned_status):
+        if cleaned_status and cleaned_status != models.Run.Status.NEW:
+            if all(
+                not getattr(self.instance, f.name)
+                for f in models.Run.get_method_fields()
+            ):
+                raise ValidationError(
+                    _("The run can't start while no method is selected."),
+                    code="ask_exec_not_allowed_if_no_method",
+                )
+
+    def clean(self):
         cleaned_data = super().clean()
-        add_type = cleaned_data.get("add_type")
-        if add_type == ObjectGroupAddChoices.OBJECT_GROUP.value[
-            0
-        ] and not cleaned_data.get("label"):
-            raise ValidationError(
-                {
-                    "label": ValidationError(
-                        _(
-                            "Group label must be specified "
-                            "when adding multiple objects"
-                        ),
-                        code="label-required-for-mulitple-objects",
-                    )
-                }
-            )
+        cleaned_status = cleaned_data.get("status")
+
+        self._clean_status_not_new_mandatory_fields(cleaned_status)
+        self._clean_status_not_new_1_method_required(cleaned_status)
+
         return cleaned_data
+
+
+class RunStatusAdminForm(RunStatusBaseForm):
+    pass
+
+
+class RunStatusMemberForm(RunStatusBaseForm):
+    def clean_status(self):
+        status = self.cleaned_data["status"]
+        if status not in [
+            models.Run.Status.NEW,
+            models.Run.Status.ASK_FOR_EXECUTION,
+        ]:
+            raise ValidationError(
+                _("Only Admin users might validate and execute runs."),
+                code="run_execution_not_allowed_to_members",
+            )
+        if self.instance and self.instance.status not in [
+            models.Run.Status.NEW,
+            models.Run.Status.ASK_FOR_EXECUTION,
+        ]:
+
+            raise ValidationError(
+                _("Only Admin users might rewind runs."),
+                code="run_rewinding_not_allowed_to_members",
+            )
+        return status
 
 
 class BeamTimeRequestForm(ModelForm):

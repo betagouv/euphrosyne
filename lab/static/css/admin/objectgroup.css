@@ -1,0 +1,22 @@
+#objects-group tr:first-child .inline-deletelink {
+  display: none !important;
+}
+
+fieldset div.field-label label {
+  font-weight: bold;
+  color: var(--body-fg);
+}
+
+h3.fr-accordion__title {
+  padding-left: 0;
+  padding-right: 0;
+  margin-top: 0;
+}
+
+input:disabled {
+  background-color: var(--grey-950-100);
+}
+
+form .aligned ul {
+  margin-left: 0;
+}

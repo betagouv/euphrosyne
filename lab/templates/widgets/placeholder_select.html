@@ -1,7 +1,7 @@
 {% load i18n %}
 <select name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
     <option value="" disabled selected>
-        {% translate "Select an object group" %}
+        {% translate "Select an object or a group of objects" %}
     </option>
     {% for group_name, group_choices, group_index in widget.optgroups %}
         {% if group_name %}

@@ -19,3 +19,7 @@
 .bg-white {
   background-color: white;
 }
+
+.overflow-auto {
+  overflow: auto;
+}

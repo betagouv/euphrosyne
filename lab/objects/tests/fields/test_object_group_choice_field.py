@@ -1,7 +1,7 @@
 from django.test import TestCase
 
+from ....tests.factories import ObjectGroupFactory, RunFactory
 from ...fields import ObjectGroupChoiceField
-from ..factories import ObjectGroupFactory, RunFactory
 
 
 class TestObjectGroupChoiceField(TestCase):

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-07 15:21+0100\n"
+"POT-Creation-Date: 2022-03-09 11:17+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -137,20 +137,6 @@ msgstr "Déconnexion"
 msgid "Log in with ORCID"
 msgstr "Se connecter avec ORCID"
 
-msgid "Object"
-msgstr "Objet"
-
-msgid ""
-"An object group can contain multiple objects                         or just "
-"one object. You can specify collection                        and inventory "
-"at the group level or per object.                        Use the total "
-"number field in the case of multiple                         similar objects."
-msgstr ""
-"Un lot d'objet peut contenir plusieurs objets ou un seul uniquement. Il est "
-"possible de spécifier la collection et l'inventaire au niveau du group ou "
-"pour chaque objet. Le champ dédié au nombre total par objet est utilse lors "
-"d'un ajout de plusieurs objets similaires."
-
 msgid "Project member"
 msgstr "Membre du projet"
 
@@ -172,11 +158,11 @@ msgstr "Informations essentielles"
 msgid "Projects"
 msgstr "Projets"
 
-msgid "Batch of objects"
-msgstr "Lot d'objets"
+msgid "Object / Sample"
+msgstr "Objet / Échantillon"
 
-msgid "Batches of objects"
-msgstr "Lots d'objets"
+msgid "Object(s) / Sample(s)"
+msgstr "Objet(s) / Échantillon(s)"
 
 msgid "Project"
 msgstr "Projet"
@@ -213,18 +199,21 @@ msgstr "La date de fin doit être après la date de début"
 msgid "Invalid filter choice"
 msgstr "Choix de filtre invalide"
 
-msgid "Group of objects"
-msgstr "Groupe d'objets"
-
-msgid "One object"
-msgstr "Objet unique"
-
-msgid "Separate each material with a comma"
-msgstr "Séparez chaque matériau par une virgule"
-
-msgid "Group label must be specified when adding multiple objects"
+#, python-brace-format
+msgid ""
+"The run can't start while the following Run fields aren't defined: {fields}."
 msgstr ""
-"L'intitulé de groupe doit etre spécifié lors d'un ajout de plusieurs objets"
+"Le run ne peut démarrer tant que les champs suivants ne sont pas remplis: "
+"{fields}."
+
+msgid "The run can't start while no method is selected."
+msgstr "Le run ne peut démarrer tant qu'aucune méthode n'est remplie. "
+
+msgid "Only Admin users might validate and execute runs."
+msgstr "Seuls les utilisateurs Admin peuvent valider et exécuter des runs."
+
+msgid "Only Admin users might rewind runs."
+msgstr "Seuls les utilisateurs Admin peuvent remettre un run en arrière."
 
 msgid "{} analysis technique"
 msgstr "technique d'analyse {}"
@@ -347,12 +336,41 @@ msgid "Beamline"
 msgstr "Ligne de faisceau"
 
 msgid "Object groups"
-msgstr "Type de lot d'objets"
+msgstr "Lots d'objets"
 
-msgid "Group label"
-msgstr "Libellé du groupe"
+msgid ""
+"A differentiated object group must contain at least 2 objects.If you want to "
+"add a single object, please click on the one object tab."
+msgstr ""
+"Un groupe d'objets différentié doit contenir au moins 2 objets. Si vous "
+"voulez ajouter un objet simple, cliquez sur l'onglet objet unique."
 
-msgid "Inventory"
+msgid "Object"
+msgstr "Objet"
+
+msgid ""
+"Fill up dating and inventory number if you object                         "
+"group is undifferentiated."
+msgstr ""
+"Remplissez la datation et le numéro d'inventaire si votre groupe d'objets "
+"est indifférencié."
+
+msgid "One object"
+msgstr "Objet unique"
+
+msgid "Group of objects"
+msgstr "Groupe d'objets"
+
+msgid "Separate each material with a comma"
+msgstr "Séparez chaque matériau par une virgule"
+
+msgid "Label"
+msgstr "Libellé"
+
+msgid "Number of objects"
+msgstr "Nombre d'objets"
+
+msgid "Inventory number"
 msgstr "Inventaire"
 
 msgid "Dating"
@@ -362,22 +380,20 @@ msgid "Materials"
 msgstr "Matériaux"
 
 msgid "Place of discovery"
-msgstr "Leu de découverte"
+msgstr "Lieu de découverte"
 
 msgid "Collection"
 msgstr "Collection"
 
-msgid "Label"
-msgstr "Libellé"
+#, python-format
+msgid "%(object_count)s objects"
+msgstr "%(object_count)s objets"
 
-msgid "Differentiation information"
-msgstr "Information de différentation"
+msgid "Object(s) / Sample(s"
+msgstr "Objet(s) / Échantillon(s)"
 
-msgid "Total number"
-msgstr "Nombre total"
-
-msgid "Number of objects if more than one"
-msgstr "Nombre d'objets si plus d'un"
+msgid "Inventory"
+msgstr "Inventaire"
 
 msgid "Home"
 msgstr "Accueil"
@@ -388,8 +404,11 @@ msgstr "Modification du chef de projet"
 msgid "Save"
 msgstr "Enregistrer"
 
-msgid "Add another object group"
-msgstr "Ajouter un autre lot"
+msgid "Differentiate objects"
+msgstr "Différencier les objets"
+
+msgid "Add another object or object group"
+msgstr "Ajouter un autre objet ou groupe d'objets"
 
 msgid "Delete?"
 msgstr "Supprimer ?"
@@ -402,6 +421,9 @@ msgstr "Voir"
 
 msgid "View on site"
 msgstr "Voir sur le site"
+
+msgid "Popup closing…"
+msgstr "Fenêtre pop-up en cours de fermeture…"
 
 msgid "Close"
 msgstr "Fermer"
@@ -455,9 +477,6 @@ msgstr "Sauvegarder et continuer l'édition"
 msgid "Save and view"
 msgstr "Sauvegarder et voir"
 
-msgid "Popup closing…"
-msgstr "Fenêtre pop-up en cours de fermeture…"
-
 msgid "File name"
 msgstr "Fichier"
 
@@ -490,8 +509,23 @@ msgstr "Vous pouvez accéder à l'invitation ici :"
 msgid "Join project"
 msgstr "Rejoindre le projet"
 
-msgid "Select an object group"
-msgstr "Choisissez un lot d'objets"
+msgid "Select an object or a group of objects"
+msgstr "Choisissez un object ou groupe d'objets"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Modifier l’objet %(model)s sélectionné"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Ajouter un autre %(model)s"
+
+msgid "Add"
+msgstr "Ajouter"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Modifier l’objet %(model)s sélectionné"
 
 msgid "Workplace"
 msgstr "Workplace"

@@ -1,8 +1,0 @@
-#objects-group tr:first-child .inline-deletelink {
-  display: none !important;
-}
-
-fieldset div.field-label label {
-  font-weight: bold;
-  color: var(--body-fg);
-}
