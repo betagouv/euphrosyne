@@ -2,6 +2,7 @@ from django import template
 
 register = template.Library()
 
+
 # pylint: disable=line-too-long
 @register.simple_tag
 def is_current_page(href: str, *args, **kwargs) -> bool:
