@@ -38,8 +38,8 @@ class Run(TimestampedModel, MethodModel):
         default=Status.NEW,
     )
 
-    start_date = models.DateTimeField(_("Run start of period"), null=True, blank=True)
-    end_date = models.DateTimeField(_("Run end of period"), null=True, blank=True)
+    start_date = models.DateTimeField(_("Start date"), null=True, blank=True)
+    end_date = models.DateTimeField(_("End date"), null=True, blank=True)
     embargo_date = models.DateField(_("Embargo date"), null=True, blank=True)
 
     particle_type = models.CharField(
