@@ -7,6 +7,13 @@ from ..methods import MethodModel
 
 
 class Run(TimestampedModel, MethodModel):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["label", "project"], name="label_project_unique"
+            )
+        ]
+
     class Status(models.TextChoices):
         NEW = "New", _("New")
         ASK_FOR_EXECUTION = "Ask for execution", _("Ask for execution")
@@ -22,7 +29,7 @@ class Run(TimestampedModel, MethodModel):
     project = models.ForeignKey(
         "lab.Project", null=False, on_delete=models.PROTECT, related_name="runs"
     )
-    label = models.CharField(_("Run label"), max_length=255, unique=True)
+    label = models.CharField(_("Run label"), max_length=255)
 
     status = models.CharField(
         _("Run status"),
