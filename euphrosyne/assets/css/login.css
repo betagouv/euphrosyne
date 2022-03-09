@@ -1,5 +1,5 @@
 #header {
-  color: var(--black-euphro);
+  color: var(--text-title-grey);
 }
 
 #branding h1 {
@@ -25,13 +25,13 @@
   align-items: center;
   padding: 10px 15px;
   margin: 10px auto 0 auto;
-  background-color: white;
-  color: black;
+  background-color: var(--background-default-grey);
+  color: var(--text-action-high-grey);
   box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14),
     0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
 .orcid-row a:hover {
-  background-color: white;
+  background-color: var(--background-alt-grey);
   border: 1px solid rgb(127, 170, 38);
   padding: 9px 14px;
 }

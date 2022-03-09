@@ -31,3 +31,14 @@ select,
 .submit-row .deletelink-box a.deletelink {
   height: auto;
 }
+
+a.related-widget-wrapper-link,
+.add-row a,
+a.change-related,
+#site-name a,
+a.inline-deletelink,
+a#logout-link,
+.datetimeshortcuts a,
+#nav-sidebar a {
+  box-shadow: none;
+}

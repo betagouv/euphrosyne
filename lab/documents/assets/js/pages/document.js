@@ -1,8 +1,5 @@
 "use strict";
 
-import "@gouvfr/dsfr/dist/component/component.css";
-import "@gouvfr/dsfr/dist/component/upload/upload.css";
-
 import { FileTable } from "../../../../assets/js/components/file-table.js";
 import { FileUploadForm } from "../../../../assets/js/components/file-upload-form.js";
 import { FileManager } from "../../../../assets/js/file-manager.js";

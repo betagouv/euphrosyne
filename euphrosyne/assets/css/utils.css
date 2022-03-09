@@ -16,10 +16,6 @@
   justify-content: space-between;
 }
 
-.bg-white {
-  background-color: white;
-}
-
 .overflow-auto {
   overflow: auto;
 }

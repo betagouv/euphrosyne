@@ -6,76 +6,29 @@
   --blue-france: #000091;
   --blue-france-300: #9a9aff;
   --blue-france-hover: #1414b2;
-  --black-euphro: #383838;
   --g-100: #f8f8f8;
 
   --primary: var(--blue-france);
 
-  --header-bg: white;
-  --header-color: var(--black-euphro);
+  --header-bg: var(--background-default-grey);
+  --header-color: var(--text-title-grey);
 
-  --button-bg: var(--primary);
-  --button-hover-bg: var(--blue-france-hover);
+  --button-bg: var(--background-active-blue-france);
+  --button-hover-bg: var(--blue-france-main-525);
   --link-fg: var(--primary);
   --default-button-bg: var(--blue-france-300);
   --default-button-hover-bg: var(--blue-france-hover);
 }
 
-@font-face {
-  font-family: "Marianne";
-  src: local("Marianne"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Regular.woff") format("woff"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Regular.woff2") format("woff2");
-  font-weight: 400;
-}
-
-@font-face {
-  font-family: "Marianne";
-  src: local("Marianne_Italic"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Regular_Italic.woff") format("woff"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Regular_Italic.woff2")
-      format("woff2");
-  font-weight: 400;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Marianne";
-  src: local("Marianne-Bold"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Bold.woff") format("woff"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Bold.woff2") format("woff2");
-  font-weight: 700;
-}
-@font-face {
-  font-family: "Marianne";
-  src: local("Marianne-Bold_Italic"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Bold_Italic.woff") format("woff"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Bold_Italic.woff2") format("woff2");
-  font-weight: 700;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Marianne";
-  src: local("Marianne-Light"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Light.woff") format("woff"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Light.woff2") format("woff2");
-  font-weight: 300;
-}
-
-@font-face {
-  font-family: "Marianne";
-  src: local("Marianne-Light_Italic"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Light_Italic.woff") format("woff"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Light_Italic.woff2") format("woff2");
-  font-weight: 300;
-  font-style: italic;
-}
-
 body {
   font-family: "Marianne", "Roboto", "Lucida Grande", "DejaVu Sans",
     "Bitstream Vera Sans", Verdana, Arial, sans-serif;
-  background-color: var(--g-100);
+  background-color: var(--background-default-grey);
+}
+
+a:link,
+a:visited {
+  color: inherit;
 }
 
 .content h1 {
@@ -83,10 +36,17 @@ body {
   line-height: 2rem;
 }
 
+div.breadcrumbs {
+  background: var(--background-active-blue-france);
+}
+.breadcrumbs a {
+  box-shadow: none;
+}
+
 #branding h1,
 #branding h1 a:link,
 #branding h1 a:visited {
-  color: var(--black-euphro);
+  color: var(--text-title-grey);
   font-weight: bold;
 }
 
@@ -95,18 +55,18 @@ body {
 }
 #user-tools a:link,
 #user-tools a:visited {
-  color: var(--black-euphro);
+  color: var(--text-title-grey);
 }
 #user-tools #logout-link {
   color: var(--delete-button-bg);
 }
 
 .module caption {
-  background-color: white;
+  background-color: var(--background-default-grey);
 }
 .module caption a.section:link,
 .module caption a.section:visited {
-  color: var(--black-euphro);
+  color: var(--text-title-grey);
 }
 .module caption th {
   font-weight: 400;
@@ -156,7 +116,7 @@ label.required:after {
 .project-tabs ul {
   display: flex;
   padding: 0;
-  border-bottom: 1px solid rgb(235, 236, 240);
+  border-bottom: 1px solid var(--border-default-grey);
 }
 .project-tabs li {
   list-style-type: none;
@@ -165,25 +125,22 @@ label.required:after {
 .project-tabs a {
   font-size: 1.15rem;
   color: var(--text-title-grey);
+  box-shadow: none;
 }
 
 .project-tabs a:hover {
-  color: var(--link-fg);
+  color: var(--text-active-blue-france);
 }
 
 .project-tabs li.active a {
-  color: var(--link-fg);
+  color: var(--text-active-blue-france);
   font-weight: bold;
-}
-
-.project-tabs li.active a:hover {
-  color: var(--text-title-grey);
 }
 
 .project-tabs span.underline {
   height: 2px;
   width: 100%;
-  background-color: var(--link-fg);
+  background-color: var(--text-active-blue-france);
   display: block;
   margin-top: 5px;
 }
