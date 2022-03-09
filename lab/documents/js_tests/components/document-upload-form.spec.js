@@ -1,15 +1,15 @@
 import { jest } from "@jest/globals";
 
-import "../_jsdom_mocks/gettext";
+import "../../../js_tests/_jsdom_mocks/gettext";
 
-import { FileUploadForm } from "../../assets/js/components/file-upload-form";
+import { DocumentUploadForm } from "../../assets/js/components/document-upload-form";
 
-describe("Test FileUploadForm", () => {
-  FileUploadForm.init();
+describe("Test DocumentUploadForm", () => {
+  DocumentUploadForm.init();
 
   beforeEach(() => {
     document.body.innerHTML = `
-        <form is="file-upload-form">
+        <form is="document-upload-form">
         <input class="fr-upload" type="file" id="file-upload" name="files" multiple required>
         </table>`;
   });
