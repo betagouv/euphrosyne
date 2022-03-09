@@ -32,8 +32,9 @@ class ProjectDocumentsView(ProjectMembershipRequiredMixin, TemplateView):
                 "attrs": {"id": "document_list"},
                 "can_delete": True,
             },
-            "file_upload_form": {
+            "document_upload_form": {
                 "attrs": {"id": "upload-form", "project-id": self.project.id},
+                "component_name": "document-upload-form",
                 "hint_text": _(
                     "Max size allowed : 30 Mo. "
                     "Multiple files allowed. "
