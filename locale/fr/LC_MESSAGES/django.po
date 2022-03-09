@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-09 11:17+0100\n"
+"POT-Creation-Date: 2022-03-09 11:33+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -522,6 +522,9 @@ msgstr "Ajouter un autre %(model)s"
 
 msgid "Add"
 msgstr "Ajouter"
+
+msgid "Add a new object or object group"
+msgstr "Créer un objet ou groupe d'objets"
 
 #, python-format
 msgid "Delete selected %(model)s"

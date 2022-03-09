@@ -16,7 +16,7 @@
             href="{{ add_related_url }}?{{ url_params }}"
             title="{% blocktranslate %}Add another {{ model }}{% endblocktranslate %}">
             <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="{% translate 'Add' %}">
-            Add a new object or object group
+            {% translate "Add a new object or object group" %}
         </a>
         {% endif %}
         {% if can_delete_related %}
