@@ -9,6 +9,10 @@
   margin-top: 12px;
 }
 
+.run-card__actions a {
+  box-shadow: none;
+}
+
 #change-link {
   padding: 5px;
 }
