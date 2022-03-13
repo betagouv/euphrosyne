@@ -5,6 +5,16 @@ import { dirname } from "path";
 
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
+import PurgecssPlugin from "purgecss-webpack-plugin";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const PATHS = {
+  euphrosyne: path.join(__dirname, "euphrosyne"),
+  euphro_auth: path.join(__dirname, "euphro_auth"),
+  lab: path.join(__dirname, "lab"),
+};
 
 export default {
   entry: {
@@ -68,5 +78,12 @@ export default {
   optimization: {
     minimizer: [new CssMinimizerPlugin()],
   },
-  plugins: [new MiniCssExtractPlugin()],
+  plugins: [
+    new MiniCssExtractPlugin(),
+    new PurgecssPlugin({
+      paths: glob.sync(`${PATHS.euphrosyne}/**/*`, {
+        nodir: true,
+      }),
+    }),
+  ],
 };
