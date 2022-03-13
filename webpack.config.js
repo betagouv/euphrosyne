@@ -1,5 +1,6 @@
 import path from "path";
 import glob from "glob";
+import globAll from "glob-all";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -81,9 +82,16 @@ export default {
   plugins: [
     new MiniCssExtractPlugin(),
     new PurgecssPlugin({
-      paths: glob.sync(`${PATHS.euphrosyne}/**/*`, {
-        nodir: true,
-      }),
+      paths: globAll.sync(
+        [
+          `${PATHS.euphrosyne}/**/*`,
+          `${PATHS.euphro_auth}/**/*`,
+          `${PATHS.lab}/**/*`,
+        ],
+        {
+          nodir: true,
+        }
+      ),
     }),
   ],
 };

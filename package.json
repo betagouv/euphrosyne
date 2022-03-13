@@ -35,6 +35,7 @@
     "css-loader": "^6.5.1",
     "css-minimizer-webpack-plugin": "^3.3.1",
     "glob": "^7.2.0",
+    "glob-all": "^3.3.0",
     "html-loader-jest": "^0.2.1",
     "mini-css-extract-plugin": "^2.4.5",
     "promise-polyfill": "8.2.1",
