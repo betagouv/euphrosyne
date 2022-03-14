@@ -559,3 +559,18 @@ msgstr "Modifié"
 
 msgid "Date this entry was most recently changed."
 msgstr "Date de la dernière modification de cette entrée"
+
+msgid "Main menu"
+msgstr "Menu principal"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Projects"
+msgstr "Projets"
+
+msgid "Users"
+msgstr "Utilisateurs"
+
+msgid "Settings"
+msgstr "Réglages"
