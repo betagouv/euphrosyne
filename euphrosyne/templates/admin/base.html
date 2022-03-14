@@ -17,3 +17,6 @@
     <a href="{% url 'admin:logout' %}" id="logout-link">{% translate 'Log out' %}</a>
 {% endblock %}
 
+{% block nav-sidebar %}
+    {% include "./nav_sidebar.html" %}
+{% endblock %}
