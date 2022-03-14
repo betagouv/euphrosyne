@@ -4,7 +4,6 @@
 <head>
 <title>{% block title %}{% endblock %}</title>
 <link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
-<link rel="stylesheet" type="text/css" href="{% static "admin/css/base.css" %}">
 <link rel="stylesheet" type="text/css" href="{% static "main.css"%}"></link>
 {% if not is_popup and is_nav_sidebar_enabled %}
   <link rel="stylesheet" type="text/css" href="{% static "admin/css/nav_sidebar.css" %}">
@@ -13,7 +12,7 @@
 {% block extrastyle %}{% endblock %}
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
 {% block extrahead %}
-<script src="{% static 'main.js' %}"></script>
+    <script type="text/javascript" src="{% static 'main.js' %}"></script>
 {% endblock %}
 {% block responsive %}
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">

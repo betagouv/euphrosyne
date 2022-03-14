@@ -20,60 +20,6 @@
   --link-fg: var(--primary);
   --default-button-bg: var(--blue-france-300);
   --default-button-hover-bg: var(--blue-france-hover);
-
-  --default-grey: #CECECE;
-  --fill-grey: #6A6A6A;
-}
-
-@font-face {
-  font-family: "Marianne";
-  src: local("Marianne"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Regular.woff") format("woff"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Regular.woff2") format("woff2");
-  font-weight: 400;
-}
-
-@font-face {
-  font-family: "Marianne";
-  src: local("Marianne_Italic"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Regular_Italic.woff") format("woff"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Regular_Italic.woff2")
-      format("woff2");
-  font-weight: 400;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Marianne";
-  src: local("Marianne-Bold"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Bold.woff") format("woff"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Bold.woff2") format("woff2");
-  font-weight: 700;
-}
-@font-face {
-  font-family: "Marianne";
-  src: local("Marianne-Bold_Italic"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Bold_Italic.woff") format("woff"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Bold_Italic.woff2") format("woff2");
-  font-weight: 700;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Marianne";
-  src: local("Marianne-Light"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Light.woff") format("woff"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Light.woff2") format("woff2");
-  font-weight: 300;
-}
-
-@font-face {
-  font-family: "Marianne";
-  src: local("Marianne-Light_Italic"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Light_Italic.woff") format("woff"),
-    url("~@gouvfr/dsfr/dist/fonts/Marianne-Light_Italic.woff2") format("woff2");
-  font-weight: 300;
-  font-style: italic;
 }
 
 body {
@@ -154,7 +100,7 @@ ul.messagelist li span.close {
 }
 
 label.required:after {
-  content: " *" !important;
+  content: " *" !important;
 }
 
 .change-list .object-tools {

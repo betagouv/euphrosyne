@@ -22,6 +22,7 @@ export default {
     main: [
       "promise-polyfill/src/polyfill",
       "whatwg-fetch",
+      "./euphrosyne/assets/js/main.js",
       "@gouvfr/dsfr/dist/core/core.module.min.js",
       "@gouvfr/dsfr/dist/dsfr/dsfr.min.css",
       "remixicon/fonts/remixicon.css",
