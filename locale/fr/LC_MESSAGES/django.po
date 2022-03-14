@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-09 16:19+0100\n"
+"POT-Creation-Date: 2022-03-14 12:56+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -134,6 +134,21 @@ msgstr "Entrez vos informations"
 msgid "Log out"
 msgstr "Déconnexion"
 
+msgid "Home"
+msgstr "Accueil"
+
+msgid "Main menu"
+msgstr "Menu principal"
+
+msgid "Django"
+msgstr ""
+
+msgid "Projects"
+msgstr "Projets"
+
+msgid "Users"
+msgstr "Utilisateurs"
+
 msgid "Log in with ORCID"
 msgstr "Se connecter avec ORCID"
 
@@ -154,9 +169,6 @@ msgstr "Runs"
 
 msgid "Basic information"
 msgstr "Informations essentielles"
-
-msgid "Projects"
-msgstr "Projets"
 
 msgid "Object / Sample"
 msgstr "Objet / Échantillon"
@@ -314,11 +326,15 @@ msgstr "Libellé du run"
 msgid "Run status"
 msgstr "Statut du run"
 
+#, fuzzy
+#| msgid "Started"
 msgid "Start date"
-msgstr "Date de début"
+msgstr "Démarré"
 
+#, fuzzy
+#| msgid "Embargo date"
 msgid "End date"
-msgstr "Date de fin"
+msgstr "Date d'embargo"
 
 msgid "Embargo date"
 msgstr "Date d'embargo"
@@ -355,14 +371,16 @@ msgstr ""
 "Remplissez la datation et le numéro d'inventaire si votre groupe d'objets "
 "est indifférencié."
 
+#, fuzzy
+#| msgid "Object"
 msgid "One object"
-msgstr "Objet unique"
+msgstr "Objet"
 
 msgid "Group of objects"
 msgstr "Groupe d'objets"
 
 msgid "Separate each material with a comma"
-msgstr "Séparez chaque matériau par une virgule"
+msgstr ""
 
 msgid "Label"
 msgstr "Libellé"
@@ -394,9 +412,6 @@ msgstr "Objet(s) / Échantillon(s)"
 
 msgid "Inventory"
 msgstr "Inventaire"
-
-msgid "Home"
-msgstr "Accueil"
 
 msgid "Change leader"
 msgstr "Modification du chef de projet"

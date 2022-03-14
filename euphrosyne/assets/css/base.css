@@ -1,11 +1,13 @@
 @import url("./dsrf-overrides.css");
 @import url("./components/fieldset.css");
+@import url("./components/nav.css");
 @import url("./utils.css");
 
 :root {
   --blue-france: #000091;
   --blue-france-300: #9a9aff;
   --blue-france-hover: #1414b2;
+  --black-euphro: #383838;
   --g-100: #f8f8f8;
 
   --primary: var(--blue-france);
@@ -98,7 +100,7 @@ ul.messagelist li span.close {
 }
 
 label.required:after {
-  content: " *" !important;
+  content: " *" !important;
 }
 
 .change-list .object-tools {

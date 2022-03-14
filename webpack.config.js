@@ -1,10 +1,21 @@
 import path from "path";
 import glob from "glob";
+import globAll from "glob-all";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
+import PurgecssPlugin from "purgecss-webpack-plugin";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const PATHS = {
+  euphrosyne: path.join(__dirname, "euphrosyne"),
+  euphro_auth: path.join(__dirname, "euphro_auth"),
+  lab: path.join(__dirname, "lab"),
+};
 
 export default {
   entry: {
@@ -14,6 +25,7 @@ export default {
       "./euphrosyne/assets/js/main.js",
       "@gouvfr/dsfr/dist/core/core.module.min.js",
       "@gouvfr/dsfr/dist/dsfr/dsfr.min.css",
+      "remixicon/fonts/remixicon.css",
       "./euphrosyne/assets/css/base.css",
     ],
     ...Object.assign(
@@ -68,5 +80,19 @@ export default {
   optimization: {
     minimizer: [new CssMinimizerPlugin()],
   },
-  plugins: [new MiniCssExtractPlugin()],
+  plugins: [
+    new MiniCssExtractPlugin(),
+    new PurgecssPlugin({
+      paths: globAll.sync(
+        [
+          `${PATHS.euphrosyne}/**/*`,
+          `${PATHS.euphro_auth}/**/*`,
+          `${PATHS.lab}/**/*`,
+        ],
+        {
+          nodir: true,
+        }
+      ),
+    }),
+  ],
 };
