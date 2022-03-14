@@ -16,6 +16,17 @@ from pathlib import Path
 
 import dj_database_url
 import psycopg2
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+# pylint: disable=abstract-class-instantiated
+sentry_sdk.init(
+    dsn=os.getenv("SENTRY_DSN"),
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=0.1,
+    send_default_pii=True,
+    environment=os.getenv("SENTRY_ENVIRONMENT"),
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
