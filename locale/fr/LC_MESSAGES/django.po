@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-13 10:25+0100\n"
+"POT-Creation-Date: 2022-03-14 12:56+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -326,11 +326,15 @@ msgstr "Libellé du run"
 msgid "Run status"
 msgstr "Statut du run"
 
-msgid "Run start of period"
-msgstr "Début de période du run"
+#, fuzzy
+#| msgid "Started"
+msgid "Start date"
+msgstr "Démarré"
 
-msgid "Run end of period"
-msgstr "Fin de période du run"
+#, fuzzy
+#| msgid "Embargo date"
+msgid "End date"
+msgstr "Date d'embargo"
 
 msgid "Embargo date"
 msgstr "Date d'embargo"
