@@ -1,61 +1,64 @@
 .sidebar {
-    background-color: var(--black-euphro);
-    width: 237px;
+  background-color: var(--g-500);
+  width: 237px;
 }
 
 .sidebar .sidebar-title {
-    font-weight: 700;
-    font-size: 30px;
-    color: white;
-    text-align: center;
+  font-weight: 700;
+  font-size: 30px;
+  color: white;
+  text-align: center;
 }
 
 .sidebar .sidebar-menu {
-    padding-inline-start: 0; /* reset DSFR styling */
+  padding-inline-start: 0; /* reset DSFR styling */
 }
 
 .sidebar .sidebar-item {
-    height: 56px;
-    display: flex;
-    align-items: center;
+  height: 56px;
+  display: flex;
+  align-items: center;
 }
 
 .sidebar a.sidebar-link {
-    flex: 1;
-    display: flex;
-    font-size: 16px;
-    color: var(--g-100);
-    padding: 16px;
-    align-items: center;
-    border-left: 2px solid transparent; /* to avoid moving during hovering */
+  flex: 1;
+  display: flex;
+  color: var(--g-100);
+  padding: 16px;
+  font-size: 16px;
+  align-items: center;
+  border-left: 2px solid transparent; /* to avoid moving during hovering */
 }
 
-.sidebar a.sidebar-link:active, 
+.sidebar a.sidebar-link:active,
 .sidebar a.sidebar-link:focus {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 .sidebar a.sidebar-link .sidebar-link-badge {
-    background-color: var(--red-marianne-main-472);
-    min-width: 24px;
-    height: 24px;
-    border-radius: 100%;
-    display: flex;
-    align-items: baseline;
-    justify-content: center;
+  background-color: var(--red-marianne-main-472);
+  min-width: 24px;
+  height: 24px;
+  border-radius: 100%;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
 }
 
 .sidebar a.sidebar-link .sidebar-link-title {
-    padding: 0 16px;
+  padding: 0 16px;
 }
 
-.sidebar a.sidebar-link[aria-current], 
+.sidebar a.sidebar-link[aria-current] {
+  font-weight: bold;
+}
+
+.sidebar a.sidebar-link[aria-current],
 .sidebar a.sidebar-link:hover {
-    background-color: #6A6A6A;
-    border-left: 2px solid #F0F0F0;
+  border-left: 2px solid #f0f0f0;
 }
 
 .sidebar .sidebar-link .icon-container {
-    width: 25px;
-    height: 25px;
+  width: 25px;
+  height: 25px;
 }
