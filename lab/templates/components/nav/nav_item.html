@@ -1,13 +1,12 @@
 {% load current_page %}
-{% is_current_page href path=request.path|urlencode exact_path=exact_path as current_page %}
 <li class="sidebar-item">
     <a href="{{ href }}" class="sidebar-link" {% if current_page %} aria-current="page" {% endif %}>
         {{ icon }}
         <span class="sidebar-link-title">{{ title }}</span>
         {% if badge %}
-        <div class="sidebar-link-badge">
-            {{ badge }}
-        </div>
+            <div class="sidebar-link-badge">
+                {{ badge }}
+            </div>
         {% endif %}
     </a>
 </li>
