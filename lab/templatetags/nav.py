@@ -6,7 +6,7 @@ from django.http import HttpRequest
 register = template.Library()
 
 
-@register.inclusion_tag('components/nav/nav_item.html', takes_context=True)
+@register.inclusion_tag("components/nav/nav_item.html", takes_context=True)
 def nav_item(context, title: str, href: str, icon: str, *args, **kwargs):
     """
     Tag to get a nav item components
@@ -54,5 +54,5 @@ def nav_item(context, title: str, href: str, icon: str, *args, **kwargs):
         "icon": icon,
         "href": href,
         "badge": badge,
-        "current_page": current_page
+        "current_page": current_page,
     }

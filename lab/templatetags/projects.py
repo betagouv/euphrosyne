@@ -64,6 +64,6 @@ def project_header(project_id: int):
         "project": project,
         "status": {
             "class_name": class_name,
-            "display": display
-        }
+            "display": display,
+        },
     }
