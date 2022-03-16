@@ -5,11 +5,12 @@ from django.http import HttpRequest
 
 register = template.Library()
 
+
 @register.inclusion_tag('components/nav/nav_item.html', takes_context=True)
 def nav_item(context, title: str, href: str, icon: str, *args, **kwargs):
     """
     Tag to get a nav item components
-    
+
     Parameters
     ----------
     context : any
@@ -47,7 +48,7 @@ def nav_item(context, title: str, href: str, icon: str, *args, **kwargs):
     else:
         match_urls = map(lambda path: path in request.path, all_path)
         current_page = any(match_urls)
-    
+
     return {
         "title": title,
         "icon": icon,
