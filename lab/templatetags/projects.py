@@ -1,7 +1,11 @@
 from django import template
+from django.contrib.admin.utils import display_for_field
 from django.http import HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+
+from lab.models import Project
+from lab.models.project import ProjectStatus
 
 register = template.Library()
 
@@ -44,3 +48,18 @@ def project_tabs(project_id: int, request: HttpRequest):
             )
         }
     return None
+
+@register.inclusion_tag("components/header/project_header.html")
+def project_header(project_id: int):
+    project = Project.objects.get(pk=project_id)
+    
+    class_name = ProjectStatus.names[ProjectStatus.values.index(project.status)].lower()
+    display = display_for_field(1, project._meta.get_field("status"), "")
+
+    return {
+        "project": project,
+        "status" : {
+            "class_name": class_name,
+            "display": display
+        }
+    }

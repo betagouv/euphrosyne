@@ -1,0 +1,94 @@
+#top-header {
+  background-color: var(--background-elevated-grey);
+  width: 100%;
+  height: 74px;
+  display: flex;
+  flex-direction: row;
+  padding-left: 20px;
+  padding-right: 20px;
+  align-items: center;
+}
+
+#top-header #header-left-content {
+  flex-grow: 1;
+}
+
+#top-header #user-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+#top-header #user-info #user-info-left {
+  font-size: small;
+  text-align: right;
+}
+
+#top-header #user-info #user-info-fullname {
+  color: var(--text-default-grey);
+}
+
+#top-header #user-info #user-info-role {
+  margin-top: -8px;
+  color: var(--text-disabled-grey);
+}
+
+#top-header #user-info #user-info-profile-picture {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  border: 0.5px var(--border-action-high-grey) solid;
+  background-color: var(--text-disabled-grey);
+}
+
+#top-header #user-info #logout-link {
+  color: var(--delete-button-bg);
+}
+
+.project-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.project-header .project-header-back {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.project-header .ri-arrow-right-s-line {
+  font-size: 28px;
+}
+
+.project-header .header-back-link-title {
+  margin-bottom: 4px;
+}
+
+.project-header a:hover .header-back-link-title,
+.project-header a:hover .project-header-back-icon {
+  color: var(--text-active-blue-france);
+}
+
+.project-header a:focus {
+  text-decoration: none;
+}
+
+.project-header h3.project-header-name {
+  margin-bottom: 6px;
+}
+
+.project-header .project-status {
+  margin: 0 16px;
+}
+
+.project-header .project-leader {
+  display: flex;
+  flex-direction: column;
+  margin-left: 22px;
+}
+
+.project-header .fr-text--xs,
+.project-header .fr-text--sm {
+  margin-bottom: 0;
+}

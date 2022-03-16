@@ -1,6 +1,7 @@
 @import url("./dsrf-overrides.css");
 @import url("./components/fieldset.css");
 @import url("./components/nav.css");
+@import url("./components/header.css");
 @import url("./utils.css");
 
 :root {
@@ -36,6 +37,10 @@ a:visited {
 .content h1 {
   font-size: 1.5rem;
   line-height: 2rem;
+}
+
+.breadcrumbs {
+    display: none;
 }
 
 div.breadcrumbs {

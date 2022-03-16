@@ -1,44 +1,49 @@
 {% extends "admin/change_form.html" %}
 {% load projects i18n %}
 
-{% block content %}
-{% if not add %}
-{% project_tabs object_id request %}
-{% endif %}
-{{ block.super }}
 
-{# On-change-tab modal #}
-<dialog aria-labelledby="fr-modal-prdformclose-title" id="fr-modal-prdformclose" class="fr-modal" role="dialog" >
-  <div class="fr-container fr-container--fluid fr-container-md">
-    <div class="fr-grid-row fr-grid-row--center">
-      <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
-        <div class="fr-modal__body">
-          <div class="fr-modal__header">
-            <button class="fr-link--close fr-link" aria-controls="fr-modal-prdformclose">{% translate 'Close' %}</button>
-          </div>
-          <div class="fr-modal__content">
-            <h1 id="fr-modal-prdformclose-title" class="fr-modal__title">
-              {% translate 'Are you sure you want to close this form?' %}
-            </h1>
-            <p>{% translate 'There are unsaved changes in the form. Changing tab will lose all changes. If you are not sure, cancel this action, check the form and save it.' %}</p>
-          </div>
-          <div class="fr-modal__footer">
-            <ul class="fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-lg fr-btns-group--icon-left">
-              <li>
-                <button class="fr-btn fr-fi-checkbox-line" aria-controls="fr-modal-prdformclose-cancel" >
-                  {% translate 'Cancel' %}
-                </button>
-              </li>
-              <li>
-                <button class="fr-btn fr-fi-checkbox-line fr-btn--secondary" aria-controls="fr-modal-prdformclose-confirm">
-                  {% translate 'Yes, abandon changes' %}
-                </button>
-              </li>
-            </ul>
-          </div>
+{% block top_header %}
+    {% project_header object_id %}
+{% endblock %}
+
+{% block content %}
+    {% if not add %}
+        {% project_tabs object_id request %}
+    {% endif %}
+    {{ block.super }}
+
+    {# On-change-tab modal #}
+    <dialog aria-labelledby="fr-modal-prdformclose-title" id="fr-modal-prdformclose" class="fr-modal" role="dialog" >
+    <div class="fr-container fr-container--fluid fr-container-md">
+        <div class="fr-grid-row fr-grid-row--center">
+        <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+            <div class="fr-modal__body">
+            <div class="fr-modal__header">
+                <button class="fr-link--close fr-link" aria-controls="fr-modal-prdformclose">{% translate 'Close' %}</button>
+            </div>
+            <div class="fr-modal__content">
+                <h1 id="fr-modal-prdformclose-title" class="fr-modal__title">
+                {% translate 'Are you sure you want to close this form?' %}
+                </h1>
+                <p>{% translate 'There are unsaved changes in the form. Changing tab will lose all changes. If you are not sure, cancel this action, check the form and save it.' %}</p>
+            </div>
+            <div class="fr-modal__footer">
+                <ul class="fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-lg fr-btns-group--icon-left">
+                <li>
+                    <button class="fr-btn fr-fi-checkbox-line" aria-controls="fr-modal-prdformclose-cancel" >
+                    {% translate 'Cancel' %}
+                    </button>
+                </li>
+                <li>
+                    <button class="fr-btn fr-fi-checkbox-line fr-btn--secondary" aria-controls="fr-modal-prdformclose-confirm">
+                    {% translate 'Yes, abandon changes' %}
+                    </button>
+                </li>
+                </ul>
+            </div>
+            </div>
         </div>
-      </div>
+        </div>
     </div>
-  </div>
-</dialog>
+    </dialog>
 {% endblock %}
