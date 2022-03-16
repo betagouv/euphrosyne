@@ -52,7 +52,7 @@ def project_tabs(project_id: int, request: HttpRequest):
 
 @register.inclusion_tag("components/header/project_header.html")
 def project_header(project_id: int):
-    if project_id is None and not isinstance(project_id, int):
+    if not project_id and not isinstance(project_id, int):
         return None
 
     project = Project.objects.get(pk=project_id)
