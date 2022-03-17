@@ -21,6 +21,8 @@
   --link-fg: var(--primary);
   --default-button-bg: var(--blue-france-300);
   --default-button-hover-bg: var(--blue-france-hover);
+
+  --grey-1000: #161616;
 }
 
 body {
