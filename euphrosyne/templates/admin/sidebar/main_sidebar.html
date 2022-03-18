@@ -1,16 +1,8 @@
-{% load i18n static nav create_list %}
+{% load i18n static nav %}
 <nav class="sidebar" id="euphrosyne-main-sidebar" role="navigation" aria-controls="main-sidebar"
     aria-label="{% translate 'Main menu' %}">
     <h1 class="sidebar-title">{{ site_header|default:_("Django") }}</h1>
     <ul class="sidebar-menu">
-        {% url 'admin:lab_project_changelist' as project_url %}
-        {% url 'admin:lab_run_changelist' as run_url %}
-        {% create_list run_url as extra_path %}
-        {% nav_item title=_("Projects") href=project_url icon="<i class=\"ri-folder-open-line\" aria-hidden=\"true\"></i>" extra_path=extra_path  %}
-        
-        {% if request.user.is_lab_admin %}
-            {% url 'admin:euphro_auth_userinvitation_changelist' as userinvitation_url %}
-            {% nav_item title=_("Users") href=userinvitation_url icon="<i class=\"ri-user-line\" aria-hidden=\"true\"></i>" %}
-        {% endif %}
+        {% sidebar_items request %}
     </ul>
 </nav>

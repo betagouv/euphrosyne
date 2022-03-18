@@ -2,57 +2,73 @@ from typing import List
 
 from django import template
 from django.http import HttpRequest
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+
+from lab.objects.nav import NavItem
 
 register = template.Library()
 
 
-@register.inclusion_tag("components/nav/nav_item.html", takes_context=True)
-def nav_item(context, title: str, href: str, icon: str, *args, **kwargs):
+@register.inclusion_tag("components/nav/nav_items.html")
+def sidebar_items(request: HttpRequest):
+    """
+    Inclustion tag to display the whole side navigation.
+
+    Parameters
+    ----------
+    request : HttpRequest
+    """
+    items: List[NavItem] = [
+        NavItem(
+            _("Projects"),
+            reverse("admin:lab_project_changelist"),
+            '<i class="ri-folder-open-line" aria-hidden="true"></i>',
+            [reverse("admin:lab_run_changelist")],
+        )
+    ]
+
+    if request.user and request.user.is_lab_admin:
+        items.append(
+            NavItem(
+                _("Users"),
+                reverse("admin:euphro_auth_userinvitation_changelist"),
+                '<i class="ri-user-line" aria-hidden="true"></i>',
+            )
+        )
+
+    return {"request": request, "items": items}
+
+
+@register.inclusion_tag("components/nav/nav_item.html")
+def nav_item(current_path: str, item: NavItem):
     """
     Tag to get a nav item components
 
     Parameters
     ----------
-    context : any
-        Get the page context automatically, usefull to get the request
-    title : str
-        Title of the nav item
-    href : str
-        Where to send the user
-    icon : str
-        HTML code for the icon
-    **kwargs :
-        Dictionary of options
-
-    Keyword Args
-    ------------
-        badge : int, optional
-            Set to show a badge in the nav item (default=0)
-        exact_path : bool, optional
-            Tell wether the `href` and the `path` must be equal (default=False)
-        extra_path : List[str], optional
-            List of other url to check if the nav item is for this current page
+    current_path : str
+        Current path of the page, used to check if this nav_item
+        is representing the current one
+    item : NavItem
+        Info to create that nav_item.html template
     """
-    request: HttpRequest = context["request"]
-
-    badge: int = kwargs.get("badge", 0)
-    exact_path: bool = kwargs.get("exact_path", False)
-    extra_path: List[str] = kwargs.get("extra_path", [])
-
-    all_path = [href] + extra_path
 
     current_page = False
 
-    if exact_path:
-        current_page = href == request.path
+    print(current_path)
+
+    if item.exact_path:
+        current_page = item.href == current_path
     else:
-        match_urls = map(lambda path: path in request.path, all_path)
+        all_path = [item.href] + item.extra_path
+        match_urls = map(lambda path: path in current_path, all_path)
         current_page = any(match_urls)
 
     return {
-        "title": title,
-        "icon": icon,
-        "href": href,
-        "badge": badge,
+        "title": item.title,
+        "icon": item.icon,
+        "href": item.href,
+        "badge": item.badge,
         "current_page": current_page,
     }
