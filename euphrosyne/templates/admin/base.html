@@ -1,60 +1,99 @@
-{% extends 'admin/base.html' %}
-{% load i18n static %}
-{% block extrastyle %}
-    <link rel="stylesheet" type="text/css" href="{% static "main.css"%}">
-    <!-- Add custom style -->
-    {% if not is_popup and is_nav_sidebar_enabled %}
-        <link rel="stylesheet" type="text/css" href="{% static "admin/css/nav_sidebar.css" %}">
-    {% endif %}
-    <!-- End add -->
-{% endblock %} 
+{% load i18n static %}<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
+<head>
+<title>{% block title %}{% endblock %}</title>
+<link rel="stylesheet" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
+<link rel="stylesheet" type="text/css" href="{% static "main.css"%}"></link>
+{% block dark-mode-vars %}
+  <link rel="stylesheet" href="{% static "admin/css/dark_mode.css" %}">
+{% endblock %}
+{% if not is_popup and is_nav_sidebar_enabled %}
+  <link rel="stylesheet" href="{% static "admin/css/nav_sidebar.css" %}">
+  <script src="{% static 'admin/js/nav_sidebar.js' %}" defer></script>
+{% endif %}
+{% block extrastyle %}{% endblock %}
+{% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
 {% block extrahead %}
-{{ block.super }}
 <script type="text/javascript" src="{% static 'main.js' %}"></script>
 {% endblock %}
+{% block responsive %}
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="{% static "admin/css/responsive.css" %}">
+    {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% static "admin/css/responsive_rtl.css" %}">{% endif %}
+{% endblock %}
+{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE">{% endblock %}
+</head>
 
-<!-- Desactivation du header -->
-{% block header %}{% endblock %}
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
+  data-admin-utc-offset="{% now "Z" %}">
 
-<!-- Ajout de la sidebar à côté de celle de l'admin. On faire la cacher des non superuser ici -->
-{% block nav-sidebar %}
-    {% if user.is_superuser %}
-        {{ block.super }}
+<!-- Container -->
+<div id="container">
+    <div class="main" id="main">
+      {% if not is_popup and is_nav_sidebar_enabled %}
+        {% block nav-sidebar %}
+            {% if user.is_superuser %}
+                {% include "admin/nav_sidebar.html" %}
+            {% endif %}
+            {% include "./sidebar/main_sidebar.html" %}
+        {% endblock %}
+      {% endif %}
+      <div class="content">
+        {% if not is_popup %}
+        <!-- Header -->
+        {% block header %}
+            <header role="banner" class="fr-header">
+                <div id="top-header" class="fr-pr-5v fr-header__body">
+                    <div id="header-left-content">
+                        {% block top_header %}{% endblock %}
+                    </div>
+                    <div id="user-info">
+                        <div id="user-info-left">
+                            <div id="user-info-fullname">
+                                {% firstof user.get_full_name user.get_username %} /
+                                <a href="{% url 'admin:logout' %}" id="logout-link">{% translate 'Log out' %}</a>
+                            </div>
+                            <div id="user-info-role">
+                                {% if user.is_superuser or user.is_lab_admin %}
+                                    {% translate "Admin" %}
+                                {% else %}
+                                    {% translate "User" %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% comment %} <div id="user-info-profile-picture" class="fr-ml-1w">
+                        </div> {% endcomment %}
+                    </div>
+                </div>
+            </header>
+        {% endblock %}
+        <!-- END Header -->
     {% endif %}
-    {% include "./sidebar/main_sidebar.html" %}
-{% endblock %}
-
-{% block welcome-msg %}
-    <strong>{% firstof user.get_full_name user.get_username %}</strong> {% if user.is_superuser or user.is_lab_admin %} (Admin) {% endif %} /
-{% endblock %}
-
-{% block userlinks %}
-    <a href="{% url 'admin:logout' %}" id="logout-link"
-    >{% translate 'Log out' %}</a
->
-{% endblock %}
-
-{% block messages %}
-    <div id="top-header" class="fr-pr-5v">
-        <div id="header-left-content">
-            {% block top_header %}{% endblock %}
+        {% block messages %}
+          {% if messages %}
+            <ul class="messagelist">{% for message in messages %}
+              <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|capfirst }}</li>
+            {% endfor %}</ul>
+          {% endif %}
+        {% endblock messages %}
+        <!-- Content -->
+        <div id="content" class="{% block coltype %}colM{% endblock %}">
+          {% block pretitle %}{% endblock %}
+          {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+          {% block content_subtitle %}{% if subtitle %}<h2>{{ subtitle }}</h2>{% endif %}{% endblock %}
+          {% block content %}
+            {% block object-tools %}{% endblock %}
+            {{ content }}
+          {% endblock %}
+          {% block sidebar %}{% endblock %}
+          <br class="clear">
         </div>
-        <div id="user-info">
-            <div id="user-info-left">
-                <div id="user-info-fullname">
-                    {% firstof user.get_full_name user.get_username %} /
-                    <a href="{% url 'admin:logout' %}" id="logout-link">{% translate 'Log out' %}</a>
-                </div>
-                <div id="user-info-role">
-                    {% if user.is_superuser or user.is_lab_admin %}
-                        {% translate "Admin" %}
-                    {% else %}
-                        {% translate "User" %}
-                    {% endif %}
-                </div>
-            </div>
-            {% comment %} <div id="user-info-profile-picture" class="fr-ml-1w">
-            </div> {% endcomment %}
-        </div>
+        <!-- END Content -->
+        {% block footer %}<div id="footer"></div>{% endblock %}
+      </div>
     </div>
-{% endblock %}
+</div>
+<!-- END Container -->
+</body>
+</html>
