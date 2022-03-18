@@ -1,7 +1,8 @@
-from typing import List
+from typing import List, Optional
 
 
-class NavItem(object):
+# pylint: disable-msg=too-many-arguments
+class NavItem:
     """
     Helper object to more easily path item info from sidebar_items to nav_item
     """
@@ -11,7 +12,7 @@ class NavItem(object):
         title: str,
         href: str,
         icon: str,
-        extra_path: List[str] = [],
+        extra_path: Optional[List[str]] = None,
         exact_path: bool = False,
         badge: int = 0,
     ):
