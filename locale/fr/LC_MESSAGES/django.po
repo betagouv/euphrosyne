@@ -135,7 +135,7 @@ msgid "Log out"
 msgstr "Déconnexion"
 
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 msgid "User"
 msgstr "Utilisateur"
@@ -332,12 +332,10 @@ msgstr "Libellé du run"
 msgid "Run status"
 msgstr "Statut du run"
 
-#, fuzzy
 #| msgid "Started"
 msgid "Start date"
 msgstr "Démarré"
 
-#, fuzzy
 #| msgid "Embargo date"
 msgid "End date"
 msgstr "Date d'embargo"
