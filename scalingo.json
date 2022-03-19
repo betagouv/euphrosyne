@@ -2,6 +2,9 @@
   "name": "euphrosyne",
   "stack": "scalingo-18",
   "env": {
+    "ALLOWED_HOSTS": {
+      "value": ".scalingo.io"
+    },
     "DISABLE_COLLECTSTATIC": {
       "value": ""
     },
@@ -11,12 +14,13 @@
     "DJANGO_SECRET_KEY": {
       "generator": "secret"
     },
+    "PR_NUMBER": {
+      "generator": "template",
+      "template": "%PR_NUMBER%"
+    },
     "SITE_URL": {
       "generator": "url",
       "template": "%URL%"
-    },
-    "ALLOWED_HOSTS": {
-      "value": ".scalingo.io"
     },
     "S3_BUCKET_NAME": {
       "generator": "template",
@@ -27,5 +31,8 @@
     "web": {
       "quantity": 1
     }
+  },
+  "scripts": {
+    "first-deploy": "./scripts/replicate_staging_db.sh $PR_NUMBER && ./postdeploy"
   }
 }
