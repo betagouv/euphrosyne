@@ -18,7 +18,10 @@ local_reviewapp_db_url=$(echo $reviewapp_db_url | sed -E 's/@[^/]+\//@localhost:
 
 dumpfile=dump-"$datetime".pgsql
 
-
+echo staging_db_url
+echo local_staging_db_url
+echo reviewapp_db_url
+echo local_reviewapp_db_url
 
 
 echo "🚇🟢 Opening tunnel to staging db"

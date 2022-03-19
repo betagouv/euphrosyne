@@ -1,0 +1,7 @@
+#!/bin/bash
+# Postdeploy script to run when deploying Scalingo review app for the first time
+# to replicate staging db.
+
+install-scalingo-cli
+./scripts/replicate_staging_db.sh $PR_NUMBER
+./postdeploy
