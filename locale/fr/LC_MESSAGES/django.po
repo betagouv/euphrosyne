@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-14 17:39+0100\n"
+"POT-Creation-Date: 2022-03-21 09:24+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -283,9 +283,6 @@ msgstr "Administrateur"
 
 msgid "Comments"
 msgstr "Commentaires"
-
-msgid "Status"
-msgstr "Statut"
 
 msgid "French"
 msgstr "Français"

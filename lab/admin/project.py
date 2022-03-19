@@ -106,7 +106,7 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
         "number_of_runs",
         "status",
     )
-    readonly_fields = ("members", "status", "editable_leader_user", "leader_user")
+    readonly_fields = ("members", "editable_leader_user", "leader_user")
 
     lab_permissions = LabPermission(
         add_permission=LabRole.ANY_STAFF_USER,
@@ -163,14 +163,13 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
         basic_fields = (
             (
                 "name",
-                "status",
                 "admin",
                 "comments",
                 "editable_leader_user" if is_lab_admin(request.user) else "leader_user",
                 "members",
             )
             if obj
-            else ("name", "status", "admin", "members")
+            else ("name", "admin", "members")
         )
         fieldsets = [
             (
