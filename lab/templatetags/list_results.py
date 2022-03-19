@@ -1,7 +1,6 @@
 from django import template
 from django.contrib.admin.templatetags.admin_list import result_list
 from django.contrib.admin.templatetags.base import InclusionAdminNode
-from django.contrib.admin.utils import display_for_field
 from django.utils.html import format_html
 
 from ..models import Project
@@ -15,15 +14,13 @@ def project_results(
     results: list[list[str]],
 ):
     def update_result(project: Project, result: list[str]) -> list[str]:
-        choice_identifier = Project.Status.names[
-            Project.Status.values.index(project.status)
-        ]
+        project_status = project.status
+        choice_identifier = project_status.name
         class_name = choice_identifier.lower()
-        display = display_for_field(1, project._meta.get_field("status"), "")
         result[list_display_status_index] = format_html(
             '<td class="field-status">'
             f'<span class="fr-tag fr-tag--sm {class_name}">'
-            f"{display}"
+            f"{project_status.value[1]}"
             "</span>"
             "</td>"
         )

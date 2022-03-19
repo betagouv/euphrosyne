@@ -1,7 +1,9 @@
+from enum import Enum
 from typing import Optional
 
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from shared.models import TimestampedModel
@@ -12,7 +14,7 @@ from .participation import Participation
 class Project(TimestampedModel):
     """A project is a collection of runs done by the same team"""
 
-    class Status(models.IntegerChoices):
+    class Status(Enum):
         TO_SCHEDULE = 1, _("To schedule")
         SCHEDULED = 11, _("Scheduled")
         ONGOING = 21, _("Ongoing")
@@ -38,12 +40,6 @@ class Project(TimestampedModel):
 
     comments = models.TextField(_("Comments"), blank=True)
 
-    status = models.IntegerField(
-        _("Status"),
-        choices=Status.choices,
-        default=Status.TO_SCHEDULE,
-    )
-
     def __str__(self):
         return f"{self.name}"
 
@@ -53,6 +49,22 @@ class Project(TimestampedModel):
             return self.participation_set.get(is_leader=True)
         except Participation.DoesNotExist:
             return None
+
+    @property
+    def status(self) -> Status:
+        runs_with_start_date = self.runs.filter(start_date__isnull=False).values(
+            "start_date", "end_date"
+        )
+        if len(runs_with_start_date):
+            if any(
+                run["end_date"] < timezone.now() if run["end_date"] else False
+                for run in runs_with_start_date
+            ):
+                return self.Status.FINISHED
+            if any(timezone.now() > run["start_date"] for run in runs_with_start_date):
+                return self.Status.ONGOING
+            return self.Status.SCHEDULED
+        return self.Status.TO_SCHEDULE
 
 
 class BeamTimeRequest(TimestampedModel):
