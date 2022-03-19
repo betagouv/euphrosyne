@@ -19,8 +19,6 @@ local_reviewapp_db_url=$(echo $reviewapp_db_url | sed -E 's/@[^/]+\//@localhost:
 dumpfile=dump-"$datetime".pgsql
 
 
-
-
 echo "🚇🟢 Opening tunnel to staging db"
 scalingo --app euphrosyne-staging db-tunnel SCALINGO_POSTGRESQL_URL >/dev/null &>/dev/null &
 tunnel_pid=$!
