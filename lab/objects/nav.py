@@ -19,7 +19,7 @@ class NavItem:
         self.title = title
         self.href = href
         self.icon = icon
-        self.extra_path = extra_path
+        self.extra_path = extra_path or []
         self.exact_path = exact_path
         self.badge = badge
 
