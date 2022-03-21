@@ -33,6 +33,7 @@
     "@gouvfr/dsfr": "^1.3.1",
     "css-loader": "^6.5.1",
     "css-minimizer-webpack-plugin": "^3.3.1",
+    "dotenv": "^16.0.0",
     "glob": "^7.2.0",
     "glob-all": "^3.3.0",
     "html-loader-jest": "^0.2.1",
@@ -68,7 +69,8 @@
     "env": {
       "browser": true,
       "es6": true,
-      "jest/globals": true
+      "jest/globals": true,
+      "node": true
     }
   }
 }

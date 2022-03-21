@@ -1,3 +1,4 @@
+import "dotenv/config";
 import path from "path";
 import glob from "glob";
 import globAll from "glob-all";
@@ -7,6 +8,7 @@ import { dirname } from "path";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
 import PurgecssPlugin from "purgecss-webpack-plugin";
+import webpack from "webpack";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -81,6 +83,7 @@ export default {
     minimizer: [new CssMinimizerPlugin()],
   },
   plugins: [
+    new webpack.EnvironmentPlugin({ MATOMO_SITE_ID: null }),
     new MiniCssExtractPlugin(),
     new PurgecssPlugin({
       paths: globAll.sync(
