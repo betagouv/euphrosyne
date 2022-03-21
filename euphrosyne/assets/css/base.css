@@ -41,17 +41,6 @@ a:visited {
   line-height: 2rem;
 }
 
-.breadcrumbs {
-  display: none;
-}
-
-div.breadcrumbs {
-  background: var(--background-active-blue-france);
-}
-.breadcrumbs a {
-  box-shadow: none;
-}
-
 #branding h1,
 #branding h1 a:link,
 #branding h1 a:visited {
