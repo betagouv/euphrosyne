@@ -1,4 +1,3 @@
-/*global global*/
 import { jest } from "@jest/globals";
 import { tabClickHandler, handleModalClose } from "./tabs.js";
 
