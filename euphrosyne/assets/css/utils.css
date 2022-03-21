@@ -19,21 +19,3 @@
 .overflow-auto {
   overflow: auto;
 }
-
-/* purgecss ignore */
-.fr-tag.to_schedule {
-  background: #fcdf41;
-}
-
-.fr-tag.scheduled {
-  background: #f7bfc3;
-}
-
-.fr-tag.ongoing {
-  background: #00eb5e;
-}
-
-.fr-tag.finished {
-  background: #9a9aff;
-}
-/* purgecss end ignore */
