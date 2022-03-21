@@ -45,6 +45,8 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split() or (
     ["localhost", ".scalingo.io"] if not DEBUG else []
 )
 
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split()
+
 SITE_URL = os.environ["SITE_URL"]
 
 
