@@ -1,13 +1,37 @@
-from typing import List
+from typing import Optional
 
 from django import template
 from django.http import HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from lab.objects.nav import NavItem
-
 register = template.Library()
+
+
+# pylint: disable-msg=too-many-arguments
+class NavItem:
+    """
+    Helper object to more easily path item info from sidebar_items to nav_item
+    """
+
+    def __init__(
+        self,
+        title: str,
+        href: str,
+        icon: str,
+        extra_path: Optional[list[str]] = None,
+        exact_path: bool = False,
+        badge: int = 0,
+    ):
+        self.title = title
+        self.href = href
+        self.icon = icon
+        self.extra_path = extra_path or []
+        self.exact_path = exact_path
+        self.badge = badge
+
+    def __str__(self) -> str:
+        return f"NavItem({self.title}, {self.href})"
 
 
 @register.inclusion_tag("components/nav/nav_items.html")
@@ -19,7 +43,7 @@ def sidebar_items(request: HttpRequest):
     ----------
     request : HttpRequest
     """
-    items: List[NavItem] = [
+    items: list[NavItem] = [
         NavItem(
             _("Projects"),
             reverse("admin:lab_project_changelist"),
