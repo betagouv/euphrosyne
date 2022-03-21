@@ -56,8 +56,6 @@ def nav_item(current_path: str, item: NavItem):
 
     current_page = False
 
-    print(current_path)
-
     if item.exact_path:
         current_page = item.href == current_path
     else:
