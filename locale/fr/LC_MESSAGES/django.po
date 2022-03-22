@@ -144,13 +144,7 @@ msgid "Main menu"
 msgstr "Menu principal"
 
 msgid "Django"
-msgstr ""
-
-msgid "Projects"
-msgstr "Projets"
-
-msgid "Users"
-msgstr "Utilisateurs"
+msgstr "Django"
 
 msgid "Log in with ORCID"
 msgstr "Se connecter avec ORCID"
@@ -172,6 +166,9 @@ msgstr "Runs"
 
 msgid "Basic information"
 msgstr "Informations essentielles"
+
+msgid "Projects"
+msgstr "Projets"
 
 msgid "Object / Sample"
 msgstr "Objet / Échantillon"
@@ -332,11 +329,9 @@ msgstr "Libellé du run"
 msgid "Run status"
 msgstr "Statut du run"
 
-#| msgid "Started"
 msgid "Start date"
 msgstr "Démarré"
 
-#| msgid "Embargo date"
 msgid "End date"
 msgstr "Date d'embargo"
 
@@ -556,6 +551,9 @@ msgstr "Données brutes"
 
 msgid "Processed data"
 msgstr "Données travaillées"
+
+msgid "Users"
+msgstr "Utilisateurs"
 
 msgid "Run(s)"
 msgstr "Run(s)"
