@@ -87,10 +87,13 @@
           <br class="clear">
         </div>
         <!-- END Content -->
-        {% block footer %}<div id="footer"></div>{% endblock %}
       </div>
     </div>
-</div>
+    {% block footer %}{% endblock %}
+  </div>
+  {% if not request.user.is_authenticated %}
+  {% include "footer.html" %}
+  {% endif %}
 <!-- END Container -->
 </body>
 </html>

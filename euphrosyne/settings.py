@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "social_django",
     "lab",
     "orcid_oauth",
+    "static_pages",
 ] + (["debug_toolbar"] if DEBUG else [])
 
 MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else []) + [
@@ -206,6 +207,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 STATICFILES_DIRS = [
     BASE_DIR / "euphrosyne/assets/dist",
+    BASE_DIR / "euphrosyne/static",
 ]
 
 # Default primary key field type
