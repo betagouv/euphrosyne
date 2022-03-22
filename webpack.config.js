@@ -1,7 +1,6 @@
 import "dotenv/config";
 import path from "path";
 import glob from "glob";
-import globAll from "glob-all";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
