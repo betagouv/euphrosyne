@@ -134,8 +134,11 @@ msgstr "Entrez vos informations"
 msgid "Log out"
 msgstr "Déconnexion"
 
-msgid "Home"
-msgstr "Accueil"
+msgid "Admin"
+msgstr ""
+
+msgid "User"
+msgstr "Utilisateur"
 
 msgid "Main menu"
 msgstr "Menu principal"
@@ -226,9 +229,6 @@ msgstr ""
 #, python-brace-format
 msgid "[Euphrosyne] Invitation to join project {project.name}"
 msgstr "[Euphrosyne] Invitation à rejoindre le projet {project.name}"
-
-msgid "User"
-msgstr "Utilisateur"
 
 msgid "Institution"
 msgstr "Institution"
@@ -419,6 +419,9 @@ msgstr "Objet(s) / Échantillon(s)"
 msgid "Inventory"
 msgstr "Inventaire"
 
+msgid "Home"
+msgstr "Accueil"
+
 msgid "Change leader"
 msgstr "Modification du chef de projet"
 
@@ -478,10 +481,6 @@ msgstr "Filtrer"
 
 msgid "Clear all filters"
 msgstr "Effacer tous les filtres"
-
-#, python-format
-msgid "Add %(name)s"
-msgstr "Ajouter %(name)s"
 
 msgid "Create a run"
 msgstr "Créer un run"
@@ -551,9 +550,6 @@ msgstr "Créer un objet ou groupe d'objets"
 msgid "Delete selected %(model)s"
 msgstr "Modifier l’objet %(model)s sélectionné"
 
-msgid "Workplace"
-msgstr "Workplace"
-
 msgid "Runs data"
 msgstr "Données des runs"
 
@@ -565,6 +561,9 @@ msgstr "Données travaillées"
 
 msgid "Run(s)"
 msgstr "Run(s)"
+
+msgid "Workplace"
+msgstr "Workplace"
 
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"
