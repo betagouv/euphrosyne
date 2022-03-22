@@ -1,11 +1,9 @@
 from django import template
-from django.contrib.admin.utils import display_for_field
 from django.http import HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from lab.models import Project
-from lab.models.project import ProjectStatus
 
 register = template.Library()
 
@@ -57,13 +55,17 @@ def project_header(project_id: int):
 
     project = Project.objects.get(pk=project_id)
 
-    class_name = ProjectStatus.names[ProjectStatus.values.index(project.status)].lower()
-    display = display_for_field(1, project._meta.get_field("status"), "")
+    if not project:
+        return None
+
+    project_status = project.status
+    choice_identifier = project_status.name
+    class_name = choice_identifier.lower()
 
     return {
         "project": project,
         "status": {
             "class_name": class_name,
-            "display": display,
+            "display": project_status.value[1],
         },
     }
