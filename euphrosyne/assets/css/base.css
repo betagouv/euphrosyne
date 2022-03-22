@@ -48,6 +48,11 @@ a:visited {
   font-weight: bold;
 }
 
+#container {
+  height: auto;
+  min-height: 100%;
+}
+
 #user-tools {
   font-weight: 400;
 }

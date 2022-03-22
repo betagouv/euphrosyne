@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-21 09:24+0100\n"
+"POT-Creation-Date: 2022-03-26 10:53+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -145,6 +145,25 @@ msgstr "Menu principal"
 
 msgid "Log in with ORCID"
 msgstr "Se connecter avec ORCID"
+
+#, python-format
+msgid "Euphrosyne, open %(aglae_link)s data."
+msgstr "Euphrosyne, ouvrir les données d'%(aglae_link)s."
+
+msgid "Our partners"
+msgstr "Nos partenaires"
+
+msgid "Accessibility: non-compliant"
+msgstr "Accessibilité: non conforme"
+
+msgid "End-user license agreement"
+msgstr "Conditions générales d'utilisation"
+
+msgid "Legal notice"
+msgstr "Notions légales"
+
+msgid "Personal data and cookies"
+msgstr "Données personnelles et cookies"
 
 msgid "Project member"
 msgstr "Membre du projet"

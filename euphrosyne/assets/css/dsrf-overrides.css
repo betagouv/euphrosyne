@@ -1,7 +1,3 @@
-[href] {
-  box-shadow: none;
-}
-
 /* Fix while we do import DSFR checkbox component. Prevents checkboxes from disappearing. */
 input,
 select,
@@ -41,4 +37,8 @@ a#logout-link,
 .datetimeshortcuts a,
 #nav-sidebar a {
   box-shadow: none;
+}
+
+.fr-footer__partners a {
+  background: none;
 }
