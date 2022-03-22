@@ -1,0 +1,43 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block bodyclass %}{{ block.super }} unauthorized{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static "css/unauthorized.css" %}">
+{% endblock %}
+
+{% block content %}
+    <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle" id="panels-container">
+      <div class="fr-col-0 fr-col-md-6 left-panel fr-background-alt--blue-ecume">
+          <div class="fr-container left-panel__container">
+            <h1>Euphrosyne</h1>
+            <img src="{% static "img/illustration-unauthorized.svg" %}" class="left-panel__illustration">
+            <h2>
+            {% blocktranslate with aglae_tag='<span class="fr-text-label--blue-cumulus">Aglae</span>' trimmed %}
+            The online board to track your {{ aglae_tag }} search projects
+            {% endblocktranslate %}
+            </h2>
+          </div>
+      </div>
+      <div class="fr-col-12 fr-col-md-6">
+          <div class="fr-container right-panel__container">
+            {% if form.errors and not form.non_field_errors %}
+            <p class="errornote">
+                {% if form.errors.items|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
+            </p>
+            {% endif %}
+            {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+                <p class="errornote">
+                {{ error }}
+                </p>
+            {% endfor %}
+            {% endif %}
+            {% block content_panel %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
