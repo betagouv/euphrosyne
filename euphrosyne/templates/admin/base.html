@@ -37,7 +37,7 @@
         {% endblock %}
       {% endif %}
       <div class="content">
-        {% if not is_popup %}
+        {% if not is_popup and user.is_authenticated %}
         <!-- Header -->
         {% block header %}
             <header role="banner" class="fr-header">
@@ -66,7 +66,7 @@
             </header>
         {% endblock %}
         <!-- END Header -->
-    {% endif %}
+        {% endif %}
         {% block messages %}
           {% if messages %}
             <ul class="messagelist">{% for message in messages %}
