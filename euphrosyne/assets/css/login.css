@@ -14,17 +14,11 @@
   text-align: center;
 }
 
-.orcid-row hr {
-  margin: 0 0 23px 0;
-  background-color: transparent;
-}
-
 .orcid-row a {
-  width: 170px;
+  width: 17rem;
   display: flex;
   align-items: center;
   padding: 10px 15px;
-  margin: 10px auto 0 auto;
   background-color: var(--background-default-grey);
   color: var(--text-action-high-grey);
   box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14),

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-26 10:53+0100\n"
+"POT-Creation-Date: 2022-03-28 12:33+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -90,11 +90,8 @@ msgstr ""
 msgid "Enter an email and password."
 msgstr "Entrez un email et un mot de passe"
 
-msgid ""
-"You can change your email, fill up your information and choose a password."
-msgstr ""
-"Vous pouvez indiquer votre email, complétez vos informations et choisir un "
-"mot de passe."
+msgid "Create your account"
+msgstr "Créer votre compte"
 
 msgid "Password"
 msgstr "Mot de passe"
@@ -105,13 +102,16 @@ msgstr "Confirmez le mot de passe"
 msgid "Save my information"
 msgstr "Enregistrer mon profil"
 
+msgid "Other registration providers"
+msgstr "Autres services d'inscription"
+
 msgid "Connect your ORCID ID"
 msgstr "Connecter votre ORCID ID"
 
 msgid ""
 "The registration link was invalid, possibly because it has already been used."
 msgstr ""
-"Le lien d'inscription est invalid, peut-être parce qu'il a déjà été utilisé."
+"Le lien d'inscription est invalide, peut-être parce qu'il a déjà été utilisé."
 
 msgid "Hello,"
 msgstr "Bonjour,"
@@ -143,8 +143,25 @@ msgstr "Utilisateur"
 msgid "Main menu"
 msgstr "Menu principal"
 
+msgid "Sign in"
+msgstr "Inscription"
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Vous êtes connecté.e en tant que %(username)s, mais n'êtres pas autorisé.e à "
+"accéderà ce contenu. Voulez-vous vous connnecter avec un compte différent?"
+
 msgid "Log in with ORCID"
 msgstr "Se connecter avec ORCID"
+
+msgid "Forgotten your password or username?"
+msgstr "Mot de pass oublié ?"
+
+msgid "Log in"
+msgstr "Connexion"
 
 #, python-format
 msgid "Euphrosyne, open %(aglae_link)s data."
@@ -164,6 +181,69 @@ msgstr "Notions légales"
 
 msgid "Personal data and cookies"
 msgstr "Données personnelles et cookies"
+
+msgid "Password reset complete"
+msgstr "Mise à jour du mot de passe terminée"
+
+msgid "Your password has been set. You may go ahead and log in now."
+msgstr ""
+"Votre mot de passe a bien été mis à jour. Vous pouvez vous connecter à "
+"nouveau."
+
+msgid "New password"
+msgstr "Nouveau mot de passe"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Entrez votre nouveau mot de passe deux fois pour être sûr qu'il soit correct."
+
+msgid "Change my password"
+msgstr "Modifier mon mot de passe"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Le lien d'inscription est invalide, peut-être parce qu'il a déjà été "
+"utilisé. Demandez-en un nouveau."
+
+msgid "Email sent"
+msgstr "Email envoyé"
+
+msgid ""
+"We’ve emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+"Un email avec les instructions pour mettre à jour votre mot de passe vous a "
+"été envoyé, si un compte existe avec cet email."
+
+msgid ""
+"If you don’t receive an email, please make sure you’ve entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Si vous ne recevez aucun email, vérifiez que vous avez entré le bon email et "
+"vérifiez dans vos courriers indésirables."
+
+msgid "Go back to login page"
+msgstr "Retour à la page de connexion"
+
+msgid "Reset password"
+msgstr "Mettre à jour le mot de passe"
+
+msgid "Email address"
+msgstr "Email"
+
+#, python-format
+msgid "The online board to track your %(aglae_tag)s search projects"
+msgstr "L'outil en ligne pour gérer vos projets de recherche AGLAE"
+
+msgid "Please correct the error below."
+msgstr "Merci de corriger l'erreur ci-dessous"
+
+msgid "Please correct the errors below."
+msgstr "Merci de corriger les erreurs ci-dessous"
 
 msgid "Project member"
 msgstr "Membre du projet"
@@ -472,12 +552,6 @@ msgstr "Annuler"
 
 msgid "Yes, abandon changes"
 msgstr "Oui, abandonner les modifications"
-
-msgid "Please correct the error below."
-msgstr "Merci de corriger l'erreur ci-dessous"
-
-msgid "Please correct the errors below."
-msgstr "Merci de corriger les erreurs ci-dessous"
 
 msgid "Filter"
 msgstr "Filtrer"

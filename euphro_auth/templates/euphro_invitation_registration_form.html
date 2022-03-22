@@ -1,19 +1,22 @@
-{% extends "admin/base_site.html" %}
+{% extends "unauthorized.html" %}
 {% load i18n static %}
 
-{% block extrastyle %}{{ block.super }}
+{% block extrastyle %}
 <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
 <link rel="stylesheet" type="text/css" href="{% static "css/registration.css" %}">
+{{ block.super }}
 {% endblock %}
 
-{% block content %}
+{% block content_title %}{% endblock %}
+
+{% block content_panel %}
+
+<h3>{% translate "Create your account" %}</h3>
+
 
 {% if validlink %}
 
-<p>{% translate "You can change your email, fill up your information and choose a password." %}</p>
-
 <form method="post">{% csrf_token %}
-    <fieldset class="module aligned">
         <div class="form-row field-email">
             {{ form.email.errors }}
             <label for="id_email">{% translate 'Email' %}:</label>
@@ -42,21 +45,23 @@
         </div>
         <br>
 
-        <input type="submit" value="{% translate 'Save my information' %}">
-    </fieldset>
+        <input type="submit" value="{% translate 'Save my information' %}" class="fr-mb-4w">
 </form>
 
 <div class="orcid-row">
-    <h1>Other registration provider</h1>
-    <a href="{% url "social:begin" "orcid" %}?user_id={{ user_id }}">
+    <h4>{% translate "Other registration providers" %}</h4>
+    <div>
         <img alt="ORCID logo" src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_24x24.png" width="24" height="24" />
-        {% translate 'Connect your ORCID ID' %}
-    </a>
+        <a href="{% url "social:begin" "orcid" %}?user_id={{ user_id }}">
+            {% translate 'Connect your ORCID ID' %}
+        </a>
+    </div>
 </div>
 
 {% else %}
-
-<p>{% translate "The registration link was invalid, possibly because it has already been used." %}</p>
+<p class="errornote">
+    {% translate "The registration link was invalid, possibly because it has already been used." %}
+</p>
 
 {% endif %}
 

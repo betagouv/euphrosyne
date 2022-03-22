@@ -12,6 +12,7 @@ from lab.workplace.views import WorkplaceView
 
 class AdminSite(admin.AdminSite):
     login_template = "euphro_admin/login.html"
+    password_change_template = "euphro_admin/password_reset_form.html"
 
     site_title = "Euphrosyne"
     site_header = "Euphrosyne"

@@ -1,20 +1,23 @@
-{% extends "admin/base_site.html" %} 
-{% load i18n static %} 
-{% block extrastyle %}{{ block.super }} 
-<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}"> 
-{% endblock %} 
+{% extends "unauthorized.html" %}
+{% load i18n static %}
 
-{% block content %}
+{% block extrastyle %}
+<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
+<link rel="stylesheet" type="text/css" href="{% static "css/registration.css" %}">
+{{ block.super }}
+{% endblock %}
 
-<p>{% translate "Verify your information" %}.</p>
+{% block content_title %}{% endblock %}
+
+{% block content_panel %}
+
+<h3>{% translate "Verify your information" %}</h3>
 
 <form method="post">
   {% csrf_token %}
-  <fieldset class="module aligned">
     {{ form.as_p }}
 
     <input type="submit" value="{% translate 'Save my information' %}" />
-  </fieldset>
 </form>
 
 {% endblock %}
