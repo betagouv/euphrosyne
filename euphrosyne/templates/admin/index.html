@@ -1,7 +1,10 @@
 {% extends 'admin/index.html' %}
 
 {% block nav-sidebar %}
-    {% include "./sidebar.html" %}
+    {% if user.is_superuser %}
+        {% include 'admin/nav_sidebar.html' %}
+    {% endif %}
+    {% include "./sidebar/main_sidebar.html" %}
 {% endblock %}
 
 {% block content %}

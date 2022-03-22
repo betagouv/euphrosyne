@@ -4,18 +4,13 @@
 {% block content_title %}{% endblock %}
 
 {% if not is_popup %}
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url "admin:index" %}">{% translate "Home" %}</a>
-{% if project %}
-&rsaquo; <a href="{% url "admin:lab_project_changelist" %}">{% translate "Projects" %}</a>
-&rsaquo; <a href="{% url "admin:lab_project_change" project.id %}">{{ project.name }}</a>
+    {% block top_header %}
+        {% project_header project.id %}
+    {% endblock %}
 {% endif %}
-&rsaquo; <a href="{% url 'admin:app_list' app_label=cl.opts.app_label %}">{{ cl.opts.app_config.verbose_name }}</a>
-&rsaquo; {{ cl.opts.verbose_name_plural|capfirst }}
-</div>
-{% endblock %}
-{% endif %}
+
+{% comment %} Hide object-tools in this page as the project param in URL in not right {% endcomment %}
+{% block object-tools %}{% endblock %}
 
 {% block content %}
 {% if project %}
