@@ -147,7 +147,7 @@ ul li {
   list-style-type: none;
 }
 
-/* purgecss ignore */
+/* purgecss start ignore */
 .fr-tag.to_schedule {
   background: var(--background-contrast-yellow-tournesol);
 }
@@ -160,4 +160,9 @@ ul li {
 .fr-tag.finished {
   background: var(--background-contrast-blue-ecume);
 }
+
+.delete-confirmation form .button.cancel-link {
+  height: unset;
+}
+
 /* purgecss end ignore */
