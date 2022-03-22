@@ -143,9 +143,6 @@ msgstr "Utilisateur"
 msgid "Main menu"
 msgstr "Menu principal"
 
-msgid "Django"
-msgstr "Django"
-
 msgid "Log in with ORCID"
 msgstr "Se connecter avec ORCID"
 
@@ -412,12 +409,6 @@ msgstr "Objet(s) / Échantillon(s)"
 msgid "Inventory"
 msgstr "Inventaire"
 
-msgid "Home"
-msgstr "Accueil"
-
-msgid "Change leader"
-msgstr "Modification du chef de projet"
-
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -521,6 +512,9 @@ msgstr "Vous pouvez accéder à l'invitation ici :"
 
 msgid "Join project"
 msgstr "Rejoindre le projet"
+
+msgid "Change leader"
+msgstr "Modification du chef de projet"
 
 msgid "Select an object or a group of objects"
 msgstr "Choisissez un object ou groupe d'objets"

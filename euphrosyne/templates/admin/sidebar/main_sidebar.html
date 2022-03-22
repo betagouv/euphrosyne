@@ -1,7 +1,7 @@
 {% load i18n static nav %}
 <nav class="sidebar" id="euphrosyne-main-sidebar" role="navigation" aria-controls="main-sidebar"
     aria-label="{% translate 'Main menu' %}">
-    <h1 class="sidebar-title">{{ site_header|default:_("Django") }}</h1>
+    <h1 class="sidebar-title">{{ site_header|default:"Django" }}</h1>
     <ul class="sidebar-menu">
         {% sidebar_items request %}
     </ul>
