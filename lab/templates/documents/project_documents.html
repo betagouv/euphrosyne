@@ -10,14 +10,8 @@
 <link rel="stylesheet" type="text/css" href="{% static "document.css" %}">
 {% endblock %}
 
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-&rsaquo; <a href="{% url 'admin:app_list' app_label='lab' %}">Lab</a>
-&rsaquo; <a href="{% url 'admin:lab_project_changelist' %}">{% translate 'Projects' %}</a>
-&rsaquo; <a href="{% url 'admin:lab_project_change' project.id %}">{{ project.name|truncatewords:"18" }}</a>
-&rsaquo; {% translate 'Documents' %}</a>
-</div>
+{% block top_header %}
+    {% project_header project.id %}
 {% endblock %}
 
 {% block content %}

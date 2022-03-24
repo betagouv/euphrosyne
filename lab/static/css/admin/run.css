@@ -29,8 +29,7 @@
   bottom: 0;
   width: 102%;
   margin-left: -1%;
-  background-color: var(--g-100);
-  border-top: 1px solid rgb(235, 236, 240);
+  border-top: 1px solid var(--grey-950-100);
   margin-top: 1em;
   height: 5em;
   padding: 1em;

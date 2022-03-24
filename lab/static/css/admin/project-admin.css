@@ -19,19 +19,6 @@
   justify-content: space-between;
 }
 
-.fr-tag.to_schedule {
-  background: var(--background-contrast-yellow-tournesol);
-}
-.fr-tag.scheduled {
-  background: var(--background-contrast-red-marianne);
-}
-.fr-tag.ongoing {
-  background: var(--background-contrast-green-bourgeon);
-}
-.fr-tag.finished {
-  background: var(--background-contrast-blue-ecume);
-}
-
 td.field-status {
   white-space: nowrap;
 }

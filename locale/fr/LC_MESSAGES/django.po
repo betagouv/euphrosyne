@@ -134,20 +134,14 @@ msgstr "Entrez vos informations"
 msgid "Log out"
 msgstr "Déconnexion"
 
-msgid "Home"
-msgstr "Accueil"
+msgid "Admin"
+msgstr "Admin"
+
+msgid "User"
+msgstr "Utilisateur"
 
 msgid "Main menu"
 msgstr "Menu principal"
-
-msgid "Django"
-msgstr ""
-
-msgid "Projects"
-msgstr "Projets"
-
-msgid "Users"
-msgstr "Utilisateurs"
 
 msgid "Log in with ORCID"
 msgstr "Se connecter avec ORCID"
@@ -169,6 +163,9 @@ msgstr "Runs"
 
 msgid "Basic information"
 msgstr "Informations essentielles"
+
+msgid "Projects"
+msgstr "Projets"
 
 msgid "Object / Sample"
 msgstr "Objet / Échantillon"
@@ -226,9 +223,6 @@ msgstr ""
 #, python-brace-format
 msgid "[Euphrosyne] Invitation to join project {project.name}"
 msgstr "[Euphrosyne] Invitation à rejoindre le projet {project.name}"
-
-msgid "User"
-msgstr "Utilisateur"
 
 msgid "Institution"
 msgstr "Institution"
@@ -332,13 +326,9 @@ msgstr "Libellé du run"
 msgid "Run status"
 msgstr "Statut du run"
 
-#, fuzzy
-#| msgid "Started"
 msgid "Start date"
 msgstr "Démarré"
 
-#, fuzzy
-#| msgid "Embargo date"
 msgid "End date"
 msgstr "Date d'embargo"
 
@@ -419,9 +409,6 @@ msgstr "Objet(s) / Échantillon(s)"
 msgid "Inventory"
 msgstr "Inventaire"
 
-msgid "Change leader"
-msgstr "Modification du chef de projet"
-
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -479,10 +466,6 @@ msgstr "Filtrer"
 msgid "Clear all filters"
 msgstr "Effacer tous les filtres"
 
-#, python-format
-msgid "Add %(name)s"
-msgstr "Ajouter %(name)s"
-
 msgid "Create a run"
 msgstr "Créer un run"
 
@@ -530,6 +513,9 @@ msgstr "Vous pouvez accéder à l'invitation ici :"
 msgid "Join project"
 msgstr "Rejoindre le projet"
 
+msgid "Change leader"
+msgstr "Modification du chef de projet"
+
 msgid "Select an object or a group of objects"
 msgstr "Choisissez un object ou groupe d'objets"
 
@@ -551,9 +537,6 @@ msgstr "Créer un objet ou groupe d'objets"
 msgid "Delete selected %(model)s"
 msgstr "Modifier l’objet %(model)s sélectionné"
 
-msgid "Workplace"
-msgstr "Workplace"
-
 msgid "Runs data"
 msgstr "Données des runs"
 
@@ -563,8 +546,14 @@ msgstr "Données brutes"
 msgid "Processed data"
 msgstr "Données travaillées"
 
+msgid "Users"
+msgstr "Utilisateurs"
+
 msgid "Run(s)"
 msgstr "Run(s)"
+
+msgid "Workplace"
+msgstr "Workplace"
 
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"

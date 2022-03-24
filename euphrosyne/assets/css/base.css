@@ -1,6 +1,7 @@
 @import url("./dsrf-overrides.css");
 @import url("./components/fieldset.css");
 @import url("./components/nav.css");
+@import url("./components/header.css");
 @import url("./utils.css");
 
 :root {
@@ -20,6 +21,8 @@
   --link-fg: var(--primary);
   --default-button-bg: var(--blue-france-300);
   --default-button-hover-bg: var(--blue-france-hover);
+
+  --grey-1000: #161616;
 }
 
 body {
@@ -36,13 +39,6 @@ a:visited {
 .content h1 {
   font-size: 1.5rem;
   line-height: 2rem;
-}
-
-div.breadcrumbs {
-  background: var(--background-active-blue-france);
-}
-.breadcrumbs a {
-  box-shadow: none;
 }
 
 #branding h1,
@@ -150,3 +146,23 @@ label.required:after {
 ul li {
   list-style-type: none;
 }
+
+/* purgecss start ignore */
+.fr-tag.to_schedule {
+  background: var(--background-contrast-yellow-tournesol);
+}
+.fr-tag.scheduled {
+  background: var(--background-contrast-red-marianne);
+}
+.fr-tag.ongoing {
+  background: var(--background-contrast-green-bourgeon);
+}
+.fr-tag.finished {
+  background: var(--background-contrast-blue-ecume);
+}
+
+.delete-confirmation form .button.cancel-link {
+  height: unset;
+}
+
+/* purgecss end ignore */

@@ -3,21 +3,21 @@
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
 <head>
 <title>{% block title %}{% endblock %}</title>
-<link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
+<link rel="stylesheet" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
 <link rel="stylesheet" type="text/css" href="{% static "main.css"%}"></link>
 {% if not is_popup and is_nav_sidebar_enabled %}
-  <link rel="stylesheet" type="text/css" href="{% static "admin/css/nav_sidebar.css" %}">
+  <link rel="stylesheet" href="{% static "admin/css/nav_sidebar.css" %}">
   <script src="{% static 'admin/js/nav_sidebar.js' %}" defer></script>
 {% endif %}
 {% block extrastyle %}{% endblock %}
-{% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
+{% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
 {% block extrahead %}
-    <script type="text/javascript" src="{% static 'main.js' %}"></script>
+<script type="text/javascript" src="{% static 'main.js' %}"></script>
 {% endblock %}
 {% block responsive %}
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="{% static "admin/css/responsive.css" %}">
-    {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% static "admin/css/responsive_rtl.css" %}">{% endif %}
+    <link rel="stylesheet" href="{% static "admin/css/responsive.css" %}">
+    {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% static "admin/css/responsive_rtl.css" %}">{% endif %}
 {% endblock %}
 {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE">{% endblock %}
 </head>
@@ -30,42 +30,43 @@
     <div class="main" id="main">
       {% if not is_popup and is_nav_sidebar_enabled %}
         {% block nav-sidebar %}
-            {% include "./sidebar.html" %}
+            {% if user.is_superuser %}
+                {% include "admin/nav_sidebar.html" %}
+            {% endif %}
+            {% include "./sidebar/main_sidebar.html" %}
         {% endblock %}
       {% endif %}
       <div class="content">
-        {% if not is_popup %}
-            <!-- Header -->
-            {% block header %}
-                <div id="header">
-                    <div id="branding">
+        {% if not is_popup and user.is_authenticated %}
+        <!-- Header -->
+        {% block header %}
+            <header role="banner" class="fr-header">
+                <div id="top-header" class="fr-px-5v fr-header__body">
+                    <div id="header-left-content">
+                        {% block top_header %}{% endblock %}
                     </div>
-                    {% block usertools %}
-                        {% if has_permission %}
-                            <div id="user-tools">
-                                {% block welcome-msg %}
-                                    <strong>{% firstof user.get_full_name user.get_username %}</strong>
-                                    {% if user.is_superuser or user.is_lab_admin %} (Admin) {% endif %} /
-                                {% endblock %}
-                                {% block userlinks %}
-                                    <a href="{% url 'admin:logout' %}" id="logout-link">{% translate 'Log out' %}</a>
-                                {% endblock %}
+                    <div id="user-info">
+                        <div id="user-info-left">
+                            <div id="user-info-fullname">
+                                {% firstof user.get_full_name user.get_username %} /
+                                <a href="{% url 'admin:logout' %}" id="logout-link">{% translate 'Log out' %}</a>
                             </div>
-                        {% endif %}
-                    {% endblock %}
-                    {% block nav-global %}{% endblock %}
+                            <div id="user-info-role">
+                                {% if user.is_superuser or user.is_lab_admin %}
+                                    {% translate "Admin" %}
+                                {% else %}
+                                    {% translate "User" %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% comment %} <div id="user-info-profile-picture" class="fr-ml-1w">
+                        </div> {% endcomment %}
+                    </div>
                 </div>
-            {% endblock %}
-            <!-- END Header -->
-            {% block breadcrumbs %}
-                <div class="breadcrumbs">
-                    <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-                    {% if title %} &rsaquo; {{ title }}{% endif %}
-                </div>
-            {% endblock %}
+            </header>
+        {% endblock %}
+        <!-- END Header -->
         {% endif %}
-
-
         {% block messages %}
           {% if messages %}
             <ul class="messagelist">{% for message in messages %}
