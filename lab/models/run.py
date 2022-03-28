@@ -26,7 +26,11 @@ class Run(TimestampedModel, MethodModel):
         DEUTON = "Deuton", _("Deuton")
 
     project = models.ForeignKey(
-        "lab.Project", null=False, on_delete=models.PROTECT, related_name="runs"
+        "lab.Project",
+        null=False,
+        on_delete=models.PROTECT,
+        related_name="runs",
+        verbose_name=_("Project"),
     )
     label = models.CharField(_("Run label"), max_length=255)
 
