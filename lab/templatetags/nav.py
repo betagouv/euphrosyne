@@ -56,8 +56,15 @@ def sidebar_items(request: HttpRequest):
         items.append(
             NavItem(
                 _("Users"),
-                reverse("admin:euphro_auth_userinvitation_changelist"),
+                reverse("admin:euphro_auth_user_changelist"),
                 '<i class="ri-user-line" aria-hidden="true"></i>',
+            )
+        )
+        items.append(
+            NavItem(
+                _("Invitations"),
+                reverse("admin:euphro_auth_userinvitation_changelist"),
+                '<i class="ri-mail-line" aria-hidden="true"></i>',
             )
         )
 
