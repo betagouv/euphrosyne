@@ -79,6 +79,16 @@ class UserAdmin(DjangoUserAdmin):
             )
         return fieldsets
 
+    def has_view_permission(
+        self, request: HttpRequest, obj: Optional[User] = None
+    ) -> bool:
+        return request.user.is_staff and is_lab_admin(request.user)
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: Optional[User] = None
+    ) -> bool:
+        return request.user.is_staff and is_lab_admin(request.user)
+
 
 class UserInvitationAdmin(ModelAdmin):
     list_display = ("email", "invitation_completed", "invitation_completed_at")
