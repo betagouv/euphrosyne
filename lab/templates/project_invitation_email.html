@@ -6,7 +6,7 @@
 </p>
 <p>
   {% block reset_link %}
-  <a href="{{site_url}}{% url 'admin:lab_project_change' project_id  %}">
+  <a href="{{site_url}}{% url 'admin:lab_project_change' project_id  %}" rel="notrack">
     {% trans "Join project" %}
   </a>
   {% endblock %}

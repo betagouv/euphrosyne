@@ -8,7 +8,7 @@
 </p>
 <p>
     {% block reset_link %}
-    <a href="{{site_url}}{% url 'registration_token' uid token %}">
+    <a href="{{site_url}}{% url 'registration_token' uid token %}" rel="notrack">
         {% trans "Create account" %}
     </a>
     {% endblock %}
