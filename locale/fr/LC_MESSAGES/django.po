@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-28 14:59+0200\n"
+"POT-Creation-Date: 2022-03-31 15:28+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -237,7 +237,7 @@ msgstr "Email"
 
 #, python-format
 msgid "The online board to track your %(aglae_tag)s search projects"
-msgstr "L'outil en ligne pour gérer vos projets de recherche AGLAE"
+msgstr "L'outil en ligne pour gérer vos projets de recherche %(aglae_tag)s"
 
 msgid "Please correct the error below."
 msgstr "Merci de corriger l'erreur ci-dessous"
@@ -466,16 +466,14 @@ msgstr ""
 "Remplissez la datation et le numéro d'inventaire si votre groupe d'objets "
 "est indifférencié."
 
-#, fuzzy
-#| msgid "Object"
 msgid "One object"
-msgstr "Objet"
+msgstr "Objet unique"
 
 msgid "Group of objects"
 msgstr "Groupe d'objets"
 
 msgid "Separate each material with a comma"
-msgstr ""
+msgstr "Séparez chaque matériau par une virgule"
 
 msgid "Label"
 msgstr "Libellé"

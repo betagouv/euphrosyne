@@ -8,9 +8,9 @@
   max-width: 150px;
   background-image: linear-gradient(
     90deg,
-    var(--g-100) 0px,
+    var(--background-default-grey) 0px,
     var(--hairline-color) 40px,
-    var(--g-100) 80px
+    var(--background-default-grey) 80px
   );
   background-size: 600px;
   animation: 2s shine-lines infinite linear;
