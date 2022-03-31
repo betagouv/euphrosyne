@@ -79,35 +79,30 @@ class LabPermissionMixin:
             >= self.lab_permissions.delete_permission
         )
 
-    @staticmethod
-    def has_module_permission(request: HttpRequest) -> bool:
+    # pylint: disable=no-self-use
+    def has_module_permission(self, request: HttpRequest) -> bool:
         return request.user.is_staff
 
 
 class LabAdminAllowedMixin:
     """Gives permission to every action to lab admin and restricts others."""
 
-    @staticmethod
-    # pylint: disable=unused-argument
-    def has_module_permission(request: HttpRequest) -> bool:
+    # pylint: disable=unused-argument,no-self-use
+    def has_module_permission(self, request: HttpRequest) -> bool:
         return request.user.is_staff and is_lab_admin(request.user)
 
-    @staticmethod
-    # pylint: disable=unused-argument
-    def has_view_permission(request: HttpRequest, obj: Optional[T] = None):
+    # pylint: disable=unused-argument,no-self-use
+    def has_view_permission(self, request: HttpRequest, obj: Optional[T] = None):
         return request.user.is_staff and is_lab_admin(request.user)
 
-    @staticmethod
-    # pylint: disable=unused-argument
-    def has_add_permission(request: HttpRequest, obj: Optional[T] = None):
+    # pylint: disable=unused-argument,no-self-use
+    def has_add_permission(self, request: HttpRequest, obj: Optional[T] = None):
         return request.user.is_staff and is_lab_admin(request.user)
 
-    @staticmethod
-    # pylint: disable=unused-argument
-    def has_change_permission(request: HttpRequest, obj: Optional[T] = None):
+    # pylint: disable=unused-argument,no-self-use
+    def has_change_permission(self, request: HttpRequest, obj: Optional[T] = None):
         return request.user.is_staff and is_lab_admin(request.user)
 
-    @staticmethod
-    # pylint: disable=unused-argument
-    def has_delete_permission(request: HttpRequest, obj: Optional[T] = None):
+    # pylint: disable=unused-argument,no-self-use
+    def has_delete_permission(self, request: HttpRequest, obj: Optional[T] = None):
         return request.user.is_staff and is_lab_admin(request.user)
