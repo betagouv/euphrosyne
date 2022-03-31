@@ -1,5 +1,5 @@
 .sidebar {
-  background-color: var(--grey-1000);
+  background-color: var(--grey-100);
   width: 237px;
 }
 
@@ -23,17 +23,18 @@
 .sidebar a.sidebar-link {
   flex: 1;
   display: flex;
-  color: var(--g-100);
+  color: var(--grey-1000);
   padding: 16px;
   font-size: 16px;
   align-items: center;
   border-left: 2px solid transparent; /* to avoid moving during hovering */
-  box-shadow: none;
+  background-image: none;
 }
 
 .sidebar a.sidebar-link:active,
 .sidebar a.sidebar-link:focus {
   text-decoration: none;
+  background-color: var(--grey-425);
 }
 
 .sidebar a.sidebar-link .sidebar-link-badge {

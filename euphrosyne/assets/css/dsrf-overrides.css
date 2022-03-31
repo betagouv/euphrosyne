@@ -35,8 +35,9 @@ a.change-related,
 a.inline-deletelink,
 a#logout-link,
 .datetimeshortcuts a,
-#nav-sidebar a {
-  box-shadow: none;
+#nav-sidebar a,
+th .text a {
+  background-image: none;
 }
 
 .fr-footer__partners a {
