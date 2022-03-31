@@ -7,7 +7,7 @@ ipython==8.2.0
 isort==5.10.1
 jedi==0.18.0
 mypy==0.942
-pylint-django==2.5.2
+pylint-django==2.5.3
 pylint==2.12.2
 pytest-django==4.4.0
 pytest==6.2.5
