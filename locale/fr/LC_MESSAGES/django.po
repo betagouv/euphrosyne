@@ -165,7 +165,7 @@ msgstr "Connexion"
 
 #, python-format
 msgid "Euphrosyne, open %(aglae_link)s data."
-msgstr "Euphrosyne, ouvrir les données d'%(aglae_link)s."
+msgstr "Euphrosyne, ouvrir les données de %(aglae_link)s."
 
 msgid "Our partners"
 msgstr "Nos partenaires"
