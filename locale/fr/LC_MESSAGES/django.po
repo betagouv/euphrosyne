@@ -158,7 +158,7 @@ msgid "Log in with ORCID"
 msgstr "Se connecter avec ORCID"
 
 msgid "Forgotten your password or username?"
-msgstr "Mot de pass oublié ?"
+msgstr "Mot de passe oublié ?"
 
 msgid "Log in"
 msgstr "Connexion"
