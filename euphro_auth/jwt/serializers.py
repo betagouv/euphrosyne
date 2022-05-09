@@ -3,12 +3,22 @@ from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.settings import api_settings as simplejwt_api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from ..models import User
+
+
+class EuphroRefreshToken(RefreshToken):
+    @classmethod
+    def for_user(cls, user: User):
+        token = super().for_user(user)
+        token["projects"] = list(user.project_set.values("id", "name"))
+        return token
+
 
 # pylint: disable=abstract-method
 class SessionTokenObtainSerializer(TokenObtainSerializer):
     """Generate token based on session user"""
 
-    token_class = RefreshToken
+    token_class = EuphroRefreshToken
     user = None
 
     def __init__(self, *args, **kwargs):
