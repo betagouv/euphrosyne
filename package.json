@@ -33,7 +33,7 @@
     "@gouvfr/dsfr": "^1.5.1",
     "css-loader": "^6.7.1",
     "css-minimizer-webpack-plugin": "^3.4.1",
-    "dotenv": "^16.0.0",
+    "dotenv": "^16.0.1",
     "glob": "^8.0.3",
     "glob-all": "^3.3.0",
     "html-loader-jest": "^0.2.1",
