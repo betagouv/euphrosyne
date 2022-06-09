@@ -25,6 +25,7 @@ from euphro_auth.views import UserTokenRegistrationView
 from orcid_oauth.views import UserCompleteAccountView
 
 urlpatterns = [
+    path("admin/doc/", include("django.contrib.admindocs.urls")),
     path(
         "admin/password_reset/",
         auth_views.PasswordResetView.as_view(),
