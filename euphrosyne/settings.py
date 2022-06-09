@@ -55,6 +55,7 @@ SITE_URL = os.environ["SITE_URL"]
 INSTALLED_APPS = [
     "euphrosyne.apps.AdminConfig",
     "euphro_auth",
+    "django.contrib.admindocs",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
