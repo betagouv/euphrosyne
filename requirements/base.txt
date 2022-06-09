@@ -1,5 +1,5 @@
 -i https://pypi.org/simple
-boto3==1.22.9
+boto3==1.24.5
 docutils==0.18.1
 dj-database-url==0.5.0
 django-debug-toolbar==3.4.0
