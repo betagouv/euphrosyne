@@ -104,7 +104,6 @@ class UserInvitationAdmin(ModelAdmin):
         extra_context = {"title": _("Invite new user")}
         return super().add_view(request, form_url, extra_context)
 
-    # pylint: disable=no-self-use
     @admin.display(
         description=_("Invitation completed"),
         boolean=True,
