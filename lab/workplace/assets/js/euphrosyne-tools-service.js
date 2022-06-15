@@ -1,6 +1,6 @@
 import { jwtFetch } from "../../../assets/js/jwt.js";
 
-export async function fetchVMConnectionLink(projectName) {
+async function fetchVMConnectionLink(projectName) {
   const response = await jwtFetch(
     `${process.env.EUPHROSYNE_TOOLS_API_URL}/connect/${projectName}`,
     {
@@ -15,7 +15,7 @@ export async function fetchVMConnectionLink(projectName) {
   throw new Error(`An error occured while fetching project ${projectName} VM`);
 }
 
-export async function fetchDeploymentStatus(projectName) {
+async function fetchDeploymentStatus(projectName) {
   const response = await jwtFetch(
     `${process.env.EUPHROSYNE_TOOLS_API_URL}/deployments/${projectName}`,
     {
@@ -32,7 +32,7 @@ export async function fetchDeploymentStatus(projectName) {
   );
 }
 
-export function deployVM(projectName) {
+function deployVM(projectName) {
   return jwtFetch(
     `${process.env.EUPHROSYNE_TOOLS_API_URL}/deployments/${projectName}`,
     {
@@ -40,3 +40,6 @@ export function deployVM(projectName) {
     }
   );
 }
+
+const exports = { fetchVMConnectionLink, fetchDeploymentStatus, deployVM };
+export default exports;

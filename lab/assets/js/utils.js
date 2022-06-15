@@ -50,3 +50,11 @@ export function getCSRFToken() {
   }
   return null;
 }
+
+const exports = {
+  displayMessage,
+  getCSRFToken,
+  formatBytes,
+};
+
+export default exports;
