@@ -43,7 +43,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
       }
       utils.displayMessage(
         window.gettext(
-          "The virtual office is being created. This may take some time."
+          "The virtual office is being created. This can take up to 10 minutes."
         ),
         "success"
       );
@@ -79,6 +79,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
         }
       } else {
         this.disabled = false;
+        this.innerText = window.gettext("Create virtual office");
       }
     }
   }
@@ -90,10 +91,16 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
       );
       if (url) {
         this.connectionUrl = url;
-        this.innerText = window.gettext("Access virtual office");
-        this.disabled = false;
-        clearInterval(this.checkDeploymentIntervalId);
         this.checkDeploymentIntervalId = null;
+        clearInterval(this.checkDeploymentIntervalId);
+        this.disabled = false;
+        this.innerText = window.gettext("Access virtual office");
+        utils.displayMessage(
+          window.gettext(
+            "The virtual office is ready. You can now access it by clicking Access virtual office button."
+          ),
+          "success"
+        );
       }
     } else {
       const deploymentStatus =
