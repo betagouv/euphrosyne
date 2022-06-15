@@ -23,10 +23,11 @@
   },
   "homepage": "https://github.com/betagouv/euphrosyne#readme",
   "devDependencies": {
-    "@types/jest": "^27.4.1",
+    "@types/jest": "^28.1.1",
     "eslint": "^8.17.0",
     "eslint-plugin-jest": "^26.5.3",
-    "jest": "^27.4.5",
+    "jest": "^28.1.1",
+    "jest-environment-jsdom": "^28.1.1",
     "prettier": "^2.6.2"
   },
   "dependencies": {
