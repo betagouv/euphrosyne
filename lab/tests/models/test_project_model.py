@@ -4,7 +4,6 @@ from django.test import TestCase
 from ...models import Participation, Project
 
 
-#  pylint: disable=no-self-use
 class TestProjectModel(TestCase):
     def test_project_leader_property(self):
         user = get_user_model().objects.create(

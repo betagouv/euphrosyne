@@ -6,7 +6,6 @@ from ...models import Project
 
 
 class TestParticipationLeaderForm(TestCase):
-    # pylint: disable=no-self-use
     def test_populates_form(self):
         project = Project.objects.create(name="Test project")
         participation = project.participation_set.create(

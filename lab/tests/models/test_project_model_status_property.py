@@ -5,7 +5,6 @@ from ...models import Project
 from .. import factories
 
 
-#  pylint: disable=no-self-use
 class TestProjectModel(TestCase):
     def test_status_is_to_schedule_by_default(self):
         project = factories.ProjectFactory()
