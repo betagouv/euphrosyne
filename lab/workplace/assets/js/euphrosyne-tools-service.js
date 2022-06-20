@@ -41,5 +41,19 @@ function deployVM(projectName) {
   );
 }
 
-const exports = { fetchVMConnectionLink, fetchDeploymentStatus, deployVM };
+function deleteVM(projectName) {
+  return jwtFetch(
+    `${process.env.EUPHROSYNE_TOOLS_API_URL}/vms/${projectName}`,
+    {
+      method: "DELETE",
+    }
+  );
+}
+
+const exports = {
+  fetchVMConnectionLink,
+  fetchDeploymentStatus,
+  deployVM,
+  deleteVM,
+};
 export default exports;

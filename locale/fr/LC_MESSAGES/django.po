@@ -631,6 +631,9 @@ msgstr "Modifier l’objet %(model)s sélectionné"
 msgid "Access virtual office"
 msgstr "Accéder au bureau distant"
 
+msgid "Delete virtual office"
+msgstr "Supprimer le bureau virtuel"
+
 msgid "Runs data"
 msgstr "Données des runs"
 
