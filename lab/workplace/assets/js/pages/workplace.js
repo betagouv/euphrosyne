@@ -7,10 +7,12 @@ import { FileUploadForm } from "../../../../assets/js/components/file-upload-for
 import { initRawData } from "../raw-data/index.js";
 import { initProcessedData } from "../processed-data/index.js";
 import VirtualOfficeButton from "../components/virtual-office-button.js";
+import VirtualOfficeDelteButton from "../components/virtual-office-delete-button.js";
 
 FileTable.init();
 FileUploadForm.init();
 VirtualOfficeButton.init();
+VirtualOfficeDelteButton.init();
 
 initRawData();
 initProcessedData();

@@ -181,4 +181,18 @@ describe("Test VirtualOfficeButton", () => {
       jest.useRealTimers();
     });
   });
+
+  describe("when receiving delete event", () => {
+    it("reset the button", () => {
+      voButton.disabled = true;
+      voButton.innerText = "Another text";
+      voButton.connectionUrl = "url";
+
+      window.dispatchEvent(new CustomEvent("vm-deleted"));
+
+      expect(voButton.disabled).toBe(false);
+      expect(voButton.innerText).toBe("Create virtual office");
+      expect(voButton.connectionUrl).toBeNull();
+    });
+  });
 });

@@ -17,6 +17,11 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
   constructor() {
     super();
     this.addEventListener("click", this.onButtonClick);
+    window.addEventListener("vm-deleted", () => {
+      this.disabled = false;
+      this.innerText = window.gettext("Create virtual office");
+      this.connectionUrl = null;
+    });
   }
 
   connectedCallback() {
@@ -67,6 +72,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
     if (url) {
       this.connectionUrl = url;
       this.disabled = false;
+      this.onConnectReady();
     } else {
       const deploymentStatus =
         await euphrosyneToolsService.fetchDeploymentStatus(this.projectName);
@@ -91,8 +97,8 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
       );
       if (url) {
         this.connectionUrl = url;
-        this.checkDeploymentIntervalId = null;
         clearInterval(this.checkDeploymentIntervalId);
+        this.checkDeploymentIntervalId = null;
         this.disabled = false;
         this.innerText = window.gettext("Access virtual office");
         utils.displayMessage(
@@ -101,6 +107,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
           ),
           "success"
         );
+        this.onConnectReady();
       }
     } else {
       const deploymentStatus =
@@ -124,5 +131,10 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
       ),
       "error"
     );
+  }
+
+  onConnectReady() {
+    /** Sends an event so other components know virtual office is ready */
+    window.dispatchEvent(new CustomEvent("vm-ready"));
   }
 }
