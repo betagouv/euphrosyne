@@ -28,7 +28,7 @@
     "eslint-plugin-jest": "^26.5.3",
     "jest": "^28.1.1",
     "jest-environment-jsdom": "^28.1.1",
-    "prettier": "^2.6.2"
+    "prettier": "^2.7.1"
   },
   "dependencies": {
     "@gouvfr/dsfr": "^1.5.1",
