@@ -23,7 +23,7 @@
 {% if action_form and actions_on_top and cl.show_admin_actions %}{% admin_actions %}{% endif %}
 
 <div class="add-row align-right">
-  <a id="add_runs" class="fr-link" href="{% url 'admin:lab_run_add' %}?project={{ project.id }}">
+  <a id="add_runs" class="fr-link fr-fi-arrow-right-line fr-link--icon-left" href="{% url 'admin:lab_run_add' %}?project={{ project.id }}">
     {% translate "Create a run"%}
   </a>
 </div>

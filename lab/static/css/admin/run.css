@@ -39,3 +39,7 @@
   background-image: none;
   color: var(--text-action-high-blue-france)
 }
+
+#changelist .add-row a {
+  color: var(--text-active-blue-france);
+}

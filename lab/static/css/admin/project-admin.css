@@ -22,3 +22,7 @@
 td.field-status {
   white-space: nowrap;
 }
+
+.deletelink-box {
+  font-size: 13px;
+}

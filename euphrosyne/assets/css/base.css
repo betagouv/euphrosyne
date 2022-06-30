@@ -32,6 +32,15 @@ body {
   background-color: var(--background-default-grey);
 }
 
+
+button:not(:disabled):hover, input[type="button"]:not(:disabled):hover, input[type="image"]:not(:disabled):hover, input[type="reset"]:not(:disabled):hover, input[type="submit"]:not(:disabled):hover {
+  --hover: var(--background-action-high-blue-france-hover);
+}
+
+.button, input[type=submit], input[type=button], .submit-row input, a.button { 
+  border-radius: 0;
+}
+
 a:link,
 a:visited {
   color: inherit;
