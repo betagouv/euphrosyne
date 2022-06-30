@@ -83,7 +83,7 @@ export class FileTable extends HTMLTableElement {
     downloadButton.classList.add(
       "download-btn",
       "fr-btn",
-      "fr-fi-download-line",
+      "fr-icon-download-line",
       "fr-btn--secondary"
     );
     downloadButton.textContent = window.gettext("Download file");
@@ -102,7 +102,7 @@ export class FileTable extends HTMLTableElement {
       deleteButton.classList.add(
         "delete-btn",
         "fr-btn",
-        "fr-fi-delete-line",
+        "fr-icon-delete-line",
         "fr-btn--secondary"
       );
       deleteButton.textContent = window.gettext("Delete file");

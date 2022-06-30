@@ -27,6 +27,12 @@ export default {
       "./euphrosyne/assets/js/main.js",
       "@gouvfr/dsfr/dist/core/core.module.min.js",
       "@gouvfr/dsfr/dist/dsfr/dsfr.min.css",
+      // We have to import each stylesheet icon separately due to a webpack
+      // compile error if we import utility.css or icons.css directly.
+      // See https://github.com/GouvernementFR/dsfr/issues/309
+      "@gouvfr/dsfr/dist/utility/icons/icons-design/icons-design.min.css",
+      "@gouvfr/dsfr/dist/utility/icons/icons-communication/icons-communication.min.css",
+      "@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.min.css",
       "remixicon/fonts/remixicon.css",
       "./euphrosyne/assets/css/base.css",
     ],

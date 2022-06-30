@@ -23,7 +23,7 @@
             {% for run in runs %}
             <li role="presentation">
                 <button id="tabpanel-run-{{ run.id }}" 
-                        class="fr-tabs__tab fr-fi-checkbox-line fr-tabs__tab--icon-left" 
+                        class="fr-tabs__tab fr-icon-checkbox-line fr-tabs__tab--icon-left" 
                         tabindex="{{ forloop.counter0 }}" 
                         role="tab" 
                         aria-selected="{% if forloop.counter0 == 0 %}true{% else %}false{% endif %}" 

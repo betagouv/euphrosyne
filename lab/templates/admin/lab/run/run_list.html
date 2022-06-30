@@ -10,11 +10,11 @@
             <input type="checkbox" name="_selected_action" value="{{ run.id }}" class="action-select">
             <div class="align-right">
               <a href="{% url "admin:lab_run_change" run.id %}" title="{% translate "Change" %}" class="fr-link">
-                <span class="fr-fi-edit-line" aria-hidden="true"></span>
+                <span class="fr-icon-edit-line" aria-hidden="true"></span>
                 <span class="fr-sr-only" rel="noopener noreferrer">{% translate "Change" %}</span>
               </a>
               <button class="fr-link" aria-controls="delete-run" data-runid="{{ run.id }}">
-                <span class="fr-fi-delete-line" aria-hidden="true"></span>
+                <span class="fr-icon-delete-line" aria-hidden="true"></span>
                 <span class="fr-sr-only" rel="noopener noreferrer">{% translate "Delete" %}</span>
               </button>
             </div>
