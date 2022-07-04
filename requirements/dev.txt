@@ -1,6 +1,6 @@
 -i https://pypi.org/simple
 -r base.txt
-black==22.3.0
+black==22.6.0
 factory-boy==3.2.1
 flake8==4.0.1
 ipython==8.4.0
