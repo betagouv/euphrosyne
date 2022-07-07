@@ -34,6 +34,7 @@ export class FileTable extends HTMLTableElement {
       const keyCell = rowEl.insertCell(),
         keyCellText = document.createTextNode(file.name);
       keyCell.appendChild(keyCellText);
+      keyCell.classList.add("file-name-cell");
 
       const lastModifiedCell = rowEl.insertCell(),
         lastModifiedCellText = document.createTextNode(file.lastModified);
@@ -44,7 +45,7 @@ export class FileTable extends HTMLTableElement {
       sizeCell.appendChild(sizeCellText);
 
       const actionsText = rowEl.insertCell();
-      actionsText.appendChild(this.generateActionCellContent(file.key));
+      actionsText.appendChild(this.generateActionCellContent(file));
       this.dataRows.push(rowEl);
     });
   }
@@ -72,7 +73,8 @@ export class FileTable extends HTMLTableElement {
     return row;
   }
 
-  generateActionCellContent(key) {
+  generateActionCellContent(file) {
+    const { name } = file;
     const unorderedList = document.createElement("ul");
     unorderedList.classList.add(
       "fr-btns-group",
@@ -90,7 +92,7 @@ export class FileTable extends HTMLTableElement {
     downloadButton.title = window.gettext("Download file");
     downloadButton.addEventListener("click", () => {
       this.dispatchEvent(
-        new CustomEvent("download-click", { detail: { key } })
+        new CustomEvent("download-click", { detail: { name } })
       );
     });
     const downloadListItem = document.createElement("li");
@@ -108,7 +110,9 @@ export class FileTable extends HTMLTableElement {
       deleteButton.textContent = window.gettext("Delete file");
       deleteButton.title = window.gettext("Delete file");
       deleteButton.addEventListener("click", () =>
-        this.dispatchEvent(new CustomEvent("delete-click", { detail: { key } }))
+        this.dispatchEvent(
+          new CustomEvent("delete-click", { detail: { name } })
+        )
       );
       const deleteListItem = document.createElement("li");
       deleteListItem.appendChild(deleteButton);
