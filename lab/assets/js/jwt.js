@@ -31,7 +31,7 @@ export async function jwtFetch(input, init = {}) {
   return response;
 }
 
-async function getToken(checkLocalStorage = true) {
+export async function getToken(checkLocalStorage = true) {
   if (checkLocalStorage) {
     const localToken = localStorage.getItem("euphrosyne-jwt-access");
     if (localToken) return localToken;
