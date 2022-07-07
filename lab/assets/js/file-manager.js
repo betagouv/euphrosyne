@@ -1,19 +1,22 @@
 import { displayMessage } from "./utils.js";
+import runDataService from "./run-data-service.js";
 
 export class FileManager {
-  constructor(fileForm, fileTable, presignedUrlService, s3Service) {
+  constructor(projectName, runName, dataType, fileForm, fileTable) {
+    this.projectName = projectName;
+    this.runName = runName;
+    this.dataType = dataType;
+
     this.fileForm = fileForm;
     this.fileTable = fileTable;
-    this.presignedUrlService = presignedUrlService;
-    this.s3Service = s3Service;
 
     this.fileTable.addEventListener("download-click", (e) => {
-      const { key } = e.detail;
-      this.downloadFile(key);
+      const { name } = e.detail;
+      this.downloadFile(name);
     });
     this.fileTable.addEventListener("delete-click", (e) => {
-      const { key } = e.detail;
-      this.deleteFile(key);
+      const { name } = e.detail;
+      this.deleteFile(name);
     });
 
     this.fileForm?.addEventListener("submit", (event) => {
@@ -24,32 +27,44 @@ export class FileManager {
 
   async fetchFiles() {
     this.fileTable.showLoading();
-    const s3Files = await this.s3Service.listObjectsV2();
-    this.fileTable.setFiles(s3Files);
+    const files = await runDataService.listData({
+      projectName: this.projectName,
+      runName: this.runName,
+      dataType: this.dataType,
+    });
+    this.fileTable.setFiles(files);
     this.fileTable.displayFiles();
   }
 
-  async downloadFile(key) {
-    const url = await this.presignedUrlService.fetchDownloadPresignedURL(key);
+  async downloadFile(name) {
+    const url = await runDataService.fetchPresignedURL({
+      projectName: this.projectName,
+      runName: this.runName,
+      dataType: this.dataType,
+      fileName: name,
+    });
     window.open(url, "_blank");
   }
 
-  async deleteFile(key) {
+  async deleteFile(name) {
     if (
       !window.confirm(
-        window.interpolate(window.gettext("Delete the document %s ?"), [
-          key.split("/").pop(),
-        ])
+        window.interpolate(window.gettext("Delete the document %s ?"), [name])
       )
     ) {
       return;
     }
     this.fileTable.showLoading();
     try {
-      await this.s3Service.deleteObject(key);
-      this.handleDeleteSuccess(key);
+      await runDataService.deleteFile({
+        projectName: this.projectName,
+        runName: this.runName,
+        dataType: this.dataType,
+        fileName: name,
+      });
+      this.handleDeleteSuccess(name);
     } catch (error) {
-      this.handleDeleteError(key);
+      this.handleDeleteError(name);
       throw error;
     }
   }
@@ -58,7 +73,14 @@ export class FileManager {
     let results;
     this.fileForm.toggleSubmitButton(true);
     try {
-      results = await this.s3Service.uploadObjects(files);
+      results = await runDataService.uploadFiles(
+        {
+          rojectName: this.projectName,
+          runName: this.runName,
+          dataType: this.dataType,
+        },
+        files
+      );
     } catch (error) {
       displayMessage(
         window.gettext(
@@ -94,22 +116,20 @@ export class FileManager {
     this.fileForm.reset();
   }
 
-  handleDeleteError(key) {
+  handleDeleteError(name) {
     displayMessage(
       window.interpolate(window.gettext("File %s could not be removed."), [
-        key.split("/").pop(),
+        name,
       ]),
       "error"
     );
     this.fileTable.displayFiles();
   }
 
-  handleDeleteSuccess(key) {
+  handleDeleteSuccess(name) {
     this.fetchFiles();
     displayMessage(
-      window.interpolate(window.gettext("File %s has been removed."), [
-        key.split("/").pop(),
-      ]),
+      window.interpolate(window.gettext("File %s has been removed."), [name]),
       "success"
     );
   }

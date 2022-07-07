@@ -41,18 +41,12 @@
                     <div class="fr-col-12 fr-col-lg-6">
                         <div class="fr-background-default--grey fr-p-3v">
                             <h3>{% trans "Raw data" %}</h2>
-                            {% if user.is_lab_admin or user.is_superuser %}
-                            {% include "components/file_upload_form.html" with component=run.raw_data_upload_form %}
-                            {% endif %}
                             {% include "components/file_table.html" with component=run.raw_data_table %}
                         </div>
                     </div>
                     <div class="fr-col-12 fr-col-lg-6">
                         <div class="fr-background-default--grey fr-p-3v">
                             <h3>{% trans "Processed data" %}</h2>
-                            {% if user.is_lab_admin or user.is_superuser %}
-                            {% include "components/file_upload_form.html" with component=run.processed_data_upload_form %}
-                            {% endif %}
                             {% include "components/file_table.html" with component=run.processed_data_table %}                
                         </div>
                     </div>
@@ -68,7 +62,8 @@
 {{ block.super }}
 <script src="{% url 'javascript-catalog' %}"></script>
 <script>
-    window.runIds = [{% for run in runs %}{{ run.id }},{% endfor %}]
+    window.projectName = "{{ project.name }}"
+    window.runs = [{% for run in runs %}{ id: {{ run.id }}, name: "{{ run.label }}" },{% endfor %}]
 </script>
 <script src="{% static 'pages/workplace.js' %}"></script>
 {% endblock %}

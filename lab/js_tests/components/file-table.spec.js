@@ -1,7 +1,8 @@
 import "../_jsdom_mocks/gettext";
 
 import { FileTable } from "../../assets/js/components/file-table";
-import { S3File } from "../../assets/js/s3-service";
+import { EuphrosyneFile } from "../../assets/js/file-service";
+import { formatBytes } from "../../assets/js/utils";
 
 describe("Test FileTable", () => {
   FileTable.init();
@@ -31,8 +32,8 @@ describe("Test FileTable", () => {
 
   describe("Test file display", () => {
     const files = [
-      new S3File("path/to/object1", new Date().toLocaleDateString(), "12 KB"),
-      new S3File("path/to/object2", new Date().toLocaleDateString(), "12 KB"),
+      new EuphrosyneFile("file-1.txt", "path/to/file-1.txt", new Date(), 12000),
+      new EuphrosyneFile("file-2.txt", "path/to/file-2.txt", new Date(), 12000),
     ];
     it("shows files in tbody", () => {
       const table = document.querySelector("table");
@@ -43,8 +44,10 @@ describe("Test FileTable", () => {
       expect(fileRows.length).toBe(2);
       expect(firstObjectCells.length).toBe(4);
       expect(firstObjectCells[0].textContent).toBe(files[0].name);
-      expect(firstObjectCells[1].textContent).toBe(files[0].lastModified);
-      expect(firstObjectCells[2].textContent).toBe(files[0].size);
+      expect(firstObjectCells[1].textContent).toBe(
+        files[0].lastModified.toLocaleDateString()
+      );
+      expect(firstObjectCells[2].textContent).toBe(formatBytes(files[0].size));
       expect(
         firstObjectCells[3].querySelectorAll("button.download-btn").length
       ).toBe(1);

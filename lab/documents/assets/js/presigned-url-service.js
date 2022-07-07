@@ -1,45 +1,16 @@
 "use strict";
 
-import { getCSRFToken } from "../../../assets/js/utils.js";
+import { jwtFetch } from "../../../assets/js/jwt.js";
 
 export class DocumentPresignedUrlService {
-  constructor(projectId) {
-    this.projectId = projectId;
-  }
+  constructor() {}
 
-  fetchURL(url) {
-    return fetch(url, {
-      method: "POST",
-      headers: new Headers({
-        "X-CSRFToken": getCSRFToken(),
-      }),
-    });
-  }
-
-  async fetchDownloadPresignedURL(key) {
-    const response = await this.fetchURL(
-      `/api/project/${this.projectId}/documents/presigned_download_url?key=${key}`
-    );
-    return (await response.json()).url;
-  }
-
-  async fetchDeletePresignedURL(key) {
-    const response = await this.fetchURL(
-      `/api/project/${this.projectId}/documents/presigned_delete_url?key=${key}`
-    );
-    return (await response.json()).url;
-  }
-
-  async fetchListPresignedUrl() {
-    const response = await this.fetchURL(
-      `/api/project/${this.projectId}/documents/presigned_list_url`
-    );
-    return (await response.json()).url;
-  }
-
-  async fetchUploadPresignedUrl() {
-    const response = await this.fetchURL(
-      `/api/project/${this.projectId}/documents/presigned_post`
+  async fetchPresignedURL(projectName) {
+    const response = jwtFetch(
+      `${process.env.EUPHROSYNE_TOOLS_API_URL}/data/{project_name}/runs/{run_name}/{data_type}/shared_access_signature/{file_name}`,
+      {
+        method: "GET",
+      }
     );
     return (await response.json()).url;
   }
