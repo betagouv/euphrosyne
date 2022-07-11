@@ -18,6 +18,9 @@
 
 <div id="content-main">
     <ul class="messagelist"></ul>
+    <div class="fr-grid-row fr-grid-row--right">
+        <button is="virtual-office-button" project-name="{{ project.name }}" class="fr-btn fr-icon-arrow-right-line fr-btn--icon-right">{% trans "Access virtual office" %}</button>
+    </div>
     <div class="fr-tabs">
         <ul class="fr-tabs__list" role="tablist" aria-label="{% trans "Runs data" %}">
             {% for run in runs %}
