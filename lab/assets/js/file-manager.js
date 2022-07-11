@@ -1,12 +1,8 @@
 import { displayMessage } from "./utils.js";
-import runDataService from "./run-data-service.js";
 
 export class FileManager {
-  constructor(projectName, runName, dataType, fileForm, fileTable) {
-    this.projectName = projectName;
-    this.runName = runName;
-    this.dataType = dataType;
-
+  constructor(fileService, fileForm, fileTable) {
+    this.fileService = fileService;
     this.fileForm = fileForm;
     this.fileTable = fileTable;
 
@@ -27,22 +23,13 @@ export class FileManager {
 
   async fetchFiles() {
     this.fileTable.showLoading();
-    const files = await runDataService.listData({
-      projectName: this.projectName,
-      runName: this.runName,
-      dataType: this.dataType,
-    });
+    const files = await this.fileService.listData();
     this.fileTable.setFiles(files);
     this.fileTable.displayFiles();
   }
 
   async downloadFile(name) {
-    const url = await runDataService.fetchPresignedURL({
-      projectName: this.projectName,
-      runName: this.runName,
-      dataType: this.dataType,
-      fileName: name,
-    });
+    const url = await this.fileService.fetchPresignedURL(name);
     window.open(url, "_blank");
   }
 
@@ -56,12 +43,7 @@ export class FileManager {
     }
     this.fileTable.showLoading();
     try {
-      await runDataService.deleteFile({
-        projectName: this.projectName,
-        runName: this.runName,
-        dataType: this.dataType,
-        fileName: name,
-      });
+      await this.fileService.deleteFile(name);
       this.handleDeleteSuccess(name);
     } catch (error) {
       this.handleDeleteError(name);
@@ -73,14 +55,7 @@ export class FileManager {
     let results;
     this.fileForm.toggleSubmitButton(true);
     try {
-      results = await runDataService.uploadFiles(
-        {
-          rojectName: this.projectName,
-          runName: this.runName,
-          dataType: this.dataType,
-        },
-        files
-      );
+      results = await this.fileService.uploadFiles(files);
     } catch (error) {
       displayMessage(
         window.gettext(
@@ -91,7 +66,7 @@ export class FileManager {
       this.fileForm.toggleSubmitButton(false);
       throw error;
     }
-    results.forEach((result) => {
+    results.forEach(async (result) => {
       if (result.status === "fulfilled") {
         displayMessage(
           window.interpolate(window.gettext("File %s has been uploaded."), [
@@ -100,6 +75,7 @@ export class FileManager {
           "success"
         );
       } else {
+        await this.fileService.deleteFile(result.reason.file.name);
         displayMessage(
           window.interpolate(window.gettext("File %s could not be uploaded."), [
             result.reason.file.name,
