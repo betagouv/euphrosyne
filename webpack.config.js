@@ -89,7 +89,10 @@ export default {
     minimizer: [new CssMinimizerPlugin()],
   },
   plugins: [
-    new webpack.EnvironmentPlugin({ MATOMO_SITE_ID: null }),
+    new webpack.EnvironmentPlugin({
+      MATOMO_SITE_ID: null,
+      EUPHROSYNE_TOOLS_API_URL: null,
+    }),
     new MiniCssExtractPlugin(),
     new PurgecssPlugin({
       paths: globAll.sync(
