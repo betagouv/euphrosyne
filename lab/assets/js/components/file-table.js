@@ -1,3 +1,5 @@
+import { formatBytes } from "../utils.js";
+
 export class FileTable extends HTMLTableElement {
   constructor() {
     super();
@@ -37,11 +39,13 @@ export class FileTable extends HTMLTableElement {
       keyCell.classList.add("file-name-cell");
 
       const lastModifiedCell = rowEl.insertCell(),
-        lastModifiedCellText = document.createTextNode(file.lastModified);
+        lastModifiedCellText = document.createTextNode(
+          file.lastModified.toLocaleDateString()
+        );
       lastModifiedCell.appendChild(lastModifiedCellText);
 
       const sizeCell = rowEl.insertCell(),
-        sizeCellText = document.createTextNode(file.size);
+        sizeCellText = document.createTextNode(formatBytes(file.size));
       sizeCell.appendChild(sizeCellText);
 
       const actionsText = rowEl.insertCell();

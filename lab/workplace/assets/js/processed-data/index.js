@@ -1,6 +1,7 @@
 "use strict";
 
 import { FileManager } from "../../../../assets/js/file-manager.js";
+import { ProcessedDataFileService } from "./processed-data-file-service.js";
 
 export function initProcessedData() {
   window.runs.forEach((run) => {
@@ -11,13 +12,11 @@ export function initProcessedData() {
         `#run-${run.id}-processed-data-upload-form`
       );
 
-    const fileManager = new FileManager(
+    const fileService = new ProcessedDataFileService(
       window.projectName,
-      run.name,
-      "processed_data",
-      fileForm,
-      fileTable
+      run.name
     );
+    const fileManager = new FileManager(fileService, fileForm, fileTable);
 
     window.addEventListener("DOMContentLoaded", () => {
       fileManager.fetchFiles();
