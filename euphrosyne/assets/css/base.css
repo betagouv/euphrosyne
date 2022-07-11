@@ -37,6 +37,14 @@ button:not(:disabled):hover, input[type="button"]:not(:disabled):hover, input[ty
   --hover: var(--background-action-high-blue-france-hover);
 }
 
+button.fr-link:hover, button.fr-tabs__tab:hover {
+  --hover: var(--background-default-grey-hover);
+}
+
+button.fr-btn--tertiary:hover, button.fr-btn--secondary:hover {
+  --hover: inherit;
+}
+
 .button, input[type=submit], input[type=button], .submit-row input, a.button { 
   border-radius: 0;
 }
