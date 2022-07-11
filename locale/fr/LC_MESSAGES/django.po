@@ -628,6 +628,9 @@ msgstr "Créer un objet ou groupe d'objets"
 msgid "Delete selected %(model)s"
 msgstr "Modifier l’objet %(model)s sélectionné"
 
+msgid "Access virtual office"
+msgstr "Accéder au bureau distant"
+
 msgid "Runs data"
 msgstr "Données des runs"
 
