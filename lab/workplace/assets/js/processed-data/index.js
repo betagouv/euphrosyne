@@ -1,33 +1,22 @@
 "use strict";
 
 import { FileManager } from "../../../../assets/js/file-manager.js";
-import { S3Service } from "../../../../assets/js/s3-service.js";
-
-import { ProcessedDataPresignedUrlService } from "./presigned-url-service.js";
+import { ProcessedDataFileService } from "./processed-data-file-service.js";
 
 export function initProcessedData() {
-  const projectId = parseInt(document.URL.split("/").reverse()[1]);
-
-  window.runIds.forEach((runId) => {
-    const presignedUrlService = new ProcessedDataPresignedUrlService(
-        projectId,
-        runId
-      ),
-      s3Service = new S3Service(presignedUrlService);
-
+  window.runs.forEach((run) => {
     const fileTable = document.querySelector(
-        `#run-${runId}-processed-data-table`
+        `#run-${run.id}-processed-data-table`
       ),
       fileForm = document.querySelector(
-        `#run-${runId}-processed-data-upload-form`
+        `#run-${run.id}-processed-data-upload-form`
       );
 
-    const fileManager = new FileManager(
-      fileForm,
-      fileTable,
-      presignedUrlService,
-      s3Service
+    const fileService = new ProcessedDataFileService(
+      window.projectName,
+      run.name
     );
+    const fileManager = new FileManager(fileService, fileForm, fileTable);
 
     window.addEventListener("DOMContentLoaded", () => {
       fileManager.fetchFiles();
