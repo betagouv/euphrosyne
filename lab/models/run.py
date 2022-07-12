@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from shared.models import TimestampedModel
 
 from ..methods import MethodModel
+from ..validators import valid_filename
 
 
 class Run(TimestampedModel, MethodModel):
@@ -32,7 +33,9 @@ class Run(TimestampedModel, MethodModel):
         related_name="runs",
         verbose_name=_("Project"),
     )
-    label = models.CharField(_("Run label"), max_length=255)
+    label = models.CharField(
+        _("Run label"), max_length=255, validators=[valid_filename]
+    )
 
     status = models.IntegerField(
         _("Run status"),

@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from shared.models import TimestampedModel
 
+from ..validators import valid_filename
 from .participation import Participation
 
 
@@ -24,7 +25,9 @@ class Project(TimestampedModel):
         verbose_name = _("Project")
         verbose_name_plural = _("Projects")
 
-    name = models.CharField(_("Project name"), max_length=255, unique=True)
+    name = models.CharField(
+        _("Project name"), max_length=255, unique=True, validators=[valid_filename]
+    )
 
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL, through="lab.Participation", verbose_name=_("Members")
