@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-09 16:24+0100\n"
+"POT-Creation-Date: 2022-06-20 18:11+0200\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -58,3 +58,46 @@ msgstr "Ces formats de fichier ne sont pas acceptés : %s"
 #, javascript-format
 msgid "Characters left: %s"
 msgstr "Caractères restant: %s"
+
+msgid "Create virtual office"
+msgstr "Créer le bureau virtuel"
+
+msgid ""
+"An error occured while creating the virtual office. Please contact an "
+"administrator or try again later."
+msgstr ""
+"Une erreur s'est produite lors de la création du bureau distant. Veuillez "
+"contacter l'équipe support."
+
+msgid "The virtual office is being created. This can take up to 10 minutes."
+msgstr ""
+"Le bureau virtuel est en cours de création. L'opération peut prendre jusqu'à "
+"10 minutes."
+
+msgid "Creating virtual office..."
+msgstr "Création du bureau distant..."
+
+msgid "Access virtual office"
+msgstr "Accéder au bureau distant"
+
+msgid ""
+"The virtual office is ready. You can now access it by clicking Access "
+"virtual office button."
+msgstr ""
+"Le bureau virtual est prêt. Vous pouvez y accéder en cliquant sur le bouton "
+"Accéder au bureau virtuel."
+
+msgid ""
+"We could not create the virtual office. Please contact an administrator."
+msgstr ""
+"Nous n'avons pas réussi à créer le bureau distant. Veuillez contacter "
+"l'équipe support."
+
+msgid "Delete virtual office ?"
+msgstr "Supprimer le bureau virtuel ?"
+
+msgid "An error occured while deleting the virtual office."
+msgstr "Une erreur s'est produite lors de la suppression du bureau distant."
+
+msgid "The virtual office has been deleted."
+msgstr "Le bureau virtuel a bien été supprimé."
