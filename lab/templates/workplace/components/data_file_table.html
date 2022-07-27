@@ -1,14 +1,11 @@
 {% load i18n %}
 <table is="file-table" 
-       cols="name,lastModified,size"
+       cols="name,size"
        data-can-delete="{{ component.can_delete|yesno:"true,false" }}" {% if component.attrs %}{% include "attrs.html" with attrs=component.attrs %}{% endif %}>
     <thead>
         <tr>  
             <th scope="col">
                 <div class="text">{% trans "File name" %}</div>
-            </th>
-            <th scope="col">
-                <div class="text">{% trans "Last modified" %}</div>
             </th>
             <th scope="col">
                 <div class="text">{% trans "Size" %}</div>
@@ -18,7 +15,6 @@
     </thead>
     <tbody>
         <tr class="loading">
-            <td><div>&nbsp;</div></td>
             <td><div>&nbsp;</div></td>
             <td><div>&nbsp;</div></td>
             <td><div>&nbsp;</div></td>

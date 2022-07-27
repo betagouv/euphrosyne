@@ -41,13 +41,13 @@
                     <div class="fr-col-12 fr-col-lg-6">
                         <div class="fr-background-default--grey fr-p-3v">
                             <h3>{% trans "Raw data" %}</h2>
-                            {% include "components/file_table.html" with component=run.raw_data_table %}
+                            {% include "workplace/components/data_file_table.html" with component=run.raw_data_table %}
                         </div>
                     </div>
                     <div class="fr-col-12 fr-col-lg-6">
                         <div class="fr-background-default--grey fr-p-3v">
                             <h3>{% trans "Processed data" %}</h2>
-                            {% include "components/file_table.html" with component=run.processed_data_table %}                
+                            {% include "workplace/components/data_file_table.html" with component=run.processed_data_table %}                
                         </div>
                     </div>
                 </div>

@@ -6,7 +6,7 @@ export class RawDataFileService extends FileService {
   constructor(projectName, runName) {
     super(
       `/data/${projectName}/runs/${runName}/raw_data`,
-      `/data/${projectName}/runs/${runName}/raw_data/shared_access_signature`
+      `/data/runs/shared_access_signature`
     );
   }
 }

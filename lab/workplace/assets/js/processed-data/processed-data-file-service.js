@@ -6,7 +6,7 @@ export class ProcessedDataFileService extends FileService {
   constructor(projectName, runName) {
     super(
       `/data/${projectName}/runs/${runName}/processed_data`,
-      `/data/${projectName}/runs/${runName}/processed_data/shared_access_signature`
+      `/data/runs/shared_access_signature`
     );
   }
 }

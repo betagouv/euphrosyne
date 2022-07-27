@@ -1,10 +1,10 @@
 "use strict";
 import { jwtFetch } from "./jwt.js";
 
-class EuphrosyneFile {
-  constructor(name, key, lastModified, size) {
+export class EuphrosyneFile {
+  constructor(name, path, lastModified, size) {
     this.name = name;
-    this.key = key;
+    this.path = path;
     this.lastModified = lastModified;
     this.size = size;
   }
@@ -62,56 +62,13 @@ export class FileService {
     }
   }
 
-  async uploadFiles(files) {
-    return await Promise.allSettled(
-      Array.from(files).map(async (file) => {
-        const url = await this.fetchPresignedURL(file.name);
-        return this.uploadFile(file, url);
-      })
-    );
-  }
-
-  async uploadFile(file, url) {
-    // File upload in an Azure Fileshare is divided in two steps :
-
-    // 1. Creation of an empty file
-    await this.createEmptyFile(url, file);
-
-    // 2. Upload file content. If the file size is greater than 4 Mb, it must be
-    // uploaded in several batches.
-    const batchNum = file.size / 4000000;
-    const promises = [...Array(Math.round(batchNum)).keys()].map(
-      (currentBatchNum) => {
-        const batchStart = 4000000 * currentBatchNum,
-          batchEnd =
-            Math.round(batchNum) === currentBatchNum + 1
-              ? file.size
-              : (currentBatchNum + 1) * 4000000;
-        return this.uploadBytesToFile(
-          url,
-          file.slice(batchStart, batchEnd),
-          batchStart,
-          batchEnd - 1
-        );
+  async fetchPresignedURL(path) {
+    const response = await jwtFetch(
+      `${this.presignURL}?path=${encodeURIComponent(path)}`,
+      {
+        method: "GET",
       }
     );
-
-    const allSettledPromises = await Promise.allSettled(promises);
-
-    // Throw error if any upload fail
-    for (const promise of allSettledPromises) {
-      if (promise.status === "rejected") {
-        throw { file, value: promise.value };
-      }
-    }
-
-    return { file };
-  }
-
-  async fetchPresignedURL(fileName) {
-    const response = await jwtFetch(`${this.presignURL}/${fileName}`, {
-      method: "GET",
-    });
     return (await response.json()).url;
   }
 

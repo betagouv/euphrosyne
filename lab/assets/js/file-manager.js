@@ -7,12 +7,12 @@ export class FileManager {
     this.fileTable = fileTable;
 
     this.fileTable.addEventListener("download-click", (e) => {
-      const { name } = e.detail;
-      this.downloadFile(name);
+      const { path } = e.detail;
+      this.downloadFile(path);
     });
     this.fileTable.addEventListener("delete-click", (e) => {
-      const { name } = e.detail;
-      this.deleteFile(name);
+      const { name, path } = e.detail;
+      this.deleteFile(name, path);
     });
 
     this.fileForm?.addEventListener("submit", (event) => {
@@ -28,12 +28,12 @@ export class FileManager {
     this.fileTable.displayFiles();
   }
 
-  async downloadFile(name) {
-    const url = await this.fileService.fetchPresignedURL(name);
+  async downloadFile(path) {
+    const url = await this.fileService.fetchPresignedURL(path);
     window.open(url, "_blank");
   }
 
-  async deleteFile(name) {
+  async deleteFile(name, path) {
     if (
       !window.confirm(
         window.interpolate(window.gettext("Delete the document %s ?"), [name])
@@ -43,7 +43,7 @@ export class FileManager {
     }
     this.fileTable.showLoading();
     try {
-      await this.fileService.deleteFile(name);
+      await this.fileService.deleteFile(path);
       this.handleDeleteSuccess(name);
     } catch (error) {
       this.handleDeleteError(name);

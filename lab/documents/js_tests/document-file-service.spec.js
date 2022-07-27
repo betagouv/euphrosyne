@@ -1,12 +1,11 @@
 import { jest } from "@jest/globals";
+import { DocumentFileService } from "../assets/js/document-file-service.js";
 
-import { FileService } from "../assets/js/file-service.js";
-
-describe("Test file service", () => {
+describe("Test document file service", () => {
   let fileService;
 
   beforeEach(() => {
-    fileService = new FileService(
+    fileService = new DocumentFileService(
       "http://listfileurl",
       "https://fetchpresignedurl"
     );
@@ -75,7 +74,7 @@ describe("Test file service", () => {
   describe("Test uploadFiles", () => {
     it("fetches presigned URL and upload file", async () => {
       const fetchPresignedURLSpy = jest
-          .spyOn(fileService, "fetchPresignedURL")
+          .spyOn(fileService, "fetchUploadPresignedURL")
           .mockImplementation(() => Promise.resolve("url")),
         uploadFileSpy = jest
           .spyOn(fileService, "uploadFile")
