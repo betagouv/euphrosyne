@@ -1,3 +1,5 @@
+import { formatBytes } from "../utils.js";
+
 export class FileTable extends HTMLTableElement {
   constructor() {
     super();
@@ -7,6 +9,10 @@ export class FileTable extends HTMLTableElement {
 
   static init() {
     customElements.define("file-table", FileTable, { extends: "table" });
+  }
+
+  get cols() {
+    return (this.getAttribute("cols") || "name,lastModified,size,").split(",");
   }
 
   showLoading() {
@@ -31,20 +37,29 @@ export class FileTable extends HTMLTableElement {
       const rowEl = this.insertRow(-1);
       rowEl.classList.add("document-row");
 
-      const keyCell = rowEl.insertCell(),
-        keyCellText = document.createTextNode(file.name);
-      keyCell.appendChild(keyCellText);
+      if (this.cols.includes("name")) {
+        const nameCell = rowEl.insertCell(),
+          nameCellText = document.createTextNode(file.name);
+        nameCell.appendChild(nameCellText);
+        nameCell.classList.add("file-name-cell");
+      }
 
-      const lastModifiedCell = rowEl.insertCell(),
-        lastModifiedCellText = document.createTextNode(file.lastModified);
-      lastModifiedCell.appendChild(lastModifiedCellText);
+      if (this.cols.includes("lastModified")) {
+        const lastModifiedCell = rowEl.insertCell(),
+          lastModifiedCellText = document.createTextNode(
+            file.lastModified.toLocaleDateString()
+          );
+        lastModifiedCell.appendChild(lastModifiedCellText);
+      }
 
-      const sizeCell = rowEl.insertCell(),
-        sizeCellText = document.createTextNode(file.size);
-      sizeCell.appendChild(sizeCellText);
+      if (this.cols.includes("size")) {
+        const sizeCell = rowEl.insertCell(),
+          sizeCellText = document.createTextNode(formatBytes(file.size));
+        sizeCell.appendChild(sizeCellText);
+      }
 
       const actionsText = rowEl.insertCell();
-      actionsText.appendChild(this.generateActionCellContent(file.key));
+      actionsText.appendChild(this.generateActionCellContent(file));
       this.dataRows.push(rowEl);
     });
   }
@@ -72,7 +87,8 @@ export class FileTable extends HTMLTableElement {
     return row;
   }
 
-  generateActionCellContent(key) {
+  generateActionCellContent(file) {
+    const { name, path } = file;
     const unorderedList = document.createElement("ul");
     unorderedList.classList.add(
       "fr-btns-group",
@@ -90,7 +106,7 @@ export class FileTable extends HTMLTableElement {
     downloadButton.title = window.gettext("Download file");
     downloadButton.addEventListener("click", () => {
       this.dispatchEvent(
-        new CustomEvent("download-click", { detail: { key } })
+        new CustomEvent("download-click", { detail: { path } })
       );
     });
     const downloadListItem = document.createElement("li");
@@ -108,7 +124,9 @@ export class FileTable extends HTMLTableElement {
       deleteButton.textContent = window.gettext("Delete file");
       deleteButton.title = window.gettext("Delete file");
       deleteButton.addEventListener("click", () =>
-        this.dispatchEvent(new CustomEvent("delete-click", { detail: { key } }))
+        this.dispatchEvent(
+          new CustomEvent("delete-click", { detail: { name, path } })
+        )
       );
       const deleteListItem = document.createElement("li");
       deleteListItem.appendChild(deleteButton);

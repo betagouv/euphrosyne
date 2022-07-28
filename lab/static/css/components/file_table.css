@@ -36,3 +36,6 @@
 .file-table td ul.fr-btns-group {
   margin: 0;
 }
+.file-table td.file-name-cell {
+  word-break: break-word;
+}
