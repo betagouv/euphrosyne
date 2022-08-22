@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/betagouv/euphrosyne#readme",
   "devDependencies": {
-    "@types/jest": "^28.1.6",
+    "@types/jest": "^28.1.7",
     "eslint": "^8.20.0",
     "eslint-plugin-jest": "^26.6.0",
     "jest": "^28.1.3",
