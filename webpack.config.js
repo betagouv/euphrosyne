@@ -33,6 +33,7 @@ export default {
       "@gouvfr/dsfr/dist/utility/icons/icons-design/icons-design.min.css",
       "@gouvfr/dsfr/dist/utility/icons/icons-communication/icons-communication.min.css",
       "@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.min.css",
+      "@gouvfr/dsfr/dist/utility/colors/colors.min.css",
       "remixicon/fonts/remixicon.css",
       "./euphrosyne/assets/css/base.css",
     ],
