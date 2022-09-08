@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-18 14:49+0200\n"
+"POT-Creation-Date: 2022-09-12 10:04+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -630,6 +630,21 @@ msgstr "Modifier l’objet %(model)s sélectionné"
 
 msgid "Access virtual office"
 msgstr "Accéder au bureau distant"
+
+msgid "Administration"
+msgstr "Administration"
+
+msgid "Project type"
+msgstr "Type de projet"
+
+msgid "Default"
+msgstr "Défaut"
+
+msgid "Imagery"
+msgstr "Imagerie"
+
+msgid "Used to determine the virtual machine size."
+msgstr "Utilisé pour déterminer la taille de la machine virtuelle."
 
 msgid "Delete virtual office"
 msgstr "Supprimer le bureau virtuel"

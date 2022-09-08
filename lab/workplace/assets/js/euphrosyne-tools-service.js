@@ -50,10 +50,34 @@ function deleteVM(projectName) {
   );
 }
 
+async function fetchProjectVmSize(projectName) {
+  const response = await jwtFetch(
+    `${process.env.EUPHROSYNE_TOOLS_API_URL}/config/${projectName}/vm-size`,
+    {
+      method: "GET",
+    }
+  );
+  if (response.ok) {
+    return (await response.json())["vm_size"];
+  }
+}
+
+async function setProjectVmSize(projectName, vmSize) {
+  return jwtFetch(
+    `${process.env.EUPHROSYNE_TOOLS_API_URL}/config/${projectName}/vm-size`,
+    {
+      method: "POST",
+      body: JSON.stringify({ vm_size: vmSize }),
+    }
+  );
+}
+
 const exports = {
   fetchVMConnectionLink,
   fetchDeploymentStatus,
   deployVM,
   deleteVM,
+  fetchProjectVmSize,
+  setProjectVmSize,
 };
 export default exports;

@@ -20,6 +20,7 @@ export async function jwtFetch(input, init = {}) {
     response = await fetch(input, {
       headers: new Headers({
         Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       }),
       ...init,
     });
