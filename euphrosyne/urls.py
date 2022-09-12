@@ -17,7 +17,6 @@ import debug_toolbar
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.shortcuts import redirect
 from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
 
@@ -25,18 +24,17 @@ from euphro_auth.views import UserTokenRegistrationView
 from orcid_oauth.views import UserCompleteAccountView
 
 urlpatterns = [
-    path("admin/doc/", include("django.contrib.admindocs.urls")),
+    path("doc/", include("django.contrib.admindocs.urls")),
     path(
-        "admin/password_reset/",
+        "password_reset/",
         auth_views.PasswordResetView.as_view(),
         name="admin_password_reset",
     ),
     path(
-        "admin/password_reset/done/",
+        "password_reset/done/",
         auth_views.PasswordResetDoneView.as_view(),
         name="password_reset_done",
     ),
-    path("admin/", admin.site.urls),
     path(
         "reset/<uidb64>/<token>/",
         auth_views.PasswordResetConfirmView.as_view(),
@@ -57,9 +55,9 @@ urlpatterns = [
         UserCompleteAccountView.as_view(),
         name="complete_registration_orcid",
     ),
+    path("", admin.site.urls),
     path("", include("static_pages.urls")),
     path("api/", include("euphrosyne.api_urls")),
     path("", include("social_django.urls")),
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
-    path("", lambda request: redirect("/admin/")),
 ] + ([path("__debug__/", include(debug_toolbar.urls))] if settings.DEBUG else [])
