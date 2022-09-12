@@ -26,7 +26,7 @@ export function dismissAddRelatedObjectGroupPopup(
     formIndex,
     relatedObjectGroupRunRunIds[0],
     "objectgroup",
-    `/admin/lab/objectgroup/${newId}/change/?next=/admin/lab/run/${pageRunId}/change/&_popup=1`,
+    `/lab/objectgroup/${newId}/change/?next=/lab/run/${pageRunId}/change/&_popup=1`,
     newRepr,
     "run",
     pageRunId

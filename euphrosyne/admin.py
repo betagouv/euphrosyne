@@ -2,7 +2,7 @@ from typing import List
 
 from django.contrib import admin
 from django.shortcuts import redirect
-from django.urls import path
+from django.urls import path, reverse
 from django.urls.resolvers import URLResolver
 
 from lab.documents.views import ProjectDocumentsView
@@ -48,7 +48,6 @@ class AdminSite(admin.AdminSite):
         return app_list
 
     def index(self, request, extra_context=None):
-        if not request.user.is_lab_admin and request.path == "/admin/":
-            return redirect("/admin/lab/project/")
-
+        if not request.user.is_lab_admin and request.path == "/":
+            return redirect(reverse("admin:lab_project_changelist"))
         return super().index(request, extra_context=extra_context)

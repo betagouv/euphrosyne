@@ -21,6 +21,6 @@ class TestSendProjectInvitationEmail(SimpleTestCase):
             f"[Euphrosyne] Invitation to join project {project.name}",
         )
         self.assertIn(
-            f"{settings.SITE_URL}/admin/lab/project/{project.id}/change/",
+            f"{settings.SITE_URL}/lab/project/{project.id}/change/",
             mail.outbox[0].body,
         )

@@ -259,7 +259,7 @@ EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS") != "false"
 DEFAULT_FROM_EMAIL = os.environ["DEFAULT_FROM_EMAIL"]
 
 # Necessary for the correct behavior of password reset flow:
-LOGIN_URL = "/admin/login/"
+LOGIN_URL = "/login/"
 
 # Logging
 
