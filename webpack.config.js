@@ -7,7 +7,7 @@ import { dirname } from "path";
 
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
-import PurgecssPlugin from "purgecss-webpack-plugin";
+import { PurgeCSSPlugin } from "purgecss-webpack-plugin";
 import webpack from "webpack";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -95,7 +95,7 @@ export default {
       EUPHROSYNE_TOOLS_API_URL: null,
     }),
     new MiniCssExtractPlugin(),
-    new PurgecssPlugin({
+    new PurgeCSSPlugin({
       paths: globAll.sync(
         [
           `${PATHS.euphrosyne}/**/*`,
