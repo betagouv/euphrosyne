@@ -55,9 +55,9 @@ urlpatterns = [
         UserCompleteAccountView.as_view(),
         name="complete_registration_orcid",
     ),
+    path("api/", include("euphrosyne.api_urls")),
+    path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
     path("", admin.site.urls),
     path("", include("static_pages.urls")),
-    path("api/", include("euphrosyne.api_urls")),
     path("", include("social_django.urls")),
-    path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
 ] + ([path("__debug__/", include(debug_toolbar.urls))] if settings.DEBUG else [])
