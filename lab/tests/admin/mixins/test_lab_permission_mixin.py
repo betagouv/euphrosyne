@@ -50,7 +50,7 @@ class TestLabPermissionMixin(SimpleTestCase):
         assert self.model_admin.has_add_permission(admin_request, self.project)
 
     @patch(
-        "lab.permissions.get_user_permission_group",
+        "lab.admin.mixins.get_user_permission_group",
         return_value=LabRole.PROJECT_LEADER,
     )
     def test_users_with_less_permission_are_restricted(self, _):
