@@ -24,6 +24,7 @@ from euphro_auth.views import UserTokenRegistrationView
 from orcid_oauth.views import UserCompleteAccountView
 
 urlpatterns = [
+    path("", include("social_django.urls")),
     path("doc/", include("django.contrib.admindocs.urls")),
     path(
         "password_reset/",
@@ -59,5 +60,4 @@ urlpatterns = [
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
     path("", admin.site.urls),
     path("", include("static_pages.urls")),
-    path("", include("social_django.urls")),
 ] + ([path("__debug__/", include(debug_toolbar.urls))] if settings.DEBUG else [])
