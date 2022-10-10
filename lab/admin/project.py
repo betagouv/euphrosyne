@@ -8,6 +8,7 @@ from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
+from euphro_tools.hooks import initialize_project_directory
 from lab.widgets import LeaderReadonlyWidget
 
 from ..forms import BaseParticipationForm, BeamTimeRequestForm, LeaderParticipationForm
@@ -221,6 +222,8 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
         obj.save()
         if not change and not is_lab_admin(request.user):
             obj.participation_set.create(user_id=request.user.id, is_leader=True)
+        if not change:
+            initialize_project_directory(obj.name)
 
     def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
         return super().changeform_view(

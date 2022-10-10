@@ -1,8 +1,12 @@
+from unittest.mock import MagicMock, patch
+
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+
+from lab.models.project import Project
 
 from ...admin import RunAdmin
 from ...models import Run
@@ -163,6 +167,21 @@ class TestRunAdminViewAsLeader(TestCase):
             "Ce choix ne fait pas partie de ceux disponibles."
             in form.errors["project"][0]
         )
+
+    @patch("lab.admin.run.initialize_run_directory")
+    def test_add_run_calls_init_directroy_hook(self, init_run_dir_mock):
+        request = self.request_factory.post(reverse("admin:lab_run_add"))
+        request.user = self.staff_user
+        run = Run(label="Run 1")
+        run.project = Project(name="Le projet du Run 1")
+        with patch.object(run, "save"):
+            RunAdmin(Run, admin_site=AdminSite()).save_model(
+                request,
+                run,
+                form=MagicMock(),
+                change=False,
+            )
+        init_run_dir_mock.assert_called_once_with(run.label, run.project.name)
 
 
 class TestRunAdminViewAsAdmin(TestCase):

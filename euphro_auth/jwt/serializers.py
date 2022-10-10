@@ -1,20 +1,8 @@
 from rest_framework import exceptions
 from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.settings import api_settings as simplejwt_api_settings
-from rest_framework_simplejwt.tokens import RefreshToken
 
-from lab.permissions import is_lab_admin
-
-from ..models import User
-
-
-class EuphroRefreshToken(RefreshToken):
-    @classmethod
-    def for_user(cls, user: User):
-        token = super().for_user(user)
-        token["projects"] = list(user.project_set.values("id", "name"))
-        token["is_admin"] = is_lab_admin(user)
-        return token
+from .tokens import EuphroRefreshToken
 
 
 # pylint: disable=abstract-method

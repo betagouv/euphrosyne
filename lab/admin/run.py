@@ -5,8 +5,11 @@ from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import InlineModelAdmin
 from django.db.models.query import QuerySet
+from django.forms import ModelForm
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
+
+from euphro_tools.hooks import initialize_run_directory
 
 from ..forms import RunDetailsForm
 from ..models import Project, Run
@@ -221,6 +224,11 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
                 "project": project,
             },
         )
+
+    def save_model(self, request: Any, obj: Run, form: ModelForm, change: bool) -> None:
+        super().save_model(request, obj, form, change)
+        if not change:
+            initialize_run_directory(obj.label, obj.project.name)
 
     def _get_project(self, request, object_id=None) -> Optional[Project]:
         if object_id:
