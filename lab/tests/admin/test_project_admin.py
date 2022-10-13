@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from unittest.mock import MagicMock, patch
 
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
@@ -224,6 +225,19 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
         project = Project.objects.get(name="some project name")
         assert project.members.count() == 1
         assert project.members.all()[0].id == self.project_member.id
+
+    @patch("lab.admin.project.initialize_project_directory")
+    def test_add_project_calls_init_directroy_hook(self, init_project_dir_mock):
+        request = self.request_factory.post(self.add_view_url)
+        request.user = self.project_member
+        project = Project(name="Projet Notre Dame")
+        ProjectAdmin(Project, admin_site=AdminSite()).save_model(
+            request,
+            project,
+            form=MagicMock(),
+            change=False,
+        )
+        init_project_dir_mock.assert_called_once_with(project.name)
 
     def test_participation_inline_is_absent_in_changeview(self):
         project = self.projects_with_member[0]
