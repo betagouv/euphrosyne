@@ -33,7 +33,7 @@ def patch_disabledselectwithhidden_optgroups():
 @pytest.fixture(scope="module", autouse=True)
 def adminform():
     # pylint: disable=line-too-long
-    # Raincoat: pypi package: Django==4.0 path: django/contrib/admin/options.py element: ModelAdmin._changeform_view
+    # Raincoat: pypi package: Django==4.1.2 path: django/contrib/admin/options.py element: ModelAdmin._changeform_view
 
     run_admin = RunAdmin(model=Run, admin_site=AdminSite())
     request = RequestFactory().get(reverse("admin:lab_run_add"))

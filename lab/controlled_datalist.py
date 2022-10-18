@@ -74,7 +74,7 @@ class MultiDatalistIntegerField(IntegerField):
 
     def to_python(self, value: Optional[List[int]]) -> Optional[int]:
         # pylint: disable=line-too-long
-        # Raincoat: pypi package: django==4.0a1 path: django/forms/fields.py element: IntegerField.to_python
+        # Raincoat: pypi package: django==4.1.2 path: django/forms/fields.py element: IntegerField.to_python
         value = Field.to_python(self, value)
         if value in self.empty_values:
             return None
