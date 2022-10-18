@@ -11,4 +11,4 @@ pylint==2.15.4
 pytest-django==4.5.2
 pytest==7.1.3
 pytest-dotenv==0.5.2
-raincoat==1.0.1
+raincoat==1.2.4
