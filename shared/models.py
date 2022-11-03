@@ -16,3 +16,13 @@ class TimestampedModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class LowerCharField(models.CharField):
+    """Like CharField but format chars to be lowercase before saving
+    into DB."""
+
+    def get_prep_value(self, value: str | None):
+        if isinstance(value, str):
+            return value.lower()
+        return value

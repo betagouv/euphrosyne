@@ -3,8 +3,9 @@ from django.contrib.postgres.constraints import ExclusionConstraint
 from django.contrib.postgres.fields import RangeOperators
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
+from django.utils.translation import gettext_lazy as _
 
-from shared.models import TimestampedModel
+from shared.models import LowerCharField, TimestampedModel
 
 
 class Participation(TimestampedModel):
@@ -39,8 +40,17 @@ class Participation(TimestampedModel):
 
 
 class Institution(models.Model):
-    name = models.CharField(max_length=255)
-    country = models.CharField(max_length=255, blank=True, null=True)
+    name = LowerCharField(verbose_name=_("name"), max_length=255)
+    country = LowerCharField(
+        verbose_name=_("country"), max_length=255, blank=True, null=True
+    )
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=["name", "country"], name="unique_name_country_per_institution"
+            ),
+        ]
 
     def __str__(self) -> str:
         if self.country:

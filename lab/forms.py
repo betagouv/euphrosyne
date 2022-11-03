@@ -30,12 +30,14 @@ class BaseParticipationForm(ModelForm):
 
     def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
-        # Try to find user with email, create it otherwise
-        try:
-            user = get_user_model().objects.get(email=cleaned_data["user"])
-        except get_user_model().DoesNotExist:
-            user = UserInvitation.create_user(email=cleaned_data["user"])
-        return {**cleaned_data, "user": user}
+        if "user" in cleaned_data:
+            # Try to find user with email, create it otherwise
+            try:
+                user = get_user_model().objects.get(email=cleaned_data["user"])
+            except get_user_model().DoesNotExist:
+                user = UserInvitation.create_user(email=cleaned_data["user"])
+            return {**cleaned_data, "user": user}
+        return cleaned_data
 
     def save(self, commit: bool = ...) -> models.Participation:
         is_new = self.instance.pk is None
