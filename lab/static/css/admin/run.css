@@ -43,3 +43,7 @@
 #changelist .add-row a {
   color: var(--text-active-blue-france);
 }
+
+.run-list .fr-grid-row--gutters {
+  margin: 0;
+}
