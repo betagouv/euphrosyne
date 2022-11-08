@@ -18,10 +18,11 @@ def _make_request(url: str) -> Optional[requests.Response]:
             headers={"Authorization": f"Bearer {token}"},
             timeout=5,
         )
-    except requests.Timeout:
+    except (requests.Timeout, requests.ConnectionError) as error:
         logger.error(
-            "Error making call to Euphrosyne Tools API.\nURL: %s\nReason: Timeout",
+            "Error making call to Euphrosyne Tools API.\nURL: %s\nReason: %s",
             url,
+            str(error),
         )
     return None
 
