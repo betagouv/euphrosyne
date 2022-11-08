@@ -96,7 +96,7 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
                 "participation_set-INITIAL_FORMS": "0",
                 "participation_set-0-id": "",
                 "participation_set-0-project": "",
-                "participation_set-0-user": self.project_participant_user.id,
+                "participation_set-0-user": self.project_participant_user.email,
                 "participation_set-0-is_leader": "True",
                 "participation_set-0-institution": self.base_institution.id,
             },

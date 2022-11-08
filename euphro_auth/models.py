@@ -44,3 +44,13 @@ class UserInvitation(User):
     def clean(self):
         if not self.pk:
             self.is_staff = True
+
+    @classmethod
+    def create_user(cls, **attributes):
+        """Create a new user and send an invitation."""
+        # pylint: disable=import-outside-toplevel
+        from euphro_auth.emails import send_invitation_email
+
+        user = cls.objects.create(**attributes, is_staff=True)
+        send_invitation_email(user)
+        return user

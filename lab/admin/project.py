@@ -53,7 +53,7 @@ class ParticipationInline(LabPermissionMixin, admin.TabularInline):
 
     lab_permissions = LabPermission(
         add_permission=LabRole.PROJECT_LEADER,
-        change_permission=LabRole.PROJECT_LEADER,
+        change_permission=LabRole.LAB_ADMIN,
         view_permission=LabRole.PROJECT_MEMBER,
         delete_permission=LabRole.PROJECT_LEADER,
     )
@@ -68,6 +68,7 @@ class ParticipationInline(LabPermissionMixin, admin.TabularInline):
         **kwargs: Mapping[str, Any]
     ):
         form = BaseParticipationForm if obj else LeaderParticipationForm
+
         formset = inlineformset_factory(
             Project,
             Participation,

@@ -3,7 +3,6 @@ from typing import Any, Dict, List, Optional, Tuple
 from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
-from django.contrib.auth.tokens import default_token_generator
 from django.db.models.query import QuerySet
 from django.forms.models import ModelForm
 from django.http import HttpResponse
@@ -119,8 +118,7 @@ class UserInvitationAdmin(ModelAdmin):
         users = queryset.filter(invitation_completed_at=None)
         if users:
             for user in users:
-                token = default_token_generator.make_token(user)
-                send_invitation_email(email=user.email, user_id=user.id, token=token)
+                send_invitation_email(user)
             message = _(
                 "Invitations sent to : {}.",
             ).format(", ".join([user.email for user in users]))
@@ -151,8 +149,7 @@ class UserInvitationAdmin(ModelAdmin):
     ) -> None:
         if not change:
             obj.save()
-            token = default_token_generator.make_token(obj)
-            send_invitation_email(email=obj.email, user_id=obj.pk, token=token)
+            send_invitation_email(obj)
             return obj
         return super().save_model(request, obj, form, change)
 

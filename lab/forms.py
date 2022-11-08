@@ -1,21 +1,44 @@
+from typing import Any
+
 from django import forms
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.forms.fields import BooleanField
+from django.forms.fields import BooleanField, EmailField
 from django.forms.forms import Form
 from django.forms.models import ModelForm
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput, Select
 from django.utils.translation import gettext_lazy as _
 
-from euphro_auth.models import User
-from lab.emails import send_project_invitation_email
+from euphro_auth.models import User, UserInvitation
 
 from . import models, widgets
 from .controlled_datalist import controlled_datalist_form
+from .emails import send_project_invitation_email
 from .methods import OTHER_VALUE, SelectWithFreeOther
 
 
 class BaseParticipationForm(ModelForm):
+    user = EmailField(label=_("User"))
+
+    def __init__(
+        self, initial=None, instance: models.Participation = None, **kwargs
+    ) -> None:
+        if instance:
+            initial = {**(initial or {}), "user": instance.user.email}
+        super().__init__(initial=initial, instance=instance, **kwargs)
+
+    def clean(self) -> dict[str, Any]:
+        cleaned_data = super().clean()
+        if "user" in cleaned_data:
+            # Try to find user with email, create it otherwise
+            try:
+                user = get_user_model().objects.get(email=cleaned_data["user"])
+            except get_user_model().DoesNotExist:
+                user = UserInvitation.create_user(email=cleaned_data["user"])
+            return {**cleaned_data, "user": user}
+        return cleaned_data
+
     def save(self, commit: bool = ...) -> models.Participation:
         is_new = self.instance.pk is None
         instance = super().save(commit=commit)
@@ -31,15 +54,11 @@ class BaseParticipationForm(ModelForm):
         model = models.Participation
         fields = ("user", "institution")
         widgets = {
-            "user": widgets.UserWidgetWrapper(
-                Select(),
-                User.participation_set.rel,
-            ),
             "institution": widgets.InstitutionWidgetWrapper(
                 Select(), models.Institution.participation_set.rel
             ),
         }
-        labels = {"user": _("User"), "institution": _("Institution")}
+        labels = {"institution": _("Institution")}
 
 
 class LeaderParticipationForm(BaseParticipationForm):
@@ -53,17 +72,14 @@ class LeaderParticipationForm(BaseParticipationForm):
         model = models.Participation
         fields = ("user", "institution")
         widgets = {
-            "user": widgets.UserWidgetWrapper(
-                Select(),
-                User.participation_set.rel,
-            ),
             "institution": widgets.InstitutionWidgetWrapper(
                 Select(), models.Institution.participation_set.rel
             ),
         }
-        labels = {
-            "user": _("Leader"),
-        }
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.fields["user"].label = _("Leader")
 
     def save(self, commit: bool = ...) -> models.Participation:
         self.instance.is_leader = True
