@@ -1,26 +1,26 @@
-name: Merge me!
+name: Merge dependabot PRs
 
 on:
   workflow_run:
     types: [completed]
-    workflows: ["Test"]
+    workflows: ['Test']
     branches:
       # npm
-      - "dependabot/*eslint*"
-      - "dependabot/*jest-and-types*"
-      - "dependabot/*prettier*"
-      - "dependabot/*css-loader*"
-      - "dependabot/*webpack*"
-      - "dependabot/*purgecss-webpack-plugin*"
-      - "dependabot/*mini-css-extract-plugin*"
+      - 'dependabot/**eslint**'
+      - 'dependabot/**jest-and-types**'
+      - 'dependabot/**prettier**'
+      - 'dependabot/**css-loader**'
+      - 'dependabot/**webpack**'
+      - 'dependabot/**purgecss-webpack-plugin**'
+      - 'dependabot/**mini-css-extract-plugin**'
       # pip
-      - "dependabot/*pylint*"
-      - "dependabot/*black*"
-      - "dependabot/*flake8*"
-      - "dependabot/*ipython*"
-      - "dependabot/*isort*"
-      - "dependabot/*pytest*"
-      - "dependabot/*sentry-sdk*"
+      - 'dependabot/**pylint**'
+      - 'dependabot/**black**'
+      - 'dependabot/**flake8**'
+      - 'dependabot/**ipython**'
+      - 'dependabot/**isort**'
+      - 'dependabot/**pytest**'
+      - 'dependabot/**sentry-sdk**'
 
 jobs:
   merge-me:
