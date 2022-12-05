@@ -1,5 +1,8 @@
 name: Dependabot auto-merge
-on: pull_request
+on: 
+  pull_request:
+    branches-ignore:
+      - 'dependabot/npm_and_yarn/gouvfr/dsfr-*'
 
 permissions:
   contents: write
@@ -8,7 +11,9 @@ permissions:
 jobs:
   dependabot:
     runs-on: ubuntu-latest
-    if: ${{ github.actor == 'dependabot[bot]' }}
+    if: >-
+      github.actor == 'dependabot[bot]' && 
+      !contains(github.head_ref, 'dsfr')
     steps:
       - name: Dependabot metadata
         id: metadata
