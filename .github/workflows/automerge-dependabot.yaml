@@ -1,47 +1,23 @@
-name: Merge me!
+name: Dependabot auto-merge
+on: pull_request
 
-on:
-  workflow_run:
-    types: [completed]
-    workflows: ["Test"]
-    branches:
-      # npm
-      - "dependabot/*eslint*"
-      - "dependabot/*jest-and-types*"
-      - "dependabot/*prettier*"
-      - "dependabot/*css-loader*"
-      - "dependabot/*webpack*"
-      - "dependabot/*purgecss-webpack-plugin*"
-      - "dependabot/*mini-css-extract-plugin*"
-      # pip
-      - "dependabot/*pylint*"
-      - "dependabot/*black*"
-      - "dependabot/*flake8*"
-      - "dependabot/*ipython*"
-      - "dependabot/*isort*"
-      - "dependabot/*pytest*"
-      - "dependabot/*sentry-sdk*"
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
-  merge-me:
-    name: Merge me!
+  dependabot:
     runs-on: ubuntu-latest
+    if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
-      - # It is often a desired behavior to merge only when a workflow execution
-        # succeeds. This can be changed as needed.
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
-        name: Merge me!
-        uses: ridedott/merge-me-action@v2
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1.1.1
         with:
-          # Depending on branch protection rules, a  manually populated
-          # `GITHUB_TOKEN_WORKAROUND` secret with permissions to push to
-          # a protected branch must be used. This secret can have an arbitrary
-          # name, as an example, this repository uses `DOTTBOTT_TOKEN`.
-          #
-          # When using a custom token, it is recommended to leave the following
-          # comment for other developers to be aware of the reasoning behind it:
-          #
-          # This must be used as GitHub Actions token does not support pushing
-          # to protected branches.
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PRESET: DEPENDABOT_MINOR
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Enable auto-merge for Dependabot PRs
+        if: ${{steps.metadata.outputs.update-type == 'version-update:semver-minor' || steps.metadata.outputs.update-type == 'version-update:semver-patch'}}
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
