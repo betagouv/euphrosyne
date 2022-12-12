@@ -6,6 +6,7 @@
 {% block content_subtitle %}{% endblock %}
 
 {% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
 <link rel="stylesheet" type="text/css" href="{% static "css/components/file_table.css" %}">
 {% endblock %}
 
@@ -18,6 +19,32 @@
 
 <div id="content-main">
     <ul class="messagelist"></ul>
+    <div class="fr-grid-row fr-grid-row--right">
+        <button is="virtual-office-button" 
+                project-name="{{ project.name }}" 
+                class="fr-btn fr-icon-arrow-right-line fr-btn--icon-right">{% trans "Access virtual office" %}</button>
+    </div>
+    {% if user.is_lab_admin %}
+    <fieldset class="module aligned fr-mt-3w">
+        <h2>{% trans "Administration" %}</h2>
+        <div class="form-row">
+            <div>   
+                <label for="vm-size-select">{% trans "Project type" %}</label>
+                <select name="vm_size" id="vm-size-select" is="vm-size-select" project-name="{{ project.name }}">
+                    <option selected value="">{% trans "Default" %}</option>
+                    <option value="IMAGERY">{% trans "Imagery" %}</option>
+                </select>
+                <div class="help">{% trans "Used to determine the virtual machine size." %}</div>
+            </div>
+        </div>
+        <div class="form-row">
+            <button is="virtual-office-delete-button" project-name="{{ project.name }}" class="fr-btn fr-btn--tertiary fr-btn--sm">
+                {% trans "Delete virtual office"%}
+            </button>
+        </div>
+    </fieldset>
+    {% endif %}
+
     <div class="fr-tabs">
         <ul class="fr-tabs__list" role="tablist" aria-label="{% trans "Runs data" %}">
             {% for run in runs %}
