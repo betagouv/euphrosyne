@@ -11,8 +11,8 @@ export class EuphrosyneFile {
 }
 
 class FileUploadError extends Error {
-  constructor(response, file) {
-    super(`Failed to upload file. Response status: ${response.status}`);
+  constructor(message, file) {
+    super(message);
     this.file = file;
   }
 }
@@ -83,7 +83,7 @@ export class FileService {
       },
     });
     if (!response.ok) {
-      throw new FileUploadError(response, file);
+      throw new FileUploadError(response.statusText, file);
     }
   }
 

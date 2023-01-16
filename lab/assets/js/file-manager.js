@@ -75,13 +75,15 @@ export class FileManager {
           "success"
         );
       } else {
-        await this.fileService.deleteFile(result.reason.file.name);
         displayMessage(
           window.interpolate(window.gettext("File %s could not be uploaded."), [
             result.reason.file.name,
-          ]),
+          ]) +
+            " " +
+            result.reason.message,
           "error"
         );
+        await this.fileService.deleteFile(result.reason.file.name);
       }
     });
     if (results.map((result) => result.status === "fulfilled").indexOf !== -1) {
