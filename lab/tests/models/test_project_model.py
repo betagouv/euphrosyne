@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
+from slugify import slugify
 
 from ...models import Participation, Project
 
@@ -24,3 +25,8 @@ class TestProjectModel(TestCase):
         Participation.objects.create(user=user, project=project)
 
         assert project.leader is None
+
+    def test_project_slug_is_saved(self):
+        project = Project.objects.create(name="Project Test")
+        assert project.slug
+        assert project.slug == slugify(project.name)
