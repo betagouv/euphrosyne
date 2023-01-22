@@ -73,6 +73,25 @@ class Project(TimestampedModel):
             return self.Status.SCHEDULED
         return self.Status.TO_SCHEDULE
 
+    def clean(self):
+        super().clean()
+        slug = self._generate_slug()
+        qs = Project.objects.filter(slug=slug)
+        if self.id:
+            qs = qs.exclude(id=self.id)
+        if qs.count() >= 1:
+            raise ValidationError(
+                {
+                    "name": ValidationError(
+                        _(
+                            "A project with a similar name already exists. "
+                            "The slug corresponding to the name you enter is '%s' "
+                            "and another project with this slug exists." % slug
+                        )
+                    )
+                }
+            )
+
     def save(
         self,
         force_insert: bool = False,
@@ -80,10 +99,10 @@ class Project(TimestampedModel):
         using: Optional[str] = None,
         update_fields: Optional[list[str]] = None,
     ) -> None:
-        self.slug = self.generate_slug()
+        self.slug = self._generate_slug()
         return super().save(force_insert, force_update, using, update_fields)
 
-    def generate_slug(self):
+    def _generate_slug(self):
         if not self.name:
             raise ValueError("Can't generate slug : project name is empty.")
         return slugify(self.name)

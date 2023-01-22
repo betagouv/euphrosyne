@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.forms import ValidationError
 from django.test import TestCase
 from slugify import slugify
 
@@ -30,3 +31,12 @@ class TestProjectModel(TestCase):
         project = Project.objects.create(name="Project Test")
         assert project.slug
         assert project.slug == slugify(project.name)
+
+    def test_clean_new_project_with_slug_field(self):
+        # Create project 1
+        Project.objects.create(name="Project Test")
+        # Init a project with a slug identic to project 1
+        project = Project(name="Project test")
+        # Clean it, it should raise ValidationError
+        with self.assertRaises(ValidationError):
+            project.clean()
