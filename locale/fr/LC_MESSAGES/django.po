@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-03 15:39+0100\n"
+"POT-Creation-Date: 2023-01-22 11:50+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -374,6 +374,9 @@ msgstr "Terminé"
 msgid "Project name"
 msgstr "Nom du projet"
 
+msgid "Project name slug"
+msgstr "Slug du projet"
+
 msgid "Members"
 msgstr "Membres"
 
@@ -382,6 +385,14 @@ msgstr "Administrateur"
 
 msgid "Comments"
 msgstr "Commentaires"
+
+#, python-format
+msgid ""
+"A project with a similar name already exists. The slug corresponding to the "
+"name you enter is '%s' and another project with this slug exists."
+msgstr ""
+"Un projet avec un nom similaire existe déjà. Le slug correspondant au nom "
+"que vous avez entré est '%s' et un autre projet avec ce slug existe."
 
 msgid "French"
 msgstr "Français"
