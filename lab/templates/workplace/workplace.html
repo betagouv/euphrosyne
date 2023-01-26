@@ -65,6 +65,14 @@
              aria-labelledby="tabpanel-run-{{ run.id }}" 
              tabindex="{{ forloop.counter0 }}">
                 <div class="fr-grid-row fr-grid-row--gutters">
+                    <div class="fr-col-12">
+                        <div class="fr-background-default--grey fr-p-3v">
+                            <h3>HDF5</h2>
+                            {% include "workplace/components/hdf5_file_table.html" with component=run.hdf5_table %}
+                        </div>
+                    </div>
+                </div>
+                <div class="fr-grid-row fr-grid-row--gutters">
                     <div class="fr-col-12 fr-col-lg-6">
                         <div class="fr-background-default--grey fr-p-3v">
                             <h3>{% trans "Raw data" %}</h2>
