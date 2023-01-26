@@ -8,7 +8,10 @@ import { DocumentFileService } from "../document-file-service.js";
 FileTable.init();
 DocumentUploadForm.init();
 
-const fileService = new DocumentFileService(window.projectName);
+const fileService = new DocumentFileService(
+  window.projectName,
+  window.projectSlug
+);
 
 const documentTable = document.getElementById("document_list");
 const documentForm = document.getElementById("upload-form");

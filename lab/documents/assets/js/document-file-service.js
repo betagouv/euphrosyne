@@ -4,9 +4,9 @@ import { FileService } from "../../../assets/js/file-service.js";
 import { jwtFetch } from "../../../assets/js/jwt.js";
 
 export class DocumentFileService extends FileService {
-  constructor(projectName) {
+  constructor(projectName, projectSlug) {
     super(
-      `/data/${projectName}/documents`,
+      `/data/${projectSlug}/documents`,
       `/data/documents/shared_access_signature`
     );
     this.uploadPresignURL = `${process.env.EUPHROSYNE_TOOLS_API_URL}/data/${projectName}/documents/upload/shared_access_signature`;

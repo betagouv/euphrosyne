@@ -8,7 +8,7 @@ export function initRawData() {
     const fileTable = document.querySelector(`#run-${run.id}-raw-data-table`),
       fileForm = document.querySelector(`#run-${run.id}-raw-data-upload-form`);
 
-    const fileService = new RawDataFileService(window.projectName, run.name);
+    const fileService = new RawDataFileService(window.projectSlug, run.name);
     const fileManager = new FileManager(fileService, fileForm, fileTable);
 
     window.addEventListener("DOMContentLoaded", () => {

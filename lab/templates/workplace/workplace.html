@@ -90,6 +90,7 @@
 <script src="{% url 'javascript-catalog' %}"></script>
 <script>
     window.projectName = "{{ project.name }}"
+    window.projectSlug = "{{ project.slug }}"
     window.runs = [{% for run in runs %}{ id: {{ run.id }}, name: "{{ run.label }}" },{% endfor %}]
 </script>
 <script src="{% static 'pages/workplace.js' %}"></script>
