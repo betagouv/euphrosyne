@@ -13,7 +13,7 @@ export function initProcessedData() {
       );
 
     const fileService = new ProcessedDataFileService(
-      window.projectName,
+      window.projectSlug,
       run.name
     );
     const fileManager = new FileManager(fileService, fileForm, fileTable);

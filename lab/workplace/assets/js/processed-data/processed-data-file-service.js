@@ -3,9 +3,9 @@
 import { FileService } from "../../../../assets/js/file-service.js";
 
 export class ProcessedDataFileService extends FileService {
-  constructor(projectName, runName) {
+  constructor(projectSlug, runName) {
     super(
-      `/data/${projectName}/runs/${runName}/processed_data`,
+      `/data/${projectSlug}/runs/${runName}/processed_data`,
       `/data/runs/shared_access_signature`
     );
   }
