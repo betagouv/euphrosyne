@@ -30,7 +30,7 @@ def _make_request(url: str) -> Optional[requests.Response]:
 def initialize_project_directory(project_name: str):
     base_url = os.environ["EUPHROSYNE_TOOLS_API_URL"]
     response = _make_request(f"{base_url}/data/{project_name}/init")
-    if response and not response.ok:
+    if response is not None and not response.ok:
         logger.error(
             "Could not init project %s directory. %s: %s",
             project_name,
@@ -42,7 +42,7 @@ def initialize_project_directory(project_name: str):
 def initialize_run_directory(project_name: str, run_name: str):
     base_url = os.environ["EUPHROSYNE_TOOLS_API_URL"]
     response = _make_request(f"{base_url}/data/{project_name}/runs/{run_name}/init")
-    if response and not response.ok:
+    if response is not None and not response.ok:
         logger.error(
             "Could not init run %s directory of project %s. %s: %s",
             run_name,
