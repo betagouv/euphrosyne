@@ -76,6 +76,13 @@ class TestRunAdminParams(TestCase):
         request.user = self.lab_admin_user
         assert "project" in self.run_admin.get_readonly_fields(request, self.run)
 
+    def test_label_is_readonly_when_change(self):
+        request = RequestFactory().get(
+            reverse("admin:lab_run_change", args=[self.run.id])
+        )
+        request.user = self.lab_admin_user
+        assert "label" in self.run_admin.get_readonly_fields(request, self.run)
+
     def test_dates_are_readonly_when_change_as_non_admin(self):
         request = RequestFactory().get(
             reverse("admin:lab_run_change", args=[self.run.id])
