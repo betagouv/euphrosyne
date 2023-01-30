@@ -10,7 +10,7 @@ markdown==3.4.1
 psycopg2==2.9.5
 python-dotenv==0.21.1
 python3-openid==3.2.0
-python-slugify==7.0.0
+python-slugify==8.0.0
 pyyaml==6.0
 sentry-sdk==1.14.0
 social-auth-app-django==5.0.0
