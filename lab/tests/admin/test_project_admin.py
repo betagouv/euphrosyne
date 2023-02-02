@@ -136,6 +136,15 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         )
         assert ParticipationInline in inlines
 
+    def test_name_is_readonly_when_change(self):
+        project = Project.objects.create(name="project")
+        project_admin = ProjectAdmin(model=Project, admin_site=AdminSite())
+        request = RequestFactory().get(
+            reverse("admin:lab_project_change", args=[project.id])
+        )
+        request.user = self.admin_user
+        assert "name" in project_admin.get_readonly_fields(request, self.run)
+
 
 class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
     def setUp(self):

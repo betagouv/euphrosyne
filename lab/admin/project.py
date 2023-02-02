@@ -190,6 +190,9 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
     def get_readonly_fields(self, request: HttpRequest, obj: Optional[Project] = None):
         """Set edit permission based on user role."""
         readonly_fields = super().get_readonly_fields(request, obj)
+        if obj:
+            # Prevent changing name after creation (because of data folder sync)
+            readonly_fields += ("name",)
         if not is_lab_admin(request.user):
             # Leader
             readonly_fields = readonly_fields + ("admin", "run_date")

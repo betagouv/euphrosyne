@@ -142,7 +142,8 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
     ) -> Union[List[str], Tuple]:
         readonly_fields = (*super().get_readonly_fields(request, obj), "status")
         if obj:
-            readonly_fields += ("project",)
+            # Prevent changing label after creation (because of data folder sync).
+            readonly_fields += ("project", "label")
 
         if not is_lab_admin(request.user):
             readonly_fields += ("start_date", "end_date")
