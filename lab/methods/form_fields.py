@@ -14,6 +14,7 @@ class SelectWithFreeOther(Select):
         context = super().get_context(name, value, attrs)
         context["OTHER_VALUE"] = OTHER_VALUE
         if isinstance(value, list):
+            # pylint: disable=broad-exception-raised
             raise Exception("List value")
         context["widget"]["value_is_other"] = value not in [c[0] for c in self.choices]
         return context

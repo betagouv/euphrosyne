@@ -121,6 +121,7 @@ def build_development_db_name(base_db_name):
     )
     branch_db_name = f"{base_db_name}_{branch_suffix}"
 
+    # pylint: disable=no-else-return
     try:
         conn = psycopg2.connect(
             user=os.getenv("DB_USER"),
