@@ -87,7 +87,6 @@ class LeaderParticipationForm(BaseParticipationForm):
 
 
 class ChangeLeaderForm(Form):
-
     leader_participation = forms.ModelChoiceField(
         queryset=None, empty_label=_("No leader"), label=_("Leader")
     )
@@ -297,7 +296,6 @@ class RunStatusMemberForm(RunStatusBaseForm):
             models.Run.Status.NEW,
             models.Run.Status.ASK_FOR_EXECUTION,
         ]:
-
             raise ValidationError(
                 _("Only Admin users might rewind runs."),
                 code="run_rewinding_not_allowed_to_members",
