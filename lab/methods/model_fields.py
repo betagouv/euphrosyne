@@ -86,6 +86,7 @@ class FiltersCharField(models.CharField):
         self, method: Method, detector: Detector, filters: list[Filter], *args, **kwargs
     ):
         if not filters:
+            # pylint: disable=broad-exception-raised
             raise Exception("FilterCharField requires some filters")
         self.method = method
         self.detector = detector
