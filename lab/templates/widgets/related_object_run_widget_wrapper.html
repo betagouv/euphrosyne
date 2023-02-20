@@ -14,6 +14,7 @@
         {% if can_add_related %}
         <a class="related-widget-wrapper-link add-related" id="add_id_{{ name }}"
             href="{{ add_related_url }}?{{ url_params }}"
+            data-popup="yes"
             title="{% blocktranslate %}Add another {{ model }}{% endblocktranslate %}">
             <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="{% translate 'Add' %}">
             {% translate "Add a new object or object group" %}

@@ -467,6 +467,13 @@ msgid "Object groups"
 msgstr "Lots d'objets"
 
 msgid ""
+"We cannot process the CSV file because it is not valid. Please refer to the "
+"template to fill it properly."
+msgstr ""
+"Nous ne pouvons traiter le fichier CSV uploadé car il n'est pas valide. "
+"Veuillez-vous référer au modèle à téléchargerpour le remplir."
+
+msgid ""
 "A differentiated object group must contain at least 2 objects.If you want to "
 "add a single object, please click on the one object tab."
 msgstr ""
@@ -528,6 +535,28 @@ msgstr "Enregistrer"
 
 msgid "Differentiate objects"
 msgstr "Différencier les objets"
+
+msgid "CSV upload"
+msgstr "import d'un CSV"
+
+msgid ""
+"You can import a CSV file with your objects in it. The file structure must "
+"follow the one of the template below."
+msgstr ""
+"Vous pouvez ajouter un fichier CSV contenant vos objets en suivant la "
+"nomenclature de ce modèle téléchargeable."
+
+msgid "Objects CSV file template"
+msgstr "Modèle CSV d'ajout d'objets"
+
+msgid "Select CSV file"
+msgstr "Sélectionner un fichier CSV"
+
+msgid "Add your CSV file here. A template is available below."
+msgstr "Ajoutez votre fichier CSV ici. Un modèle est disponible ci-dessous."
+
+msgid "manually"
+msgstr "manuellement"
 
 msgid "Add another object or object group"
 msgstr "Ajouter un autre objet ou groupe d'objets"

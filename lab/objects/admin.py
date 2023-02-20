@@ -1,32 +1,42 @@
+import io
 import json
+from dataclasses import asdict
 from typing import Any, Dict, List, Mapping, Optional, Tuple
 
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import IS_POPUP_VAR
+from django.core.files.uploadedfile import UploadedFile
+from django.db.models import QuerySet
 from django.forms import BaseInlineFormSet, ValidationError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.forms.utils import ErrorList
+from django.http import HttpResponse, HttpResponseRedirect, QueryDict
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
 from lab.models.run import Run
 from lab.permissions import is_lab_admin
 
+from .csv_upload import CSVParseError, parse_csv
 from .forms import ObjectGroupForm
 from .models import Object, ObjectGroup
+
+
+class CSVValidationError(ValidationError):
+    pass
 
 
 class ObjectFormSet(BaseInlineFormSet):
     # pylint: disable=too-many-arguments
     def __init__(
         self,
-        data: Optional[Any] = None,
-        files: Optional[Any] = None,
-        instance: Optional[Any] = None,
+        data: Optional[QueryDict] = None,
+        files: Optional[dict[str, UploadedFile]] = None,
+        instance: Optional[Object] = None,
         save_as_new: bool = False,
-        prefix: Optional[Any] = None,
-        queryset: Optional[Any] = None,
-        **kwargs: Any
+        prefix: Optional[str] = None,
+        queryset: Optional[QuerySet] = None,
+        **kwargs: Any,
     ) -> None:
         super().__init__(data, files, instance, save_as_new, prefix, queryset, **kwargs)
         if instance and (instance.collection or instance.inventory):
@@ -46,6 +56,40 @@ class ObjectFormSet(BaseInlineFormSet):
             self.instance.save()
         return saved_objects
 
+    def full_clean(self) -> Any:
+        if not self.instance.id and self.files and "objects-template" in self.files:
+            # if present, extract data from CSV file and
+            # replace self.data with its content.
+            csv_data = {f"{self.prefix}-INITIAL_FORMS": "0"}
+            total_forms = 0
+            csv_file = io.TextIOWrapper(self.files["objects-template"])
+            try:
+                for index, object_in_csv in enumerate(parse_csv(csv_file)):
+                    csv_data[f"{self.prefix}-{index}-id"] = ""
+                    for field, value in asdict(object_in_csv).items():
+                        csv_data[f"{self.prefix}-{index}-{field}"] = value
+                    total_forms += 1
+            except CSVParseError:
+                error_message = _(
+                    "We cannot process the CSV file because it is not valid. "
+                    "Please refer to the template to fill it properly."
+                )
+                self._non_form_errors = self.error_class(
+                    [
+                        CSVValidationError(
+                            error_message,
+                            code="csv-not-valid",
+                        )
+                    ],
+                    error_class="nonform",
+                    renderer=self.renderer,  # pylint: disable=no-member
+                )
+                self._errors = []
+                return
+            csv_data[f"{self.prefix}-TOTAL_FORMS"] = str(total_forms)
+            self.data = csv_data
+        super().full_clean()
+
     def clean(self) -> None:
         super().clean()
         if len(self.forms) == 1:
@@ -57,6 +101,23 @@ class ObjectFormSet(BaseInlineFormSet):
                 ),
                 code="differentiated-object-group-too-few",
             )
+
+    def csv_differentiation_errors(self) -> Any:
+        errors: ErrorList = self.non_form_errors()
+        errors.data = list(
+            filter(lambda error: isinstance(error, CSVValidationError), errors.data)
+        )
+        return errors
+
+    def manual_differentiation_errors(self) -> Any:
+        errors: ErrorList = self.non_form_errors()
+        errors.data = list(
+            filter(
+                lambda error: not isinstance(error, CSVValidationError),
+                errors.data,
+            )
+        )
+        return errors
 
 
 class ObjectInline(admin.TabularInline):
@@ -99,7 +160,7 @@ class ObjectInline(admin.TabularInline):
         self,
         request: HttpRequest,
         obj: Optional[ObjectGroup] = None,
-        **kwargs: Mapping[str, Any]
+        **kwargs: Mapping[str, Any],
     ) -> Optional[int]:
         if request.method == "POST":
             # Forbids empty form in formset to enforce object_count is equal to
@@ -111,7 +172,7 @@ class ObjectInline(admin.TabularInline):
         self,
         request: HttpRequest,
         obj: Optional[ObjectGroup] = None,
-        **kwargs: Mapping[str, Any]
+        **kwargs: Mapping[str, Any],
     ) -> Optional[int]:
         if obj and obj.object_set.count() == 1:
             return 1

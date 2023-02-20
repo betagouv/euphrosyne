@@ -54,3 +54,9 @@ class ObjectGroupForm(forms.ModelForm):
         )
         if self.instance.id:
             self.fields["add_type"].widget.attrs["disabled"] = "disabled"
+
+    def is_multipart(self) -> Any:
+        if not self.instance.id:
+            # Enables file upload when adding new object group (CSV upload)
+            return True
+        return super().is_multipart()

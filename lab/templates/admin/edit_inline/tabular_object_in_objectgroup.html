@@ -1,69 +1,96 @@
 {% load i18n admin_urls static admin_modify inlines %}
-<fieldset class="module aligned {% if not are_objects_differentiated %}hidden{% endif %}" id="{{ inline_admin_formset.formset.prefix }}-fieldset">
-  <section class="fr-accordion">
-    <h3 class="fr-accordion__title">
-      <button type="button" class="fr-accordion__btn" aria-expanded="{% if are_objects_differentiated %}true{% else %}false{% endif %}" aria-controls="differentiation-accordion">
-        {% translate "Differentiate objects" %}
-      </button>
-    </h3>
-    <div class="fr-collapse" id="differentiation-accordion">
-      <div class="js-inline-admin-formset inline-group overflow-auto" id="{{ inline_admin_formset.formset.prefix }}-group"
-      data-inline-type="tabular"
-      data-inline-formset="{{ inline_admin_formset.inline_formset_data|update_inline_formset_data_add_text:_("Add another object or object group") }}">
-      <div class="tabular inline-related {% if forloop.last %}last-related{% endif %}">
-        {{ inline_admin_formset.formset.management_form }}
-          {{ inline_admin_formset.formset.non_form_errors }}
-          <table>
-            <thead><tr>
-              <th class="original"></th>
-              {% for field in inline_admin_formset.fields %}
-              <th class="column-{{ field.name }}{% if field.required %} required{% endif %}{% if field.widget.is_hidden %} hidden{% endif %}">{{ field.label|capfirst }}
-                {% if field.help_text %}<img src="{% static "admin/img/icon-unknown.svg" %}" class="help help-tooltip" width="10" height="10" alt="({{ field.help_text|striptags }})" title="{{ field.help_text|striptags }}">{% endif %}
-              </th>
-              {% endfor %}
-              {% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission %}<th>{% translate "Delete?" %}</th>{% endif %}
-            </tr></thead>
-            <tbody>
-            {% for inline_admin_form in inline_admin_formset %}
-            {% if inline_admin_form.form.non_field_errors %}
-            <tr class="row-form-errors"><td colspan="{{ inline_admin_form|cell_count }}">{{ inline_admin_form.form.non_field_errors }}</td></tr>
-            {% endif %}
-            <tr class="form-row {% if inline_admin_form.original or inline_admin_form.show_url %}has_original{% endif %}{% if forloop.last and inline_admin_formset.has_add_permission %} empty-form{% endif %}"
-            id="{{ inline_admin_formset.formset.prefix }}-{% if not forloop.last %}{{ forloop.counter0 }}{% else %}empty{% endif %}">
-            <td class="original">
-              {% if inline_admin_form.original or inline_admin_form.show_url %}<p>
-                {% if inline_admin_form.original %}
-                {{ inline_admin_form.original }}
-                {% if inline_admin_form.model_admin.show_change_link and inline_admin_form.model_admin.has_registered_model %}<a href="{% url inline_admin_form.model_admin.opts|admin_urlname:'change' inline_admin_form.original.pk|admin_urlquote %}" class="{% if inline_admin_formset.has_change_permission %}inlinechangelink{% else %}inlineviewlink{% endif %}">{% if inline_admin_formset.has_change_permission %}{% translate "Change" %}{% else %}{% translate "View" %}{% endif %}</a>{% endif %}
-                {% endif %}
-                      {% if inline_admin_form.show_url %}<a href="{{ inline_admin_form.absolute_url }}">{% translate "View on site" %}</a>{% endif %}
-                      </p>{% endif %}
-                      {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
-                      {% if inline_admin_form.fk_field %}{{ inline_admin_form.fk_field.field }}{% endif %}
-                    </td>
-                    {% for fieldset in inline_admin_form %}
-                    {% for line in fieldset %}
-                    {% for field in line %}
-                    <td class="{% if field.field.name %}field-{{ field.field.name }}{% endif %}{% if field.field.is_hidden %} hidden{% endif %}">
-                      {% if field.is_readonly %}
-                      <p>{{ field.contents }}</p>
-                      {% else %}
-                      {{ field.field.errors.as_ul }}
-                      {{ field.field }}
+<fieldset class="module {% if not are_objects_differentiated %}hidden{% endif %}" id="{{ inline_admin_formset.formset.prefix }}-fieldset">
+  <div class="fr-accordions-group">
+
+    <section class="fr-accordion">
+      <h3 class="fr-accordion__title">
+        <button type="button" 
+          class="fr-accordion__btn" 
+          aria-expanded="{% if are_objects_differentiated or inline_admin_formset.formset.csv_differentiation_errors %}true{% else %}false{% endif %}" 
+          aria-controls="differentiation-accordion-csv"
+        >
+          {% translate "Differentiate objects" %} ({% translate "CSV upload" %})
+        </button>
+      </h3>
+      <div class="fr-collapse" id="differentiation-accordion-csv">
+        {{ inline_admin_formset.formset.csv_differentiation_errors }}
+        <div class="fr-upload-group fr-mb-4w">
+          <p class="fr-pl-0 fr-mb-4w">{% translate "You can import a CSV file with your objects in it. The file structure must follow the one of the template below." %}</p>
+          <label class="fr-label fr-mb-3v" for="file-upload">{% translate "Objects CSV file template" %}</label>
+          <a class="fr-link fr-icon-file-download-line fr-link--icon-left" href="/static/modele-upload-objets.csv">modele-upload-objets.csv (66 o)</a>
+
+          <label class="fr-label fr-mt-4w" for="objects-template">{% translate "Select CSV file" %}
+              <span class="fr-hint-text">{% translate "Add your CSV file here. A template is available below." %}</span>
+          </label>
+          <input class="fr-upload" type="file" id="objects-template" name="objects-template">
+        </div>
+      </div>
+    </section>
+
+    <section class="fr-accordion">
+      <h3 class="fr-accordion__title">
+        <button type="button" class="fr-accordion__btn" aria-expanded="{% if are_objects_differentiated or inline_admin_formset.formset.manual_differentiation_errors or inline_admin_formset.formset.errors %}true{% else %}false{% endif %}" aria-controls="differentiation-accordion">
+          {% translate "Differentiate objects" %} ({% translate "manually" %})
+        </button>
+      </h3>
+      <div class="fr-collapse" id="differentiation-accordion">
+        <div class="js-inline-admin-formset inline-group overflow-auto" id="{{ inline_admin_formset.formset.prefix }}-group"
+        data-inline-type="tabular"
+        data-inline-formset="{{ inline_admin_formset.inline_formset_data|update_inline_formset_data_add_text:_("Add another object or object group") }}">
+        <div class="tabular inline-related {% if forloop.last %}last-related{% endif %}">
+          {{ inline_admin_formset.formset.management_form }}
+          {{ inline_admin_formset.formset.manual_differentiation_errors }}
+            <table>
+              <thead><tr>
+                <th class="original"></th>
+                {% for field in inline_admin_formset.fields %}
+                <th class="column-{{ field.name }}{% if field.required %} required{% endif %}{% if field.widget.is_hidden %} hidden{% endif %}">{{ field.label|capfirst }}
+                  {% if field.help_text %}<img src="{% static "admin/img/icon-unknown.svg" %}" class="help help-tooltip" width="10" height="10" alt="({{ field.help_text|striptags }})" title="{{ field.help_text|striptags }}">{% endif %}
+                </th>
+                {% endfor %}
+                {% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission %}<th>{% translate "Delete?" %}</th>{% endif %}
+              </tr></thead>
+              <tbody>
+              {% for inline_admin_form in inline_admin_formset %}
+              {% if inline_admin_form.form.non_field_errors %}
+              <tr class="row-form-errors"><td colspan="{{ inline_admin_form|cell_count }}">{{ inline_admin_form.form.non_field_errors }}</td></tr>
+              {% endif %}
+              <tr class="form-row {% if inline_admin_form.original or inline_admin_form.show_url %}has_original{% endif %}{% if forloop.last and inline_admin_formset.has_add_permission %} empty-form{% endif %}"
+              id="{{ inline_admin_formset.formset.prefix }}-{% if not forloop.last %}{{ forloop.counter0 }}{% else %}empty{% endif %}">
+              <td class="original">
+                {% if inline_admin_form.original or inline_admin_form.show_url %}<p>
+                  {% if inline_admin_form.original %}
+                  {{ inline_admin_form.original }}
+                  {% if inline_admin_form.model_admin.show_change_link and inline_admin_form.model_admin.has_registered_model %}<a href="{% url inline_admin_form.model_admin.opts|admin_urlname:'change' inline_admin_form.original.pk|admin_urlquote %}" class="{% if inline_admin_formset.has_change_permission %}inlinechangelink{% else %}inlineviewlink{% endif %}">{% if inline_admin_formset.has_change_permission %}{% translate "Change" %}{% else %}{% translate "View" %}{% endif %}</a>{% endif %}
+                  {% endif %}
+                        {% if inline_admin_form.show_url %}<a href="{{ inline_admin_form.absolute_url }}">{% translate "View on site" %}</a>{% endif %}
+                        </p>{% endif %}
+                        {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
+                        {% if inline_admin_form.fk_field %}{{ inline_admin_form.fk_field.field }}{% endif %}
+                      </td>
+                      {% for fieldset in inline_admin_form %}
+                      {% for line in fieldset %}
+                      {% for field in line %}
+                      <td class="{% if field.field.name %}field-{{ field.field.name }}{% endif %}{% if field.field.is_hidden %} hidden{% endif %}">
+                        {% if field.is_readonly %}
+                        <p>{{ field.contents }}</p>
+                        {% else %}
+                        {{ field.field.errors.as_ul }}
+                        {{ field.field }}
+                        {% endif %}
+                      </td>
+                      {% endfor %}
+                      {% endfor %}
+                      {% endfor %}
+                      {% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission %}
+                      <td class="delete">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>
                       {% endif %}
-                    </td>
+                    </tr>
                     {% endfor %}
-                    {% endfor %}
-                    {% endfor %}
-                    {% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission %}
-                    <td class="delete">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>
-                    {% endif %}
-                  </tr>
-                  {% endfor %}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+      </div>
     </div>
+    </section>
   </div>
-</div>
-</section>
 </fieldset>
