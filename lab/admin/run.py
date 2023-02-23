@@ -229,7 +229,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
     def save_model(self, request: Any, obj: Run, form: ModelForm, change: bool) -> None:
         super().save_model(request, obj, form, change)
         if not change:
-            initialize_run_directory(obj.label, obj.project.name)
+            initialize_run_directory(obj.project.name, obj.label)
 
     def _get_project(self, request, object_id=None) -> Optional[Project]:
         if object_id:
