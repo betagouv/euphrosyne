@@ -10,7 +10,7 @@ from ...factories import RunFactory
 
 
 class FinishRunCommandTestCase(TestCase):
-    @mock.patch("lab.commands.finish_runs.timezone")
+    @mock.patch("lab.management.commands.finish_runs.timezone")
     def test_finish_run_command(self, timezone_patch: mock.MagicMock):
         timezone_patch.now.return_value = timezone.datetime(2023, 2, 23)
 
