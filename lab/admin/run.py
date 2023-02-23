@@ -143,7 +143,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         readonly_fields = (*super().get_readonly_fields(request, obj), "status")
         if obj:
             # Prevent changing label after creation (because of data folder sync).
-            readonly_fields += ("project", "label")
+            readonly_fields += ("project",)
 
         if not is_lab_admin(request.user):
             readonly_fields += ("start_date", "end_date")
