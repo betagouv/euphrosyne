@@ -181,7 +181,48 @@ class TestRunAdminViewAsLeader(TestCase):
                 form=MagicMock(),
                 change=False,
             )
-        init_run_dir_mock.assert_called_once_with(run.label, run.project.name)
+        init_run_dir_mock.assert_called_once_with(run.project.name, run.label)
+
+    @patch("lab.admin.run.rename_run_directory")
+    def test_change_run_label_calls_hook(self, rename_run_dir_mock):
+        run = factories.RunFactory()
+        run.project.members.add(self.staff_user)
+        request = self.request_factory.post(
+            reverse(
+                "admin:lab_run_change",
+                args=[run.id],
+            ),
+            data={
+                "label": "new-run-name",
+                "particle_type": "",
+                "energy_in_keV_Proton": "",
+                "energy_in_keV_Alpha particle": "",
+                "energy_in_keV_Deuton": "",
+                "beamline": "Microbeam",
+                "filters_for_detector_LE0": "",
+                "filters_for_detector_HE1": "",
+                "filters_for_detector_HE2": "",
+                "filters_for_detector_HE3": "",
+                "filters_for_detector_HE4": "",
+                "detector_IBIL_other": "",
+                "detector_FORS_other": "",
+                "detector_ERDA": "",
+                "detector_NRA": "",
+                "Run_run_object_groups-TOTAL_FORMS": "0",
+                "Run_run_object_groups-INITIAL_FORMS": "0",
+            },
+        )
+        request.user = self.staff_user
+        with patch.object(run, "save"):
+            run_admin = RunAdmin(Run, admin_site=AdminSite())
+            form_class = run_admin.get_form(request, obj=run, change=True)
+            form = form_class(request.POST, request.FILES, instance=run)
+            # Clean form to populate run instance
+            form.is_valid()
+            run_admin.save_model(request, run, form=form, change=True)
+        rename_run_dir_mock.assert_called_once_with(
+            run.project.name, form.initial["label"], "new-run-name"
+        )
 
 
 class TestRunAdminViewAsAdmin(TestCase):
