@@ -33,7 +33,7 @@ body {
 }
 
 
-button:not(:disabled):hover, input[type="button"]:not(:disabled):hover, input[type="image"]:not(:disabled):hover, input[type="reset"]:not(:disabled):hover, input[type="submit"]:not(:disabled):hover {
+input[type="button"]:not(:disabled):hover, input[type="image"]:not(:disabled):hover, input[type="reset"]:not(:disabled):hover, input[type="submit"]:not(:disabled):hover {
   --hover: var(--background-action-high-blue-france-hover);
 }
 
