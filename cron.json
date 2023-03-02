@@ -1,0 +1,8 @@
+{
+  "jobs": [
+    {
+      "command": "0 20 * * 1 python manage.py finish_runs",
+      "size": "S"
+    }
+  ]
+}
