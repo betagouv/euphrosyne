@@ -9,7 +9,7 @@ from django.forms import ModelForm
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
-from euphro_tools.hooks import initialize_run_directory
+from euphro_tools.hooks import initialize_run_directory, rename_run_directory
 
 from ..forms import RunDetailsForm
 from ..models import Project, Run
@@ -143,7 +143,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         readonly_fields = (*super().get_readonly_fields(request, obj), "status")
         if obj:
             # Prevent changing label after creation (because of data folder sync).
-            readonly_fields += ("project", "label")
+            readonly_fields += ("project",)
 
         if not is_lab_admin(request.user):
             readonly_fields += ("start_date", "end_date")
@@ -229,7 +229,9 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
     def save_model(self, request: Any, obj: Run, form: ModelForm, change: bool) -> None:
         super().save_model(request, obj, form, change)
         if not change:
-            initialize_run_directory(obj.label, obj.project.name)
+            initialize_run_directory(obj.project.name, obj.label)
+        elif "label" in form.changed_data:
+            rename_run_directory(obj.project.name, form.initial["label"], obj.label)
 
     def _get_project(self, request, object_id=None) -> Optional[Project]:
         if object_id:
