@@ -248,3 +248,11 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
             request,
             {**(extra_context if extra_context else {}), "title": _("Projects")},
         )
+
+    def get_field_queryset(
+        self, db: None, db_field, request: Optional[HttpRequest]
+    ) -> Optional[Any]:
+        qs = super().get_field_queryset(db, db_field, request)
+        if qs and db_field == Project.admin.field:
+            return qs.filter(is_lab_admin=True)
+        return qs
