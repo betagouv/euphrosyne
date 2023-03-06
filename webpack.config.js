@@ -1,7 +1,6 @@
 import "dotenv/config";
 import path from "path";
 import { globSync } from "glob";
-import globAll from "glob-all";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -99,7 +98,7 @@ export default {
     }),
     new MiniCssExtractPlugin(),
     new PurgeCSSPlugin({
-      paths: globAll.sync(
+      paths: globSync(
         [
           `${PATHS.euphrosyne}/**/*`,
           `${PATHS.euphro_auth}/**/*`,
