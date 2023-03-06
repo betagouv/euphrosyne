@@ -10,7 +10,7 @@
   },
   "engines": {
     "node": "16.x",
-    "npm": "8.x"
+    "npm": "9.x"
   },
   "repository": {
     "type": "git",
@@ -35,8 +35,7 @@
     "css-loader": "^6.7.3",
     "css-minimizer-webpack-plugin": "^4.2.2",
     "dotenv": "^16.0.3",
-    "glob": "^8.1.0",
-    "glob-all": "^3.3.1",
+    "glob": "^9.2.1",
     "html-loader-jest": "^0.2.1",
     "mini-css-extract-plugin": "^2.7.2",
     "promise-polyfill": "8.3.0",

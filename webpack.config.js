@@ -1,7 +1,6 @@
 import "dotenv/config";
 import path from "path";
-import glob from "glob";
-import globAll from "glob-all";
+import { globSync } from "glob";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -9,15 +8,6 @@ import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
 import { PurgeCSSPlugin } from "purgecss-webpack-plugin";
 import webpack from "webpack";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const PATHS = {
-  euphrosyne: path.join(__dirname, "euphrosyne"),
-  euphro_auth: path.join(__dirname, "euphro_auth"),
-  lab: path.join(__dirname, "lab"),
-};
 
 export default {
   entry: {
@@ -40,14 +30,16 @@ export default {
     ],
     ...Object.assign(
       {},
-      ...glob.sync("./**/assets/js/pages/*.js").map((file) => {
-        return {
-          [file.split("/").pop().split(".").shift()]: {
-            import: file,
-            filename: "./pages/[name].js",
-          },
-        };
-      })
+      ...globSync("./**/assets/js/pages/*.js", { dotRelative: true }).map(
+        (file) => {
+          return {
+            [file.split("/").pop().split(".").shift()]: {
+              import: file,
+              filename: "./pages/[name].js",
+            },
+          };
+        }
+      )
     ),
   },
   output: {
@@ -97,16 +89,10 @@ export default {
     }),
     new MiniCssExtractPlugin(),
     new PurgeCSSPlugin({
-      paths: globAll.sync(
-        [
-          `${PATHS.euphrosyne}/**/*`,
-          `${PATHS.euphro_auth}/**/*`,
-          `${PATHS.lab}/**/*`,
-        ],
-        {
-          nodir: true,
-        }
-      ),
+      paths: globSync([`{euphrosyne,euphro_auth,lab}/**/*`], {
+        nodir: true,
+        dotRelative: true,
+      }),
     }),
   ],
 };
