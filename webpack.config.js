@@ -9,15 +9,6 @@ import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
 import { PurgeCSSPlugin } from "purgecss-webpack-plugin";
 import webpack from "webpack";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const PATHS = {
-  euphrosyne: path.join(__dirname, "euphrosyne"),
-  euphro_auth: path.join(__dirname, "euphro_auth"),
-  lab: path.join(__dirname, "lab"),
-};
-
 export default {
   entry: {
     main: [
@@ -98,16 +89,10 @@ export default {
     }),
     new MiniCssExtractPlugin(),
     new PurgeCSSPlugin({
-      paths: globSync(
-        [
-          `${PATHS.euphrosyne}/**/*`,
-          `${PATHS.euphro_auth}/**/*`,
-          `${PATHS.lab}/**/*`,
-        ],
-        {
-          nodir: true,
-        }
-      ),
+      paths: globSync([`{euphrosyne,euphro_auth,lab}/**/*`], {
+        nodir: true,
+        dotRelative: true,
+      }),
     }),
   ],
 };
