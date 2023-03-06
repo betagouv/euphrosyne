@@ -1,7 +1,6 @@
 import "dotenv/config";
 import path from "path";
-import glob from "glob";
-import globAll from "glob-all";
+import { globSync } from "glob";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -40,14 +39,16 @@ export default {
     ],
     ...Object.assign(
       {},
-      ...glob.sync("./**/assets/js/pages/*.js").map((file) => {
-        return {
-          [file.split("/").pop().split(".").shift()]: {
-            import: file,
-            filename: "./pages/[name].js",
-          },
-        };
-      })
+      ...globSync("./**/assets/js/pages/*.js", { dotRelative: true }).map(
+        (file) => {
+          return {
+            [file.split("/").pop().split(".").shift()]: {
+              import: file,
+              filename: "./pages/[name].js",
+            },
+          };
+        }
+      )
     ),
   },
   output: {
@@ -97,7 +98,7 @@ export default {
     }),
     new MiniCssExtractPlugin(),
     new PurgeCSSPlugin({
-      paths: globAll.sync(
+      paths: globSync(
         [
           `${PATHS.euphrosyne}/**/*`,
           `${PATHS.euphro_auth}/**/*`,
