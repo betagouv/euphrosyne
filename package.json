@@ -42,7 +42,7 @@
     "purgecss-webpack-plugin": "^5.0.0",
     "remixicon": "^2.5.0",
     "source-map-loader": "^4.0.1",
-    "webpack": "^5.75.0",
+    "webpack": "^5.76.1",
     "webpack-cli": "^5.0.1",
     "whatwg-fetch": "^3.6.2"
   },
