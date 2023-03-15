@@ -24,10 +24,10 @@ npm install
 ./manage.py runserver
 ```
 
-2. Lancez le serveur de développement Webpack
+2. Lancez Webpack en mode développement pour créer les _bundles_ des fichiers relatifs au frontend.
 
 ```
-npm run start
+npm run build:dev
 ```
 
 ### Frontend
