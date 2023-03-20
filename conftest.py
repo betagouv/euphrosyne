@@ -1,6 +1,9 @@
+import logging
 from unittest import mock
 
 import pytest
+
+logging.getLogger("faker").setLevel(logging.WARNING)
 
 
 @pytest.fixture(autouse=True)

@@ -58,6 +58,6 @@ urlpatterns = [
     ),
     path("api/", include("euphrosyne.api_urls")),
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
-    path("", admin.site.urls),
     path("", include("static_pages.urls")),
+    path("", admin.site.urls),
 ] + ([path("__debug__/", include(debug_toolbar.urls))] if settings.DEBUG else [])
