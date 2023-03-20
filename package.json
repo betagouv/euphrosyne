@@ -37,7 +37,7 @@
     "dotenv": "^16.0.3",
     "glob": "^9.3.0",
     "html-loader-jest": "^0.2.1",
-    "mini-css-extract-plugin": "^2.7.3",
+    "mini-css-extract-plugin": "^2.7.5",
     "promise-polyfill": "8.3.0",
     "purgecss-webpack-plugin": "^5.0.0",
     "remixicon": "^2.5.0",
