@@ -9,7 +9,7 @@
     "build:dev": "webpack --mode=development --watch"
   },
   "engines": {
-    "node": "16.x",
+    "node": "19.x",
     "npm": "9.x"
   },
   "repository": {
