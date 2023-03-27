@@ -1,4 +1,5 @@
 {% extends 'admin/index.html' %}
+{% load static i18n %}
 
 {% block nav-sidebar %}
     {% if user.is_superuser %}
@@ -7,5 +8,21 @@
     {% include "./sidebar/main_sidebar.html" %}
 {% endblock %}
 
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static "css/dashboard.css" %}">
+{{ block.super }}
+{% endblock %}
+
 {% block content %}
+<div class="module calendar">
+    <h3>{% trans "Calendar" %}</h3>
+    <div is="admin-calendar" id="admin-calendar"></div>
+</div>
+
+{% endblock %}
+
+{% block footer %}
+{{ block.super }}
+<script src="{% url 'javascript-catalog' %}"></script>
+<script type="text/javascript" src="{% static 'pages/index.js' %}"></script>
 {% endblock %}

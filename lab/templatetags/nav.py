@@ -53,6 +53,15 @@ def sidebar_items(request: HttpRequest):
     ]
 
     if request.user and request.user.is_lab_admin:
+        items.insert(
+            0,
+            NavItem(
+                _("Dashboard"),
+                reverse("admin:index"),
+                '<i class="fr-icon-calendar-line fr-icon--sm" aria-hidden="true"></i>',
+                exact_path=True,
+            ),
+        )
         items.append(
             NavItem(
                 _("Users"),

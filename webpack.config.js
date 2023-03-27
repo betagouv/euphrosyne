@@ -24,6 +24,7 @@ export default {
       "@gouvfr/dsfr/dist/utility/icons/icons-communication/icons-communication.min.css",
       "@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.min.css",
       "@gouvfr/dsfr/dist/utility/icons/icons-document/icons-document.min.css",
+      "@gouvfr/dsfr/dist/utility/icons/icons-business/icons-business.min.css",
       "@gouvfr/dsfr/dist/utility/colors/colors.min.css",
       "remixicon/fonts/remixicon.css",
       "./euphrosyne/assets/css/base.css",
