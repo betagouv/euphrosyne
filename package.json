@@ -35,7 +35,7 @@
     "css-loader": "^6.7.3",
     "css-minimizer-webpack-plugin": "^4.2.2",
     "dotenv": "^16.0.3",
-    "glob": "^9.3.0",
+    "glob": "^9.3.2",
     "html-loader-jest": "^0.2.1",
     "mini-css-extract-plugin": "^2.7.5",
     "promise-polyfill": "8.3.0",
