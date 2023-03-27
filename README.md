@@ -1,16 +1,20 @@
 # euphrosyne
 
-Ouvrir les données de NewAglaé, l’Accélérateur Grand Louvre d'Analyses Elémentaires
+Euphrosyne est une application web qui permet d'ouvrir et d'explorer les données de NewAglaé, l'Accélérateur Grand Louvre d'Analyses Elémentaires. Ce projet est basé sur Django, un framework web en Python, et sur des Web Components Javascript compilés avec Webpack.
 
 ## Installation
 
-1. Installez les dépendances python
+Suivre les étapes suivantes pour installer les dépendances nécessaires au fonctionnement d'Euphrosyne :
+
+1. Installer les dépendances python en exécutant la commande suivante :
 
 ```
 pip install -r requirements/[dev|prod].txt
 ```
 
-2. Installez les dépendances javascript
+Remplacer [dev|prod] par dev pour les environnements de développement et prod pour les environnements de production.
+
+2. Installer les dépendances javascript
 
 ```
 npm install
@@ -44,32 +48,33 @@ Le contenu du fichier peut-être copié dans un nouveau fichier `.env` pour para
 
 ## Développement
 
-1. Lancez le serveur de développement Django :
+Pour lancer le serveur de développement Django, exécutez la commande suivante :
 
 ```
 ./manage.py runserver
 ```
 
-2. Lancez Webpack en mode développement pour créer les _bundles_ des fichiers relatifs au frontend.
+Cela va lancer le serveur sur http://localhost:8000.
+
+Pour créer les bundles des fichiers relatifs au frontend en mode développement, exécutez la commande suivante :
+
+Pour créer les bundles des fichiers relatifs au frontend en mode développement, exécutez la commande suivante :
 
 ```
 npm run build:dev
 ```
 
+Cela va lancer Webpack et créer les fichiers javascript et css nécessaires pour le frontend.
+
 ### Frontend
 
 #### Gestion des modules javascript par Webpack
 
-Webpack cherche les fichiers javascript présent dans les noms de dossiers `./**/assets/js/pages/*.js`.
-Pour chaque fichier, un fichier javascript sera compilé et accessible dans un template django avec la balise `static` :
+Le frontend d'Euphrosyne est géré par Webpack, un outil de gestion de modules javascript. Les fichiers javascript sont compilés à partir des fichiers présents dans les dossiers `./**/assets/js/pages/*.js`. Les fichiers de style (css, scss, ...) importés dans le code javascript sont regroupés dans un fichier `<filename>.css`.
+
+Pour faire référence aux fichiers javascript et css dans un template Django, vous pouvez utiliser les balises script et link suivantes :
 
 ```
 <script src="{% static 'pages/<filename>.js' %}"></script>
-```
-
-Si des fichiers de style (css, scss, ...) sont importés dans le code javascript, un fichier `<filename.css>` sera créé qui regroupera ces fichiers de style.
-Il est possible d'y faire référence de la manière suivante :
-
-```
 <link rel="stylesheet" type="text/css" href="{% static "<filename>.css" %}">
 ```
