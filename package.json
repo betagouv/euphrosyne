@@ -43,7 +43,7 @@
     "mini-css-extract-plugin": "^2.7.5",
     "promise-polyfill": "8.3.0",
     "purgecss-webpack-plugin": "^5.0.0",
-    "remixicon": "^2.5.0",
+    "remixicon": "^3.1.1",
     "source-map-loader": "^4.0.1",
     "webpack": "^5.76.3",
     "webpack-cli": "^5.0.1",
