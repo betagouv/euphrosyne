@@ -1,6 +1,6 @@
 {
   "name": "euphrosyne",
-  "stack": "scalingo-18",
+  "stack": "scalingo-22",
   "env": {
     "DISABLE_COLLECTSTATIC": {
       "value": ""
