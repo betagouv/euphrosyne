@@ -19,7 +19,7 @@ jobs:
     uses: betagouv/euphrosyne/.github/workflows/test.yaml@main
 
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
 
@@ -63,7 +63,7 @@ jobs:
     needs:
       - call-workflow-test
       - build
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
 

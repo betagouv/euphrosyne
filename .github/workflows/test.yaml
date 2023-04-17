@@ -17,7 +17,7 @@ env:
 
 jobs:
   python-checks:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
       # -- block install --
       - uses: actions/checkout@v2
@@ -69,7 +69,7 @@ jobs:
           python -m mypy
 
   python-tests:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     services:
       postgres:
         image: postgres
@@ -124,7 +124,7 @@ jobs:
           DB_NAME: euphrosyne
 
   frontend-tests:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
