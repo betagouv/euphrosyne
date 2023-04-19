@@ -27,12 +27,12 @@ describe("Test VirtualOfficeButton", () => {
   describe("Button init", () => {
     describe("When receiving connection URL directly", () => {
       beforeEach(() => {
-        voButton.setAttribute("project-name", "projet tango");
+        voButton.setAttribute("project-slug", "projet-tango");
         fetchVMMock.mockResolvedValueOnce("url");
       });
       it("creates the button properly", async () => {
         await voButton.initButton();
-        expect(voButton.projectName).toBe("projet tango");
+        expect(voButton.projectSlug).toBe("projet-tango");
         expect(voButton.connectionUrl).toBe("url");
         expect(voButton.disabled).toBeFalsy();
       });
@@ -121,10 +121,10 @@ describe("Test VirtualOfficeButton", () => {
       const waitDeployMock = jest
         .spyOn(VirtualOfficeButton.prototype, "waitForDeploymentComplete")
         .mockImplementationOnce(() => {});
-      voButton.setAttribute("project-name", "projet tango");
+      voButton.setAttribute("project-slug", "projet-tango");
       await voButton.onButtonClick();
 
-      expect(deployMock).toHaveBeenCalledWith("projet tango");
+      expect(deployMock).toHaveBeenCalledWith("projet-tango");
       expect(waitDeployMock).toHaveBeenCalledTimes(1);
       expect(voButton.disabled).toBe(true);
 
@@ -135,7 +135,7 @@ describe("Test VirtualOfficeButton", () => {
       const deployMock = jest
         .spyOn(euphrosyneToolsService, "deployVM")
         .mockImplementationOnce(() => Promise.reject());
-      voButton.setAttribute("project-name", "projet tango");
+      voButton.setAttribute("project-slug", "projet-tango");
 
       let hadError = false;
       try {
