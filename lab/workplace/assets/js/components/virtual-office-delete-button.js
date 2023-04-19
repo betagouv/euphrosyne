@@ -14,8 +14,8 @@ export default class VirtualOfficeDeleteButton extends HTMLButtonElement {
     );
   }
 
-  get projectName() {
-    return this.getAttribute("project-name");
+  get projectSlug() {
+    return this.getAttribute("project-slug");
   }
 
   constructor() {
@@ -36,7 +36,7 @@ export default class VirtualOfficeDeleteButton extends HTMLButtonElement {
     }
     this.disabled = true;
     try {
-      await euphrosyneToolsService.deleteVM(this.projectName);
+      await euphrosyneToolsService.deleteVM(this.projectSlug);
     } catch (error) {
       this.disabled = false;
       utils.displayMessage(
