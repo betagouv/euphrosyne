@@ -21,7 +21,7 @@
     <ul class="messagelist"></ul>
     <div class="fr-grid-row fr-grid-row--right">
         <button is="virtual-office-button" 
-                project-name="{{ project.name }}" 
+                project-slug="{{ project.slug }}" 
                 class="fr-btn fr-icon-arrow-right-line fr-btn--icon-right">{% trans "Access virtual office" %}</button>
     </div>
     {% if user.is_lab_admin %}

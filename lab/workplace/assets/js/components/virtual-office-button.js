@@ -10,8 +10,8 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
     });
   }
 
-  get projectName() {
-    return this.getAttribute("project-name");
+  get projectSlug() {
+    return this.getAttribute("project-slug");
   }
 
   constructor() {
@@ -35,7 +35,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
     } else {
       this.disabled = true;
       try {
-        await euphrosyneToolsService.deployVM(this.projectName);
+        await euphrosyneToolsService.deployVM(this.projectSlug);
       } catch (error) {
         this.disabled = false;
         utils.displayMessage(
@@ -67,7 +67,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
 
   async initButton() {
     const url = await euphrosyneToolsService.fetchVMConnectionLink(
-      this.projectName
+      this.projectSlug
     );
     if (url) {
       this.connectionUrl = url;
@@ -75,7 +75,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
       this.onConnectReady();
     } else {
       const deploymentStatus =
-        await euphrosyneToolsService.fetchDeploymentStatus(this.projectName);
+        await euphrosyneToolsService.fetchDeploymentStatus(this.projectSlug);
       if (deploymentStatus) {
         this.deploymentStatus = deploymentStatus;
         if (deploymentStatus === "Failed") {
@@ -93,7 +93,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
   async checkDeploymentProgress() {
     if (this.deploymentStatus && this.deploymentStatus === "Succeeded") {
       const url = await euphrosyneToolsService.fetchVMConnectionLink(
-        this.projectName
+        this.projectSlug
       );
       if (url) {
         this.connectionUrl = url;
@@ -111,7 +111,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
       }
     } else {
       const deploymentStatus =
-        await euphrosyneToolsService.fetchDeploymentStatus(this.projectName);
+        await euphrosyneToolsService.fetchDeploymentStatus(this.projectSlug);
       if (deploymentStatus) {
         this.deploymentStatus = deploymentStatus;
         if (this.deploymentStatus === "Failed") {
