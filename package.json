@@ -36,7 +36,7 @@
     "@fullcalendar/list": "^6.1.4",
     "@gouvfr/dsfr": "^1.9.0",
     "css-loader": "^6.7.3",
-    "css-minimizer-webpack-plugin": "^4.2.2",
+    "css-minimizer-webpack-plugin": "^5.0.0",
     "dotenv": "^16.0.3",
     "glob": "^10.2.2",
     "html-loader-jest": "^0.2.1",
