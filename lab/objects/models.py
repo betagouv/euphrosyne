@@ -4,6 +4,12 @@ from django.utils.translation import gettext_lazy as _
 
 
 class ObjectGroup(models.Model):
+    c2rmf_id = models.CharField(
+        _("C2RMF ID"),
+        max_length=255,
+        null=True,
+        unique=True,
+    )
     label = models.CharField(
         _("Label"),
         max_length=255,
@@ -19,6 +25,7 @@ class ObjectGroup(models.Model):
     dating = models.CharField(
         _("Dating"),
         max_length=255,
+        blank=True,
     )
     materials = ArrayField(
         models.CharField(max_length=255),

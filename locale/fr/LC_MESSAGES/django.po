@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-06 11:11+0100\n"
+"POT-Creation-Date: 2023-05-25 12:30+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -486,6 +486,9 @@ msgstr ""
 msgid "Object"
 msgstr "Objet"
 
+msgid "This object was imported from EROS."
+msgstr "Cet objet a été importé via EROS."
+
 msgid ""
 "Fill up dating and inventory number if you object                         "
 "group is undifferentiated."
@@ -501,6 +504,15 @@ msgstr "Groupe d'objets"
 
 msgid "Separate each material with a comma"
 msgstr "Séparez chaque matériau par une virgule"
+
+msgid "An error occured when importing data from Eros."
+msgstr "Une erreur est survenue lors de l'import via Eros."
+
+msgid "This ID was not found in Eros."
+msgstr "Ce numéro n'a pas été trouvé dans Eros."
+
+msgid "C2RMF ID"
+msgstr "Numéro C2RMF"
 
 msgid "Label"
 msgstr "Libellé"
@@ -672,6 +684,9 @@ msgstr "Ajouter"
 
 msgid "Add a new object or object group"
 msgstr "Créer un objet ou groupe d'objets"
+
+msgid "Import with C2RMF ID"
+msgstr "Importer avec un numéro C2RMF"
 
 #, python-format
 msgid "Delete selected %(model)s"

@@ -8,7 +8,7 @@ from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import QuerySet
-from django.forms import BaseInlineFormSet, ValidationError
+from django.forms import BaseInlineFormSet, ModelForm, ValidationError
 from django.forms.utils import ErrorList
 from django.http import HttpResponse, HttpResponseRedirect, QueryDict
 from django.http.request import HttpRequest
@@ -17,8 +17,13 @@ from django.utils.translation import gettext_lazy as _
 from lab.models.run import Run
 from lab.permissions import is_lab_admin
 
+from .c2rmf import fetch_full_objectgroup_from_eros
 from .csv_upload import CSVParseError, parse_csv
-from .forms import ObjectGroupForm
+from .forms import (
+    ObjectGroupForm,
+    ObjectGroupImportC2RMFForm,
+    ObjectGroupImportC2RMFReadonlyForm,
+)
 from .models import Object, ObjectGroup
 
 
@@ -50,10 +55,11 @@ class ObjectFormSet(BaseInlineFormSet):
 
     def save(self, commit: bool = True):
         saved_objects = super().save(commit)
-        object_set_count = self.instance.object_set.count()
-        if object_set_count and self.instance.object_count != object_set_count:
-            self.instance.object_count = object_set_count
-            self.instance.save()
+        if self.instance.pk:
+            object_set_count = self.instance.object_set.count()
+            if object_set_count and self.instance.object_count != object_set_count:
+                self.instance.object_count = object_set_count
+                self.instance.save()
         return saved_objects
 
     def full_clean(self) -> Any:
@@ -194,28 +200,75 @@ class ObjectGroupAdmin(ModelAdmin):
     def has_change_permission(
         self, request: HttpRequest, obj: Optional[ObjectGroup] = None
     ) -> bool:
+        # If obj was imported from Eros, make page readonly
+        if obj and obj.c2rmf_id:
+            return False
         return is_lab_admin(request.user) or (
             obj and obj.runs.filter(project__members=request.user.id).exists()
         )
 
+    def get_form(
+        self,
+        request: HttpRequest,
+        obj: Optional[ObjectGroup] = None,
+        change: bool = False,
+        **kwargs: Any,
+    ):
+        if not obj and _is_c2rmf_import_request(request):
+            # EROS import
+            return ObjectGroupImportC2RMFForm
+        if obj and obj.c2rmf_id:
+            # After EROS import, readonly
+            return ObjectGroupImportC2RMFReadonlyForm
+        # Manual creation / edition
+        return super().get_form(request, obj, change, **kwargs)
+
     def get_fieldsets(
         self, request: HttpRequest, obj: Optional[ObjectGroup] = None
     ) -> List[Tuple[Optional[str], Dict[str, Any]]]:
-        return [
+        description = ""
+        if obj and obj.c2rmf_id:
+            description = _("This object was imported from EROS.")
+        elif not _is_c2rmf_import_request(request):
+            description = _(
+                "Fill up dating and inventory number if you object \
+                        group is undifferentiated."
+            )
+        fieldsets = [
             (
                 None,
-                {
-                    "fields": self.get_fields(request, obj),
-                    "description": _(
-                        "Fill up dating and inventory number if you object \
-                        group is undifferentiated."
-                    ),
-                },
+                {"fields": self.get_fields(request, obj), "description": description},
             )
         ]
+        return fieldsets
+
+    def get_object(
+        self, request: HttpRequest, object_id: str, from_field=None
+    ) -> Any | None:
+        object_group = super().get_object(request, object_id, from_field)
+        if object_group and object_group.c2rmf_id:
+            object_group = fetch_full_objectgroup_from_eros(
+                object_group.c2rmf_id, object_group
+            )
+        return object_group
+
+    def save_form(
+        self, request: HttpRequest, form: ModelForm, change: bool
+    ) -> ObjectGroup:
+        # Calls save_form in any case to populate ModelForm.save_m2m
+        object_group = super().save_form(request, form, change)
+        if isinstance(form, ObjectGroupImportC2RMFForm):
+            # Check if object group already exists with c2rmf id
+            try:
+                return self.get_queryset(request).get(
+                    c2rmf_id=form.cleaned_data["c2rmf_id"]
+                )
+            except ObjectGroup.DoesNotExist:
+                pass
+        return object_group
 
     def save_model(
-        self, request: Any, obj: ObjectGroup, form: ObjectGroupForm, change: bool
+        self, request: Any, obj: ObjectGroup, form: ModelForm, change: bool
     ) -> None:
         super().save_model(request, obj, form, change)
         if not change and request.POST.get(IS_POPUP_VAR) and "run" in request.GET:
@@ -281,3 +334,8 @@ class ObjectGroupAdmin(ModelAdmin):
         if request.method == "POST" and "object_set-TOTAL_FORMS" in request.POST:
             return int(request.POST["object_set-TOTAL_FORMS"]) > 0
         return False
+
+
+def _is_c2rmf_import_request(request: HttpRequest) -> bool:
+    """Return True if object group creation method is C2RM import from EROS."""
+    return request.GET.get("import_c2rmf")

@@ -1,4 +1,5 @@
 import json
+from unittest import mock
 
 from django.contrib.admin.sites import AdminSite
 from django.test import RequestFactory, TestCase
@@ -6,9 +7,16 @@ from django.urls import reverse
 
 from lab.tests import factories
 
-from ..admin import ObjectGroupAdmin
-from ..forms import ObjectGroupForm
+from ..admin import ObjectGroupAdmin, _is_c2rmf_import_request
+from ..forms import (
+    ObjectGroupForm,
+    ObjectGroupImportC2RMFForm,
+    ObjectGroupImportC2RMFReadonlyForm,
+)
 from ..models import ObjectGroup
+
+CHANGE_VIEWNAME = "admin:lab_objectgroup_change"
+ADD_VIEWNAME = "admin:lab_objectgroup_add"
 
 
 class TesObjectGroupAdminPermissions(TestCase):
@@ -23,7 +31,7 @@ class TesObjectGroupAdminPermissions(TestCase):
 
     def test_change_objectgroup_is_allowed_if_project_member(self):
         request = RequestFactory().get(
-            reverse("admin:lab_objectgroup_change", args=[self.object_group.id])
+            reverse(CHANGE_VIEWNAME, args=[self.object_group.id])
         )
         request.user = self.member
         assert self.objectgroup_admin.has_change_permission(request, self.object_group)
@@ -31,7 +39,7 @@ class TesObjectGroupAdminPermissions(TestCase):
     def test_change_objectgroup_is_forbidden_for_non_participant(self):
         user = factories.StaffUserFactory()
         request = RequestFactory().get(
-            reverse("admin:lab_objectgroup_change", args=[self.object_group.id])
+            reverse(CHANGE_VIEWNAME, args=[self.object_group.id])
         )
         request.user = user
         assert not self.objectgroup_admin.has_change_permission(
@@ -50,7 +58,7 @@ class TestObjectGroupAdminBehavior(TestCase):
 
     def test_save_run_relationship_when_specified_in_popup_when_adding(self):
         request = RequestFactory().post(
-            reverse("admin:lab_objectgroup_add") + f"?run={self.run.id}", {"_popup": 1}
+            reverse(ADD_VIEWNAME) + f"?run={self.run.id}", {"_popup": 1}
         )
         request.user = self.member
         self.objectgroup_admin.save_model(
@@ -62,7 +70,7 @@ class TestObjectGroupAdminBehavior(TestCase):
 
     def test_saving_run_relationship_is_ignored_when_run_does_not_exist(self):
         request = RequestFactory().post(
-            reverse("admin:lab_objectgroup_add") + "?run=-23", {"_popup": 1}
+            reverse(ADD_VIEWNAME) + "?run=-23", {"_popup": 1}
         )
         request.user = self.member
         self.objectgroup_admin.save_model(
@@ -74,7 +82,7 @@ class TestObjectGroupAdminBehavior(TestCase):
 
     def test_saving_run_relationship_is_ignored_on_change(self):
         request = RequestFactory().post(
-            reverse("admin:lab_objectgroup_change", args=[self.object_group.id])
+            reverse(CHANGE_VIEWNAME, args=[self.object_group.id])
             + f"?run={self.run.id}",
             {"_popup": 1},
         )
@@ -88,7 +96,7 @@ class TestObjectGroupAdminBehavior(TestCase):
 
     def test_saving_run_relationship_is_ignored_when_not_popup(self):
         request = RequestFactory().post(
-            reverse("admin:lab_objectgroup_add") + f"?run={self.run.id}",
+            reverse(ADD_VIEWNAME) + f"?run={self.run.id}",
         )
         request.user = self.member
         self.objectgroup_admin.save_model(
@@ -102,7 +110,7 @@ class TestObjectGroupAdminBehavior(TestCase):
         run = factories.RunFactory(project=factories.ProjectWithLeaderFactory())
         self.object_group.runs.add(run)
         request = RequestFactory().post(
-            reverse("admin:lab_objectgroup_add") + f"?run={self.run.id}",
+            reverse(ADD_VIEWNAME) + f"?run={self.run.id}",
             {"_popup": 1},
         )
         request.user = self.member
@@ -123,7 +131,7 @@ class TestGetAreObjectsDifferentiated(TestCase):
         admin = ObjectGroupAdmin(ObjectGroup, admin_site=AdminSite())
         data = {}
         request = RequestFactory().post(
-            reverse("admin:lab_objectgroup_change", args=[objectgroup.id]), data=data
+            reverse(CHANGE_VIEWNAME, args=[objectgroup.id]), data=data
         )
 
         assert admin.get_are_objects_differentiated(request, objectgroup)
@@ -133,11 +141,11 @@ class TestGetAreObjectsDifferentiated(TestCase):
         objectgroup = ObjectGroup(id=1)
         admin = ObjectGroupAdmin(ObjectGroup, admin_site=AdminSite())
         request_with_differentiated_objects = RequestFactory().post(
-            reverse("admin:lab_objectgroup_change", args=[objectgroup.id]),
+            reverse(CHANGE_VIEWNAME, args=[objectgroup.id]),
             data={"object_set-TOTAL_FORMS": "12"},
         )
         request_without_differentiated_objects = RequestFactory().post(
-            reverse("admin:lab_objectgroup_change", args=[objectgroup.id]),
+            reverse(CHANGE_VIEWNAME, args=[objectgroup.id]),
             data={"object_set-TOTAL_FORMS": "0"},
         )
 
@@ -151,6 +159,70 @@ class TestGetAreObjectsDifferentiated(TestCase):
         objectgroup = ObjectGroup(id=1)
         admin = ObjectGroupAdmin(ObjectGroup, admin_site=AdminSite())
         request = RequestFactory().get(
-            reverse("admin:lab_objectgroup_change", args=[objectgroup.id]),
+            reverse(CHANGE_VIEWNAME, args=[objectgroup.id]),
         )
         assert not admin.get_are_objects_differentiated(request)
+
+
+class TestObjectErosImport(TestCase):
+    def setUp(self):
+        self.admin = ObjectGroupAdmin(ObjectGroup, admin_site=AdminSite())
+
+        self.run = factories.RunFactory(project=factories.ProjectWithLeaderFactory())
+        self.member = self.run.project.members.first()
+        self.object_group = factories.ObjectGroupFactory()
+
+    def test_page_is_readonly_after_import(self):
+        objectgroup = ObjectGroup(id=1, c2rmf_id="123")
+        request = RequestFactory().get(reverse(CHANGE_VIEWNAME, args=[objectgroup.id]))
+        request.user = self.member
+        assert not self.admin.has_change_permission(request, objectgroup)
+
+    def test_correct_form_class_is_used_when_importing(self):
+        request = RequestFactory().get(f"{reverse(ADD_VIEWNAME)}?import_c2rmf=1")
+        request.user = self.member
+        assert (
+            self.admin.get_form(request, None, change=False)
+            == ObjectGroupImportC2RMFForm
+        )
+
+    def test_correct_form_class_is_used_after_import(self):
+        objectgroup = ObjectGroup(id=1, c2rmf_id="123")
+        request = RequestFactory().get(reverse(CHANGE_VIEWNAME, args=[objectgroup.id]))
+        request.user = self.member
+        assert (
+            self.admin.get_form(request, objectgroup, change=True)
+            == ObjectGroupImportC2RMFReadonlyForm
+        )
+
+    def test_fetch_object_from_eros_when_imported(self):
+        objectgroup = factories.ObjectGroupFactory(c2rmf_id="123")
+        request = RequestFactory().get(reverse(CHANGE_VIEWNAME, args=[objectgroup.id]))
+        with mock.patch(
+            "lab.objects.admin.fetch_full_objectgroup_from_eros"
+        ) as fetch_mock:
+            self.admin.get_object(request, objectgroup.id)
+            fetch_mock.assert_called_once_with(objectgroup.c2rmf_id, objectgroup)
+
+    def test_get_object_from_db_if_exists(self):
+        object_group = factories.ObjectGroupFactory(c2rmf_id="123")
+        request = RequestFactory().post(
+            reverse(ADD_VIEWNAME) + "?import_c2rmf=1",
+            {"c2rmf_id": "123", "object_count": 1},
+        )
+        form = self.admin.get_form(request, None, change=False)(
+            request.POST, request.FILES, instance=None
+        )
+        with mock.patch.object(form, "full_clean"):
+            form.cleaned_data = {"c2rmf_id": "123", "object_count": 1}
+            assert (
+                self.admin.save_form(request, form, change=False).id == object_group.id
+            )
+
+    def test_c2rmf_request_check(self):
+        assert _is_c2rmf_import_request(
+            RequestFactory().get(f"{reverse(ADD_VIEWNAME)}?import_c2rmf=1")
+        )
+        assert not _is_c2rmf_import_request(
+            RequestFactory().get(f"{reverse(ADD_VIEWNAME)}")
+        )
