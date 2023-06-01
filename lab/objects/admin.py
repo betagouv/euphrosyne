@@ -197,8 +197,18 @@ class ObjectGroupAdmin(ModelAdmin):
     def has_add_permission(self, request: HttpRequest) -> bool:
         return request.user.is_staff
 
+    def has_view_permission(
+        self, request: HttpRequest, obj: ObjectGroup | None = None
+    ) -> bool:
+        # We must implement this to use has_change_permission to make
+        # page readonly. Otherwise will throw 403 error when viewing the page
+        # for non admin users.
+        return is_lab_admin(request.user) or (
+            obj and obj.runs.filter(project__members=request.user.id).exists()
+        )
+
     def has_change_permission(
-        self, request: HttpRequest, obj: Optional[ObjectGroup] = None
+        self, request: HttpRequest, obj: ObjectGroup | None = None
     ) -> bool:
         # If obj was imported from Eros, make page readonly
         if obj and obj.c2rmf_id:
