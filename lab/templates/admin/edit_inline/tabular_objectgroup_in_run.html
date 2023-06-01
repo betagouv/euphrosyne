@@ -47,7 +47,7 @@
               <td class="{% if field.field.name %}field-{{ field.field.name }}{% endif %}{% if field.field.is_hidden %} hidden{% endif %}">
               {% if field.is_readonly %}
                   <p>
-                    <a href="{% url "admin:lab_objectgroup_change" field.form.instance.objectgroup.pk %}?next={{request.get_full_path|urlencode}}">
+                    <a href="{% url "admin:lab_objectgroup_change" field.form.instance.objectgroup.pk %}?next={{request.get_full_path|urlencode}}&run={{field.form.instance.run.pk}}">
                       {{field.form.instance.objectgroup}}
                     </a>
                   </p>
