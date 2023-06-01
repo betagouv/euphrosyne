@@ -42,50 +42,50 @@
   color: var(--delete-button-bg);
 }
 
-.project-header {
+.context-header {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
 
-.project-header .project-header-back {
+.context-header .context-header-back {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
 
-.project-header .ri-arrow-right-s-line {
+.context-header .ri-arrow-right-s-line {
   font-size: 1.75rem;
 }
 
-.project-header .header-back-link-title {
+.context-header .header-back-link-title {
   margin-bottom: 4px;
 }
 
-.project-header a:hover .header-back-link-title,
-.project-header a:hover .project-header-back-icon {
+.context-header a:hover .header-back-link-title,
+.context-header a:hover .context-header-back-icon {
   color: var(--text-active-blue-france);
 }
 
-.project-header a:focus {
+.context-header a:focus {
   text-decoration: none;
 }
 
-.project-header h3.project-header-name {
+.context-header h3.context-header-name {
   margin-bottom: 6px;
 }
 
-.project-header .project-status {
+.context-header .project-status {
   margin: 0 1rem;
 }
 
-.project-header .project-leader {
+.context-header .project-leader {
   display: flex;
   flex-direction: column;
   margin-left: 22px;
 }
 
-.project-header .fr-text--xs,
-.project-header .fr-text--sm {
+.context-header .fr-text--xs,
+.context-header .fr-text--sm {
   margin-bottom: 0;
 }

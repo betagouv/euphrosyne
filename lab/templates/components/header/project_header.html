@@ -1,8 +1,8 @@
 {% load i18n %}
-<div class="project-header">
+<div class="context-header">
     <a href="{% url 'admin:lab_project_changelist' %}" class="header-back-link">
-        <div class="project-header-back">
-            <div class="project-header-back-icon">
+        <div class="context-header-back">
+            <div class="context-header-back-icon">
                 <i class="ri-arrow-left-line fr-mr-1w" aria-hidden="true"></i>
             </div>
             <div class="header-back-link-title fr-text--md">
@@ -12,7 +12,7 @@
     </a>
     {% if project %}
         <i class="ri-arrow-right-s-line" aria-hidden="true"></i> 
-        <h3 class="project-header-name">{{ project.name }}</h3>
+        <h3 class="context-header-name">{{ project.name }}</h3>
         <div class="project-status">
             <span class="fr-tag {{ status.class_name }}">
                 {{ status.display }}
