@@ -298,6 +298,16 @@ class ObjectGroupAdmin(ModelAdmin):
         obj: ObjectGroup = self.get_object(request, object_id=object_id)
         are_objects_differentiated = self.get_are_objects_differentiated(request, obj)
 
+        run = (
+            (
+                Run.objects.filter(id=request.GET.get("run"))
+                .values("id", "label")
+                .first()
+            )
+            if request.GET.get("run")
+            else None
+        )
+
         return super().changeform_view(
             request,
             object_id,
@@ -308,6 +318,8 @@ class ObjectGroupAdmin(ModelAdmin):
                 "show_save_as_new": False,
                 "show_save_and_add_another": False,
                 "show_save_and_continue": False,
+                "show_close": False,
+                "objectgroup_run": run,
             },
         )
 
