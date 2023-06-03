@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import reverse, serializers
 
 from ..models import Project, Run
 from ..objects.models import ObjectGroup
@@ -12,10 +12,23 @@ class ProjectRunObjectGroupSerializer(serializers.ModelSerializer):
 
 class ProjectRunSerializer(serializers.ModelSerializer):
     objects = ProjectRunObjectGroupSerializer(many=True, source="run_object_groups")
+    methods_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Run
-        fields = ("id", "label", "particle_type", "energy_in_keV", "objects")
+        fields = (
+            "id",
+            "label",
+            "particle_type",
+            "energy_in_keV",
+            "objects",
+            "methods_url",
+        )
+
+    def get_methods_url(self, obj: Run):
+        return reverse.reverse(
+            "api:run-detail-methods", args=[obj.id], request=self.context["request"]
+        )
 
 
 class ProjectSerializer(serializers.ModelSerializer):
