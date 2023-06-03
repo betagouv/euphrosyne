@@ -1,4 +1,4 @@
-from rest_framework.authentication import SessionAuthentication
+from rest_framework import authentication
 from rest_framework.permissions import IsAdminUser
 from rest_framework_simplejwt.views import TokenViewBase
 
@@ -11,6 +11,9 @@ class SessionTokenObtainPairView(TokenViewBase):
     token pair to prove the authentication of those credentials.
     """
 
-    authentication_classes = [SessionAuthentication]
+    authentication_classes = [
+        authentication.BasicAuthentication,
+        authentication.SessionAuthentication,
+    ]
     permission_classes = [IsAdminUser]  # permission to user with `is_staff`
     serializer_class = SessionTokenObtainSerializer
