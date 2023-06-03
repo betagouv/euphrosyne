@@ -17,7 +17,6 @@ class ProjectRunSerializer(serializers.ModelSerializer):
     class Meta:
         model = Run
         fields = (
-            "id",
             "label",
             "particle_type",
             "energy_in_keV",
