@@ -111,7 +111,7 @@ class ObjectGroupFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = ObjectGroup
 
-    label = factory.Faker("words")
+    label = factory.Faker("name")
     dating = factory.fuzzy.FuzzyChoice(["XXe", "XIXe", "XVIIIe", "XVIIe"])
     materials = factory.fuzzy.FuzzyChoice(["wood", "stone", "glass", "metal"], list)
     object_count = 3
