@@ -170,6 +170,11 @@ ul li {
   list-style-type: none;
 }
 
+/* purgecss ignore */
+#toolbar input#searchbar {
+  height: 1.93rem;
+}
+
 /* purgecss start ignore */
 .fr-tag.to_schedule {
   background: var(--background-contrast-yellow-tournesol);
