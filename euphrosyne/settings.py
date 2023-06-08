@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "social_django",
     "rest_framework",
+    "django_filters",
     "lab",
     "orcid_oauth",
     "static_pages",

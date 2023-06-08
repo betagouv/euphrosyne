@@ -1,0 +1,345 @@
+openapi: 3.0.2
+info:
+  title: ""
+  version: ""
+paths:
+  /api/lab/calendar:
+    get:
+      operationId: listCalendars
+      description: ""
+      parameters: []
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Calendar"
+          description: ""
+      tags:
+        - api
+  /api/lab/projects/:
+    get:
+      operationId: listProjects
+      description:
+        "List projects with optional filters on start and end dates in
+        the query params.
+
+        Filters names: start_before, start_after, end_before, end_after."
+      parameters:
+        - name: start_before
+          required: false
+          in: query
+          description: start_before
+          schema:
+            type: string
+        - name: start_after
+          required: false
+          in: query
+          description: start_after
+          schema:
+            type: string
+        - name: end_before
+          required: false
+          in: query
+          description: end_before
+          schema:
+            type: string
+        - name: end_after
+          required: false
+          in: query
+          description: end_after
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+          description: ""
+      tags:
+        - api
+  /api/lab/runs/{id}/methods:
+    get:
+      operationId: retrieveRun
+      description: ""
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: A unique integer value identifying this run.
+          schema:
+            type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RunMethods"
+          description: ""
+      tags:
+        - api
+  /api/auth/token/:
+    post:
+      operationId: createSessionTokenObtain
+      description:
+        "Takes an authenticated request and returns an access and refresh
+        JSON web
+
+        token pair to prove the authentication of those credentials."
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SessionTokenObtain"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/SessionTokenObtain"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/SessionTokenObtain"
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionTokenObtain"
+          description: ""
+      tags:
+        - api
+      security:
+        - basicAuth: []
+  /api/auth/token/refresh/:
+    post:
+      operationId: createTokenRefresh
+      description:
+        "Takes a refresh type JSON web token and returns an access type
+        JSON web
+
+        token if the refresh token is valid."
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenRefresh"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/TokenRefresh"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/TokenRefresh"
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenRefresh"
+          description: ""
+      tags:
+        - api
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Calendar:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        group_id:
+          type: integer
+        title:
+          type: string
+          readOnly: true
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+        url:
+          type: string
+          readOnly: true
+      required:
+        - group_id
+        - start
+        - end
+    Project:
+      type: object
+      properties:
+        name:
+          type: string
+          pattern: ^[\w\- ]+$
+          maxLength: 255
+        runs:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+                pattern: ^[\w\- ]+$
+                maxLength: 255
+              particle_type:
+                enum:
+                  - Proton
+                  - Alpha particle
+                  - Deuton
+                type: string
+              energy_in_keV:
+                type: integer
+                maximum: 2147483647
+                minimum: -2147483648
+                nullable: true
+              objects:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                      maxLength: 255
+                    id:
+                      type: integer
+                      readOnly: true
+                  required:
+                    - label
+              methods_url:
+                type: string
+                readOnly: true
+            required:
+              - label
+              - objects
+        slug:
+          type: string
+          maxLength: 255
+      required:
+        - name
+        - runs
+        - slug
+    RunMethods:
+      type: object
+      properties:
+        method_PIXE:
+          type: boolean
+          description: technique d'analyse PIXE
+        method_PIGE:
+          type: boolean
+          description: technique d'analyse PIGE
+        method_IBIL:
+          type: boolean
+          description: technique d'analyse IBIL
+        method_FORS:
+          type: boolean
+          description: technique d'analyse FORS
+        method_RBS:
+          type: boolean
+          description: technique d'analyse RBS
+        method_ERDA:
+          type: boolean
+          description: technique d'analyse ERDA
+        method_NRA:
+          type: boolean
+          description: technique d'analyse NRA
+        detector_LE0:
+          type: boolean
+          description: "d\xE9tecteur PIXE / LE0"
+        detector_HE1:
+          type: boolean
+          description: "d\xE9tecteur PIXE / HE1"
+        detector_HE2:
+          type: boolean
+          description: "d\xE9tecteur PIXE / HE2"
+        detector_HE3:
+          type: boolean
+          description: "d\xE9tecteur PIXE / HE3"
+        detector_HE4:
+          type: boolean
+          description: "d\xE9tecteur PIXE / HE4"
+        detector_HPGe20:
+          type: boolean
+          description: "d\xE9tecteur PIGE / HPGe-20"
+        detector_HPGe70:
+          type: boolean
+          description: "d\xE9tecteur PIGE / HPGe-70"
+        detector_HPGe70N:
+          type: boolean
+          description: "d\xE9tecteur PIGE / HPGe-70-N"
+        detector_IBIL_QE65000:
+          type: boolean
+          description: "d\xE9tecteur IBIL / QE65000"
+        detector_IBIL_other:
+          type: string
+          description: "d\xE9tecteur IBIL / _"
+          maxLength: 45
+        detector_FORS_QE65000:
+          type: boolean
+          description: "d\xE9tecteur FORS / QE65000"
+        detector_FORS_other:
+          type: string
+          description: "d\xE9tecteur FORS / _"
+          maxLength: 45
+        detector_PIPS130:
+          type: boolean
+          description: "d\xE9tecteur RBS / PIPS - 130\xB0"
+        detector_PIPS150:
+          type: boolean
+          description: "d\xE9tecteur RBS / PIPS - 150\xB0"
+        detector_ERDA:
+          type: string
+          description: "d\xE9tecteur ERDA / _"
+          maxLength: 45
+        detector_NRA:
+          type: string
+          description: "d\xE9tecteur NRA / _"
+          maxLength: 45
+        filters_for_detector_LE0:
+          type: string
+          description: choix de filtres PIXE / LE0
+          maxLength: 45
+        filters_for_detector_HE1:
+          type: string
+          description: choix de filtres PIXE / HE1
+          maxLength: 45
+        filters_for_detector_HE2:
+          type: string
+          description: choix de filtres PIXE / HE2
+          maxLength: 45
+        filters_for_detector_HE3:
+          type: string
+          description: choix de filtres PIXE / HE3
+          maxLength: 45
+        filters_for_detector_HE4:
+          type: string
+          description: choix de filtres PIXE / HE4
+          maxLength: 45
+    SessionTokenObtain:
+      type: object
+      properties: {}
+    TokenRefresh:
+      type: object
+      properties:
+        refresh:
+          type: string
+        access:
+          type: string
+          readOnly: true
+      required:
+        - refresh
+
+security:
+  - bearerAuth: []

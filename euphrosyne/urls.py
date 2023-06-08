@@ -56,7 +56,7 @@ urlpatterns = [
         UserCompleteAccountView.as_view(),
         name="complete_registration_orcid",
     ),
-    path("api/", include("euphrosyne.api_urls")),
+    path("api/", include("euphrosyne.api_urls"), name="api"),
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
 ]
 
