@@ -116,6 +116,8 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
         view_permission=LabRole.PROJECT_MEMBER,
     )
 
+    search_fields = ("name",)
+
     class Media:
         js = ("pages/project.js",)
         css = {"all": ("css/admin/project-admin.css",)}
