@@ -19,9 +19,15 @@ class ObjectImportC2RMFView(StaffUserRequiredMixin, CreateView):
     def form_valid(self, form: forms.ObjectGroupImportC2RMFForm):
         if IS_POPUP_VAR in self.request.POST:
             # pylint: disable=attribute-defined-outside-init
-            self.object = form.save()
+            self.object = form.save(commit=not form.instance.id)
             run_id = self.request.GET.get("run")
             if run_id:
+                # At last, check if this object is not already in the run
+                if self.object.runs.filter(id=run_id).exists():
+                    form.add_error(
+                        "c2rmf_id", _("This object has already been added to the run.")
+                    )
+                    return self.form_invalid(form)
                 self.object.runs.add(run_id)
             popup_response_data = json.dumps(
                 {

@@ -3,6 +3,8 @@ from unittest import mock
 import pytest
 from django.forms import ValidationError
 
+from lab.tests import factories
+
 from ...c2rmf import ErosHTTPError
 from ...forms import ObjectGroupImportC2RMFForm
 
@@ -15,6 +17,7 @@ def test_form_conf():
     assert not form.fields["label"].required
 
 
+@pytest.mark.django_db
 @mock.patch("lab.objects.forms.fetch_partial_objectgroup_from_eros")
 def test_clean_fetch_data(mock_fetch: mock.MagicMock):
     mock_fetch.return_value = {
@@ -30,6 +33,7 @@ def test_clean_fetch_data(mock_fetch: mock.MagicMock):
     assert cleaned_data["object_count"] == 1
 
 
+@pytest.mark.django_db
 @mock.patch("lab.objects.forms.fetch_partial_objectgroup_from_eros")
 def test_clean_raises_if_fetch_none(mock_fetch: mock.MagicMock):
     mock_fetch.return_value = None
@@ -39,6 +43,7 @@ def test_clean_raises_if_fetch_none(mock_fetch: mock.MagicMock):
         form.clean()
 
 
+@pytest.mark.django_db
 @mock.patch("lab.objects.forms.fetch_partial_objectgroup_from_eros")
 def test_clean_raises_if_fetch_fails(mock_fetch: mock.MagicMock):
     mock_fetch.side_effect = ErosHTTPError()
@@ -46,3 +51,16 @@ def test_clean_raises_if_fetch_fails(mock_fetch: mock.MagicMock):
     form.cleaned_data = {"c2rmf_id": "C2RMF00000"}
     with pytest.raises(ValidationError):
         form.clean()
+
+
+@pytest.mark.django_db
+def test_clean_set_form_if_obj_exists():
+    c2rmf_id = "C2RMF00000"
+    objectgroup = factories.ObjectGroupFactory(c2rmf_id=c2rmf_id)
+
+    form = ObjectGroupImportC2RMFForm()
+    form.cleaned_data = {"c2rmf_id": c2rmf_id}
+    form.clean()
+
+    assert form.instance
+    assert form.instance.id == objectgroup.id
