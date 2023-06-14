@@ -94,8 +94,20 @@ class ObjectGroupImportC2RMFForm(forms.ModelForm):
         self.fields["label"].disabled = True
         self.fields["label"].required = False
 
+    def _post_clean(self):
+        # Skip _post_clean if we already have an existing instance
+        if not self.instance.id:
+            super()._post_clean()
+
     def clean(self) -> dict[str, Any]:
-        data = super().clean()
+        # First, check if objectgroup with this c2rmf id exists.
+        instance = ObjectGroup.objects.filter(
+            c2rmf_id=self.cleaned_data["c2rmf_id"]
+        ).first()
+        if instance:
+            self.instance = instance
+            return self.cleaned_data
+        # If it does not exist, then fetch data from Eros
         try:
             eros_data = fetch_partial_objectgroup_from_eros(
                 self.cleaned_data["c2rmf_id"]
@@ -114,7 +126,6 @@ class ObjectGroupImportC2RMFForm(forms.ModelForm):
                 {"c2rmf_id": _("This ID was not found in Eros.")}
             )
         data = {
-            **data,
             **eros_data,
             "object_count": 1,
         }

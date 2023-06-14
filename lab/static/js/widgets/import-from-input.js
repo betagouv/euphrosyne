@@ -93,9 +93,11 @@
         if (response.status === 404) {
           displayErrorMessage(
             importFromInputEl,
-            window.gettext("We could not retrieve this object.")
+            window.gettext("No results found.")
           );
           return;
+        } else if (!response.ok) {
+          throw new Error(`${response.status}: ${await response.text()}`);
         }
         const data = await response.json();
         for (const key in data) {

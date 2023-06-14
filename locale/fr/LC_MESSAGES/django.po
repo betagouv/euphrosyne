@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-14 11:29+0200\n"
+"POT-Creation-Date: 2023-06-14 16:59+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -544,6 +544,9 @@ msgstr "Objet(s) / Échantillon(s)"
 
 msgid "Inventory"
 msgstr "Inventaire"
+
+msgid "This object has already been added to the run."
+msgstr "Cet object a déjà été ajouté à ce run."
 
 msgid "EROS import"
 msgstr "Import EROS"
