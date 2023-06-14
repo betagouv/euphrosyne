@@ -6,6 +6,7 @@ from django.urls import path, reverse
 from django.urls.resolvers import URLResolver
 
 from lab.documents.views import ProjectDocumentsView
+from lab.objects.views import ObjectImportC2RMFView
 from lab.views import ChangeLeaderView
 from lab.workplace.views import WorkplaceView
 
@@ -34,6 +35,11 @@ class AdminSite(admin.AdminSite):
                 "lab/project/<project_id>/workplace",
                 self.admin_view(WorkplaceView.as_view()),
                 name="lab_project_workplace",
+            ),
+            path(
+                "lab/objectgroup/c2rmf_import",
+                self.admin_view(ObjectImportC2RMFView.as_view()),
+                name="lab_objectgroup_c2rmfimport",
             ),
             *super().get_urls(),
         ]

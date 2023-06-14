@@ -7,12 +7,8 @@ from django.urls import reverse
 
 from lab.tests import factories
 
-from ..admin import ObjectGroupAdmin, _is_c2rmf_import_request
-from ..forms import (
-    ObjectGroupForm,
-    ObjectGroupImportC2RMFForm,
-    ObjectGroupImportC2RMFReadonlyForm,
-)
+from ..admin import ObjectGroupAdmin
+from ..forms import ObjectGroupForm, ObjectGroupImportC2RMFReadonlyForm
 from ..models import ObjectGroup
 
 CHANGE_VIEWNAME = "admin:lab_objectgroup_change"
@@ -178,14 +174,6 @@ class TestObjectErosImport(TestCase):
         request.user = self.member
         assert not self.admin.has_change_permission(request, objectgroup)
 
-    def test_correct_form_class_is_used_when_importing(self):
-        request = RequestFactory().get(f"{reverse(ADD_VIEWNAME)}?import_c2rmf=1")
-        request.user = self.member
-        assert (
-            self.admin.get_form(request, None, change=False)
-            == ObjectGroupImportC2RMFForm
-        )
-
     def test_correct_form_class_is_used_after_import(self):
         objectgroup = ObjectGroup(id=1, c2rmf_id="123")
         request = RequestFactory().get(reverse(CHANGE_VIEWNAME, args=[objectgroup.id]))
@@ -203,26 +191,3 @@ class TestObjectErosImport(TestCase):
         ) as fetch_mock:
             self.admin.get_object(request, objectgroup.id)
             fetch_mock.assert_called_once_with(objectgroup.c2rmf_id, objectgroup)
-
-    def test_get_object_from_db_if_exists(self):
-        object_group = factories.ObjectGroupFactory(c2rmf_id="123")
-        request = RequestFactory().post(
-            reverse(ADD_VIEWNAME) + "?import_c2rmf=1",
-            {"c2rmf_id": "123", "object_count": 1},
-        )
-        form = self.admin.get_form(request, None, change=False)(
-            request.POST, request.FILES, instance=None
-        )
-        with mock.patch.object(form, "full_clean"):
-            form.cleaned_data = {"c2rmf_id": "123", "object_count": 1}
-            assert (
-                self.admin.save_form(request, form, change=False).id == object_group.id
-            )
-
-    def test_c2rmf_request_check(self):
-        assert _is_c2rmf_import_request(
-            RequestFactory().get(f"{reverse(ADD_VIEWNAME)}?import_c2rmf=1")
-        )
-        assert not _is_c2rmf_import_request(
-            RequestFactory().get(f"{reverse(ADD_VIEWNAME)}")
-        )
