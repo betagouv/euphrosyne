@@ -7,12 +7,19 @@ from ...c2rmf import ErosHTTPError
 from ...forms import ObjectGroupImportC2RMFForm
 
 
+def test_form_conf():
+    form = ObjectGroupImportC2RMFForm()
+    assert set(form.fields.keys()) == {"c2rmf_id", "label", "object_count"}
+    assert form.fields["object_count"].initial == 1
+    assert form.fields["label"].disabled
+    assert not form.fields["label"].required
+
+
 @mock.patch("lab.objects.forms.fetch_partial_objectgroup_from_eros")
 def test_clean_fetch_data(mock_fetch: mock.MagicMock):
     mock_fetch.return_value = {
         "c2rmf_id": "C2RMF00000",
         "label": "Test",
-        "object_count": 1,
     }
     form = ObjectGroupImportC2RMFForm()
     form.cleaned_data = {"c2rmf_id": "C2RMF00000"}

@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .api_views.calendar import CalendarView
+from .api_views.objects import get_eros_object
 from .api_views.project import ProjectList
 from .api_views.run import RunMethodsView
 
@@ -19,5 +20,10 @@ urlpatterns = [
         "runs/<int:pk>/methods",
         RunMethodsView.as_view(),
         name="run-detail-methods",
+    ),
+    path(
+        "objectgroup/c2rmf-fetch",
+        get_eros_object,
+        name="objectgroup-c2rmf-fetch",
     ),
 ]

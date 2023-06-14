@@ -19,11 +19,7 @@ from lab.permissions import is_lab_admin
 
 from .c2rmf import fetch_full_objectgroup_from_eros
 from .csv_upload import CSVParseError, parse_csv
-from .forms import (
-    ObjectGroupForm,
-    ObjectGroupImportC2RMFForm,
-    ObjectGroupImportC2RMFReadonlyForm,
-)
+from .forms import ObjectGroupForm, ObjectGroupImportC2RMFReadonlyForm
 from .models import Object, ObjectGroup
 
 
@@ -224,9 +220,6 @@ class ObjectGroupAdmin(ModelAdmin):
         change: bool = False,
         **kwargs: Any,
     ):
-        if not obj and _is_c2rmf_import_request(request):
-            # EROS import
-            return ObjectGroupImportC2RMFForm
         if obj and obj.c2rmf_id:
             # After EROS import, readonly
             return ObjectGroupImportC2RMFReadonlyForm
@@ -239,7 +232,7 @@ class ObjectGroupAdmin(ModelAdmin):
         description = ""
         if obj and obj.c2rmf_id:
             description = _("This object was imported from EROS.")
-        elif not _is_c2rmf_import_request(request):
+        else:
             description = _(
                 "Fill up dating and inventory number if you object \
                         group is undifferentiated."
@@ -267,14 +260,6 @@ class ObjectGroupAdmin(ModelAdmin):
     ) -> ObjectGroup:
         # Calls save_form in any case to populate ModelForm.save_m2m
         object_group = super().save_form(request, form, change)
-        if isinstance(form, ObjectGroupImportC2RMFForm):
-            # Check if object group already exists with c2rmf id
-            try:
-                return self.get_queryset(request).get(
-                    c2rmf_id=form.cleaned_data["c2rmf_id"]
-                )
-            except ObjectGroup.DoesNotExist:
-                pass
         return object_group
 
     def save_model(
@@ -356,8 +341,3 @@ class ObjectGroupAdmin(ModelAdmin):
         if request.method == "POST" and "object_set-TOTAL_FORMS" in request.POST:
             return int(request.POST["object_set-TOTAL_FORMS"]) > 0
         return False
-
-
-def _is_c2rmf_import_request(request: HttpRequest) -> bool:
-    """Return True if object group creation method is C2RM import from EROS."""
-    return request.GET.get("import_c2rmf")

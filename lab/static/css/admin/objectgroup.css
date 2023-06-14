@@ -24,3 +24,7 @@ form .aligned ul {
 .submit-row a.closelink {
   display: none;
 }
+
+input[type="submit"][disabled].default {
+  color: white;
+}

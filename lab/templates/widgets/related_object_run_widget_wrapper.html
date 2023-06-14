@@ -20,7 +20,7 @@
             {% translate "Add a new object or object group" %}
         </a>
         <a class="related-widget-wrapper-link" id="import_id_{{ name }}"
-           href="{{ add_related_url }}?{{ url_params }}&import_c2rmf=1"
+           href="{% url "admin:lab_objectgroup_c2rmfimport" %}?{{ url_params }}"
            data-popup="yes"
            title="{% blocktranslate %}Import with C2RMF ID{% endblocktranslate %}">
             <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="{% translate 'Add' %}">

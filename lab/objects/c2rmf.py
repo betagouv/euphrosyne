@@ -31,7 +31,7 @@ def fetch_partial_objectgroup_from_eros(c2rmf_id: str) -> dict[str, Any] | None:
     save it to DB."""
     data = _fetch_object_group_from_eros(c2rmf_id)
     if data:
-        return {"object_count": 1, "c2rmf_id": c2rmf_id, "label": data["title"]}
+        return {"c2rmf_id": c2rmf_id, "label": data["title"]}
     return None
 
 

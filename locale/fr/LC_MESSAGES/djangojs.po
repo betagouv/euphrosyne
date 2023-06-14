@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-06 17:03+0100\n"
+"POT-Creation-Date: 2023-06-14 11:31+0200\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -58,9 +58,27 @@ msgstr "La taille totale des fichiers ne doit pas dépasser %s."
 msgid "The following file formats are not accepted : %s"
 msgstr "Ces formats de fichier ne sont pas acceptés : %s"
 
+msgid "Search for a valid C2RMF ID before submitting the form."
+msgstr ""
+"Lancez la recherche sur un numéro C2RMF valide avant de soumettre le "
+"formulaire. "
+
 #, javascript-format
 msgid "Characters left: %s"
 msgstr "Caractères restant: %s"
+
+msgid "You must enter a valid value for this field."
+msgstr "Entrez une valeur valide pour ce champs."
+
+msgid "We could not retrieve this object."
+msgstr "Nous n'avons pas pu trouver cet objet."
+
+msgid ""
+"An error occured while retrieving the object. Please contact AGLAE team if "
+"the error persists."
+msgstr ""
+"Une erreur s'est produite lors de la recherche de l'object sur Eros. Si "
+"l'erreur persiste, veuillez contacter l'équipe AGLAE."
 
 msgid "Create virtual office"
 msgstr "Créer le bureau virtuel"

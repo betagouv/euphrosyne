@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-25 12:30+0200\n"
+"POT-Creation-Date: 2023-06-14 11:29+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -545,6 +545,9 @@ msgstr "Objet(s) / Échantillon(s)"
 msgid "Inventory"
 msgstr "Inventaire"
 
+msgid "EROS import"
+msgstr "Import EROS"
+
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -633,6 +636,13 @@ msgstr "Sauvegarder et continuer l'édition"
 msgid "Save and view"
 msgstr "Sauvegarder et voir"
 
+msgid ""
+"Use the search field to import an object from Eros. The name of the object "
+"will be displayed in the field after."
+msgstr ""
+"Utilisez le champs de recherche pour importer un object à partir d'Eros. Le "
+"nom de l'objet sera affiché dans le champs suivant."
+
 msgid "File name"
 msgstr "Fichier"
 
@@ -664,6 +674,9 @@ msgstr "Vous pouvez accéder à l'invitation ici :"
 
 msgid "Join project"
 msgstr "Rejoindre le projet"
+
+msgid "Search"
+msgstr "Recherche"
 
 msgid "Change leader"
 msgstr "Modification du chef de projet"

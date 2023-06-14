@@ -9,6 +9,7 @@ from lab import widgets
 
 from .c2rmf import ErosHTTPError, fetch_partial_objectgroup_from_eros
 from .models import ObjectGroup
+from .widgets import ImportFromInput
 
 logger = logging.getLogger(__name__)
 
@@ -78,21 +79,27 @@ class ObjectGroupForm(forms.ModelForm):
 class ObjectGroupImportC2RMFForm(forms.ModelForm):
     class Meta:
         model = ObjectGroup
-        fields = ("c2rmf_id",)
+        fields = ("c2rmf_id", "label", "object_count")
+        widgets = {
+            "object_count": forms.HiddenInput(),
+            "c2rmf_id": ImportFromInput(
+                "api:objectgroup-c2rmf-fetch", {"label": "id_label"}
+            ),
+        }
 
-    def __init__(self, *args, **kwargs: dict[str, Any]) -> None:
+    def __init__(self, *args, **kwargs: dict[str, Any]):
         super().__init__(*args, **kwargs)
         self.fields["c2rmf_id"].widget.attrs["placeholder"] = "C2RMF00000"
-
-    def full_clean(self):
-        super().full_clean()
-        self.instance.object_count = 1
-        self.instance.label = self.cleaned_data["label"]
+        self.fields["object_count"].initial = 1
+        self.fields["label"].disabled = True
+        self.fields["label"].required = False
 
     def clean(self) -> dict[str, Any]:
-        # Disable unique check
+        data = super().clean()
         try:
-            data = fetch_partial_objectgroup_from_eros(self.cleaned_data["c2rmf_id"])
+            eros_data = fetch_partial_objectgroup_from_eros(
+                self.cleaned_data["c2rmf_id"]
+            )
         except ErosHTTPError as error:
             logger.error(
                 "An error occured when importing data from Eros.\nID: %s\nResponse: %s",
@@ -102,10 +109,15 @@ class ObjectGroupImportC2RMFForm(forms.ModelForm):
             raise forms.ValidationError(
                 {"c2rmf_id": _("An error occured when importing data from Eros.")}
             )
-        if not data:
+        if not eros_data:
             raise forms.ValidationError(
                 {"c2rmf_id": _("This ID was not found in Eros.")}
             )
+        data = {
+            **data,
+            **eros_data,
+            "object_count": 1,
+        }
         return data
 
 
