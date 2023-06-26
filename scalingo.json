@@ -1,11 +1,6 @@
 {
   "name": "euphrosyne",
   "stack": "scalingo-22",
-  "addons": [
-    {
-      "plan": "postgresql:postgresql-starter-512"
-    }
-  ],
   "env": {
     "DISABLE_COLLECTSTATIC": {
       "value": ""
