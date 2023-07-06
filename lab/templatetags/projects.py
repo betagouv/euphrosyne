@@ -41,7 +41,7 @@ def project_tabs(project_id: int, request: HttpRequest):
                     "name": _("Workplace"),
                     "url": reverse("admin:lab_project_workplace", args=[project_id]),
                     "is_active": request.resolver_match.url_name
-                    == "lab_project_workplace",
+                    in ["lab_project_workplace", "lab_project_hdf5_viewer"],
                 },
             )
         }

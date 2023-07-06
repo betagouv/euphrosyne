@@ -97,6 +97,7 @@
 {{ block.super }}
 <script src="{% url 'javascript-catalog' %}"></script>
 <script>
+    window.projectId = "{{ project.id }}"
     window.projectName = "{{ project.name }}"
     window.projectSlug = "{{ project.slug }}"
     window.runs = [{% for run in runs %}{ id: {{ run.id }}, name: "{{ run.label }}" },{% endfor %}]

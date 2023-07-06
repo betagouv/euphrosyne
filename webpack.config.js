@@ -8,7 +8,6 @@ import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
 import { PurgeCSSPlugin } from "purgecss-webpack-plugin";
 import webpack from "webpack";
-
 export default {
   entry: {
     main: [
@@ -31,7 +30,7 @@ export default {
     ],
     ...Object.assign(
       {},
-      ...globSync("./**/assets/js/pages/*.js", { dotRelative: true }).map(
+      ...globSync("./**/assets/js/pages/*.js*", { dotRelative: true }).map(
         (file) => {
           return {
             [file.split("/").pop().split(".").shift()]: {
@@ -59,8 +58,19 @@ export default {
         use: ["source-map-loader"],
       },
       {
+        test: /\.(jsx)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env", "@babel/preset-react"],
+          },
+        },
+      },
+      {
         test: /\.css$/i,
         use: [MiniCssExtractPlugin.loader, "css-loader"],
+        sideEffects: true, // add this to prevent webpack from removing css used in js files (e.g. @import) https://stackoverflow.com/questions/55505894/webpack-mini-css-extract-plugin-not-outputting-css-file
       },
       {
         test: /\.(woff(2)?|ttf|eot)$/,
@@ -68,11 +78,6 @@ export default {
         generator: {
           filename: "./fonts/[name][ext]",
         },
-      },
-      {
-        test: /\.js$/,
-        enforce: "pre",
-        use: ["source-map-loader"],
       },
       {
         test: /\.html$/i,
@@ -89,11 +94,11 @@ export default {
       EUPHROSYNE_TOOLS_API_URL: null,
     }),
     new MiniCssExtractPlugin(),
-    new PurgeCSSPlugin({
-      paths: globSync([`{euphrosyne,euphro_auth,lab}/**/*`], {
-        nodir: true,
-        dotRelative: true,
-      }),
-    }),
+    //new PurgeCSSPlugin({
+    //  paths: globSync([`{euphrosyne,euphro_auth,lab}/**/*`], {
+    //    nodir: true,
+    //    dotRelative: true,
+    //  }),
+    //}),
   ],
 };

@@ -31,10 +31,15 @@
     "prettier": "^2.8.8"
   },
   "dependencies": {
+    "@babel/core": "^7.22.5",
+    "@babel/preset-env": "^7.22.5",
+    "@babel/preset-react": "^7.22.5",
     "@fullcalendar/core": "^6.1.8",
     "@fullcalendar/daygrid": "^6.1.8",
     "@fullcalendar/list": "^6.1.8",
     "@gouvfr/dsfr": "^1.9.3",
+    "@h5web/app": "^8.0.0",
+    "babel-loader": "^9.1.2",
     "css-loader": "^6.8.1",
     "css-minimizer-webpack-plugin": "^5.0.1",
     "dotenv": "^16.3.1",
@@ -43,6 +48,7 @@
     "mini-css-extract-plugin": "^2.7.6",
     "promise-polyfill": "8.3.0",
     "purgecss-webpack-plugin": "^5.0.0",
+    "react-router-dom": "^6.14.1",
     "remixicon": "^3.4.0",
     "source-map-loader": "^4.0.1",
     "webpack": "^5.88.2",
