@@ -23,7 +23,7 @@ export class HDF5FileTable extends FileTable {
     );
     const viewLink = document.createElement("a");
     viewLink.textContent = window.gettext("View");
-    viewLink.href = `${this.getAttribute("h5webapp-host")}/?file=${path}`;
+    viewLink.href = `lab/project/${window.projectId}/hdf5-viewer?file=${path}`;
     viewLink.target = "_blank";
     viewLink.rel = "noopener";
     const anchorListItem = document.createElement("li");
