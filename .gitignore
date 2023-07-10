@@ -6,3 +6,5 @@ venv*
 local.*
 node_modules
 **/assets/dist/
+/docker-compose.yml
+/Dockerfile
