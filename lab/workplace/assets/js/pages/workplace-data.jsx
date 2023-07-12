@@ -6,12 +6,27 @@ import {
   QueryClientProvider,
   QueryClient,
   useQuery,
+  useMutation,
+  useQueryClient,
 } from "@tanstack/react-query";
-import { formatBytes } from "../../../../assets/js/utils";
+import { displayMessage, formatBytes } from "../../../../assets/js/utils";
 
 const queryClient = new QueryClient();
 
 const FileTableRow = ({ file, onDelete, onDownload }) => {
+  const clickDelete = () => {
+    if (
+      !window.confirm(
+        window.interpolate(window.gettext("Delete the document %s ?"), [
+          file.name,
+        ])
+      )
+    ) {
+      return;
+    }
+
+    onDelete(file);
+  };
   return (
     <tr>
       <td>{file.name}</td>
@@ -32,7 +47,7 @@ const FileTableRow = ({ file, onDelete, onDownload }) => {
             <button
               className="delete-btn fr-btn fr-icon-delete-line fr-btn--secondary"
               title={window.gettext("Delete file")}
-              onClick={() => onDelete(file)}
+              onClick={clickDelete}
             >
               {window.gettext("Delete file")}
             </button>
@@ -71,6 +86,7 @@ const DirectoryTableRow = ({ file, onOpen }) => {
 
 const RawDataTable = ({ service }) => {
   const [folder, setFolder] = useState([]);
+  const queryClient = useQueryClient();
   const { isLoading, data: files } = useQuery(
     ["fetch-raw-data", service.listFileURL, folder],
     async () => {
@@ -78,6 +94,29 @@ const RawDataTable = ({ service }) => {
       return files;
     },
     { refetchOnMount: false, refetchOnReconnect: false }
+  );
+
+  const { mutate: deleteFile } = useMutation(
+    (file) => service.deleteFile(file.path),
+    {
+      onSuccess: (_data, variable) => {
+        queryClient.invalidateQueries(["fetch-raw-data", service.listFileURL]);
+        displayMessage(
+          window.interpolate(window.gettext("File %s has been removed."), [
+            variable.name,
+          ]),
+          "success"
+        );
+      },
+      onError: (_error, variable) => {
+        displayMessage(
+          window.interpolate(window.gettext("File %s could not be removed."), [
+            variable.name,
+          ]),
+          "error"
+        );
+      },
+    }
   );
 
   const appendFolder = (name) => {
@@ -88,8 +127,10 @@ const RawDataTable = ({ service }) => {
     setFolder((prev) => prev.slice(0, -1));
   };
 
-  const onDeleteFile = (file) => {};
-  const onDownloadFile = (file) => {};
+  const onDownloadFile = async (file) => {
+    const url = await service.fetchPresignedURL(file.path);
+    window.open(url, "_blank");
+  };
 
   return (
     <div>
@@ -105,9 +146,7 @@ const RawDataTable = ({ service }) => {
           <button
             className="fr-btn fr-icon-arrow-left-line fr-btn--sm fr-btn--secondary fr-mr-1w"
             onClick={removeLastFolder}
-          >
-            back
-          </button>
+          />
           <div>/{folder.join("/")}</div>
         </div>
       )}
@@ -151,7 +190,7 @@ const RawDataTable = ({ service }) => {
                   <FileTableRow
                     key={file.name}
                     file={file}
-                    onDelete={onDeleteFile}
+                    onDelete={deleteFile}
                     onDownload={onDownloadFile}
                   />
                 )}
@@ -195,13 +234,13 @@ const RunTabPanel = ({ run, idx }) => {
       <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-12 fr-col-lg-6">
           <div className="fr-background-default--grey fr-p-3v">
-            <h3>Raw data</h3>
+            <h3>{window.gettext("Raw data")}</h3>
             <RawDataTable service={rawService} />
           </div>
         </div>
         <div className="fr-col-12 fr-col-lg-6">
           <div className="fr-background-default--grey fr-p-3v">
-            <h3>Processed data</h3>
+            <h3>{window.gettext("Processed data")}</h3>
             <RawDataTable service={processedService} />
           </div>
         </div>
