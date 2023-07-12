@@ -8,3 +8,4 @@ node_modules
 **/assets/dist/
 /docker-compose.yml
 /Dockerfile
+.DS_Store

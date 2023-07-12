@@ -2,11 +2,12 @@
 import { jwtFetch } from "./jwt.js";
 
 export class EuphrosyneFile {
-  constructor(name, path, lastModified, size) {
+  constructor(name, path, lastModified, size, type) {
     this.name = name;
     this.path = path;
     this.lastModified = lastModified;
     this.size = size;
+    this.type = type;
   }
 }
 
@@ -24,8 +25,13 @@ export class FileService {
     this.presignURL = `${process.env.EUPHROSYNE_TOOLS_API_URL}${fetchPresignedURL}`;
   }
 
-  async listData() {
-    const response = await jwtFetch(this.listFileURL, {
+  async listData(folder) {
+    let url = this.listFileURL;
+    if (folder != null && folder !== "") {
+      url += `?folder=${encodeURIComponent(folder)}`;
+    }
+
+    const response = await jwtFetch(url, {
       method: "GET",
     });
     if (response.ok) {
@@ -36,7 +42,8 @@ export class FileService {
             file.name,
             file.path,
             new Date(file.last_modified),
-            file.size
+            file.size,
+            file.type
           )
       );
     } else if (response.status === 404) {
