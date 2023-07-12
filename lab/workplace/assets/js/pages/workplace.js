@@ -19,6 +19,6 @@ VirtualOfficeDelteButton.init();
 VMSizeSelect.init();
 HDF5FileTable.init();
 
-initRawData();
-initProcessedData();
+// initRawData();
+// initProcessedData();
 initHDF5();

@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { createRoot } from "react-dom/client";
+import Fuse from "fuse.js";
 import { RawDataFileService } from "../raw-data/raw-data-file-service";
 import { ProcessedDataFileService } from "../processed-data/processed-data-file-service";
 import {
@@ -86,6 +87,7 @@ const DirectoryTableRow = ({ file, onOpen }) => {
 
 const RawDataTable = ({ service }) => {
   const [folder, setFolder] = useState([]);
+  const [query, setQuery] = useState("");
   const queryClient = useQueryClient();
   const { isLoading, data: files } = useQuery(
     ["fetch-raw-data", service.listFileURL, folder],
@@ -119,6 +121,21 @@ const RawDataTable = ({ service }) => {
     }
   );
 
+  const fuse = useMemo(() => {
+    return new Fuse(files, {
+      includeScore: true,
+      keys: ["name"],
+    });
+  }, [files]);
+
+  const filteredFiles = useMemo(() => {
+    if (query === "") {
+      return files;
+    }
+
+    return fuse.search(query).map((i) => i.item);
+  }, [fuse, query]);
+
   const appendFolder = (name) => {
     setFolder((prev) => [...prev, name]);
   };
@@ -150,14 +167,22 @@ const RawDataTable = ({ service }) => {
           <div>/{folder.join("/")}</div>
         </div>
       )}
+      <input
+        className="fr-input fr-mb-1w"
+        name="query"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={window.gettext("Search files")}
+      />
+
       <table is="file-table" cols="name,size">
         <thead>
           <tr>
             <th scope="col">
-              <div class="text">{window.gettext("File name")}</div>
+              <div className="text">{window.gettext("File name")}</div>
             </th>
             <th scope="col">
-              <div class="text">{window.gettext("Size")}</div>
+              <div className="text">{window.gettext("Size")}</div>
             </th>
             <th scope="col"></th>
           </tr>
@@ -177,31 +202,28 @@ const RawDataTable = ({ service }) => {
             </tr>
           )}
 
-          {!isLoading && (files == null || files.length <= 0) && (
-            <tr className="no_data">
-              <td colSpan={3}>{window.gettext("No file yet")}</td>
-            </tr>
-          )}
+          {!isLoading &&
+            (filteredFiles == null || filteredFiles.length <= 0) && (
+              <tr className="no_data">
+                <td colSpan={3}>{window.gettext("No file yet")}</td>
+              </tr>
+            )}
 
-          {files != null &&
-            files.map((file) => (
-              <>
+          {!isLoading &&
+            filteredFiles != null &&
+            filteredFiles.map((file) => (
+              <React.Fragment key={file.name}>
                 {file.type === "file" && (
                   <FileTableRow
-                    key={file.name}
                     file={file}
                     onDelete={deleteFile}
                     onDownload={onDownloadFile}
                   />
                 )}
                 {file.type === "directory" && (
-                  <DirectoryTableRow
-                    key={file.name}
-                    file={file}
-                    onOpen={appendFolder}
-                  />
+                  <DirectoryTableRow file={file} onOpen={appendFolder} />
                 )}
-              </>
+              </React.Fragment>
             ))}
         </tbody>
       </table>

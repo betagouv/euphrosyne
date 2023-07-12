@@ -125,3 +125,6 @@ msgstr "Le bureau virtuel a bien été supprimé."
 
 msgid "View"
 msgstr "Voir"
+
+msgid "Search files"
+msgstr "Cherchez des fichiers"
