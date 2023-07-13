@@ -45,52 +45,6 @@
     </fieldset>
     {% endif %}
 
-
-    <!-- <div class="fr-tabs"> -->
-    <!--     <ul class="fr-tabs__list" role="tablist" aria-label="{% trans "Runs data" %}"> -->
-    <!--         {% for run in runs %} -->
-    <!--         <li role="presentation"> -->
-    <!--             <button id="tabpanel-run-{{ run.id }}"  -->
-    <!--                     class="fr-tabs__tab fr-icon-checkbox-line fr-tabs__tab--icon-left"  -->
-    <!--                     tabindex="{{ forloop.counter0 }}"  -->
-    <!--                     role="tab"  -->
-    <!--                     aria-selected="{% if forloop.counter0 == 0 %}true{% else %}false{% endif %}"  -->
-    <!--                     aria-controls="tabpanel-run-{{ run.id }}-panel">{{ run.label }}</button> -->
-    <!--         </li> -->
-    <!--         {% endfor %} -->
-    <!--     </ul> -->
-    <!--     {% for run in runs %} -->
-    <!--     <div id="tabpanel-run-{{ run.id }}-panel"  -->
-    <!--          class="fr-tabs__panel {% if forloop.counter0 == 0 %}fr-tabs__panel--selected{% endif %}" -->
-    <!--          role="tabpanel"  -->
-    <!--          aria-labelledby="tabpanel-run-{{ run.id }}"  -->
-    <!--          tabindex="{{ forloop.counter0 }}"> -->
-    <!--             <div class="fr-grid-row fr-grid-row--gutters"> -->
-    <!--                 <div class="fr-col-12"> -->
-    <!--                     <div class="fr-background-default--grey fr-p-3v"> -->
-    <!--                         <h3>HDF5</h2> -->
-    <!--                         {% include "workplace/components/hdf5_file_table.html" with component=run.hdf5_table %} -->
-    <!--                     </div> -->
-    <!--                 </div> -->
-    <!--             </div> -->
-    <!--             <div class="fr-grid-row fr-grid-row--gutters"> -->
-    <!--                 <div class="fr-col-12 fr-col-lg-6"> -->
-    <!--                     <div class="fr-background-default--grey fr-p-3v"> -->
-    <!--                         <h3>{% trans "Raw data" %}</h2> -->
-    <!--                         {% include "workplace/components/data_file_table.html" with component=run.raw_data_table %} -->
-    <!--                     </div> -->
-    <!--                 </div> -->
-    <!--                 <div class="fr-col-12 fr-col-lg-6"> -->
-    <!--                     <div class="fr-background-default--grey fr-p-3v"> -->
-    <!--                         <h3>{% trans "Processed data" %}</h2> -->
-    <!--                         {% include "workplace/components/data_file_table.html" with component=run.processed_data_table %}                 -->
-    <!--                     </div> -->
-    <!--                 </div> -->
-    <!--             </div> -->
-    <!--     </div> -->
-    <!--     {% endfor %} -->
-    <!-- </div> -->
-
     <div id="workspace-react" />
 </div>
 
