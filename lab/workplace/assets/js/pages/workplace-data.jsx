@@ -14,7 +14,7 @@ import { displayMessage, formatBytes } from "../../../../assets/js/utils";
 
 const queryClient = new QueryClient();
 
-const FileTableRow = ({ file, onDelete, onDownload }) => {
+const FileTableRow = ({ file, onDelete, onDownload, showLastModified }) => {
   const clickDelete = () => {
     if (
       !window.confirm(
@@ -32,6 +32,11 @@ const FileTableRow = ({ file, onDelete, onDownload }) => {
     <tr>
       <td>{file.name}</td>
       <td>{formatBytes(file.size)}</td>
+      {showLastModified && (
+        <td>
+          {file.lastModified != null && file.lastModified.toLocaleDateString()}
+        </td>
+      )}
       <td>
         <ul className="fr-btns-group fr-btns-group--inline fr-btns-group--sm">
           <li>
@@ -59,7 +64,7 @@ const FileTableRow = ({ file, onDelete, onDownload }) => {
   );
 };
 
-const DirectoryTableRow = ({ file, onOpen }) => {
+const DirectoryTableRow = ({ file, onOpen, showLastModified }) => {
   return (
     <tr key={file.name}>
       <td>
@@ -69,6 +74,11 @@ const DirectoryTableRow = ({ file, onOpen }) => {
         </div>
       </td>
       <td></td>
+      {showLastModified && (
+        <td>
+          {file.lastModified != null && file.lastModified.toLocaleDateString()}
+        </td>
+      )}
       <td>
         <ul className="fr-btns-group fr-btns-group--inline fr-btns-group--sm">
           <li>
@@ -85,7 +95,7 @@ const DirectoryTableRow = ({ file, onOpen }) => {
   );
 };
 
-const RawDataTable = ({ service }) => {
+const RawDataTable = ({ service, showLastModified }) => {
   const [folder, setFolder] = useState([]);
   const [query, setQuery] = useState("");
   const queryClient = useQueryClient();
@@ -175,7 +185,10 @@ const RawDataTable = ({ service }) => {
         placeholder={window.gettext("Search files")}
       />
 
-      <table is="file-table" cols="name,size">
+      <table
+        is="file-table"
+        cols={`name,size${showLastModified ? ",lastModified" : ""}`}
+      >
         <thead>
           <tr>
             <th scope="col">
@@ -184,6 +197,11 @@ const RawDataTable = ({ service }) => {
             <th scope="col">
               <div className="text">{window.gettext("Size")}</div>
             </th>
+            {showLastModified && (
+              <th scope="col">
+                <div className="text">{window.gettext("Last modified")}</div>
+              </th>
+            )}
             <th scope="col"></th>
           </tr>
         </thead>
@@ -199,13 +217,20 @@ const RawDataTable = ({ service }) => {
               <td>
                 <div>&nbsp;</div>
               </td>
+              {showLastModified && (
+                <td>
+                  <div>&nbsp;</div>
+                </td>
+              )}
             </tr>
           )}
 
           {!isLoading &&
             (filteredFiles == null || filteredFiles.length <= 0) && (
               <tr className="no_data">
-                <td colSpan={3}>{window.gettext("No file yet")}</td>
+                <td colSpan={showLastModified ? 4 : 3}>
+                  {window.gettext("No file yet")}
+                </td>
               </tr>
             )}
 
@@ -218,10 +243,15 @@ const RawDataTable = ({ service }) => {
                     file={file}
                     onDelete={deleteFile}
                     onDownload={onDownloadFile}
+                    showLastModified={showLastModified}
                   />
                 )}
                 {file.type === "directory" && (
-                  <DirectoryTableRow file={file} onOpen={appendFolder} />
+                  <DirectoryTableRow
+                    file={file}
+                    onOpen={appendFolder}
+                    showLastModified={showLastModified}
+                  />
                 )}
               </React.Fragment>
             ))}
