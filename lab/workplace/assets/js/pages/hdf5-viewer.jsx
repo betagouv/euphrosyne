@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import { App, H5GroveProvider } from "@h5web/app";
 import { useLocation } from "react-router-dom";
-import { createRoot } from "react-dom/client";
+import ReactDom from "react-dom";
 import { getToken } from "../../../../assets/js/jwt";
 import "@h5web/app/styles.css";
 
@@ -54,9 +54,9 @@ function HDF5ViewerApp() {
 }
 
 const container = document.getElementById("root");
-const root = createRoot(container);
-root.render(
+ReactDom.render(
   <BrowserRouter>
     <HDF5ViewerApp />
-  </BrowserRouter>
+  </BrowserRouter>,
+  container
 );
