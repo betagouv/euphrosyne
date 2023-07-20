@@ -94,11 +94,11 @@ export default {
       EUPHROSYNE_TOOLS_API_URL: null,
     }),
     new MiniCssExtractPlugin(),
-    //new PurgeCSSPlugin({
-    //  paths: globSync([`{euphrosyne,euphro_auth,lab}/**/*`], {
-    //    nodir: true,
-    //    dotRelative: true,
-    //  }),
-    //}),
+    new PurgeCSSPlugin({
+      paths: globSync([`{euphrosyne,euphro_auth,lab}/**/*`], {
+        nodir: true,
+        dotRelative: true,
+      }),
+    }),
   ],
 };
