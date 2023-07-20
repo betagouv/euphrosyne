@@ -41,6 +41,14 @@ const ALLOWED_FILE_FORMATS = [
   "xlsx",
   "xml",
   "zip",
+  "par",
+  "nra",
+  "xnra",
+  "geo",
+  "str",
+  "spc",
+  "prf",
+  "tcn",
 ];
 
 export class DocumentUploadForm extends FileUploadForm {
