@@ -99,7 +99,15 @@ export default {
         nodir: true,
         dotRelative: true,
         ignore: {
-          ignored: (p) => /dist\/hdf5-viewer\.css/.test(p.fullpath()),
+          ignored: (p) => {
+            if (/hdf5-viewer\.css/.test(p.fullpath())) {
+              console.log("\n", p.fullpath());
+            }
+            if (/dist\/hdf5-viewer\.css/.test(p.fullpath())) {
+              console.log("PurgeCSS: found file to ignore");
+            }
+            return /dist\/hdf5-viewer\.css/.test(p.fullpath());
+          },
         },
       }),
     }),
