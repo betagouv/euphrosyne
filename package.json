@@ -47,7 +47,7 @@
     "source-map-loader": "^4.0.1",
     "webpack": "^5.88.1",
     "webpack-cli": "^5.1.4",
-    "whatwg-fetch": "^3.6.2"
+    "whatwg-fetch": "^3.6.17"
   },
   "eslintConfig": {
     "root": true,
