@@ -98,6 +98,9 @@ export default {
       paths: globSync([`{euphrosyne,euphro_auth,lab}/**/*`], {
         nodir: true,
         dotRelative: true,
+        ignore: {
+          ignored: (p) => /dist\/hdf5-viewer\.css/.test(p.fullpath()),
+        },
       }),
     }),
   ],
