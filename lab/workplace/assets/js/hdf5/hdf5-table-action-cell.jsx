@@ -22,16 +22,6 @@ export default function HDF5TableActionCell({ file, handlers: {}, projectId }) {
             {window.gettext("View")}
           </a>
         </li>
-
-        <li>
-          <button
-            className="delete-btn fr-btn fr-icon-delete-line fr-btn--secondary"
-            title={window.gettext("Delete file")}
-            onClick={clickDelete}
-          >
-            {window.gettext("Delete file")}
-          </button>
-        </li>
       </ul>
     </td>
   );

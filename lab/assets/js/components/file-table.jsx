@@ -44,7 +44,7 @@ export default function FileTable({
 
       <div className="fr-search-bar fr-mb-1w" role="search">
         <label className="fr-label" htmlFor="file-search">
-          Recherche
+          {window.gettext("Search files")}
         </label>
         <input
           className="fr-input"
@@ -105,6 +105,7 @@ export default function FileTable({
                     onDelete={onFileDelete}
                     onDownload={onFileDownload}
                     renderActionsCellFn={renderActionsCellFn}
+                    cols={cols}
                   />
                 )}
                 {file.type === "directory" && (
