@@ -4,8 +4,10 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 
 import { ProcessedDataFileService } from "../processed-data/processed-data-file-service";
 import { RawDataFileService } from "../raw-data/raw-data-file-service";
+import { HDF5FileService } from "../hdf5/hdf5-file-service";
 
-import FileTable from "../../../../assets/js/components/file-table.jsx";
+import FileManager from "../../../../assets/js/components/file-manager.jsx";
+import HDF5TableActionCell from "../hdf5/hdf5-table-action-cell.jsx";
 
 const queryClient = new QueryClient();
 
@@ -15,6 +17,7 @@ const RunTabPanel = ({ run, idx }) => {
     window.projectSlug,
     run.name
   );
+  const hdf5Service = new HDF5FileService(window.projectSlug, run.name);
 
   return (
     <div
@@ -27,21 +30,37 @@ const RunTabPanel = ({ run, idx }) => {
       <div className="fr-grid-now fr-grid-now--gutters">
         <div className="fr-col-12">
           <div className="fr-background-default--grey fr-p-3v">
-            <h3>HDF5</h3>
+            <FileManager
+              title="HDF5"
+              fileService={hdf5Service}
+              cols={["name", "size"]}
+              enableFormUpload={false}
+              renderActionsCellFn={(file) => (
+                <HDF5TableActionCell file={file} projectId={window.projectId} />
+              )}
+            />
           </div>
         </div>
       </div>
       <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-12 fr-col-lg-6">
           <div className="fr-background-default--grey fr-p-3v">
-            <h3>{window.gettext("Raw data")}</h3>
-            <FileTable service={rawService} cols={["name", "size"]} />
+            <FileManager
+              title={window.gettext("Raw data")}
+              fileService={rawService}
+              cols={["name", "size"]}
+              enableFormUpload={false}
+            />
           </div>
         </div>
         <div className="fr-col-12 fr-col-lg-6">
           <div className="fr-background-default--grey fr-p-3v">
-            <h3>{window.gettext("Processed data")}</h3>
-            <FileTable service={processedService} cols={["name", "size"]} />
+            <FileManager
+              title={window.gettext("Processed data")}
+              fileService={processedService}
+              cols={["name", "size"]}
+              enableFormUpload={false}
+            />
           </div>
         </div>
       </div>

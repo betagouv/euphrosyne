@@ -18,14 +18,8 @@
 
 
 <div id="content-main">
-    <ul class="messagelist"></ul>
-    {% include "components/file_upload_form.html" with component=document_upload_form %}
-    <div class="documents-wrapper">
-        <h2>{% translate 'Documents' %}</h2>
-        <div>
-            {% include "components/file_table.html" with component=file_table %}
-        </div>
-    </div>
+    <div id="project-documents"
+         file-upload-form-attrs='{{ document_upload_form }}'></div>
 </div>
 <script src="{% url 'javascript-catalog' %}"></script>
 <script>

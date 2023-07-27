@@ -1,76 +1,26 @@
-import React, { useState, useMemo } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import Fuse from "fuse.js";
+import React from "react";
 
 import DirectoryTableRow from "./directory-table-row.jsx";
 import FileTableRow from "./file-table-row.jsx";
-import { displayMessage } from "../utils.js";
 
 export default function FileTable({
-  service,
+  files,
+  loading,
+  onFileSearch,
+  onFileDelete,
+  onFileDownload,
+  folder,
+  setFolder,
+  searchQuery,
   cols = ["name", "lastModified", "size"],
+  renderActionsCellFn = null,
 }) {
-  const [folder, setFolder] = useState([]);
-  const [query, setQuery] = useState("");
-  const queryClient = useQueryClient();
-  const { isLoading, data: files } = useQuery(
-    ["fetch-raw-data", service.listFileURL, folder],
-    async () => {
-      const files = await service.listData(folder.join("/"));
-      return files;
-    },
-    { refetchOnMount: false, refetchOnReconnect: false }
-  );
-
-  const { mutate: deleteFile } = useMutation(
-    (file) => service.deleteFile(file.path),
-    {
-      onSuccess: (_data, variable) => {
-        queryClient.invalidateQueries(["fetch-raw-data", service.listFileURL]);
-        displayMessage(
-          window.interpolate(window.gettext("File %s has been removed."), [
-            variable.name,
-          ]),
-          "success"
-        );
-      },
-      onError: (_error, variable) => {
-        displayMessage(
-          window.interpolate(window.gettext("File %s could not be removed."), [
-            variable.name,
-          ]),
-          "error"
-        );
-      },
-    }
-  );
-
-  const fuse = useMemo(() => {
-    return new Fuse(files, {
-      includeScore: true,
-      keys: ["name"],
-    });
-  }, [files]);
-
-  const filteredFiles = useMemo(() => {
-    if (query === "") {
-      return files;
-    }
-
-    return fuse.search(query).map((i) => i.item);
-  }, [fuse, query]);
-
   const appendFolder = (name) => {
     setFolder((prev) => [...prev, name]);
   };
 
   const removeLastFolder = () => {
     setFolder((prev) => prev.slice(0, -1));
-  };
-
-  const onDownloadFile = async (file) => {
-    const url = await service.fetchPresignedURL(file.path);
-    window.open(url, "_blank");
   };
 
   return (
@@ -91,15 +41,23 @@ export default function FileTable({
           <div>/{folder.join("/")}</div>
         </div>
       )}
-      <input
-        className="fr-input fr-mb-1w"
-        name="query"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder={window.gettext("Search files")}
-      />
 
-      <table is="file-table" cols="name,size">
+      <div className="fr-search-bar fr-mb-1w" role="search">
+        <label className="fr-label" htmlFor="file-search">
+          Recherche
+        </label>
+        <input
+          className="fr-input"
+          placeholder={window.gettext("Search files")}
+          type="search"
+          id="file-search"
+          value={searchQuery}
+          onChange={onFileSearch}
+          name="query"
+        />
+      </div>
+
+      <table class="file-table" is="file-table" cols="name,size">
         <thead>
           <tr>
             {cols.includes("name") && (
@@ -121,7 +79,7 @@ export default function FileTable({
           </tr>
         </thead>
         <tbody>
-          {isLoading && (
+          {loading && (
             <tr className="loading">
               {Array.from(Array(cols.length + 1)).map((_, idx) => (
                 <td key={idx}>
@@ -131,22 +89,22 @@ export default function FileTable({
             </tr>
           )}
 
-          {!isLoading &&
-            (filteredFiles == null || filteredFiles.length <= 0) && (
-              <tr className="no_data">
-                <td colSpan={cols.length}>{window.gettext("No file yet")}</td>
-              </tr>
-            )}
+          {!loading && (files == null || files.length <= 0) && (
+            <tr className="no_data">
+              <td colSpan={cols.length}>{window.gettext("No file yet")}</td>
+            </tr>
+          )}
 
-          {!isLoading &&
-            filteredFiles != null &&
-            filteredFiles.map((file) => (
+          {!loading &&
+            files != null &&
+            files.map((file) => (
               <React.Fragment key={file.name}>
                 {file.type === "file" && (
                   <FileTableRow
                     file={file}
-                    onDelete={deleteFile}
-                    onDownload={onDownloadFile}
+                    onDelete={onFileDelete}
+                    onDownload={onFileDownload}
+                    renderActionsCellFn={renderActionsCellFn}
                   />
                 )}
                 {file.type === "directory" && (
