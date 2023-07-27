@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import DirectoryTableRow from "./directory-table-row.jsx";
 import FileTableRow from "./file-table-row.jsx";
+import FileTablePagination from "./file-table-pagination.jsx";
 
 export default function FileTable({
   files,
@@ -22,6 +23,17 @@ export default function FileTable({
   const removeLastFolder = () => {
     setFolder((prev) => prev.slice(0, -1));
   };
+
+  let pages = files ? Math.ceil(files.length / 50) : 1;
+  const [currentPage, setPage] = useState(1);
+
+  const displayedFiles =
+    pages === 1 ? files : files.slice(50 * (currentPage - 1), 50 * currentPage);
+
+  useEffect(() => {
+    pages = files ? Math.ceil(files.length / 50) : 1;
+    setPage(1);
+  }, [files]);
 
   return (
     <div>
@@ -97,7 +109,7 @@ export default function FileTable({
 
           {!loading &&
             files != null &&
-            files.map((file) => (
+            displayedFiles.map((file) => (
               <React.Fragment key={file.name}>
                 {file.type === "file" && (
                   <FileTableRow
@@ -119,6 +131,13 @@ export default function FileTable({
             ))}
         </tbody>
       </table>
+      {pages > 1 && (
+        <FileTablePagination
+          currentPage={currentPage}
+          setPage={setPage}
+          pages={pages}
+        />
+      )}
     </div>
   );
 }
