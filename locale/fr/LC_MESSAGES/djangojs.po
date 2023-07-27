@@ -122,3 +122,6 @@ msgstr "Une erreur s'est produite lors de la suppression du bureau distant."
 
 msgid "The virtual office has been deleted."
 msgstr "Le bureau virtuel a bien été supprimé."
+
+msgid "View"
+msgstr "Voir"

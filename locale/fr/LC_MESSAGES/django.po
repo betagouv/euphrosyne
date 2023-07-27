@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-14 16:59+0200\n"
+"POT-Creation-Date: 2023-07-20 11:18+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -340,6 +340,9 @@ msgstr "Choix de filtre invalide"
 
 msgid "Only Admin users might rewind runs."
 msgstr "Seuls les utilisateurs Admin peuvent remettre un run en arrière."
+
+msgid "HDF5 Viewer"
+msgstr "Visionneur HDF5"
 
 msgid "{} analysis technique"
 msgstr "technique d'analyse {}"

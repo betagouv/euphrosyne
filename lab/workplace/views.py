@@ -1,3 +1,4 @@
+import os
 from typing import Any, Dict
 
 from django.contrib.admin import site
@@ -45,6 +46,12 @@ class WorkplaceView(ProjectMembershipRequiredMixin, TemplateView):
                         "id": f"run-{id}-processed-data-upload-form",
                         "project-id": self.project.id,
                     }
+                },
+                "hdf5_table": {
+                    "attrs": {
+                        "id": f"run-{id}-hdf5-table",
+                        "h5webapp-host": os.getenv("H5WEBAPP_URL"),
+                    },
                 },
             }
             for (id, label) in self.project.runs.values_list("id", "label")
