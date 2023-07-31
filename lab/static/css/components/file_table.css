@@ -39,3 +39,6 @@
 .file-table td.file-name-cell {
   word-break: break-word;
 }
+.file-table .directory-row a{
+  font-size: 0.8125rem;
+}

@@ -1,27 +1,25 @@
 import React from "react";
 
 export default function DirectoryTableRow({ file, onOpen, cols }) {
+  const onDirClick = (e) => {
+    e.preventDefault();
+    onOpen(file.name);
+  };
   return (
-    <tr key={file.name}>
+    <tr key={file.name} className="directory-row">
       <td>
         <div>
           <span className="fr-icon-folder-2-fill fr-icon--sm fr-mr-1w" />
-          {file.name}
+          <a
+            className="fr-link fr-icon-arrow-right-line fr-link--icon-right"
+            href="#"
+            onClick={onDirClick}
+          >
+            {file.name}
+          </a>
         </div>
       </td>
-      <td colSpan={cols.length - 1}></td>
-      <td>
-        <ul className="fr-btns-group fr-btns-group--inline fr-btns-group--sm">
-          <li>
-            <button
-              className="fr-btn fr-icon-arrow-right-line fr-btn--secondary"
-              onClick={() => onOpen(file.name)}
-            >
-              Open
-            </button>
-          </li>
-        </ul>
-      </td>
+      <td colSpan={cols.length}></td>
     </tr>
   );
 }
