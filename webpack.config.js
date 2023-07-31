@@ -6,7 +6,7 @@ import { dirname } from "path";
 
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
-import { PurgeCSSPlugin } from "purgecss-webpack-plugin";
+// import { PurgeCSSPlugin } from "purgecss-webpack-plugin";
 import webpack from "webpack";
 export default {
   entry: {
@@ -94,22 +94,22 @@ export default {
       EUPHROSYNE_TOOLS_API_URL: null,
     }),
     new MiniCssExtractPlugin(),
-    new PurgeCSSPlugin({
-      paths: globSync([`{euphrosyne,euphro_auth,lab}/**/*`], {
-        nodir: true,
-        dotRelative: true,
-        ignore: {
-          ignored: (p) => {
-            if (/hdf5-viewer\.css/.test(p.fullpath())) {
-              console.log("\n", p.fullpath());
-            }
-            if (/dist\/hdf5-viewer\.css/.test(p.fullpath())) {
-              console.log("PurgeCSS: found file to ignore");
-            }
-            return /dist\/hdf5-viewer\.css/.test(p.fullpath());
-          },
-        },
-      }),
-    }),
+    // new PurgeCSSPlugin({
+    //   paths: globSync([`{euphrosyne,euphro_auth,lab}/**/*`], {
+    //     nodir: true,
+    //     dotRelative: true,
+    //     ignore: {
+    //       ignored: (p) => {
+    //         if (/hdf5-viewer\.css/.test(p.fullpath())) {
+    //           console.log("\n", p.fullpath());
+    //         }
+    //         if (/dist\/hdf5-viewer\.css/.test(p.fullpath())) {
+    //           console.log("PurgeCSS: found file to ignore");
+    //         }
+    //         return /dist\/hdf5-viewer\.css/.test(p.fullpath());
+    //       },
+    //     },
+    //   }),
+    // }),
   ],
 };
