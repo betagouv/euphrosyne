@@ -13,7 +13,7 @@ python-dotenv==1.0.0
 python3-openid==3.2.0
 python-slugify==8.0.1
 pyyaml==6.0.1
-sentry-sdk==1.30.0
+sentry-sdk==1.31.0
 social-auth-app-django==5.3.0
 wheel==0.41.2
 whitenoise==6.5.0
