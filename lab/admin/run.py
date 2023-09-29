@@ -4,6 +4,8 @@ from typing import Any, List, Optional, Tuple, Type, Union
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import InlineModelAdmin
+from django.contrib.admin.views.main import ChangeList
+from django.core.exceptions import PermissionDenied
 from django.db.models.query import QuerySet
 from django.forms import ModelForm
 from django.http.request import HttpRequest
@@ -68,6 +70,19 @@ class ObjectGroupInline(admin.TabularInline):
         return super().get_formset(
             request, obj=obj, formfield_callback=self.formfield_callback, **kwargs
         )
+
+
+class RunChangeList(ChangeList):
+    def get_queryset(self, request):
+        remaining_lookup_params = self.get_filters(request)[2]
+        if "project" in remaining_lookup_params and not (
+            is_lab_admin(request.user)
+            or Project.objects.filter(
+                id=remaining_lookup_params["project"], members__id=request.user.id
+            ).exists()
+        ):
+            raise PermissionDenied
+        return super().get_queryset(request)
 
 
 @admin.register(Run)
@@ -149,6 +164,9 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
             readonly_fields += ("start_date", "end_date")
 
         return readonly_fields
+
+    def get_changelist(self, request, **kwargs):
+        return RunChangeList
 
     def get_inlines(
         self, request: HttpRequest, obj: Optional[Run] = None
