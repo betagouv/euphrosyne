@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-14 16:59+0200\n"
+"POT-Creation-Date: 2023-09-29 15:05+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -341,6 +341,9 @@ msgstr "Choix de filtre invalide"
 msgid "Only Admin users might rewind runs."
 msgstr "Seuls les utilisateurs Admin peuvent remettre un run en arrière."
 
+msgid "HDF5 Viewer"
+msgstr "Visualiseur HDF5"
+
 msgid "{} analysis technique"
 msgstr "technique d'analyse {}"
 
@@ -661,9 +664,6 @@ msgstr "Ajouter des fichiers"
 msgid "Upload"
 msgstr "Téléverser"
 
-msgid "Documents"
-msgstr "Documents"
-
 msgid "Other"
 msgstr "Autre"
 
@@ -729,15 +729,6 @@ msgstr "Utilisé pour déterminer la taille de la machine virtuelle."
 msgid "Delete virtual office"
 msgstr "Supprimer le bureau virtuel"
 
-msgid "Runs data"
-msgstr "Données des runs"
-
-msgid "Raw data"
-msgstr "Données brutes"
-
-msgid "Processed data"
-msgstr "Données travaillées"
-
 msgid "Dashboard"
 msgstr ""
 
@@ -749,6 +740,9 @@ msgstr "Invitations"
 
 msgid "Run(s)"
 msgstr "Run(s)"
+
+msgid "Documents"
+msgstr "Documents"
 
 msgid "Workplace"
 msgstr "Workplace"
