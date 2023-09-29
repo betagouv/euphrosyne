@@ -1,7 +1,9 @@
 from unittest.mock import MagicMock, patch
 
+import pytest
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
@@ -224,6 +226,25 @@ class TestRunAdminViewAsLeader(TestCase):
             run.project.name, form.initial["label"], "new-run-name"
         )
 
+    def test_change_list_view_with_project_lookup_when_project_member(self):
+        """Calling changelist_view with a project member should return ok"""
+        request = self.request_factory.get(
+            reverse("admin:lab_run_changelist") + f"?project={self.project.id}"
+        )
+        request.user = self.project_leader_user
+        admin = RunAdmin(Run, admin_site=AdminSite())
+        assert admin.changelist_view(request)
+
+    def test_change_list_view_with_project_lookup_when_not_project_member(self):
+        """Calling changelist_view with a non-project member should return 403"""
+        request = self.request_factory.get(
+            reverse("admin:lab_run_changelist") + f"?project={self.project.id}"
+        )
+        request.user = self.staff_user
+        admin = RunAdmin(Run, admin_site=AdminSite())
+        with pytest.raises(PermissionDenied):
+            admin.changelist_view(request)
+
 
 class TestRunAdminViewAsAdmin(TestCase):
     def setUp(self):
@@ -259,6 +280,16 @@ class TestRunAdminViewAsAdmin(TestCase):
             }
         )
         assert "project" not in form.fields
+
+    def test_change_list_view_with_project_lookup_when_admin(self):
+        """Calling changelist_view with an admin should return ok"""
+        project = factories.ProjectFactory()
+        request = self.request_factory.get(
+            reverse("admin:lab_run_changelist") + f"?project={project.id}"
+        )
+        request.user = self.admin_user
+        admin = RunAdmin(Run, admin_site=AdminSite())
+        assert admin.changelist_view(request)
 
 
 class TestRunAdminMethodFieldset(TestCase):
