@@ -1,5 +1,20 @@
 {% extends "admin/base_site.html" %}
+{% load static %}
 
 {% block content %}
-{{ content | safe }}
+<div class="fr-container">
+    <div class="fr-row">
+        <div class="fr-col-md-8">
+            {% block breadcrumbs %}
+            {{ content | safe }}
+            {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrastyle %}
+<link rel="stylesheet" type="text/css" href="{% static "css/static-pages.css" %}">
+{{ block.super }}
+{{ form.media }}
 {% endblock %}
