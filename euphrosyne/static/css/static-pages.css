@@ -1,0 +1,13 @@
+#container {
+  min-height: 500px
+}
+
+li {
+  font-size: inherit;
+  line-height: inherit;
+  list-style-type: inherit;
+}
+
+code {
+  font-size: inherit;
+}

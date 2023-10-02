@@ -49,3 +49,20 @@ def legal_notice_view(request, html):
 @static_page(Path(__file__).resolve().parent / "pages/personal_data.md")
 def personal_data_view(request, html):
     return StaticPageResponse(request, _("Personal data and cookies"), html)
+
+
+@static_page(Path(__file__).resolve().parent / "pages/accessibility_declaration.md")
+def accessibility_declaration_view(request, html):
+    return StaticPageResponse(request, _("Accessibility declaration"), html)
+
+
+@static_page(
+    Path(__file__).resolve().parent / "pages/accessibility_multiyear_schema.md"
+)
+def accessibility_multiyear_schema_view(request, html):
+    return StaticPageResponse(request, _("Accessibility multi-year schema"), html)
+
+
+@static_page(Path(__file__).resolve().parent / "pages/accessibility_map.md")
+def accessibility_map_view(request, html):
+    return StaticPageResponse(request, _("Site map"), html)

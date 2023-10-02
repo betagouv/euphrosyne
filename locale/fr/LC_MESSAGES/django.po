@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-14 16:59+0200\n"
+"POT-Creation-Date: 2023-10-02 16:39+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -180,7 +180,7 @@ msgid "End-user license agreement"
 msgstr "Conditions générales d'utilisation"
 
 msgid "Legal notice"
-msgstr "Notions légales"
+msgstr "Mentions légales"
 
 msgid "Personal data and cookies"
 msgstr "Données personnelles et cookies"
@@ -769,3 +769,12 @@ msgstr "Modifié"
 
 msgid "Date this entry was most recently changed."
 msgstr "Date de la dernière modification de cette entrée"
+
+msgid "Accessibility declaration"
+msgstr "Déclaration d'accessibilité"
+
+msgid "Accessibility multi-year schema"
+msgstr "Schéma pluriannuel d’accessibilité"
+
+msgid "Site map"
+msgstr "Plan du site"
