@@ -9,6 +9,7 @@ import { initProcessedData } from "../processed-data/index.js";
 import VirtualOfficeButton from "../components/virtual-office-button.js";
 import VirtualOfficeDelteButton from "../components/virtual-office-delete-button.js";
 import VMSizeSelect from "../components/vm-size-select.js";
+import downloadRunData from "../../../../assets/js/run-data-downloader.js";
 
 FileTable.init();
 FileUploadForm.init();
@@ -18,3 +19,13 @@ VMSizeSelect.init();
 
 initRawData();
 initProcessedData();
+
+document.querySelectorAll(".run-data-download-btn").forEach((btn) => {
+  btn.addEventListener("click", async (e) => {
+    downloadRunData(
+      window.projectSlug,
+      e.target.dataset.runName,
+      e.target.dataset.runDataType
+    );
+  });
+});
