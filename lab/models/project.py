@@ -14,6 +14,13 @@ from ..validators import valid_filename
 from .participation import Participation
 
 
+class ProjectManager(models.Manager):
+    def only_finished(self):
+        return (
+            super().get_queryset().filter(runs__end_date__lt=timezone.now()).distinct()
+        )
+
+
 class Project(TimestampedModel):
     """A project is a collection of runs done by the same team"""
 
@@ -26,6 +33,8 @@ class Project(TimestampedModel):
     class Meta:
         verbose_name = _("Project")
         verbose_name_plural = _("Projects")
+
+    objects = ProjectManager()
 
     name = models.CharField(
         _("Project name"), max_length=255, unique=True, validators=[valid_filename]
