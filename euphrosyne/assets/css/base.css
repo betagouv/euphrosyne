@@ -188,6 +188,9 @@ ul li {
 .fr-tag.finished {
   background: var(--background-contrast-blue-ecume);
 }
+.fr-tag.data_available {
+  background: var(--background-contrast-purple-glycine);
+}
 
 .delete-confirmation form .button.cancel-link {
   height: unset;
