@@ -30,7 +30,8 @@ class Command(BaseCommand):
                 )
                 if not response.ok:
                     self.stderr.write(
-                        "[data availability] Failed to check project %s.\n\tReason : [%s] %s"
+                        "[data availability] Failed to check project %s.\
+                            \n\tReason : [%s] %s"
                         % (
                             project.name,
                             response.status_code,
