@@ -56,6 +56,12 @@ class Project(TimestampedModel):
 
     comments = models.TextField(_("Comments"), blank=True)
 
+    is_data_available = models.BooleanField(
+        _("Data available"),
+        default=False,
+        help_text=_("Has at least one run with data available."),
+    )
+
     def __str__(self):
         return f"{self.name}"
 
