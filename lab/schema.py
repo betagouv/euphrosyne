@@ -9,7 +9,13 @@ from .models import ObjectGroup, Project
 class ProjectType(DjangoObjectType):
     class Meta:
         model = Project
-        fields = ("name", "problem_statement", "status", "comments")
+        fields = (
+            "name",
+            "problem_statement",
+            "status",
+            "comments",
+            "is_data_available",
+        )
 
     object_group_labels = graphene.List(graphene.String)
     status = graphene.String()
