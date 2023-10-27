@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "social_django",
     "rest_framework",
+    "graphene_django",
     "django_filters",
     "lab",
     "orcid_oauth",
@@ -306,3 +307,5 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     )
 }
+
+GRAPHENE = {"SCHEMA": "lab.schema.schema"}
