@@ -3,6 +3,10 @@
     {
       "command": "0 20 * * 1 python manage.py finish_runs",
       "size": "S"
+    },
+    {
+      "command": "0 */6 * * * python manage.py check_project_data_availability",
+      "size": "S"
     }
   ]
 }
