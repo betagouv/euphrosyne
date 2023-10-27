@@ -29,6 +29,7 @@ class Project(TimestampedModel):
         SCHEDULED = 11, _("Scheduled")
         ONGOING = 21, _("Ongoing")
         FINISHED = 31, _("Finished")
+        DATA_AVAILABLE = 41, _("Data available")
 
     class Meta:
         verbose_name = _("Project")
@@ -74,6 +75,8 @@ class Project(TimestampedModel):
 
     @property
     def status(self) -> Status:
+        if self.is_data_available:
+            return self.Status.DATA_AVAILABLE
         runs_with_start_date = self.runs.filter(start_date__isnull=False).values(
             "start_date", "end_date"
         )

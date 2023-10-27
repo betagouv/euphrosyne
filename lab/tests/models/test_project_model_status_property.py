@@ -30,3 +30,7 @@ class TestProjectModel(TestCase):
             end_date=timezone.now() - timezone.timedelta(days=1),
         )
         assert run.project.status == Project.Status.FINISHED
+
+    def test_status_is_data_available(self):
+        project = factories.ProjectFactory(is_data_available=True)
+        assert project.status == Project.Status.DATA_AVAILABLE
