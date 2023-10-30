@@ -14,7 +14,6 @@ class ProjectType(DjangoObjectType):
             "problem_statement",
             "status",
             "comments",
-            "is_data_available",
         )
 
     object_group_labels = graphene.List(graphene.String)

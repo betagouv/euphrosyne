@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-27 17:37+0200\n"
+"POT-Creation-Date: 2023-10-27 18:03+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -374,6 +374,9 @@ msgstr "En cours"
 msgid "Finished"
 msgstr "Terminé"
 
+msgid "Data available"
+msgstr "Données disponibles"
+
 msgid "Project name"
 msgstr "Nom du projet"
 
@@ -388,9 +391,6 @@ msgstr "Administrateur"
 
 msgid "Comments"
 msgstr "Commentaires"
-
-msgid "Data available"
-msgstr "Données disponibles"
 
 msgid "Has at least one run with data available."
 msgstr "A au moins un run avec des données disponibles."
