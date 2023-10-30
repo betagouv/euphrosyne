@@ -9,6 +9,6 @@ mypy==1.6.1
 pylint-django==2.5.4
 pylint==3.0.2
 pytest-django==4.5.2
-pytest==7.4.2
+pytest==7.4.3
 pytest-dotenv==0.5.2
 raincoat==1.2.4
