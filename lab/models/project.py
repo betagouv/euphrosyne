@@ -16,9 +16,7 @@ from .participation import Participation
 
 class ProjectManager(models.Manager):
     def only_finished(self):
-        return (
-            super().get_queryset().filter(runs__end_date__lt=timezone.now()).distinct()
-        )
+        return super().get_queryset().filter(runs__end_date__lt=timezone.now())
 
 
 class Project(TimestampedModel):
@@ -69,7 +67,9 @@ class Project(TimestampedModel):
     @property
     def leader(self) -> Optional["Participation"]:
         try:
-            return self.participation_set.get(is_leader=True)
+            return self.participation_set.select_related("user", "institution").get(
+                is_leader=True
+            )
         except Participation.DoesNotExist:
             return None
 

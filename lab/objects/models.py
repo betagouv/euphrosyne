@@ -2,8 +2,10 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from shared.models import TimestampedModel
 
-class ObjectGroup(models.Model):
+
+class ObjectGroup(TimestampedModel):
     c2rmf_id = models.CharField(
         _("C2RMF ID"),
         max_length=255,
