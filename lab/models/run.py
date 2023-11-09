@@ -1,10 +1,16 @@
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from shared.models import TimestampedModel
 
 from ..methods import MethodModel
 from ..validators import valid_filename
+
+
+class RunManager(models.Manager):
+    def only_finished(self):
+        return super().get_queryset().filter(end_date__lt=timezone.now())
 
 
 class Run(TimestampedModel, MethodModel):
@@ -25,6 +31,8 @@ class Run(TimestampedModel, MethodModel):
         PROTON = "Proton", _("Proton")
         ALPHA = "Alpha particle", _("Alpha particle")
         DEUTON = "Deuton", _("Deuton")
+
+    objects = RunManager()
 
     project = models.ForeignKey(
         "lab.Project",
