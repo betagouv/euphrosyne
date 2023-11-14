@@ -47,6 +47,18 @@ class ProjectWithLeaderFactory(ProjectFactory):
     )
 
 
+class FinishedProject(ProjectFactory):
+    @factory.post_generation
+    def runs(self, create, *args, **kwargs):
+        if not create:
+            return
+        RunFactory(
+            project=self,
+            start_date=NOW - timedelta(days=2),
+            end_date=NOW - timedelta(days=1),
+        )
+
+
 class ProjectWithMultipleParticipationsFactory(ProjectWithLeaderFactory):
     member_1 = factory.RelatedFactory(
         ParticipationFactory, factory_related_name="project", is_leader=False

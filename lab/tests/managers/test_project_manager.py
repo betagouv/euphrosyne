@@ -20,6 +20,6 @@ class ProjectModelTestCase(TestCase):
         self.assertEqual(Project.objects.only_finished().count(), 1)
 
     def test_project_only_public(self):
-        Project.objects.create(name="Public Project", confifdential=False)
-        Project.objects.create(name="Confidential Project", confifdential=True)
+        Project.objects.create(name="Public Project", confidential=False)
+        Project.objects.create(name="Confidential Project", confidential=True)
         self.assertEqual(Project.objects.only_public().count(), 1)

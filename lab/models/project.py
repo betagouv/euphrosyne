@@ -14,12 +14,23 @@ from ..validators import valid_filename
 from .participation import Participation
 
 
-class ProjectManager(models.Manager):
+class ProjectQuerySet(models.QuerySet):
     def only_finished(self):
-        return super().get_queryset().filter(runs__end_date__lt=timezone.now())
+        return self.filter(runs__end_date__lt=timezone.now())
 
     def only_public(self):
-        return super().get_queryset().filter(confifdential=False)
+        return self.filter(confidential=False)
+
+
+class ProjectManager(models.Manager):
+    def get_queryset(self):
+        return ProjectQuerySet(self.model, using=self._db)
+
+    def only_finished(self):
+        return self.get_queryset().only_finished()
+
+    def only_public(self):
+        return self.get_queryset().only_public()
 
 
 class Project(TimestampedModel):
