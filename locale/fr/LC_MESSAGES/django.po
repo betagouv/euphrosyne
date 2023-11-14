@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-27 18:03+0200\n"
+"POT-Creation-Date: 2023-11-14 11:06+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -382,6 +382,14 @@ msgstr "Nom du projet"
 
 msgid "Project name slug"
 msgstr "Slug du projet"
+
+msgid "Confidential"
+msgstr "Confidentiel"
+
+msgid ""
+"Mark this project as confidential. This will hide it from external servicecs "
+"(Euphrosyne Diglab, ...)."
+msgstr ""
 
 msgid "Members"
 msgstr "Membres"

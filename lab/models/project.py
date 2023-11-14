@@ -18,6 +18,9 @@ class ProjectManager(models.Manager):
     def only_finished(self):
         return super().get_queryset().filter(runs__end_date__lt=timezone.now())
 
+    def only_public(self):
+        return super().get_queryset().filter(confifdential=False)
+
 
 class Project(TimestampedModel):
     """A project is a collection of runs done by the same team"""
@@ -40,6 +43,14 @@ class Project(TimestampedModel):
     )
 
     slug = models.CharField(_("Project name slug"), max_length=255, unique=True)
+
+    confidential = models.BooleanField(
+        _("Confidential"),
+        default=False,
+        help_text=_(
+            "Mark this project as confidential. This will hide it from external servicecs (Euphrosyne Diglab, ...)."
+        ),
+    )
 
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL, through="lab.Participation", verbose_name=_("Members")
