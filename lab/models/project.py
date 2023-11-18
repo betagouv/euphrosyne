@@ -59,7 +59,8 @@ class Project(TimestampedModel):
         _("Confidential"),
         default=False,
         help_text=_(
-            "Mark this project as confidential. This will hide it from external servicecs (Euphrosyne Diglab, ...)."
+            "Mark this project as confidential. "
+            "This will hide it from external servicecs (Euphrosyne Diglab, ...)."
         ),
     )
 
