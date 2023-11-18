@@ -50,6 +50,7 @@ def get_empty_beam_time_request_post_data(project_id: int):
 
 
 class BaseTestCases:
+    # pylint: disable=too-many-instance-attributes
     class BaseTestProjectAdmin(TestCase):
         def setUp(self):
             self.client = Client()
