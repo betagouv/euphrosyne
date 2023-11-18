@@ -175,7 +175,12 @@ class Query(graphene.ObjectType):
     object_group_detail = graphene.Field(ObjectGroupType, pk=graphene.String())
 
     def resolve_last_projects(self, info, limit=None):
-        projects = Project.objects.only_finished().order_by("-created").distinct()
+        projects = (
+            Project.objects.only_finished()
+            .only_public()
+            .order_by("-created")
+            .distinct()
+        )
         if limit:
             projects = projects[:limit]
         return projects
