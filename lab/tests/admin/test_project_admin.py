@@ -8,6 +8,7 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 
 from euphro_auth.models import User
+from lab.tests.factories import ProjectFactory
 
 from ...admin.project import BeamTimeRequestInline, ParticipationInline, ProjectAdmin
 from ...models import Institution, Participation, Project
@@ -66,6 +67,12 @@ class BaseTestCases:
                 name="Louvre", country="France"
             )
 
+            self.change_project = ProjectFactory()
+            self.project_admin = ProjectAdmin(model=Project, admin_site=AdminSite())
+            self.change_request = RequestFactory().get(
+                reverse("admin:lab_project_change", args=[self.change_project.id])
+            )
+
 
 class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
     def setUp(self):
@@ -77,6 +84,7 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
             is_staff=True,
         )
         self.client.force_login(self.admin_user)
+        self.change_request.user = self.admin_user
 
     def test_add_project_form_has_leader_hidden_input(self):
         response = self.client.get(self.add_view_url)
@@ -102,11 +110,9 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
             },
         )
         assert response.status_code == 302
-        assert Project.objects.all().count() == 1
-        assert Project.objects.all()[0].name == "some project name"
-        assert (
-            Project.objects.all()[0].leader.user_id == self.project_participant_user.id
-        )
+        project = Project.objects.filter(name="some project name").first()
+        assert project
+        assert project.leader.user == self.project_participant_user
 
     def test_add_project_set_admin_as_admin(self):
         project = Project.objects.create(name="some project name")
@@ -127,23 +133,28 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         assert "other project 2" in response.content.decode()
 
     def test_participation_inline_is_present_in_changeview(self):
-        project = Project.objects.create(name="some project name")
-        change_view_url = reverse("admin:lab_project_change", args=[project.id])
-        request = self.request_factory.get(change_view_url)
-        request.user = self.admin_user
-        inlines = ProjectAdmin(Project, admin_site=AdminSite()).get_inlines(
-            request, project
+        inlines = self.project_admin.get_inlines(
+            self.change_request, self.change_project
         )
         assert ParticipationInline in inlines
 
     def test_name_is_readonly_when_change(self):
-        project = Project.objects.create(name="project")
-        project_admin = ProjectAdmin(model=Project, admin_site=AdminSite())
-        request = RequestFactory().get(
-            reverse("admin:lab_project_change", args=[project.id])
+        assert "name" in self.project_admin.get_readonly_fields(
+            self.change_request, self.change_project
         )
-        request.user = self.admin_user
-        assert "name" in project_admin.get_readonly_fields(request, self.run)
+
+    def test_add_project_form_has_confidential_checkbox(self):
+        response = self.client.get(self.add_view_url)
+        assert (
+            '<input type="checkbox" name="confidential" id="id_confidential">'
+            in response.content.decode()
+        )
+
+    def test_change_project_form_has_confidential_checkbox(self):
+        fieldsets = self.project_admin.get_fieldsets(
+            self.change_request, self.change_project
+        )
+        assert "confidential" in fieldsets[0][1]["fields"]
 
 
 class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
@@ -154,27 +165,37 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
             password="leader",
             is_staff=True,
         )
-        self.project = Project.objects.create(name="some project name")
-        self.leader_participation = self.project.participation_set.create(
+        self.leader_participation = self.change_project.participation_set.create(
             user=self.project_leader, is_leader=True, institution=self.base_institution
         )
         self.client.force_login(self.project_leader)
-        self.change_view_url = reverse(
-            "admin:lab_project_change", args=[self.project.id]
-        )
+        self.change_request.user = self.project_leader
 
     def test_participation_inline_is_present_in_changeview(self):
-        request = self.request_factory.get(self.change_view_url)
-        request.user = self.project_leader
-        inlines = ProjectAdmin(Project, admin_site=AdminSite()).get_inlines(
-            request, self.project
+        inlines = self.project_admin.get_inlines(
+            self.change_request, self.change_project
         )
         assert ParticipationInline in inlines
 
     def test_change_leader_link_is_hidden(self):
-        response = self.client.get(self.change_view_url)
+        response = self.client.get(
+            reverse("admin:lab_project_change", args=[self.change_project.id])
+        )
 
         assert "change-leader-link" not in response.content.decode()
+
+    def test_add_project_form_has_not_confidential_checkbox(self):
+        response = self.client.get(self.add_view_url)
+        assert (
+            '<input type="checkbox" name="confidential" id="id_confidential">'
+            not in response.content.decode()
+        )
+
+    def test_change_project_form_has_not_confidential_checkbox(self):
+        fieldsets = self.project_admin.get_fieldsets(
+            self.change_request, self.change_project
+        )
+        assert "confidential" not in fieldsets[0][1]["fields"]
 
 
 class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
@@ -186,14 +207,12 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
             password="project_participant_user",
             is_staff=True,
         )
-        self.projects_with_member = [
-            Project.objects.create(name="project foo"),
-            Project.objects.create(name="project bar"),
-        ]
-        for project in self.projects_with_member:
-            project.participation_set.create(user=self.admin_user, is_leader=True)
-            project.participation_set.create(user=self.project_member)
+        self.change_project.participation_set.create(
+            user=self.admin_user, is_leader=True
+        )
+        self.change_project.participation_set.create(user=self.project_member)
         self.client.force_login(self.project_member)
+        self.change_request.user = self.project_member
 
     def test_cannot_view_other_projects(self):
         project = Project.objects.create(name="unviewable")
@@ -249,21 +268,13 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
         init_project_dir_mock.assert_called_once_with(project.name)
 
     def test_participation_inline_is_absent_in_changeview(self):
-        project = self.projects_with_member[0]
-        change_view_url = reverse("admin:lab_project_change", args=[project.id])
-        request = self.request_factory.get(change_view_url)
-        request.user = self.project_member
-        inlines = ProjectAdmin(Project, admin_site=AdminSite()).get_inlines(
-            request, project
+        inlines = self.project_admin.get_inlines(
+            self.change_request, self.change_project
         )
         assert ParticipationInline not in inlines
 
     def test_beamtimerequest_inline_is_present_in_changeview(self):
-        project = self.projects_with_member[0]
-        change_view_url = reverse("admin:lab_project_change", args=[project.id])
-        request = self.request_factory.get(change_view_url)
-        request.user = self.project_member
-        inlines = ProjectAdmin(Project, admin_site=AdminSite()).get_inlines(
-            request, project
+        inlines = self.project_admin.get_inlines(
+            self.change_request, self.change_project
         )
         assert BeamTimeRequestInline in inlines
