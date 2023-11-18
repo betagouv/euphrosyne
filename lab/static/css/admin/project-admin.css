@@ -26,3 +26,15 @@ td.field-status {
 .deletelink-box {
   font-size: 13px;
 }
+
+.field-confidential .checkbox-row {
+  flex-direction: row-reverse;
+}
+
+.field-confidential .checkbox-row label {
+  padding-left: 0;
+}
+
+.field-confidential .checkbox-row label::after {
+  content: " :";
+}

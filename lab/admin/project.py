@@ -175,6 +175,8 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
             if obj
             else ("name", "admin", "members")
         )
+        if is_lab_admin(request.user):
+            basic_fields += ("confidential",)
         fieldsets = [
             (
                 _("Basic information"),
