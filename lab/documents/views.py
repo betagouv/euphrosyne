@@ -36,7 +36,6 @@ class ProjectDocumentsView(ProjectMembershipRequiredMixin, TemplateView):
                 "attrs": {"id": "upload-form", "project-id": self.project.id},
                 "component_name": "document-upload-form",
                 "hint_text": _(
-                    "Max size allowed : 30 Mo. "
                     "Multiple files allowed. "
                     "Allowed files: images, documents and archives."
                 ),

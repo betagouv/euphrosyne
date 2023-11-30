@@ -15,45 +15,6 @@ describe("Test DocumentUploadForm", () => {
   });
 
   describe("Test validation", () => {
-    it("accepts files if total size is less or equal to 30 Mb", () => {
-      const setCustomValidityMock = jest.fn();
-      const event = {
-        target: {
-          files: [
-            { name: "1.jpg", size: 30719999 },
-            { name: "2.jpg", size: 1 },
-          ],
-          setCustomValidity: setCustomValidityMock,
-        },
-      };
-      document.querySelector("form").validateFileInput(event);
-
-      expect(setCustomValidityMock).toHaveBeenCalledTimes(1);
-      expect(setCustomValidityMock.mock.calls[0][0]).toBe("");
-    });
-
-    it("rejects large files", () => {
-      const setCustomValidityMock = jest.fn();
-      const event = {
-        target: {
-          files: [
-            { name: "1.jpg", size: 30719999 },
-            { name: "2.jpg", size: 2 },
-          ],
-          setCustomValidity: setCustomValidityMock,
-        },
-      };
-
-      document.querySelector("form").validateFileInput(event);
-
-      expect(setCustomValidityMock).toHaveBeenCalledTimes(2);
-      expect(
-        setCustomValidityMock.mock.calls[1][0].startsWith(
-          "Total file sizes must not exceed"
-        )
-      ).toBeTruthy();
-    });
-
     it("rejects unknown extensions", () => {
       const setCustomValidityMock = jest.fn();
       const event = {

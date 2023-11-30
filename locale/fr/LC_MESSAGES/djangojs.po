@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-14 17:02+0200\n"
+"POT-Creation-Date: 2023-11-30 16:36+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -49,10 +49,6 @@ msgstr "Le fichier %s n'a pas pu être supprimé."
 #, javascript-format
 msgid "File %s has been removed."
 msgstr "Le fichier %s a été supprimé."
-
-#, javascript-format
-msgid "Total file sizes must not exceed %s."
-msgstr "La taille totale des fichiers ne doit pas dépasser %s."
 
 #, javascript-format
 msgid "The following file formats are not accepted : %s"

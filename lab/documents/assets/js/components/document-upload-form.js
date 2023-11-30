@@ -5,8 +5,6 @@
 
 import { FileUploadForm } from "../../../../assets/js/components/file-upload-form.js";
 
-const FILES_MAX_SIZE = 30 * 1024 * 1000; // 30 MB
-const MAX_SIZE_FORMATTED = "30 MB";
 const ALLOWED_FILE_FORMATS = [
   "7z",
   "csv",
@@ -66,21 +64,9 @@ export class DocumentUploadForm extends FileUploadForm {
   validateFileInput(event) {
     const fileInput = event.target;
     const { files } = fileInput;
-    const totalSize = Array.from(files)
-      .map((file) => file.size)
-      .reduce((size, nextSize) => size + nextSize);
 
     fileInput.setCustomValidity("");
 
-    if (totalSize > FILES_MAX_SIZE) {
-      fileInput.setCustomValidity(
-        window.interpolate(
-          window.gettext("Total file sizes must not exceed %s."),
-          [MAX_SIZE_FORMATTED]
-        )
-      );
-      return;
-    }
     const notSupportedFormats = Array.from(files)
       .map((file) => file.name.split(".").pop()?.toLowerCase())
       .filter((format) => ALLOWED_FILE_FORMATS.indexOf(format) === -1);
