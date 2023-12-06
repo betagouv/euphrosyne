@@ -1,5 +1,7 @@
 import { formatBytes } from "../utils.js";
 
+const COLLAPSED_ROW_NUM = 25;
+
 export class FileTable extends HTMLTableElement {
   constructor() {
     super();
@@ -20,15 +22,19 @@ export class FileTable extends HTMLTableElement {
     this.tBodies[0].appendChild(this.generateLoadingRow());
   }
 
-  displayFiles() {
+  displayFiles(isExpanded = false) {
     this.tBodies[0].querySelectorAll("tr").forEach((row) => row.remove());
     if (this.dataRows.length > 0) {
-      this.dataRows.forEach((row) => {
+      this.dataRows.forEach((row, index) => {
+        if (!isExpanded && index >= COLLAPSED_ROW_NUM) {
+          return;
+        }
         this.tBodies[0].appendChild(row);
       });
     } else {
       this.tBodies[0].appendChild(this.generateNoDataRow());
     }
+    this.generateFooter(isExpanded);
   }
 
   setFiles(files) {
@@ -134,5 +140,41 @@ export class FileTable extends HTMLTableElement {
     }
 
     return unorderedList;
+  }
+
+  generateFooter(isExpanded = false) {
+    if (this.querySelector("tfoot")) {
+      this.querySelector("tfoot").remove();
+    }
+    if (this.dataRows.length <= COLLAPSED_ROW_NUM) {
+      return;
+    }
+    const tfoot = document.createElement("tfoot");
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.setAttribute("colspan", this.tHead.querySelectorAll("th").length);
+    cell.style = "width: 100%";
+    const expandButton = document.createElement("button");
+    expandButton.classList.add(
+      "fr-btn",
+      "fr-btn--tertiary-no-outline",
+      "fr-btn--sm",
+      "fr-btn--icon-left",
+      isExpanded ? "fr-icon-arrow-up-s-line" : "fr-icon-arrow-down-s-line"
+    );
+    expandButton.innerText = isExpanded
+      ? window.gettext("Show less")
+      : window.gettext("Show more") + ` (${this.dataRows.length})`;
+    expandButton.style.justifyContent = "center";
+    expandButton.style.width = "100%";
+    expandButton.ariaExpanded = isExpanded;
+    expandButton.addEventListener("click", () => {
+      expandButton.ariaExpanded = !isExpanded;
+      this.displayFiles(!isExpanded);
+    });
+    cell.appendChild(expandButton);
+    row.appendChild(cell);
+    tfoot.appendChild(row);
+    this.appendChild(tfoot);
   }
 }

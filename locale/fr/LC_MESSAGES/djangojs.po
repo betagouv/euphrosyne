@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-30 16:36+0100\n"
+"POT-Creation-Date: 2023-12-06 09:50+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -22,6 +22,12 @@ msgstr "Télécharger le fichier"
 
 msgid "Delete file"
 msgstr "Supprimer le fichier"
+
+msgid "Show less"
+msgstr "Afficher moins"
+
+msgid "Show more"
+msgstr "Afficher plus"
 
 #, javascript-format
 msgid "Delete the document %s ?"

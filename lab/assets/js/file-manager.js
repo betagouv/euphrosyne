@@ -25,7 +25,7 @@ export class FileManager {
     this.fileTable.showLoading();
     const files = await this.fileService.listData();
     this.fileTable.setFiles(files);
-    this.fileTable.displayFiles();
+    this.fileTable.displayFiles(false);
   }
 
   async downloadFile(path) {

@@ -81,6 +81,41 @@
         </div>
         {% endfor %}
     </div>
+
+    <fieldset class="module aligned fr-mt-3w">
+        <div class="fr-downloads-group fr-downloads-group--bordered">
+            <h2 class="fr-downloads-group__title">{% trans "Download run data" %}</h2>
+            <ul>
+                {% for run in runs %}
+                <li>
+                    <div class="fr-download">
+                        <p>
+                            <button download class="fr-download__link run-data-download-btn" data-run-name="{{ run.label }}" data-run-data-type="raw_data">
+                                {% blocktranslate with label=run.label %}Download raw data of run {{ label }}{% endblocktranslate %}
+                                <span class="fr-download__detail">
+                                    ZIP
+                                </span>
+                            </button>
+                        </p>
+                    </div>
+                </li>
+                <li>
+                    <div class="fr-download">
+                        <p>
+                            <button download class="fr-download__link run-data-download-btn" data-run-name="{{ run.label }}" data-run-data-type="processed_data">
+                                {% blocktranslate with label=run.label %}Download processed data of run {{ label }}{% endblocktranslate %}
+                                <span class="fr-download__detail">
+                                    ZIP
+                                </span>
+                            </button>
+                        </p>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+    </fieldset>
 </div>
 
 {% endblock %}
