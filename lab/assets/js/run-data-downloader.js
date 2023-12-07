@@ -6,7 +6,7 @@ export default async function downloadRunData(
   runDataType
 ) {
   // First, get token to download data
-  const path = `projects/${projectSlug}/runs/${runName}/${runDataType}}`;
+  const path = `projects/${projectSlug}/runs/${runName}/${runDataType}`;
   const response = await jwtFetch(
     `${process.env.EUPHROSYNE_TOOLS_API_URL}/data/${projectSlug}/token?path=${path}`,
     {
@@ -14,7 +14,6 @@ export default async function downloadRunData(
     }
   );
   const { token } = await response.json();
-  console.log(token);
   if (!token) {
     throw new Error("Failed to get token to download run data.");
   }
