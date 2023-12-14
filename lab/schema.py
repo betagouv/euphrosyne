@@ -1,14 +1,21 @@
 # pylint: disable=no-member,unused-argument
 import itertools
+from datetime import datetime
+from typing import Literal
 
 import graphene
-from django.db.models import Prefetch, Q
+from django.db.models import F, Prefetch, Q, Sum
+from django.utils import timezone
 from graphene_django import DjangoObjectType
 
 from euphro_auth.models import User
 from lab.methods.model_fields import DetectorCharField
 
 from .models import Institution, Object, ObjectGroup, Participation, Project, Run
+
+StatPeriodLiteral = Literal["all", "year"]
+
+THIS_YEAR_START_DT = datetime(timezone.now().year, 1, 1)
 
 
 class ObjectType(DjangoObjectType):
@@ -169,10 +176,56 @@ class ProjectType(DjangoObjectType):
         )
 
 
+class LabStatType(graphene.ObjectType):
+    total_projects = graphene.Int()
+    total_object_groups = graphene.Int()
+    total_hours = graphene.Int()
+
+
+class LabStatField(graphene.Field):
+    period: StatPeriodLiteral
+
+    def __init__(self, *args, period: StatPeriodLiteral = "all", **kwargs):
+        self.period = period
+        super().__init__(LabStatType, *args, **kwargs)
+
+
+class LabStatsType(graphene.ObjectType):
+    all = LabStatField(period="all")
+    year = LabStatField(period="year")
+
+    @staticmethod
+    def get_total_projects(period: StatPeriodLiteral):
+        qs = Project.objects
+        if period == "year":
+            qs = qs.filter(created__gte=THIS_YEAR_START_DT)
+        print(THIS_YEAR_START_DT)
+        return qs.count()
+
+    @staticmethod
+    def get_total_object_groups(period: StatPeriodLiteral):
+        run_qs = Run.objects.filter(end_date__lte=timezone.now())
+        if period == "year":
+            run_qs = run_qs.filter(start_date__gte=THIS_YEAR_START_DT)
+        return ObjectGroup.objects.filter(runs__in=run_qs).count()
+
+    @staticmethod
+    def get_total_hours(period: StatPeriodLiteral):
+        qs = Run.objects.filter(end_date__lte=timezone.now())
+        if period == "year":
+            qs = qs.filter(start_date__gte=THIS_YEAR_START_DT)
+        qs = qs.annotate(time_in_secs=(F("end_date") - F("start_date")))
+        aggregation = qs.aggregate(total_hours=Sum("time_in_secs"))
+        if not aggregation.get("total_hours"):
+            return 0
+        return int(aggregation["total_hours"].total_seconds() / 3600)
+
+
 class Query(graphene.ObjectType):
     last_projects = graphene.List(ProjectType, limit=graphene.Int())
     project_detail = graphene.Field(ProjectType, slug=graphene.String())
     object_group_detail = graphene.Field(ObjectGroupType, pk=graphene.String())
+    stats = graphene.Field(LabStatsType)
 
     def resolve_last_projects(self, info, limit=None):
         projects = (
@@ -204,6 +257,20 @@ class Query(graphene.ObjectType):
             .annotate(is_data_available=Q(runs__project__is_data_available=True))
             .first()
         )
+
+    def resolve_stats(self, info):
+        return {
+            "all": LabStatType(
+                total_projects=LabStatsType.get_total_projects("all"),
+                total_object_groups=LabStatsType.get_total_object_groups("all"),
+                total_hours=LabStatsType.get_total_hours("all"),
+            ),
+            "year": LabStatType(
+                total_projects=LabStatsType.get_total_projects("year"),
+                total_object_groups=LabStatsType.get_total_object_groups("year"),
+                total_hours=LabStatsType.get_total_hours("year"),
+            ),
+        }
 
 
 schema = graphene.Schema(query=Query)
