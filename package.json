@@ -24,17 +24,21 @@
   "homepage": "https://github.com/betagouv/euphrosyne#readme",
   "devDependencies": {
     "@types/jest": "^29.5.12",
+    "@types/react": "^18.2.48",
     "eslint": "^8.56.0",
     "eslint-plugin-jest": "^27.6.3",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "prettier": "^2.8.8"
+    "prettier": "^2.8.8",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.8",
     "@fullcalendar/daygrid": "^6.1.10",
     "@fullcalendar/list": "^6.1.10",
     "@gouvfr/dsfr": "^1.11.0",
+    "@types/react-dom": "^18.2.18",
     "css-loader": "^6.10.0",
     "css-minimizer-webpack-plugin": "^6.0.0",
     "dotenv": "^16.4.1",
@@ -43,6 +47,8 @@
     "mini-css-extract-plugin": "^2.8.0",
     "promise-polyfill": "8.3.0",
     "purgecss-webpack-plugin": "^5.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "remixicon": "^4.1.0",
     "source-map-loader": "^5.0.0",
     "webpack": "^5.90.1",
