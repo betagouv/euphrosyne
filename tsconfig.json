@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "es5",
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "moduleResolution": "node"
+  },
+  "include": ["**/*.ts", "**/*.tsx", "**/**/*.ts", "**/**/*.tsx"],
+  "exclude": ["node_modules", "_static", "euphrosyne/static/dist"]
+}
