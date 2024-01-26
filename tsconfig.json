@@ -6,8 +6,11 @@
     "target": "es5",
     "jsx": "react-jsx",
     "allowJs": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    /* Type Checking */
+    "strict": true /* Enable all strict type-checking options. */
   },
+
   "include": ["**/*.ts", "**/*.tsx", "**/**/*.ts", "**/**/*.tsx"],
-  "exclude": ["node_modules", "_static", "euphrosyne/static/dist"]
+  "exclude": ["node_modules", "_static", "euphrosyne/assets/dist"]
 }

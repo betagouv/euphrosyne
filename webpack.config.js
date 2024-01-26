@@ -85,6 +85,9 @@ export default {
       },
     ],
   },
+  resolve: {
+    extensions: [".ts", ".tsx", ".js"],
+  },
   optimization: {
     minimizer: [new CssMinimizerPlugin()],
   },
