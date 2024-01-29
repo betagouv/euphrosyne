@@ -6,6 +6,10 @@
     {% project_header object_id %}
 {% endblock %}
 
+{%  block top_header_data %}
+    {% project_header_json_data object_id %}
+{% endblock %}
+
 {% block content %}
     {% if not add %}
         {% project_tabs object_id request %}

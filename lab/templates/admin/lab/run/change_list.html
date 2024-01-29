@@ -7,6 +7,9 @@
     {% block top_header %}
         {% project_header project.id %}
     {% endblock %}
+    {%  block top_header_data %}
+      {% project_header_json_data project.id %}
+    {% endblock %}
 {% endif %}
 
 {% comment %} Hide object-tools in this page as the project param in URL in not right {% endcomment %}
