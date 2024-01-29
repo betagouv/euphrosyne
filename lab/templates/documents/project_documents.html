@@ -9,9 +9,6 @@
 <link rel="stylesheet" type="text/css" href="{% static "css/components/file_table.css" %}">
 {% endblock %}
 
-{% block top_header %}
-    {% project_header project.id %}
-{% endblock %}
 {%  block top_header_data %}
     {% project_header_json_data project.id %}
 {% endblock %}
