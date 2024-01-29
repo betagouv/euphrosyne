@@ -14,9 +14,18 @@ export default {
     main: [
       "promise-polyfill/src/polyfill",
       "whatwg-fetch",
-      "./euphrosyne/assets/js/main.js",
+      "./euphrosyne/assets/js/main.ts",
+      "./euphrosyne/assets/css/base.css",
+    ],
+    anonymous: [
+      "./euphrosyne/assets/js/anonymous.ts",
+      "./euphrosyne/assets/css/base.css",
+    ],
+    dsfr: [
       "@gouvfr/dsfr/dist/core/core.module.min.js",
       "@gouvfr/dsfr/dist/dsfr/dsfr.min.css",
+    ],
+    icons: [
       // We have to import each stylesheet icon separately due to a webpack
       // compile error if we import utility.css or icons.css directly.
       // See https://github.com/GouvernementFR/dsfr/issues/309
@@ -25,9 +34,9 @@ export default {
       "@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.min.css",
       "@gouvfr/dsfr/dist/utility/icons/icons-document/icons-document.min.css",
       "@gouvfr/dsfr/dist/utility/icons/icons-business/icons-business.min.css",
+      "@gouvfr/dsfr/dist/utility/icons/icons-user/icons-user.min.css",
       "@gouvfr/dsfr/dist/utility/colors/colors.min.css",
       "remixicon/fonts/remixicon.css",
-      "./euphrosyne/assets/css/base.css",
     ],
     ...Object.assign(
       {},
