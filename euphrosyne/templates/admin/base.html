@@ -45,37 +45,16 @@
             {% if user.is_superuser %}
                 {% include "admin/nav_sidebar.html" %}
             {% endif %}
-            {% include "./sidebar/main_sidebar.html" %}
         {% endblock %}
       {% endif %}
       <div class="content">
         {% if not is_popup and user.is_authenticated %}
         <!-- Header -->
         {% block header %}
-            <header role="banner" class="fr-header">
-                <div id="top-header" class="fr-px-5v fr-header__body">
-                    <div id="header-left-content">
-                        {% block top_header %}{% endblock %}
-                    </div>
-                    <div id="user-info">
-                        <div id="user-info-left">
-                            <div id="user-info-fullname">
-                                {% firstof user.get_full_name user.get_username %} /
-                                <a href="{% url 'admin:logout' %}" id="logout-link">{% translate 'Log out' %}</a>
-                            </div>
-                            <div id="user-info-role">
-                                {% if user.is_superuser or user.is_lab_admin %}
-                                    {% translate "Admin" %}
-                                {% else %}
-                                    {% translate "User" %}
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% comment %} <div id="user-info-profile-picture" class="fr-ml-1w">
-                        </div> {% endcomment %}
-                    </div>
-                </div>
-            </header>
+        <header role="banner" class="fr-header">
+            <div id="header-main"></div> 
+            <div id="header-nav"></div> 
+        </header>
         {% endblock %}
         <!-- END Header -->
         {% endif %}
