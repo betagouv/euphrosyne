@@ -43,6 +43,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.3",
     "@fullcalendar/core": "^6.1.8",
     "@fullcalendar/daygrid": "^6.1.11",
     "@fullcalendar/list": "^6.1.11",
