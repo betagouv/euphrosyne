@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-06 09:51+0100\n"
+"POT-Creation-Date: 2024-01-29 16:39+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -130,9 +130,6 @@ msgstr "L'équipe Euphrosyne"
 
 msgid "Enter your information"
 msgstr "Entrez vos informations"
-
-msgid "Log out"
-msgstr "Déconnexion"
 
 msgid "Admin"
 msgstr "Admin"

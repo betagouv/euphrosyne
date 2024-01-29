@@ -60,6 +60,7 @@ urlpatterns = [
         name="complete_registration_orcid",
     ),
     path("api/", include("euphrosyne.api_urls"), name="api"),
+    path("i18n/", include("django.conf.urls.i18n")),
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
 ]
 
