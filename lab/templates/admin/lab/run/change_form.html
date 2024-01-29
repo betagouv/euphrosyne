@@ -1,10 +1,6 @@
 {% extends "admin/change_form.html" %}
 {% load i18n admin_urls projects %}
 
-{% block top_header %}
-    {% project_header project.id %}
-{% endblock %}
-
 {% block content %}
 {% project_tabs project.id request %}
 {{ block.super }}

@@ -50,29 +50,6 @@ def project_tabs(project_id: int, request: HttpRequest):
     return None
 
 
-@register.inclusion_tag("components/header/project_header.html")
-def project_header(project_id: int):
-    if not project_id and not isinstance(project_id, int):
-        return None
-
-    project = Project.objects.get(pk=project_id)
-
-    if not project:
-        return None
-
-    project_status = project.status
-    choice_identifier = project_status.name
-    class_name = choice_identifier.lower()
-
-    return {
-        "project": project,
-        "status": {
-            "class_name": class_name,
-            "display": project_status.value[1],
-        },
-    }
-
-
 @register.simple_tag
 def project_header_json_data(project_id: int):
     if not project_id and not isinstance(project_id, int):
