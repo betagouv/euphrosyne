@@ -17,3 +17,9 @@
     </div>
 {% endif %}
 {% endblock %}
+{% block top_header_data %}
+  {"project": null, "backLink": {
+    "href": "{% url 'admin:lab_run_change' objectgroup_run.id %}",
+    "title": "{{ objectgroup_run.label }}"
+  }}
+{% endblock %}
