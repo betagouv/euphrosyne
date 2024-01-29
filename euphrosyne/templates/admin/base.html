@@ -1,4 +1,4 @@
-{% load i18n static %}<!DOCTYPE html>
+{% load i18n static nav %}<!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
 <head>
@@ -96,5 +96,27 @@
   {% include "footer.html" %}
   {% endif %}
 <!-- END Container -->
+{%if not is_popup and user.is_authenticated %}
+  <script id="top-header-data" type="application/json">
+    {% autoescape off %}
+    {% block top_header_data %}
+      {"project": null, "backLink": null}
+    {% endblock %}
+    {% endautoescape %}
+  </script>
+  <script id="nav-items-data" type="application/json">
+    {% if request.user and request.user.is_authenticated %}
+    {% autoescape off %}
+    {% nav_items_json request %}
+    {% endautoescape %}
+    {% endif %}
+  </script>
+  <script id="user-data" type="application/json">
+    {
+      "fullName": "{{ user.get_full_name }}",
+      "isLabAdmin": {{ user.is_lab_admin|yesno:"true,false" }}
+    }
+  </script>
+{% endif %}
 </body>
 </html>

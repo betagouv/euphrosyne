@@ -13,6 +13,9 @@
 {% block top_header %}
     {% project_header project.id %}
 {% endblock %}
+{%  block top_header_data %}
+    {% project_header_json_data project.id %}
+{% endblock %}
 
 {% block content %}
 {% project_tabs project.id request %}

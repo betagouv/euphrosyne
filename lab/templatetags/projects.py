@@ -1,3 +1,5 @@
+import json
+
 from django import template
 from django.http import HttpRequest
 from django.urls import reverse
@@ -69,3 +71,32 @@ def project_header(project_id: int):
             "display": project_status.value[1],
         },
     }
+
+
+@register.simple_tag
+def project_header_json_data(project_id: int):
+    if not project_id and not isinstance(project_id, int):
+        return ""
+
+    project = Project.objects.get(pk=project_id)
+
+    if not project:
+        return ""
+
+    project_status = project.status
+    choice_identifier = project_status.name
+    class_name = choice_identifier.lower()
+
+    data = {
+        "backLink": {
+            "href": reverse("admin:lab_project_changelist"),
+            "title": str(_("Project")),
+        },
+        "project": {
+            "name": project.name,
+            "leader": project.leader.user.get_full_name()
+            or project.leader.user.get_username(),
+            "status": {"label": str(project_status.value[1]), "className": class_name},
+        },
+    }
+    return json.dumps(data)

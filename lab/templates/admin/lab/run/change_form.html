@@ -19,3 +19,9 @@
     {% endif %}
 {% endfor %}
 {% endblock %}
+
+{% if project %}
+{%  block top_header_data %}
+    {% project_header_json_data project.id %}
+{% endblock %}
+{% endif %}
