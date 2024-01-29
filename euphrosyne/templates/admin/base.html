@@ -4,7 +4,13 @@
 <head>
 <title>{% block title %}{% endblock %}</title>
 <link rel="stylesheet" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
+{% if user.is_authenticated %}
 <link rel="stylesheet" type="text/css" href="{% static "main.css"%}"></link>
+{% else %}
+<link rel="stylesheet" href="{% static "anonymous.css" %}">
+{% endif %}
+<link rel="stylesheet" href="{% static "dsfr.css" %}">
+<link rel="stylesheet" href="{% static "icons.css" %}">
 <link rel="stylesheet" href="{% block dark-mode-vars %}{% static "admin/css/dark_mode.css" %}{% endblock %}">
 {% if not is_popup and is_nav_sidebar_enabled %}
   <link rel="stylesheet" href="{% static "admin/css/nav_sidebar.css" %}">
@@ -13,7 +19,12 @@
 {% block extrastyle %}{% endblock %}
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
 {% block extrahead %}
+{% if user.is_authenticated %}
+<script type="text/javascript" src="{% static 'dsfr.js' %}"></script>
 <script type="text/javascript" src="{% static 'main.js' %}"></script>
+{% else %}
+<script type="text/javascript" src="{% static 'anonymous.js' %}"></script>
+{% endif %}
 {% endblock %}
 {% block responsive %}
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
