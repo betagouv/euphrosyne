@@ -40,7 +40,7 @@ export default {
     ],
     ...Object.assign(
       {},
-      ...globSync("./**/assets/js/pages/*.js", { dotRelative: true }).map(
+      ...globSync("./**/assets/js/pages/*.{js,ts}", { dotRelative: true }).map(
         (file) => {
           return {
             [file.split("/").pop().split(".").shift()]: {
