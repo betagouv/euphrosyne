@@ -1,7 +1,7 @@
 import "./matomo.js";
 import { createElement } from "react";
-import { createRoot } from "react-dom/client";
 
+import { renderComponent } from "./react";
 import HeaderNav from "./components/header/HeaderNav";
 import Header from "./components/header/Header";
 
@@ -22,18 +22,6 @@ interface HeaderData {
 interface UserData {
   fullName: string;
   isLabAdmin: boolean;
-}
-
-function renderComponent(elementId: string, component: JSX.Element) {
-  const element = document.getElementById(elementId);
-  if (!element) {
-    console.error(
-      `Could not render ${component.type}. Element with id ${elementId} not found.`
-    );
-    return;
-  }
-  const root = createRoot(element);
-  root.render(component);
 }
 
 function getTemplateJSONData<Type>(elementId: string): Type | null {
