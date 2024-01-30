@@ -7,6 +7,7 @@ from ...api_views.serializers import (
     ProjectRunSerializer,
     ProjectSerializer,
     RunMethodsSerializer,
+    UpcomingProjectSerializer,
 )
 from ...models import Run
 from .. import factories
@@ -99,4 +100,22 @@ class TestRunMethodsSerializer(SimpleTestCase):
             "filters_for_detector_HE2": "",
             "filters_for_detector_HE3": "",
             "filters_for_detector_HE4": "",
+        }
+
+
+class TestUpcomingProjectSerializer(TestCase):
+    def test_upcoming_project_serializer(self):
+        run = factories.RunFactory()
+        serializer = UpcomingProjectSerializer(run.project)
+        serializer.context["request"] = mock.MagicMock()
+
+        assert serializer.data["change_url"].endswith(
+            f"/lab/project/{run.project.id}/change/"
+        )
+        assert serializer.data["name"] == run.project.name
+        assert serializer.data["start_date"] == run.start_date
+        assert serializer.data["num_runs"] == 1
+        assert serializer.data["status"] == {
+            "label": run.project.status.value[1],
+            "class_name": run.project.status.name.lower(),
         }
