@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import reverse, serializers
 
 from ..models import Project, Run
@@ -36,6 +37,43 @@ class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ("name", "runs", "slug")
+
+
+class UpcomingProjectSerializer(serializers.ModelSerializer):
+    change_url = serializers.SerializerMethodField()
+    start_date = serializers.SerializerMethodField()
+    num_runs = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Project
+        fields = ("name", "start_date", "change_url", "status", "num_runs")
+
+    def get_change_url(self, obj: Project):
+        return reverse.reverse("admin:lab_project_change", args=[obj.id])
+
+    def get_start_date(self, obj: Project):
+        # Get start_date by ordering runs by start_date and filtering the
+        # ones that are after now
+        ordered_start_dates = [
+            r.start_date
+            for r in sorted(
+                filter(lambda r: r.start_date >= timezone.now(), obj.runs.all()),
+                key=lambda r: r.start_date,
+            )
+        ]
+        if not ordered_start_dates:
+            return None
+        return ordered_start_dates[0]
+
+    def get_num_runs(self, obj: Project):
+        return obj.runs.count()
+
+    def get_status(self, obj: Project):
+        return {
+            "label": obj.status.value[1],
+            "class_name": obj.status.name.lower(),
+        }
 
 
 class RunMethodsSerializer(serializers.ModelSerializer):

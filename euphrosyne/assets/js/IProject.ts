@@ -8,3 +8,11 @@ export interface Project {
   leader: string;
   status: ProjectStatus;
 }
+
+export interface UpcomingProject {
+  name: string;
+  startDate: string;
+  changeUrl: string;
+  status: ProjectStatus;
+  runCount: number;
+}
