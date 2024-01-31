@@ -22,13 +22,18 @@ const isCurrentPath = (currentPath: string, navItem: NavItem) => {
 
 export default function HeaderNav({ currentPath, items }: HeaderNavProps) {
   return (
-    <div className="fr-header__menu fr-modal">
+    <div
+      className="fr-header__menu fr-modal"
+      id="header-modal"
+      aria-labelledby="header-modal-btn"
+    >
       <div className="fr-container">
         <button
           className="fr-btn--close fr-btn"
-          title={window.gettext("Fermer")}
+          title={window.gettext("Close")}
+          aria-controls="header-modal"
         >
-          {window.gettext("Fermer")}
+          {window.gettext("Close")}
         </button>
         <div className="fr-header__menu-links"></div>
         <nav className="fr-nav" role="navigation" aria-label={"Main menu"}>
