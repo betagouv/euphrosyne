@@ -138,5 +138,7 @@ jobs:
         run: npx eslint .
       - name: Check Prettier
         run: npx prettier -c $(git ls-files | grep -E '\.(js|json|yaml)$')
+      - name: Run tsc
+        run: npm run lint:tsc
       - name: Run tests
         run: npm run test
