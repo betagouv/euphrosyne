@@ -1,4 +1,5 @@
 import "./matomo.js";
+
 import { createElement } from "react";
 
 import { renderComponent } from "./react";

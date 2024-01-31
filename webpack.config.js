@@ -22,8 +22,8 @@ export default {
       "./euphrosyne/assets/css/base.css",
     ],
     dsfr: [
-      "@gouvfr/dsfr/dist/core/core.module.min.js",
       "@gouvfr/dsfr/dist/dsfr/dsfr.min.css",
+      "@gouvfr/dsfr/dist/dsfr.module.min.js",
     ],
     icons: [
       // We have to import each stylesheet icon separately due to a webpack
@@ -111,6 +111,9 @@ export default {
         nodir: true,
         dotRelative: true,
       }),
+      safelist: {
+        greedy: [/^fr-/],
+      },
     }),
   ],
 };
