@@ -9,6 +9,7 @@
     "build:dev": "webpack --mode=development --watch",
     "lint": "npx eslint .",
     "lint:fix": "npm run lint -- --fix",
+    "lint:tsc": "tsc --noEmit --skipLibCheck",
     "prettier": "npx prettier . --check",
     "prettier:fix": "npm run prettier -- --write",
     "format": "npm run prettier:fix && npm run lint:fix"
