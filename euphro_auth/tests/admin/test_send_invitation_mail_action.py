@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -36,7 +38,7 @@ class TestSendInvitationMailAction(TestCase):
             email="registered@test.test",
             is_staff=True,
             invitation_completed_at=timezone.datetime(
-                2021, 11, 22, tzinfo=timezone.utc
+                2021, 11, 22, tzinfo=datetime.timezone.utc
             ),
         )
 

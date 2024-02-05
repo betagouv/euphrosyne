@@ -73,16 +73,16 @@ class ObjectGroupInline(admin.TabularInline):
 
 
 class RunChangeList(ChangeList):
-    def get_queryset(self, request):
+    def get_queryset(self, request, exclude_parameters=None):
         remaining_lookup_params = self.get_filters(request)[2]
         if "project" in remaining_lookup_params and not (
             is_lab_admin(request.user)
             or Project.objects.filter(
-                id=remaining_lookup_params["project"], members__id=request.user.id
+                id=remaining_lookup_params["project"][0], members__id=request.user.id
             ).exists()
         ):
             raise PermissionDenied
-        return super().get_queryset(request)
+        return super().get_queryset(request, exclude_parameters=exclude_parameters)
 
 
 @admin.register(Run)
@@ -99,6 +99,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
     HIDE_ADD_SIDEBAR = True
     form = RunDetailsForm
     actions = [change_state]
+    list_filter = ("project",)
     fieldsets = (
         (_("Project"), {"fields": ("project",)}),
         (
