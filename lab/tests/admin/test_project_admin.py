@@ -146,10 +146,7 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
 
     def test_add_project_form_has_confidential_checkbox(self):
         response = self.client.get(self.add_view_url)
-        assert (
-            '<input type="checkbox" name="confidential" id="id_confidential">'
-            in response.content.decode()
-        )
+        assert '<input type="checkbox" name="confidential"' in response.content.decode()
 
     def test_change_project_form_has_confidential_checkbox(self):
         fieldsets = self.project_admin.get_fieldsets(

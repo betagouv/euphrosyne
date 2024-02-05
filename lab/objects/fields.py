@@ -17,7 +17,7 @@ class ObjectGroupChoiceField(ModelChoiceField):
     def __init__(self, project_id: int, **kwargs: Any) -> None:
         self.project_id = project_id
         queryset = ObjectGroup.objects.filter(runs__project=project_id)
-        self.choices = [
+        self._choices = [
             (objectgroup.id, str(objectgroup)) for objectgroup in queryset.distinct()
         ]
         queryset = queryset | ObjectGroup.objects.filter(runs=None)
