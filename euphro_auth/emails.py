@@ -1,3 +1,5 @@
+import logging
+import smtplib
 import typing
 
 from django.conf import settings
@@ -10,6 +12,8 @@ from django.utils.translation import gettext_lazy as _
 
 if typing.TYPE_CHECKING:
     from euphro_auth.models import User
+
+logger = logging.getLogger(__name__)
 
 
 def send_invitation_email(user: "User"):
@@ -31,4 +35,11 @@ def send_invitation_email(user: "User"):
     html_email = loader.render_to_string("invitation_email.html", context)
     email_message.attach_alternative(html_email, "text/html")
 
-    email_message.send()
+    try:
+        email_message.send()
+    except (smtplib.SMTPException, ConnectionError) as e:
+        logger.error(
+            "Error sending invitation email to %s. Reason: %s",
+            user.email,
+            str(e),
+        )
