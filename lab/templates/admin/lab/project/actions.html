@@ -1,0 +1,10 @@
+{% load i18n %}
+<span class="action-counter" style="display:none;"></span> <!-- prevent django js error -->
+<div class="actions"></div>
+
+<button class="fr-btn fr-btn--icon-left fr-icon-checkbox-circle-line action-delete-btn fr-btn--tertiary-no-outline fr-icon-delete-line " 
+  type="submit" name="index" value="{{ action_index|default:0 }}" id="delete-action-btn"
+  disabled="true">
+  {% trans "Delete selected projects" %}
+</button>
+<input type="hidden" name="action" value="delete_selected">
