@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-05 11:16+0100\n"
+"POT-Creation-Date: 2024-02-12 13:50+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -245,6 +245,9 @@ msgstr "Merci de corriger les erreurs ci-dessous"
 msgid "Project"
 msgstr "Projet"
 
+msgid "status"
+msgstr "statut"
+
 msgid "Project member"
 msgstr "Membre du projet"
 
@@ -265,6 +268,9 @@ msgstr "Informations essentielles"
 
 msgid "Projects"
 msgstr "Projets"
+
+msgid "To schedule"
+msgstr "A planifier"
 
 msgid "Object / Sample"
 msgstr "Objet / Échantillon"
@@ -356,9 +362,6 @@ msgstr "nom"
 
 msgid "country"
 msgstr "pays"
-
-msgid "To schedule"
-msgstr "A planifier"
 
 msgid "Scheduled"
 msgstr "Planifié"
@@ -608,6 +611,9 @@ msgstr "Voir sur le site"
 msgid "Popup closing…"
 msgstr "Fenêtre pop-up en cours de fermeture…"
 
+msgid "Delete selected projects"
+msgstr "Supprimer les projets sélectionnés"
+
 msgid "Close"
 msgstr "Fermer"
 
@@ -629,11 +635,73 @@ msgstr "Annuler"
 msgid "Yes, abandon changes"
 msgstr "Oui, abandonner les modifications"
 
+msgid "Create new project"
+msgstr "Créer un nouveau projet"
+
 msgid "Filter"
 msgstr "Filtrer"
 
-msgid "Clear all filters"
-msgstr "Effacer tous les filtres"
+msgid "No project yet"
+msgstr "Aucun projet pour le moment"
+
+msgid "We couldn't find any projects attached to your account."
+msgstr "Nous n'avons pu trouver aucun projet attaché à votre compte."
+
+msgid ""
+"On this page you can find all of your research projects carried out at New "
+"AGLAE."
+msgstr ""
+"Sur cette page, vous pouvez trouver tous vos projets de recherche menés à "
+"New AGLAE."
+
+msgid ""
+"If a project has already been created by a member of your team, they can "
+"send you an invitation link to join it."
+msgstr ""
+"Si un projet a déjà été créé par un membre de votre équipe, ils peuvent vous "
+"envoyer un lien d'invitation pour le rejoindre."
+
+msgid "Create my first project"
+msgstr "Créer mon premier projet"
+
+msgid "Remove from sorting"
+msgstr "Enlever du tri"
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Priorité de tri : %(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "Changer l'ordre de tri"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "Par %(filter_title)s "
+
+msgid "Show all"
+msgstr "Montrer tout"
+
+msgid "Search projects"
+msgstr "Rechercher des projets"
+
+msgid "Search"
+msgstr "Recherche"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s résultat"
+msgstr[1] "%(counter)s résultats"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s total"
+
+#, python-format
+msgid "%(counter)s project"
+msgid_plural "%(counter)s projects"
+msgstr[0] "%(counter)s projet"
+msgstr[1] "%(counter)s projets"
 
 msgid "Create a run"
 msgstr "Créer un run"
@@ -688,9 +756,6 @@ msgstr "Vous pouvez accéder à l'invitation ici :"
 
 msgid "Join project"
 msgstr "Rejoindre le projet"
-
-msgid "Search"
-msgstr "Recherche"
 
 msgid "Change leader"
 msgstr "Modification du chef de projet"
