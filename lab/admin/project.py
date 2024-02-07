@@ -3,6 +3,8 @@ from typing import Any, Dict, List, Mapping, Optional, Tuple, Type
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import InlineModelAdmin
+from django.contrib.admin.views.main import ChangeList
+from django.db.models import Count, DateTimeField, Value
 from django.forms.models import BaseInlineFormSet, ModelForm, inlineformset_factory
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
@@ -15,6 +17,40 @@ from ..forms import BaseParticipationForm, BeamTimeRequestForm, LeaderParticipat
 from ..models import BeamTimeRequest, Participation, Project
 from ..permissions import is_lab_admin, is_project_leader
 from .mixins import LabPermission, LabPermissionMixin, LabRole
+
+
+class ProjectStatusListFilter(admin.SimpleListFilter):
+    title = _("status")
+
+    parameter_name = "status"
+    template = "admin/lab/project/filter.html"
+
+    def lookups(self, request, model_admin):
+        return [
+            (enum_member.name, enum_member.value[1])
+            for enum_member in list(Project.Status)
+            if enum_member != Project.Status.TO_SCHEDULE
+            # exclude TO_SCHEDULE from filter as it is displayed in a separate table
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter_by_status(Project.Status[self.value()])
+        return queryset
+
+
+class ProjectChangeList(ChangeList):
+    def get_queryset(self, request: HttpRequest, exclude_parameters=None):
+        qs = super().get_queryset(request, exclude_parameters)
+        if request.method == "POST" and request.POST.get("action") == "delete_selected":
+            return qs  # use more general queryset for delete action
+        return (
+            qs.exclude(runs__start_date__isnull=True)
+            .distinct()
+            .annotate_first_run_date()
+            .annotate(number_of_runs=Count("runs"))
+            .order_by("-first_run_date")
+        )
 
 
 class ParticipationFormSet(BaseInlineFormSet):
@@ -98,30 +134,7 @@ class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
         return obj
 
 
-@admin.register(Project)
-class ProjectAdmin(LabPermissionMixin, ModelAdmin):
-    list_display = (
-        "name",
-        "admin",
-        "leader_user",
-        "first_run_date",
-        "number_of_runs",
-        "status",
-    )
-    readonly_fields = ("members", "editable_leader_user", "leader_user")
-
-    lab_permissions = LabPermission(
-        add_permission=LabRole.ANY_STAFF_USER,
-        change_permission=LabRole.PROJECT_MEMBER,
-        view_permission=LabRole.PROJECT_MEMBER,
-    )
-
-    search_fields = ("name",)
-
-    class Media:
-        js = ("pages/project.js",)
-        css = {"all": ("css/admin/project-admin.css",)}
-
+class ProjectDisplayMixin:
     @staticmethod
     @admin.display(description=_("Leader"))
     def leader_user(obj: Optional[Project]) -> Optional[User]:
@@ -142,6 +155,8 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
     @admin.display(description=_("First run"))
     def first_run_date(obj: Optional[Project]):
         if obj:
+            if hasattr(obj, "first_run_date"):  # from annotated queryset
+                return obj.first_run_date
             run_dates = (
                 obj.runs.filter(start_date__isnull=False)
                 .order_by("start_date")
@@ -155,11 +170,46 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
     @admin.display(description=_("Runs"))
     def number_of_runs(obj: Optional[Project]) -> Optional[int]:
         if obj:
+            if hasattr(obj, "number_of_runs"):
+                return obj.number_of_runs  # from annotated queryset
             return obj.runs.count()
         return None
 
+
+@admin.register(Project)
+class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
+    list_display = (
+        "name",
+        "admin",
+        "leader_user",
+        "first_run_date",
+        "number_of_runs",
+        "status",
+    )
+    readonly_fields = ("members", "editable_leader_user", "leader_user")
+
+    lab_permissions = LabPermission(
+        add_permission=LabRole.ANY_STAFF_USER,
+        change_permission=LabRole.PROJECT_MEMBER,
+        view_permission=LabRole.PROJECT_MEMBER,
+    )
+
+    search_fields = ("name",)
+
+    list_filter = [ProjectStatusListFilter]
+    list_per_page = 20
+
+    class Media:
+        js = ("pages/project.js",)
+        css = {"all": ("css/admin/project-admin.css",)}
+
     def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
         return obj
+
+    def has_delete_permission(
+        self, request: HttpRequest, obj: Project | None = None
+    ) -> bool:
+        return is_lab_admin(request.user)
 
     def get_fieldsets(
         self, request: HttpRequest, obj: Optional[Project] = ...
@@ -208,6 +258,9 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
             return projects_qs
         return projects_qs.filter(participation__user_id=request.user.id).distinct()
 
+    def get_changelist(self, request, **kwargs):
+        return ProjectChangeList
+
     def get_inlines(
         self, request: HttpRequest, obj: Optional[Project] = ...
     ) -> List[Type[InlineModelAdmin]]:
@@ -248,10 +301,47 @@ class ProjectAdmin(LabPermissionMixin, ModelAdmin):
     def changelist_view(
         self, request: HttpRequest, extra_context: Optional[Dict[str, str]] = None
     ):
-        return super().changelist_view(
+        changelist_view = super().changelist_view(
             request,
-            {**(extra_context if extra_context else {}), "title": _("Projects")},
+            {
+                **(extra_context if extra_context else {}),
+                "title": _("Projects"),
+                "has_delete_permission": self.has_delete_permission(request),
+                "extra_qs": [],
+            },
         )
+
+        if not hasattr(changelist_view, "context_data"):
+            # when actions (i.e delete) request
+            return changelist_view
+
+        cl = changelist_view.context_data.get("cl")
+        changelist_view.context_data["has_data"] = cl.full_result_count > 0
+        if cl and not cl.has_active_filters and not cl.query and not cl.page_num > 1:
+            # add scheduled projects on basic page (no search or pagination)
+            to_schedule_projects = (
+                self.get_queryset(request)
+                .only_to_schedule()
+                .annotate(
+                    first_run_date=Value(
+                        None,
+                        output_field=DateTimeField(),
+                    )
+                )  # db query optimization
+                .annotate(number_of_runs=Count("runs"))
+                .order_by("-created")
+                .distinct()
+            )
+            changelist_view.context_data["extra_qs"].append(
+                {"qs": to_schedule_projects, "title": _("To schedule")}
+            )
+        changelist_view.context_data["has_data"] = any(
+            [
+                changelist_view.context_data["has_data"],
+                *[len(qs["qs"]) > 0 for qs in changelist_view.context_data["extra_qs"]],
+            ]
+        )
+        return changelist_view
 
     def get_field_queryset(
         self, db: None, db_field, request: Optional[HttpRequest]
