@@ -3,14 +3,27 @@ from unittest.mock import MagicMock, patch
 
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
+from django.template.response import TemplateResponse
 from django.test import Client, TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
-from lab.tests.factories import ProjectFactory
+from lab.tests.factories import (
+    LabAdminUserFactory,
+    ProjectFactory,
+    ProjectWithLeaderFactory,
+    RunFactory,
+)
 
-from ...admin.project import BeamTimeRequestInline, ParticipationInline, ProjectAdmin
+from ...admin.project import (
+    BeamTimeRequestInline,
+    ParticipationInline,
+    ProjectAdmin,
+    ProjectChangeList,
+)
 from ...models import Institution, Participation, Project
 
 
@@ -57,11 +70,9 @@ class BaseTestCases:
             self.add_view_url = reverse("admin:lab_project_add")
             self.request_factory = RequestFactory()
 
-            self.admin_user = get_user_model().objects.create_user(
+            self.admin_user = LabAdminUserFactory(
                 email="admin_user@test.com",
                 password="admin_user",
-                is_staff=True,
-                is_lab_admin=True,
             )
 
             self.base_institution = Institution.objects.create(
@@ -276,3 +287,95 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
             self.change_request, self.change_project
         )
         assert BeamTimeRequestInline in inlines
+
+
+class TestProjectChangeList(TestCase):
+    def test_queryset(self):
+        # pylint: disable=expression-not-assigned
+        RunFactory(start_date=None).project  # not scheduled project
+
+        scheduled_project = RunFactory(
+            start_date=timezone.now() + timezone.timedelta(days=1)
+        ).project
+        RunFactory(
+            start_date=timezone.now() + timezone.timedelta(days=2),
+            project=scheduled_project,
+        )  # later run to test first_run_date
+
+        project_admin = ProjectAdmin(model=Project, admin_site=AdminSite())
+        request = RequestFactory().get(reverse("admin:lab_project_changelist"))
+        request.user = LabAdminUserFactory()
+
+        cl = project_admin.get_changelist_instance(request)
+        qs = cl.get_queryset(request)
+
+        assert isinstance(cl, ProjectChangeList)
+        assert qs.count() == 1
+        result = qs.first()
+        assert result == scheduled_project
+        assert hasattr(result, "first_run_date")
+        assert hasattr(result, "number_of_runs")
+
+
+class TestProjectDisplayMixin(TestCase):
+    def setUp(self):
+        self.project = ProjectWithLeaderFactory()
+        self.admin = ProjectAdmin(model=Project, admin_site=AdminSite())
+
+    def test_display_first_run_date(self):
+        run = RunFactory(
+            project=self.project, start_date=timezone.now() + timezone.timedelta(days=1)
+        )
+        assert self.admin.first_run_date(self.project) == run.start_date
+
+    def test_display_leader_user(self):
+        assert self.admin.leader_user(self.project) == self.project.leader.user
+        assert self.admin.leader_user(ProjectFactory()) is None
+
+    def test_display_editable_leader_user(self):
+        print(self.admin.editable_leader_user(self.project))
+        assert self.admin.editable_leader_user(self.project)
+
+    def test_number_of_runs(self):
+        RunFactory(project=self.project)
+        RunFactory(project=self.project)
+        assert self.admin.number_of_runs(self.project) == 2
+
+
+class TestProjectAdminChangelistView(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.admin_user = LabAdminUserFactory()
+        self.admin = ProjectAdmin(model=Project, admin_site=AdminSite())
+        self.request = RequestFactory().get(reverse("admin:lab_project_changelist"))
+        self.request.user = self.admin_user
+
+    def test_has_to_schedule_projects_in_ctx(self):
+        pids = [r.project_id for r in RunFactory.create_batch(3, start_date=None)]
+
+        cl_view: TemplateResponse = self.admin.changelist_view(self.request)
+        assert "extra_qs" in cl_view.context_data
+        assert len(cl_view.context_data["extra_qs"]) == 1
+        assert cl_view.context_data["extra_qs"][0]["title"] == _("To schedule")
+        qs = cl_view.context_data["extra_qs"][0]["qs"]
+        assert qs.count() == 3
+        self.assertListEqual(
+            list(qs.values_list("id", flat=True)),
+            list(reversed(pids)),  # reversed because of ordering
+        )
+        # test annotation
+        first_project = qs.first()
+        assert hasattr(first_project, "number_of_runs")
+        assert hasattr(first_project, "first_run_date")
+
+    def test_no_to_schedule_projects_in_ctx_when_paginated_results(self):
+        for url_query_hiding_qs in ("?q=test", "?p=2", "?status=SCHEDULED"):
+            request = RequestFactory().get(
+                reverse("admin:lab_project_changelist") + url_query_hiding_qs
+            )
+            request.user = self.admin_user
+            cl_view: TemplateResponse = self.admin.changelist_view(request)
+            assert "extra_qs" in cl_view.context_data
+            assert (
+                len(cl_view.context_data["extra_qs"]) == 0
+            ), f"Test failed for query {url_query_hiding_qs}"

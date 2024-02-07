@@ -1,0 +1,13 @@
+{% load i18n %}
+<details data-filter-title="{{ title }}" open>
+  <summary class="fr-mb-1w">
+    {% blocktranslate with filter_title=title %} By {{ filter_title }} {% endblocktranslate %}
+  </summary>
+  <ul class="fr-tags-group">
+  {% for choice in choices %}
+    <li{% if choice.selected %} class="selected"{% endif %}>
+        <a class="fr-tag" target="_self" {% if choice.selected %}aria-pressed="true"{% endif %} href="{{ choice.query_string|iriencode }}">{{ choice.display }}</a>
+    </li>
+  {% endfor %}
+  </ul>
+</details>
