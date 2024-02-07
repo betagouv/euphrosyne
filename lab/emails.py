@@ -1,9 +1,14 @@
+import logging
+import smtplib
+
 from django.conf import settings
 from django.core.mail.message import EmailMultiAlternatives
 from django.template import loader
 from django.utils.translation import gettext_lazy as _
 
 from .models import Project
+
+logger = logging.getLogger(__name__)
 
 
 def send_project_invitation_email(email: str, project: Project):
@@ -25,4 +30,11 @@ def send_project_invitation_email(email: str, project: Project):
     html_email = loader.render_to_string("project_invitation_email.html", context)
     email_message.attach_alternative(html_email, "text/html")
 
-    email_message.send()
+    try:
+        email_message.send()
+    except (smtplib.SMTPException, ConnectionError) as e:
+        logger.error(
+            "Error sending invitation email to %s. Reason: %s",
+            email,
+            str(e),
+        )
