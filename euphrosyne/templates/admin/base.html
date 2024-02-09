@@ -20,6 +20,7 @@
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
 {% block extrahead %}
 {% if user.is_authenticated %}
+<script src="{% url 'javascript-catalog' %}"></script>
 <script type="text/javascript"  src="{% static 'dsfr.js' %}"></script>
 <script type="text/javascript" src="{% static 'main.js' %}"></script>
 {% else %}
