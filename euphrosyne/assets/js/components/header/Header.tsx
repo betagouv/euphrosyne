@@ -4,6 +4,7 @@ import { BackLink } from "../../IHeader";
 import { Project } from "../../IProject";
 import Translate from "./Translate";
 import HeaderLeftContent from "./HeaderLeftContent";
+import { getCSRFToken } from "../../../../../lab/assets/js/utils";
 
 interface User {
   fullName: string;
@@ -69,9 +70,20 @@ export default function Header({
                   )}
                 </li>
                 <li>
-                  <a className="fr-btn" href="/logout" css={errorTextStyle}>
-                    <span>{window.gettext("Log out")}</span>
-                  </a>
+                  <form method="post" action="/logout/?next=/login">
+                    <button
+                      className="fr-btn"
+                      css={errorTextStyle}
+                      type="submit"
+                    >
+                      <span>{window.gettext("Log out")}</span>
+                      <input
+                        type="hidden"
+                        name="csrfmiddlewaretoken"
+                        value={getCSRFToken() || ""}
+                      />
+                    </button>
+                  </form>
                 </li>
               </ul>
             </div>
