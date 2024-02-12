@@ -55,7 +55,7 @@ jobs:
           ./manage.py makemessages --all --verbosity 0 --no-location --no-obsolete
           git diff -I'^"PO' --exit-code locale/*/LC_MESSAGES/django.po  # Fail if any change apart from headers.
           git checkout -- locale/*/LC_MESSAGES/django.po
-          ./manage.py makemessages --all --verbosity 0 --no-location --no-obsolete -d djangojs
+          ./manage.py makemessages --all --verbosity 0 --no-obsolete --no-location -d djangojs --ignore 'node_modules/*' --ignore 'venv/*' --ignore 'euphrosyne/assets/dist/*' -e js,tsx,ts,jsx
           git diff -I'^"PO' --exit-code locale/*/LC_MESSAGES/djangojs.po  # Fail if any change apart from headers.
           git checkout -- locale/*/LC_MESSAGES/djangojs.po
       - name: Check no translation is empty
