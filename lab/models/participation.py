@@ -15,7 +15,7 @@ class Participation(TimestampedModel):
     """
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
-    project = models.ForeignKey("lab.Project", on_delete=models.PROTECT)
+    project = models.ForeignKey("lab.Project", on_delete=models.CASCADE)
     is_leader = models.BooleanField(default=False)
     institution = models.ForeignKey(
         "lab.Institution", on_delete=models.SET_NULL, null=True
