@@ -71,8 +71,7 @@ def project_header_json_data(project_id: int):
         },
         "project": {
             "name": project.name,
-            "leader": project.leader.user.get_full_name()
-            or project.leader.user.get_username(),
+            "leader": (project.leader.user.get_full_name() if project.leader else ""),
             "status": {"label": str(project_status.value[1]), "className": class_name},
         },
     }
