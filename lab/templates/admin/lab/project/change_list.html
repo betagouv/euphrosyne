@@ -90,11 +90,13 @@
       if(!actionButton) return;
       allCheckboxes.forEach(function(checkBox) {
         checkBox.addEventListener('change', function(el) {
-          if (el.target.checked && actionButton.disabled) {
-            actionButton.disabled = false;
+          if (el.target.checked){
+            if(actionButton.disabled) {
+              actionButton.disabled = false;
+            }
           } else {
             const hasAnyChecked = Array.from(
-                document.querySelector(".action-select")
+                document.querySelectorAll(".action-select")
               ).some(function(c) {
               return c.checked;
             });
