@@ -2,3 +2,7 @@
 
 {% block content_title %}{% endblock %}
 {% block content_subtitle %}{% endblock %}
+
+{% block content %}
+<div class="fr-container">{{ block.super }}</div>
+{% endblock %}
