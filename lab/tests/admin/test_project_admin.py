@@ -84,6 +84,7 @@ class BaseTestCases:
             self.change_request = RequestFactory().get(
                 reverse("admin:lab_project_change", args=[self.change_project.id])
             )
+            self.add_request = RequestFactory().get(self.add_view_url)
 
 
 class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
@@ -97,34 +98,7 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         )
         self.client.force_login(self.admin_user)
         self.change_request.user = self.admin_user
-
-    def test_add_project_form_has_leader_hidden_input(self):
-        response = self.client.get(self.add_view_url)
-        assert response.status_code == HTTPStatus.OK
-        assert (
-            '<input type="hidden" name="participation_set-0-is_leader" '
-            'value="True" id="id_participation_set-0-is_leader">'
-            in response.content.decode()
-        )
-
-    def test_add_project_allows_setting_any_user_as_leader(self):
-        response = self.client.post(
-            self.add_view_url,
-            data={
-                "name": "some project name",
-                "participation_set-TOTAL_FORMS": "1",
-                "participation_set-INITIAL_FORMS": "0",
-                "participation_set-0-id": "",
-                "participation_set-0-project": "",
-                "participation_set-0-user": self.project_participant_user.email,
-                "participation_set-0-is_leader": "True",
-                "participation_set-0-institution": self.base_institution.id,
-            },
-        )
-        assert response.status_code == 302
-        project = Project.objects.filter(name="some project name").first()
-        assert project
-        assert project.leader.user == self.project_participant_user
+        self.add_request.user = self.admin_user
 
     def test_add_project_set_admin_as_admin(self):
         project = Project.objects.create(name="some project name")
@@ -165,6 +139,10 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         )
         assert "confidential" in fieldsets[0][1]["fields"]
 
+    def test_add_project_has_not_cgu_checkbox(self):
+        fieldsets = self.project_admin.get_fieldsets(self.add_request)
+        assert len(fieldsets) == 1
+
 
 class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
     def setUp(self):
@@ -179,6 +157,7 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
         )
         self.client.force_login(self.project_leader)
         self.change_request.user = self.project_leader
+        self.add_request.user = self.project_leader
 
     def test_participation_inline_is_present_in_changeview(self):
         inlines = self.project_admin.get_inlines(
@@ -205,6 +184,10 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
             self.change_request, self.change_project
         )
         assert "confidential" not in fieldsets[0][1]["fields"]
+
+    def test_add_project_has_cgu_checkbox(self):
+        fieldsets = self.project_admin.get_fieldsets(self.add_request)
+        assert "has_accepted_cgu" in fieldsets[1][1]["fields"]
 
 
 class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
@@ -241,9 +224,7 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
     def test_add_project_sets_user_as_leader(self):
         response = self.client.post(
             self.add_view_url,
-            data={
-                "name": "some project name",
-            },
+            data={"name": "some project name", "has_accepted_cgu": 1},
         )
         project = Project.objects.get(name="some project name")
 
@@ -254,9 +235,7 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
     def test_add_project_adds_user_as_member(self):
         response = self.client.post(
             self.add_view_url,
-            data={
-                "name": "some project name",
-            },
+            data={"name": "some project name", "has_accepted_cgu": 1},
         )
         assert response.status_code == 302
         project = Project.objects.get(name="some project name")
