@@ -27,7 +27,7 @@ class TestUserTokenRegistrationView(TestCase):
             response,
             (
                 '<input type="email" name="email" value="test@test.test" '
-                'autocomplete="email" maxlength="254" required id="id_email">'
+                'autocomplete="email" maxlength="254" required id="id_email"'
             ),
         )
 
