@@ -23,11 +23,12 @@ class TestUserTokenRegistrationView(TestCase):
     def test_email_should_be_prefilled(self):
         preresponse = self.client.get(self.view_url)
         response = self.client.get(preresponse.headers["Location"])
+        print(response.content)
         self.assertContains(
             response,
             (
                 '<input type="email" name="email" value="test@test.test" '
-                'autocomplete="email" maxlength="254" required id="id_email">'
+                'autocomplete="email" maxlength="254" required id="id_email"'
             ),
         )
 

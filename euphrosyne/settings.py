@@ -55,6 +55,7 @@ SITE_URL = os.environ["SITE_URL"]
 INSTALLED_APPS = [
     "euphrosyne.apps.AdminConfig",
     "euphro_auth",
+    "django.forms",
     "django.contrib.admindocs",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -99,6 +100,8 @@ TEMPLATES = [
         },
     },
 ]
+
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 WSGI_APPLICATION = "euphrosyne.wsgi.application"
 

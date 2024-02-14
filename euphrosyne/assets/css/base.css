@@ -10,6 +10,8 @@
 
   --primary: var(--blue-france);
 
+  --body-bg: var(--background-default-grey);
+
   --header-bg: var(--background-default-grey);
   --header-color: var(--text-title-grey);
 
@@ -27,9 +29,7 @@
 body {
   font-family: "Marianne", "Roboto", "Lucida Grande", "DejaVu Sans",
     "Bitstream Vera Sans", Verdana, Arial, sans-serif;
-  background-color: var(--background-default-grey);
 }
-
 
 input[type="button"]:not(:disabled):hover, input[type="image"]:not(:disabled):hover, input[type="reset"]:not(:disabled):hover, input[type="submit"]:not(:disabled):hover {
   --hover: var(--background-action-high-blue-france-hover);
@@ -122,6 +122,10 @@ label.required:after {
 
 .change-list .object-tools {
   margin-top: -128px;
+}
+
+#changelist .actions {
+  padding: 0 !important;
 }
 
 .change-form .object-tools {
