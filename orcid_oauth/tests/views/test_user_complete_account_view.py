@@ -39,16 +39,16 @@ class TestUserCompleteAccountView(TestCase):
         content = str(response.content)
         assert (
             '<input type="text" name="first_name" value="John" maxlength="150" '
-            'required id="id_first_name">'
+            'required id="id_first_name"'
         ) in content
         assert (
             '<input type="text" name="last_name" value="Doe" maxlength="150" '
-            'required id="id_last_name">'
+            'required id="id_last_name"'
         ) in content
 
         assert (
             '<input type="email" name="email" value="test@test.test" maxlength="254" '
-            'required id="id_email">'
+            'required id="id_email"'
         ) in content
 
     def test_post_response_redirects(self):

@@ -17,12 +17,12 @@ input[type="search"]
 textarea,
 select,
 .vTextField {
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 5px 6px;
+  border: 0;
+  border-radius: .25rem .25rem 0 0;
+  padding: .5rem 1rem;
   margin-top: 0;
-  color: var(--body-fg);
-  background-color: var(--body-bg);
+  color: var(--text-default-grey);
+  background-color: var(--background-contrast-grey)
 }
 
 .submit-row .deletelink-box a.deletelink {
@@ -43,4 +43,9 @@ th .text a {
 
 .fr-footer__partners a {
   background: none;
+}
+
+
+table input.fr-input[type="checkbox"] {
+  width: auto;
 }
