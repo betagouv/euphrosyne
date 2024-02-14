@@ -1,3 +1,33 @@
+body.change-form {
+  background-color: var(--background-alt-grey);
+}
+
+#content-main {
+  background-color: var(--body-bg);;
+}
+
+fieldset {
+  box-shadow: none;
+}
+
+fieldset .description {
+  padding: 0;
+}
+
+fieldset .description p {
+  margin: 0;
+}
+
+#project_form .submit-row {
+  background: none;
+  border: none;
+  float: right;
+}
+
+#project_form input {
+  max-width: 35rem;
+}
+
 .two-boxes-inline-container {
   display: flex;
   flex-wrap: wrap;

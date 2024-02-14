@@ -13,7 +13,12 @@ from euphro_auth.models import User
 from euphro_tools.hooks import initialize_project_directory
 from lab.widgets import LeaderReadonlyWidget
 
-from ..forms import BaseParticipationForm, BeamTimeRequestForm, LeaderParticipationForm
+from ..forms import (
+    BaseParticipationForm,
+    BeamTimeRequestForm,
+    LeaderParticipationForm,
+    ProjectForm,
+)
 from ..models import BeamTimeRequest, Participation, Project
 from ..permissions import is_lab_admin, is_project_leader
 from .mixins import LabPermission, LabPermissionMixin, LabRole
@@ -84,7 +89,7 @@ class ParticipationFormSet(BaseInlineFormSet):
 
 class ParticipationInline(LabPermissionMixin, admin.TabularInline):
     model = Participation
-    verbose_name = _("Project member")
+    verbose_name = _("Project leader")
     verbose_name_plural = _("Project members")
 
     lab_permissions = LabPermission(
@@ -199,6 +204,8 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
     list_filter = [ProjectStatusListFilter]
     list_per_page = 20
 
+    form = ProjectForm
+
     class Media:
         js = ("pages/project.js",)
         css = {"all": ("css/admin/project-admin.css",)}
@@ -212,7 +219,7 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         return is_lab_admin(request.user)
 
     def get_fieldsets(
-        self, request: HttpRequest, obj: Optional[Project] = ...
+        self, request: HttpRequest, obj: Optional[Project] = None
     ) -> List[Tuple[Optional[str], Dict[str, Any]]]:
         basic_fields = (
             (
@@ -223,16 +230,33 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                 "members",
             )
             if obj
-            else ("name", "admin", "members")
+            else ("name",)
         )
         if is_lab_admin(request.user):
             basic_fields += ("confidential",)
+
+        basic_fields_label = _("Basic information") if obj else _("Create new project")
         fieldsets = [
             (
-                _("Basic information"),
+                basic_fields_label,
                 {"fields": basic_fields},
             ),
         ]
+        if not obj and not is_lab_admin(request.user):
+            fieldsets += [
+                (
+                    None,
+                    {
+                        "fields": ("has_accepted_cgu",),
+                        "description": "<p><strong>%s</strong></p>"
+                        % _(
+                            # pylint: disable=line-too-long
+                            "To create a project on Euphrosyne, you are required to acknowledge and agree to the platform's general terms of use."
+                        ),
+                    },
+                )
+            ]
+
         return fieldsets
 
     def get_exclude(self, request: HttpRequest, obj: Optional[Project] = None):
@@ -265,9 +289,9 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         self, request: HttpRequest, obj: Optional[Project] = ...
     ) -> List[Type[InlineModelAdmin]]:
         inlines = []
-        if is_lab_admin(request.user) or (obj and is_project_leader(request.user, obj)):
-            inlines += [ParticipationInline]
         if obj:
+            if is_lab_admin(request.user) or is_project_leader(request.user, obj):
+                inlines += [ParticipationInline]
             inlines += [BeamTimeRequestInline]
         return inlines
 
@@ -293,6 +317,7 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
             form_url,
             {
                 **(extra_context if extra_context else {}),
+                "show_save": True,
                 "show_save_as_new": False,
                 "show_save_and_add_another": False,
             },
@@ -311,7 +336,9 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
             },
         )
 
-        if not hasattr(changelist_view, "context_data"):
+        if not hasattr(
+            changelist_view, "context_data"
+        ) or not changelist_view.context_data.get("cl"):
             # when actions (i.e delete) request
             return changelist_view
 

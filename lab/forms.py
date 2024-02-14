@@ -308,3 +308,14 @@ class BeamTimeRequestForm(ModelForm):
         model = models.BeamTimeRequest
         fields = ("request_type", "request_id", "form_type", "problem_statement")
         widgets = {"problem_statement": widgets.CounterTextarea()}
+
+
+class ProjectForm(ModelForm):
+    has_accepted_cgu = forms.BooleanField(
+        required=True,
+        label=_("I have read and accepted the general conditions of Euphrosyne."),
+    )
+
+    class Meta:
+        model = models.Project
+        fields = ["name"]
