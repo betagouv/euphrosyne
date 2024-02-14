@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-12 13:50+0100\n"
+"POT-Creation-Date: 2024-02-14 10:47+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -140,6 +140,23 @@ msgstr "Voir plus"
 msgid "Calendar"
 msgstr "Calendrier"
 
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Save as new"
+msgstr "Sauvegarder comme nouveau"
+
+#, fuzzy
+#| msgid "Save and view"
+msgid "Save and add another"
+msgstr "Sauvegarder et ajouter un autre"
+
+msgid "Close"
+msgstr "Fermer"
+
+msgid "Delete"
+msgstr "Supprimer"
+
 msgid "Sign in"
 msgstr "Inscription"
 
@@ -248,8 +265,8 @@ msgstr "Projet"
 msgid "status"
 msgstr "statut"
 
-msgid "Project member"
-msgstr "Membre du projet"
+msgid "Project leader"
+msgstr "Chef de projet"
 
 msgid "Project members"
 msgstr "Membres du projet"
@@ -265,6 +282,16 @@ msgstr "Runs"
 
 msgid "Basic information"
 msgstr "Informations essentielles"
+
+msgid "Create new project"
+msgstr "Créer un nouveau projet"
+
+msgid ""
+"To create a project on Euphrosyne, you are required to acknowledge and agree "
+"to the platform's general terms of use."
+msgstr ""
+"Pour créer un projet sur Euphrosyne, vous devez lire et accepter les "
+"conditions générales d'utilisation de la plateforme."
 
 msgid "Projects"
 msgstr "Projets"
@@ -341,6 +368,9 @@ msgstr "Choix de filtre invalide"
 
 msgid "Only Admin users might rewind runs."
 msgstr "Seuls les utilisateurs Admin peuvent remettre un run en arrière."
+
+msgid "I have read and accepted the general conditions of Euphrosyne."
+msgstr "J'ai lu et accepté les conditions générales d'Euphrosyne."
 
 msgid "{} analysis technique"
 msgstr "technique d'analyse {}"
@@ -565,9 +595,6 @@ msgstr "Cet object a déjà été ajouté à ce run."
 msgid "EROS import"
 msgstr "Import EROS"
 
-msgid "Save"
-msgstr "Enregistrer"
-
 msgid "Differentiate objects"
 msgstr "Différencier les objets"
 
@@ -614,9 +641,6 @@ msgstr "Fenêtre pop-up en cours de fermeture…"
 msgid "Delete selected projects"
 msgstr "Supprimer les projets sélectionnés"
 
-msgid "Close"
-msgstr "Fermer"
-
 msgid "Are you sure you want to close this form?"
 msgstr "Êtes-vous sûr(e) de vouloir fermer ce formulaire ?"
 
@@ -634,9 +658,6 @@ msgstr "Annuler"
 
 msgid "Yes, abandon changes"
 msgstr "Oui, abandonner les modifications"
-
-msgid "Create new project"
-msgstr "Créer un nouveau projet"
 
 msgid "Filter"
 msgstr "Filtrer"
@@ -708,9 +729,6 @@ msgstr "Créer un run"
 
 msgid "Methods"
 msgstr "Méthodes"
-
-msgid "Delete"
-msgstr "Supprimer"
 
 msgid "Save and continue editing"
 msgstr "Sauvegarder et continuer l'édition"
