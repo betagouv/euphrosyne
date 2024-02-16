@@ -312,10 +312,6 @@ class TestProjectDisplayMixin(TestCase):
         assert self.admin.leader_user(self.project) == self.project.leader.user
         assert self.admin.leader_user(ProjectFactory()) is None
 
-    def test_display_editable_leader_user(self):
-        print(self.admin.editable_leader_user(self.project))
-        assert self.admin.editable_leader_user(self.project)
-
     def test_number_of_runs(self):
         RunFactory(project=self.project)
         RunFactory(project=self.project)

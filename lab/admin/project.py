@@ -14,7 +14,6 @@ from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
 from euphro_tools.hooks import initialize_project_directory
-from lab.widgets import LeaderReadonlyWidget
 
 from ..forms import (
     BaseParticipationForm,
@@ -161,15 +160,6 @@ class ProjectDisplayMixin:
         if obj and obj.leader:
             return obj.leader.user
         return None
-
-    @staticmethod
-    @admin.display(description=_("Leader"))
-    def editable_leader_user(obj: Optional[Project]) -> str:
-        user = obj.leader.user if obj.leader else None
-        widget = LeaderReadonlyWidget(project_id=obj.id, user=user)
-        content = widget.render("change_id_leader", user)
-        media = str(widget.media)  # pylint: disable=no-member
-        return content + media
 
     @staticmethod
     @admin.display(description=_("First run"))
