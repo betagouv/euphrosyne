@@ -8,6 +8,7 @@ from django.test import Client, TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
@@ -319,6 +320,24 @@ class TestProjectDisplayMixin(TestCase):
         RunFactory(project=self.project)
         RunFactory(project=self.project)
         assert self.admin.number_of_runs(self.project) == 2
+
+    def test_first_run_date_with_link(self):
+        run_date = timezone.now() + timezone.timedelta(days=1)
+        project_with_scheduled_run = RunFactory(
+            project=self.project, start_date=run_date
+        ).project
+        project_without_scheduled_run = ProjectFactory()
+
+        assert self.admin.first_run_date_with_link(
+            project_with_scheduled_run
+        ) == date_format(run_date, format="SHORT_DATE_FORMAT", use_l10n=True)
+        assert self.admin.first_run_date_with_link(
+            project_without_scheduled_run
+        ) == '%s <a href="/lab/run/?project=%s" class="fr-link fr-link--sm">%s</a>' % (
+            _("No scheduled run."),
+            project_without_scheduled_run.id,
+            _("See runs"),
+        )
 
 
 class TestProjectAdminChangelistView(TestCase):

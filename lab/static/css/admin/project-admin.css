@@ -2,8 +2,50 @@ body.change-form {
   background-color: var(--background-alt-grey);
 }
 
+select {
+  height: auto;
+}
+
+.related-widget-wrapper {
+  align-items: center;
+}
+
+.related-widget-wrapper select.fr-select {
+  width: calc(100% - 100px)
+}
+
+#participation_set-group .field-user input {
+  max-width: unset;
+  width: 30rem;
+}
+
+#participation_set-group td.delete input {
+  /* add margin so th delete is in one line */
+  margin: 0 40px;
+}
+
+#participation_set-group td .autocomplete-input {
+  min-width: 500px;
+}
+
+#participation_set-group tbody th {
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+}
+
+
 #content-main {
-  background-color: var(--body-bg);;
+  background-color: var(--body-bg);
+  float: none;
+}
+
+#content-main.project-change {
+  background-color: transparent;
+}
+
+.project-change .form-col {
+  background-color: var(--body-bg);
+  height: 100%;
 }
 
 fieldset {
@@ -18,10 +60,14 @@ fieldset .description p {
   margin: 0;
 }
 
+fieldset textarea.vLargeTextField {
+  width: 100%;
+}
+
 #project_form .submit-row {
   background: none;
   border: none;
-  float: right;
+  justify-content: right;
 }
 
 #project_form input {
@@ -67,4 +113,8 @@ td.field-status {
 
 .field-confidential .checkbox-row label::after {
   content: " :";
+}
+
+.dynamic-beamtimerequest h3 {
+  display: none;
 }
