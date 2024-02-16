@@ -47,6 +47,35 @@ class UserWidgetWrapper(RelatedFieldWidgetWrapper):
         return super().get_related_url(info, action, *args)
 
 
+class InstitutionAutoCompleteWidget(Widget):
+    input_type = "text"
+    template_name = "widgets/institution_autocomplete_widget.html"
+
+    def __init__(self, attrs: dict[str, Any] | None = None, choices=None) -> None:
+        self.choices = choices
+        super().__init__(attrs)
+
+    def get_context(
+        self, name: str, value: Any, attrs: dict[str, Any] | None
+    ) -> dict[str, Any]:
+        attrs = attrs or {}
+        attrs["class"] = "fr-input"
+        context = super().get_context(name, value, attrs)
+        context["widget"]["choices"] = self.choices
+        context["widget"]["instance"] = next(
+            (
+                choice[0].instance
+                for choice in list(self.choices)
+                if choice[0] and choice[0].instance.id == value
+            ),
+            None,
+        )
+        return context
+
+    class Media:
+        js = ("js/widgets/institution-autocomplete-widget.js",)
+
+
 class InstitutionWidgetWrapper(RelatedFieldWidgetWrapper):
     # pylint: disable=too-many-arguments
     def __init__(

@@ -1,3 +1,4 @@
+{% load dsfr %}
 <fieldset class="module {{ fieldset.classes }}">
     {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}
     {% if fieldset.description %}
@@ -16,7 +17,7 @@
                                     {{ field.label_tag }}
                                 </div>
                             {% else %}
-                                {{ field.label_tag }}
+                                {% label_tag_with_dsfr field.label_tag %}
                                 {% if field.is_readonly %}
                                     <div class="readonly">{{ field.contents }}</div>
                                 {% else %}

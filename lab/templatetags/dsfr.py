@@ -1,4 +1,5 @@
 from django import template
+from django.utils.html import format_html
 
 register = template.Library()
 
@@ -7,7 +8,18 @@ register = template.Library()
 def attrs_with_dsfr(context):
     if "widget" in context and "attrs" in context["widget"]:
         # add the dsfr class to the widget
+        classes_to_add = []
+        widget = context["widget"]
+        if "select.html" in widget["template_name"]:
+            classes_to_add.append("fr-select")
+        else:
+            classes_to_add.append("fr-input")
         context["widget"]["attrs"]["class"] = (
-            context["widget"]["attrs"].get("class", "") + " fr-input"
+            widget["attrs"].get("class", "") + " " + " ".join(classes_to_add)
         )
     return context
+
+
+@register.simple_tag
+def label_tag_with_dsfr(label_html: str):
+    return format_html(label_html.replace("<label", '<label class="fr-label"'))

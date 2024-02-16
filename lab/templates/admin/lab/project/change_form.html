@@ -1,6 +1,5 @@
 {% extends "admin/change_form.html" %}
-{% load projects i18n %}
-
+{% load i18n admin_modify static projects %}
 
 {%  block top_header_data %}
     {% project_header_json_data object_id %}
@@ -8,42 +7,89 @@
 
 {% block content %}
     {% if not add %}
+    <div class="fr-container">
         {% project_tabs object_id request %}
+    </div>
     {% endif %}
-    {{ block.super }}
+    <div id="content-main" class="project-{{ add|yesno:"add,change" }} fr-container fr-mt-3w">
+        {% block object-tools %}
+        {% if change and not is_popup %}
+          <ul class="object-tools">
+            {% block object-tools-items %}
+              {% change_form_object_tools %}
+            {% endblock %}
+          </ul>
+        {% endif %}
+        {% endblock %}
+        <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
+            <div>
+            {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+            {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+            {% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
+            {% if errors %}
+                <p class="errornote">
+                {% blocktranslate count counter=errors|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+                </p>
+                {{ adminform.form.non_field_errors }}
+            {% endif %}
+
+            <div class="fr-grid-row fr-grid-row--gutters fr-mb-3w">
+                <div class="fr-col-12 {% if inline_admin_formsets.0 %}fr-col-md-6{% endif %}">
+                    <div class="form-col">                        
+                        {% block field_sets %}
+                            {% for fieldset in adminform %}
+                            {% include "admin/includes/fieldset.html" %}
+                            {% endfor %}
+                        {% endblock %}
+                        
+                        {% block after_field_sets %}{% endblock %}
+                    </div>
+                </div>
+                {% block inline_field_sets %}
+                {% for inline_admin_formset in inline_admin_formsets  %}
+                {% if inline_admin_formset.opts.opts.label == "lab.BeamTimeRequest" %}
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div class="form-col">
+                            {% include inline_admin_formset.opts.template %}
+                        </div>
+                    </div>
+                {% endif %}
+                {% endfor %}
+                </div>
+                    {% for inline_admin_formset in inline_admin_formsets %}
+                        {% if inline_admin_formset.opts.opts.label != "lab.BeamTimeRequest" %}
+                        <div class="fr-grid-row">
+                            <div class="fr-col-12">
+                                <div class="form-col">
+                                {% include inline_admin_formset.opts.template %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endblock %}
+            
+            {% block after_related_objects %}{% endblock %}
+            
+            {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+            
+            {% block admin_change_form_document_ready %}
+                <script id="django-admin-form-add-constants"
+                        src="{% static 'admin/js/change_form.js' %}"
+                        {% if adminform and add %}
+                            data-model-name="{{ opts.model_name }}"
+                        {% endif %}
+                        async>
+            </script>
+            {% endblock %}
+            
+            {# JavaScript for prepopulated fields #}
+            {% prepopulated_fields_js %}
+            
+            </div>
+        </form>
+    </div>
 
     {# On-change-tab modal #}
-    <dialog aria-labelledby="fr-modal-prdformclose-title" id="fr-modal-prdformclose" class="fr-modal" role="dialog" >
-    <div class="fr-container fr-container--fluid fr-container-md">
-        <div class="fr-grid-row fr-grid-row--center">
-        <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
-            <div class="fr-modal__body">
-            <div class="fr-modal__header">
-                <button class="fr-link--close fr-link" aria-controls="fr-modal-prdformclose">{% translate 'Close' %}</button>
-            </div>
-            <div class="fr-modal__content">
-                <h1 id="fr-modal-prdformclose-title" class="fr-modal__title">
-                {% translate 'Are you sure you want to close this form?' %}
-                </h1>
-                <p>{% translate 'There are unsaved changes in the form. Changing tab will lose all changes. If you are not sure, cancel this action, check the form and save it.' %}</p>
-            </div>
-            <div class="fr-modal__footer">
-                <ul class="fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-lg fr-btns-group--icon-left">
-                <li>
-                    <button class="fr-btn fr-icon-checkbox-line" aria-controls="fr-modal-prdformclose-cancel" >
-                    {% translate 'Cancel' %}
-                    </button>
-                </li>
-                <li>
-                    <button class="fr-btn fr-icon-checkbox-line fr-btn--secondary" aria-controls="fr-modal-prdformclose-confirm">
-                    {% translate 'Yes, abandon changes' %}
-                    </button>
-                </li>
-                </ul>
-            </div>
-            </div>
-        </div>
-        </div>
-    </div>
-    </dialog>
+    {% include "admin/lab/project/on_change_modal.html" %}
 {% endblock %}

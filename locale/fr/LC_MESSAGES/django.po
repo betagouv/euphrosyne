@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-14 10:47+0100\n"
+"POT-Creation-Date: 2024-02-16 15:22+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -254,7 +254,9 @@ msgid "The online board to track your %(aglae_tag)s search projects"
 msgstr "L'outil en ligne pour gérer vos projets de recherche %(aglae_tag)s"
 
 msgid "Please correct the error below."
-msgstr "Merci de corriger l'erreur ci-dessous"
+msgid_plural "Please correct the errors below."
+msgstr[0] "Merci de corriger l'erreur ci-dessous"
+msgstr[1] "Merci de corriger les erreurs ci-dessous"
 
 msgid "Please correct the errors below."
 msgstr "Merci de corriger les erreurs ci-dessous"
@@ -265,8 +267,8 @@ msgstr "Projet"
 msgid "status"
 msgstr "statut"
 
-msgid "Project leader"
-msgstr "Chef de projet"
+msgid "Project member"
+msgstr "Membre du projet"
 
 msgid "Project members"
 msgstr "Membres du projet"
@@ -276,6 +278,15 @@ msgstr "Chef de projet"
 
 msgid "First run"
 msgstr "Premier run"
+
+msgid "First run date"
+msgstr "Date du premier run"
+
+msgid "No scheduled run."
+msgstr "Aucun run planifié."
+
+msgid "See runs"
+msgstr "Voir les runs"
 
 msgid "Runs"
 msgstr "Runs"
@@ -466,7 +477,7 @@ msgid "Problem statement"
 msgstr "Question posée"
 
 msgid "Description of the problematic being studied with the beam analysis"
-msgstr "Description de a problématique étudiée par analyse de faisceau"
+msgstr "Description de la problématique étudiée par analyse de faisceau"
 
 msgid "Form type"
 msgstr "Type du formulaire"
@@ -641,24 +652,6 @@ msgstr "Fenêtre pop-up en cours de fermeture…"
 msgid "Delete selected projects"
 msgstr "Supprimer les projets sélectionnés"
 
-msgid "Are you sure you want to close this form?"
-msgstr "Êtes-vous sûr(e) de vouloir fermer ce formulaire ?"
-
-msgid ""
-"There are unsaved changes in the form. Changing tab will lose all changes. "
-"If you are not sure, cancel this action, check the form and save it."
-msgstr ""
-"Le formulaire contient des modifications qui ne sont pas encore "
-"sauvegardées. Changer d'ongler vous fera perdre toutes ces modifications. Si "
-"vous n'êtes pas sûr(e), annulez cette action, vérifiez le formulaire et "
-"sauvegardez-le."
-
-msgid "Cancel"
-msgstr "Annuler"
-
-msgid "Yes, abandon changes"
-msgstr "Oui, abandonner les modifications"
-
 msgid "Filter"
 msgstr "Filtrer"
 
@@ -698,6 +691,24 @@ msgstr "Changer l'ordre de tri"
 #, python-format
 msgid " By %(filter_title)s "
 msgstr "Par %(filter_title)s "
+
+msgid "Are you sure you want to close this form?"
+msgstr "Êtes-vous sûr(e) de vouloir fermer ce formulaire ?"
+
+msgid ""
+"There are unsaved changes in the form. Changing tab will lose all changes. "
+"If you are not sure, cancel this action, check the form and save it."
+msgstr ""
+"Le formulaire contient des modifications qui ne sont pas encore "
+"sauvegardées. Changer d'ongler vous fera perdre toutes ces modifications. Si "
+"vous n'êtes pas sûr(e), annulez cette action, vérifiez le formulaire et "
+"sauvegardez-le."
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Yes, abandon changes"
+msgstr "Oui, abandonner les modifications"
 
 msgid "Show all"
 msgstr "Montrer tout"
@@ -775,8 +786,8 @@ msgstr "Vous pouvez accéder à l'invitation ici :"
 msgid "Join project"
 msgstr "Rejoindre le projet"
 
-msgid "Change leader"
-msgstr "Modification du chef de projet"
+msgid "Country"
+msgstr "Pays"
 
 msgid "Select an object or a group of objects"
 msgstr "Choisissez un object ou groupe d'objets"
@@ -862,6 +873,9 @@ msgid "Only alphanumeric, underscore, hyphen and space characters are allowed"
 msgstr ""
 "Seuls les lettres, chiffres, tirets bas, traits d'union et espaces sont des "
 "caractères valides"
+
+msgid "Change leader"
+msgstr "Modification du chef de projet"
 
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"
