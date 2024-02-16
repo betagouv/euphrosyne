@@ -27,6 +27,20 @@ class BaseParticipationForm(ModelForm):
         if instance:
             initial = {**(initial or {}), "user": instance.user.email}
         super().__init__(initial=initial, instance=instance, **kwargs)
+        self.fields["user"].widget.attrs["placeholder"] = _("Email")
+
+    def try_populate_institution(self):
+        if not self.data.get(f"{self.prefix}-institution") and self.data.get(
+            f"{self.prefix}-institution__name"
+        ):
+            (
+                institution,
+                _,
+            ) = models.Institution.objects.get_or_create(
+                name=self.data[f"{self.prefix}-institution__name"],
+                country=self.data.get(f"{self.prefix}-institution__country"),
+            )
+            self.data[f"{self.prefix}-institution"] = institution.pk
 
     def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
@@ -54,9 +68,11 @@ class BaseParticipationForm(ModelForm):
         model = models.Participation
         fields = ("user", "institution")
         widgets = {
-            "institution": widgets.InstitutionWidgetWrapper(
-                Select(), models.Institution.participation_set.rel
-            ),
+            "institution": widgets.InstitutionAutoCompleteWidget(
+                choices=models.Institution.objects.values_list(
+                    "id", "name", "country"
+                ).order_by("-name")
+            )
         }
         labels = {"institution": _("Institution")}
 
@@ -164,9 +180,11 @@ class RunDetailsForm(ModelForm):
                 models.Run.project.field.remote_field,  # pylint: disable=no-member
             ),
             **{
-                filter_fieldname: Select(choices=[(c, c) for c in ["", *choices]])
-                if OTHER_VALUE not in choices
-                else SelectWithFreeOther(choices=[(c, c) for c in ["", *choices]])
+                filter_fieldname: (
+                    Select(choices=[(c, c) for c in ["", *choices]])
+                    if OTHER_VALUE not in choices
+                    else SelectWithFreeOther(choices=[(c, c) for c in ["", *choices]])
+                )
                 for filter_fieldname, choices in [
                     (field.name, field.filters)
                     for field in models.Run.get_filters_fields()
@@ -318,4 +336,4 @@ class ProjectForm(ModelForm):
 
     class Meta:
         model = models.Project
-        fields = ["name"]
+        fields = ["name", "confidential"]

@@ -198,6 +198,11 @@ ul li {
   height: unset;
 }
 
+.submit-row .delete-btn {
+  color: var(--text-default-error);
+  box-shadow: inset 0 0 0 1px var(--text-default-error);
+}
+
 /* purgecss end ignore */
 
 /*

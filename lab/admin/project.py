@@ -7,6 +7,9 @@ from django.contrib.admin.views.main import ChangeList
 from django.db.models import Count, DateTimeField, Value
 from django.forms.models import BaseInlineFormSet, ModelForm, inlineformset_factory
 from django.http.request import HttpRequest
+from django.urls import reverse
+from django.utils.formats import date_format
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
@@ -68,7 +71,7 @@ class ParticipationFormSet(BaseInlineFormSet):
         save_as_new: bool = None,
         prefix: Optional[Any] = None,
         queryset: Optional[Any] = None,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None:
         super().__init__(
             data=data,
@@ -77,7 +80,7 @@ class ParticipationFormSet(BaseInlineFormSet):
             save_as_new=save_as_new,
             prefix=prefix,
             queryset=queryset,
-            **kwargs
+            **kwargs,
         )
         for form in self:
             if form.instance.is_leader and "DELETE" in form.fields:
@@ -86,11 +89,17 @@ class ParticipationFormSet(BaseInlineFormSet):
     def get_queryset(self):
         return super().get_queryset().order_by("-is_leader")
 
+    def full_clean(self):
+        for form in self:
+            form.try_populate_institution()
+        return super().full_clean()
+
 
 class ParticipationInline(LabPermissionMixin, admin.TabularInline):
     model = Participation
-    verbose_name = _("Project leader")
+    verbose_name = _("Project member")
     verbose_name_plural = _("Project members")
+    template = "admin/edit_inline/tabular_participation_in_project.html"
 
     lab_permissions = LabPermission(
         add_permission=LabRole.PROJECT_LEADER,
@@ -106,7 +115,7 @@ class ParticipationInline(LabPermissionMixin, admin.TabularInline):
         self,
         request: HttpRequest,
         obj: Optional[Project] = None,
-        **kwargs: Mapping[str, Any]
+        **kwargs: Mapping[str, Any],
     ):
         form = BaseParticipationForm if obj else LeaderParticipationForm
 
@@ -137,6 +146,12 @@ class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
 
     def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
         return obj
+
+    def has_delete_permission(
+        self, request: HttpRequest, obj: Project | None = None
+    ) -> bool:
+        # should only add or edit
+        return False
 
 
 class ProjectDisplayMixin:
@@ -169,7 +184,21 @@ class ProjectDisplayMixin:
             )
             if run_dates:
                 return run_dates[0]
-        return None
+        return ""
+
+    @staticmethod
+    @admin.display(description=_("First run date"))
+    def first_run_date_with_link(obj: Optional[Project]) -> str:
+        date = ProjectDisplayMixin.first_run_date(obj)
+        if not date:
+            return format_html(
+                '{} <a href="{}" class="{}">{}</a>',
+                _("No scheduled run."),
+                reverse("admin:lab_run_changelist") + f"?project={obj.id}",
+                "fr-link fr-link--sm",
+                _("See runs"),
+            )
+        return date_format(date, format="SHORT_DATE_FORMAT", use_l10n=True)
 
     @staticmethod
     @admin.display(description=_("Runs"))
@@ -191,7 +220,7 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         "number_of_runs",
         "status",
     )
-    readonly_fields = ("members", "editable_leader_user", "leader_user")
+    readonly_fields = ("first_run_date_with_link",)
 
     lab_permissions = LabPermission(
         add_permission=LabRole.ANY_STAFF_USER,
@@ -203,8 +232,6 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
 
     list_filter = [ProjectStatusListFilter]
     list_per_page = 20
-
-    form = ProjectForm
 
     class Media:
         js = ("pages/project.js",)
@@ -222,13 +249,7 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         self, request: HttpRequest, obj: Optional[Project] = None
     ) -> List[Tuple[Optional[str], Dict[str, Any]]]:
         basic_fields = (
-            (
-                "name",
-                "admin",
-                "comments",
-                "editable_leader_user" if is_lab_admin(request.user) else "leader_user",
-                "members",
-            )
+            ("name", "admin", "comments", "first_run_date_with_link")
             if obj
             else ("name",)
         )
@@ -258,6 +279,17 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
             ]
 
         return fieldsets
+
+    def get_form(
+        self,
+        request: HttpRequest,
+        obj: Optional[Project] = None,
+        change: bool = False,
+        **kwargs: dict[str, Any],
+    ):
+        if not obj:
+            return ProjectForm
+        return super().get_form(request, obj, change, **kwargs)
 
     def get_exclude(self, request: HttpRequest, obj: Optional[Project] = None):
         excluded = super().get_exclude(request, obj)
