@@ -16,7 +16,6 @@ from django.forms.widgets import (
 )
 from django.urls import reverse
 
-from euphro_auth.models import User
 from lab.models.run import Run
 
 
@@ -96,26 +95,6 @@ class InstitutionWidgetWrapper(RelatedFieldWidgetWrapper):
             can_delete_related=False,
             can_view_related=can_view_related,
         )
-
-
-class LeaderReadonlyWidget(Widget):
-    template_name = "widgets/leader_readonly.html"
-
-    class Media:
-        js = ("js/admin/ViewObjectLookups.js",)
-
-    def __init__(self, project_id: int, user: User = None, attrs=None):
-        self.user = user
-        self.project_id = project_id
-        super().__init__(attrs)
-
-    def get_context(self, name, value, attrs):
-        context = super().get_context(name, value, attrs)
-        return {
-            **context,
-            "user": self.user,
-            "project_id": self.project_id,
-        }
 
 
 class DisabledSelectWithHidden(Select):
