@@ -9,8 +9,8 @@ from django.utils import timezone
 from graphene_django import DjangoObjectType
 
 from euphro_auth.models import User
-from lab.methods.model_fields import DetectorCharField
 
+from .methods.dto import method_model_to_dto
 from .models import Institution, Object, ObjectGroup, Participation, Project, Run
 
 StatPeriodLiteral = Literal["all", "year"]
@@ -100,37 +100,15 @@ class RunType(DjangoObjectType):
 
     def resolve_methods(self, info):
         methods = []
-        for method_field in self.get_method_fields():
-            method = MethodType(name=method_field.method, detectors=[])
-            if not getattr(
-                self, method_field.attname
-            ):  # Empty detectors if method is not enabled
-                continue
-            for detector_field in self.get_detector_fields():
-                if detector_field.method == method.name:
-                    # DetectorCharField
-                    if isinstance(detector_field, DetectorCharField):
-                        if not getattr(self, detector_field.attname):
-                            continue
-                        detector = DetectorType(
-                            name=getattr(self, detector_field.attname),
-                            filters=[],
-                        )
-                    # DetectorBooleanField
-                    else:
-                        detector = DetectorType(
-                            name=detector_field.detector,
-                            filters=[],
-                        )
-                        if not getattr(self, detector_field.attname):
-                            continue
-                    for filter_field in self.get_filters_fields():
-                        if (
-                            filter_field.method == method.name
-                            and filter_field.detector == detector.name
-                        ):
-                            detector.filters.append(getattr(self, filter_field.attname))
-                    method.detectors.append(detector)
+        for method_dto in method_model_to_dto(self):
+            method = MethodType(name=method_dto.name, detectors=[])
+            for detector_dto in method_dto.detectors:
+                method.detectors.append(
+                    DetectorType(
+                        name=detector_dto.name,
+                        filters=detector_dto.filters,
+                    )
+                )
             methods.append(method)
         return methods
 
