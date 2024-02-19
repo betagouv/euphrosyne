@@ -1,0 +1,10 @@
+{% load i18n %}
+<div class="fr-row">
+    <div class="fr-col-12 fr-col-md-8">
+        <h2>{% translate "No run yet" %}</h2>
+        
+        <p>{% translate "A run is a series of analyses performed on one or multiple objects under the same experimental conditions. A starting date will be assigned to each run by a new AGLAE administrator." %}</p>
+        
+        <a class="fr-mt-1w fr-btn fr-ml-1w" href="{% url "admin:lab_run_add" %}">{% translate "Create a first run" %}</a>
+    </div>
+<div>

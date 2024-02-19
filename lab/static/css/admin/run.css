@@ -1,9 +1,14 @@
+body {
+  background-color: var(--background-alt-grey);
+}
+
 #changelist {
   background: unset;
 }
 
-.mt-30 {
-  margin-top: 30px;
+.module h4 {
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .action-select {
@@ -20,8 +25,7 @@
 }
 
 .run-clickable-card__selected {
-  border: 3px solid var(--breadcrumbs-bg);
-  padding: 3px;
+  outline: 3px solid var(--border-default-blue-france);
 }
 
 .run-footer {
@@ -46,4 +50,19 @@
 
 .run-list .fr-grid-row--gutters {
   margin: 0;
+}
+
+.card-add-run {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-style: dashed;
+  height: 100%;
+  border-color: var(--border-default-grey);
+  min-height: 300px;
+}
+
+.module .fr-card__desc p {
+  padding-left: 0;
+  padding-right: 0;
 }

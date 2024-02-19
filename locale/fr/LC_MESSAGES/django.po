@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-16 15:22+0100\n"
+"POT-Creation-Date: 2024-02-19 11:05+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -735,11 +735,40 @@ msgid_plural "%(counter)s projects"
 msgstr[0] "%(counter)s projet"
 msgstr[1] "%(counter)s projets"
 
-msgid "Create a run"
-msgstr "Créer un run"
+msgid "No run yet"
+msgstr "Aucun run pour le moment"
+
+#, fuzzy
+#| msgid ""
+#| "A run is a series of analyses performed on one or multiple objects under "
+#| "the same experimental conditions. A starting date will be assigned to "
+#| "each run by a New AGLAE administrator."
+msgid ""
+"A run is a series of analyses performed on one or multiple objects under the "
+"same experimental conditions. A starting date will be assigned to each run "
+"by a new AGLAE administrator."
+msgstr ""
+"Un run est une série d'analyses réalisées sur un ou plusieurs objets dans "
+"les mêmes conditions expérimentales. Une date de début sera attribuée à "
+"chaque run par un administrateur New AGLAE."
+
+msgid "Create a first run"
+msgstr "Créer un premier run"
 
 msgid "Methods"
 msgstr "Méthodes"
+
+msgid "Start"
+msgstr "Début"
+
+msgid "End"
+msgstr "Fin"
+
+msgid "Energy"
+msgstr "Energie"
+
+msgid "Create new run"
+msgstr "Créer un nouveau run"
 
 msgid "Save and continue editing"
 msgstr "Sauvegarder et continuer l'édition"
