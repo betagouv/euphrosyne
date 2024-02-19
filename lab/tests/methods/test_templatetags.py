@@ -13,13 +13,16 @@ from django.urls import reverse
 from lab.widgets import DisabledSelectWithHidden
 
 from ...admin.run import RunAdmin
+from ...methods.dto import method_model_to_dto
 from ...models import Run
 from ...templatetags.methods import (
     _get_adminfield_name,
     detector_fields,
     filters_field,
     method_fields,
+    run_methods_repr,
 )
+from .. import factories
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -87,3 +90,14 @@ def test_LE0_filters_fields_returns_corresponding_filter_fieldnames_in_order(adm
         filters_field(adminform, "detector_LE0").field.name
         == "filters_for_detector_LE0"
     )
+
+
+@pytest.mark.django_db
+def test_run_methods_repr():
+    run = factories.RunFactory(
+        method_PIXE=True,
+        detector_LE0=True,
+        filters_for_detector_LE0="Helium",
+    )
+
+    assert run_methods_repr(run) == {"methods": method_model_to_dto(run)}

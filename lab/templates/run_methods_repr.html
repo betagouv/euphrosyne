@@ -1,0 +1,26 @@
+<div>
+    <div class="fr-grid-row">
+        {% for method in methods %}
+            <div
+              class="fr-col-6"
+              style="display: flex;">
+              <div>
+                <strong>{{ method.name }}</strong>
+              </div>
+              <div class="fr-ml-2v">
+                {% for detector in method.detectors %}
+                      <div>
+                        <span>
+                          {{ detector.name }}
+                          {% if detector.filters %}
+                          {{": "}}
+                          {% endif %}
+                          {{ detector.filters|join:", " }}
+                        </span>
+                      </div>
+                {% endfor %}
+              </div>
+            </div>
+        {% endfor %}
+    </div>
+  </div>
