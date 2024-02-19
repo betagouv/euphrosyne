@@ -1,8 +1,9 @@
-{% load admin_urls i18n %}
-<div class="run-list fr-container--fluid mt-30 px-0">
+{% load admin_urls i18n methods %}
+<div class="run-list fr-container--fluid fr-mt-3w px-0">
   <div class="fr-grid-row fr-grid-row--gutters">
+    {% if runs %}
     {% for run in runs %}
-    <div class="fr-col-6">
+    <div class="fr-col-12 fr-col-md-6 fr-col-lg-4">
       <div id="runs-{{ run.id }}" class="run-clickable-card fr-card fr-card--no-arrow" data-runid="{{ run.id }}" data-changestateaction="{% if run.change_state_action_name %}{{ run.change_state_action_name }}{% endif %}">
         <div class="fr-card__body">      
           <h4 class="fr-card__title flex-container">
@@ -22,23 +23,52 @@
           <div class="fr-card__desc">
 
             <div class="flex-container fr-text--sm">
-              <div>{{ run.start_date }}</div>
-              <div>{{ run.end_date }}</div>
+              <p class="fr-text--sm fr-mb-0">
+                <span class="fr-text--xs">{% translate "Start" %}</span>
+                <br>{% if run.start_date %}{{ run.start_date|date:"SHORT_DATE_FORMAT" }} {{ run.start_date|time:"H:i" }}{% else %}-{% endif %}
+              </p>
+              <p class="fr-text--sm fr-mb-0">
+                <span class="fr-text--xs">{% translate "End" %}</span>
+                <br>{% if run.end_date %}{{ run.end_date|date:"SHORT_DATE_FORMAT" }} {{ run.end_date|time:"H:i" }}{% else %}-{% endif %}
+              </p>
             </div>
 
             <div class="fr-text--xs mb-0">{% translate "Experimental conditions" %}</div>
-            <div class="flex-container fr-text--sm">
-              <div>{{ run.particle_type|default:"-" }}</div>
-              <div>{{ run.energy_in_keV|default:"-" }}</div>
-              <div>{{ run.beamline|default:"-" }}</div>
+            <div class="flex-container fr-text--sm fr-mb-1v">
+              <p>
+                <span class="fr-text--xs">{% translate "Particle type" %}</span>
+                <br>{{ run.particle_type|default:"-" }}
+              </p>
+              <p>
+                <span class="fr-text--xs">{% translate "Energy" %}</span>
+                <br>{{ run.energy_in_keV|default:"-" }}
+              </p>
+              <p>
+                <span class="fr-text--xs">{% translate "Beamline" %}</span>
+                <br>{{ run.beamline|default:"-" }}
+              </p>
             </div>
+            
+            {% run_methods_repr run %}
+            
           </div>
-
-          {#<div class="fr-text--xs mb-0">{% translate "Methods" %}</div>#}
-
         </div>
       </div>
     </div>
   {% endfor %}
+  <div class="fr-col-6 fr-col-lg-4">
+    <div class="card-add-run">
+      <a class="fr-btn fr-btn--icon-left fr-icon-add-line" href="{% url "admin:lab_run_add" %}?project={{ project_id }}">
+        {% trans "Create new run" %}
+      </a>
+    </div>
   </div>
+
+  {% else %}          
+  <div class="fr-mt-5w">
+    {% include "admin/lab/run/change_list__no_run.html" %}
+  </div>
+  {% endif %}
+
+
 </div>

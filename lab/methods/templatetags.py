@@ -1,7 +1,10 @@
-from typing import Optional
+from typing import Literal, Optional
 
 from django.contrib.admin.helpers import AdminField, AdminForm
 
+from lab.models.run import Run
+
+from .dto import MethodDTO, method_model_to_dto
 from .models import MethodModel
 
 
@@ -52,3 +55,7 @@ def filters_field(
     if filters_modelfield:
         return _get_adminfields(adminform, [filters_modelfield.name])[0]
     return None
+
+
+def run_methods_repr(run: Run) -> dict[Literal["method"], list[MethodDTO]]:
+    return {"methods": method_model_to_dto(run)}
