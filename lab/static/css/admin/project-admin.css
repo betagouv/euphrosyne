@@ -60,12 +60,6 @@ fieldset textarea.vLargeTextField {
   width: 100%;
 }
 
-#project_form .submit-row {
-  background: none;
-  border: none;
-  justify-content: right;
-}
-
 #project_form input {
   max-width: 35rem;
 }
