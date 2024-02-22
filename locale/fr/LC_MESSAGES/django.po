@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-19 11:05+0100\n"
+"POT-Creation-Date: 2024-02-22 16:43+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -130,6 +130,12 @@ msgstr "L'équipe Euphrosyne"
 
 msgid "Enter your information"
 msgstr "Entrez vos informations"
+
+msgid "History"
+msgstr "Historique"
+
+msgid "View on site"
+msgstr "Voir sur le site"
 
 msgid "Upcoming projects"
 msgstr "Projets à venir"
@@ -319,6 +325,13 @@ msgstr "Objet(s) / Échantillon(s)"
 msgid "Experimental conditions"
 msgstr "Conditions expérimentales"
 
+msgid ""
+"You do not have permission for this project. If you think this is an error, "
+"please contact the New AGLAE team."
+msgstr ""
+"Vous n'avez pas les droits pour ce projet. Si vous pensez que c'est une "
+"erreur, contactez l'équipe New AGLAE."
+
 #, python-brace-format
 msgid ""
 "The run can't start while the following Run fields aren't defined: {fields}."
@@ -371,14 +384,14 @@ msgstr "Institution"
 msgid "No leader"
 msgstr "Aucun chef de projet"
 
-msgid "The end date must be after the start date"
-msgstr "La date de fin doit être après la date de début"
-
 msgid "Invalid filter choice"
 msgstr "Choix de filtre invalide"
 
 msgid "Only Admin users might rewind runs."
 msgstr "Seuls les utilisateurs Admin peuvent remettre un run en arrière."
+
+msgid "The end date must be after the start date"
+msgstr "La date de fin doit être après la date de début"
 
 msgid "I have read and accepted the general conditions of Euphrosyne."
 msgstr "J'ai lu et accepté les conditions générales d'Euphrosyne."
@@ -501,10 +514,10 @@ msgid "Run status"
 msgstr "Statut du run"
 
 msgid "Start date"
-msgstr "Démarré"
+msgstr "Date de début"
 
 msgid "End date"
-msgstr "Date d'embargo"
+msgstr "Date de fin"
 
 msgid "Embargo date"
 msgstr "Date d'embargo"
@@ -643,9 +656,6 @@ msgstr "Modification"
 msgid "View"
 msgstr "Voir"
 
-msgid "View on site"
-msgstr "Voir sur le site"
-
 msgid "Popup closing…"
 msgstr "Fenêtre pop-up en cours de fermeture…"
 
@@ -735,6 +745,24 @@ msgid_plural "%(counter)s projects"
 msgstr[0] "%(counter)s projet"
 msgstr[1] "%(counter)s projets"
 
+msgid "Reschedule"
+msgstr "Re-planifier"
+
+msgid "Schedule"
+msgstr "Planifier"
+
+msgid "Start"
+msgstr "Début"
+
+msgid "End"
+msgstr "Fin"
+
+msgid "Embargo"
+msgstr "Embargo"
+
+msgid "No embargo date"
+msgstr "Pas de date d'embargo"
+
 msgid "No run yet"
 msgstr "Aucun run pour le moment"
 
@@ -758,17 +786,14 @@ msgstr "Créer un premier run"
 msgid "Methods"
 msgstr "Méthodes"
 
-msgid "Start"
-msgstr "Début"
-
-msgid "End"
-msgstr "Fin"
-
 msgid "Energy"
 msgstr "Energie"
 
 msgid "Create new run"
 msgstr "Créer un nouveau run"
+
+msgid "Schedule run"
+msgstr "Planifier le run"
 
 msgid "Save and continue editing"
 msgstr "Sauvegarder et continuer l'édition"

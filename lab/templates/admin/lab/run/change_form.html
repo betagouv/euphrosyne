@@ -1,19 +1,85 @@
 {% extends "admin/change_form.html" %}
-{% load i18n admin_urls projects %}
+{% load i18n admin_urls static admin_modify projects %}
+
+{% block object-tools %}
+{% if change and not is_popup %}
+  <ul class="aglae-object-tools">
+    {% block object-tools-items %}
+      {% change_form_object_tools %}
+    {% endblock %}
+    {% if user.is_lab_admin %}
+    <li class="fr-ml-1w">
+        <button class="fr-btn" data-fr-opened="{{ schedule_modal.form.errors|yesno:"true,false" }}" aria-controls="{{ schedule_modal.id }}">
+            {% if original.start_date %}{% translate "Reschedule" %}{% else %}{% translate "Schedule" %}{% endif %}
+        </button>
+    </li>
+    {% endif %}
+  </ul>
+{% endif %}
+{% endblock %}
 
 {% block content %}
-{% project_tabs project.id request %}
-{{ block.super }}
+
+{% include "admin/lab/run/schedule_modal.html" %}
+
+<div class="fr-container">
+    {% project_tabs project.id request %}
+    <div>
+        <h1>{{ original.label }}</h1>
+
+        {% if original.start_date %}
+        <div class="run-dates">
+            <span class="fr-icon fr-icon-calendar-line" aria-hidden="true"></span>
+            <p class="fr-ml-2w">
+                <span class="fr-text--sm">{% translate "Start" %}</span><br>{{ original.start_date|date:"SHORT_DATE_FORMAT" }} {{ original.start_date|time:"H:i" }}
+            </p>
+            {% if original.end_date %}
+            <p class="fr-ml-2w"><span class="fr-text--sm">{% translate "End" %}</span><br>
+                    {{ original.end_date|date:"SHORT_DATE_FORMAT" }} {{ original.end_date|time:"H:i" }}{% endif %}
+            </p>
+            {% if request.user.is_lab_admin %}
+            <span class="fr-icon fr-icon-lock-line fr-ml-3w" aria-hidden="true"></span>
+            <p class="fr-ml-2w"><span class="fr-text--sm">{% translate "Embargo" %}</span><br>
+                {% if original.embargo_date %}{{ original.embargo_date|date:"SHORT_DATE_FORMAT" }}{% else %}{% translate "No embargo date" %}{% endif %}</p>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+    {{ block.super }}
 {% endblock %}
 
 {% block field_sets %}
-{% for fieldset in adminform %}
-    {% if fieldset.name == "METHODS" %}
-        {% include "admin/lab/run/includes/methods_fieldset.html" %}
-    {% else %}
-        {% include "admin/includes/fieldset.html" %}
+<div class="fr-grid-row fr-grid-row--gutters">
+    <div class="fr-col-12 fr-col-md-7">
+    {% for fieldset in adminform %}
+        {% if fieldset.name == "METHODS" %}
+            {% include "admin/lab/run/includes/methods_fieldset.html" %}
+        {% else %}
+            {% include "admin/includes/fieldset.html" %}
+        {% endif %}
+    {% endfor %}
+    </div>
+    <div class="fr-col-12 fr-col-md-5">
+        {% for inline_admin_formset in inline_admin_formsets  %}
+        {% if inline_admin_formset.opts.opts.label == "lab.Run_run_object_groups" %}
+        {% include inline_admin_formset.opts.template %}
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block inline_field_sets %}
+    <div class="fr-grid-row">
+    {% for inline_admin_formset in inline_admin_formsets  %}
+    {% if inline_admin_formset.opts.opts.label != "lab.Run_run_object_groups" %}
+    {% include inline_admin_formset.opts.template %}
     {% endif %}
-{% endfor %}
+    {% endfor %}
+    </div>
 {% endblock %}
 
 {% if project %}
@@ -21,3 +87,8 @@
     {% project_header_json_data project.id %}
 {% endblock %}
 {% endif %}
+
+{% block footer %}
+{{ block.super }}
+<script type="text/javascript" src="{% static 'pages/run-change-form.js' %}"></script>
+{% endblock %}

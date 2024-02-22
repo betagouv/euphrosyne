@@ -48,6 +48,21 @@ body {
   color: var(--text-active-blue-france);
 }
 
+.change-form .run-dates {
+  display: flex;
+}
+
+.change-form .run-dates span.fr-icon {
+  color: var(--text-action-high-blue-france);
+}
+
+.change-form fieldset.flex-flow--wrap h2 {
+  width: 100%;
+}
+.change-form fieldset.flex-flow--wrap .form-row {
+  width: 33%;
+}
+
 .run-list .fr-grid-row--gutters {
   margin: 0;
 }
