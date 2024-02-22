@@ -1,10 +1,9 @@
-from datetime import time
 from typing import Any, Optional, Tuple
 
 from django import forms
 from django.contrib.admin import site
 from django.contrib.admin.sites import AdminSite
-from django.contrib.admin.widgets import AdminSplitDateTime, RelatedFieldWidgetWrapper
+from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.forms.widgets import (
     ChoiceWidget,
@@ -116,29 +115,6 @@ class DisabledSelectWithHidden(Select):
         return self.hidden_widget.value_from_datadict(data, files, name)
 
 
-class ProjectWidgetWrapper(RelatedFieldWidgetWrapper):
-    # pylint: disable=too-many-arguments
-    def __init__(
-        self,
-        widget: forms.Widget,
-        rel: ForeignObjectRel,
-        can_add_related: Optional[bool] = None,
-        can_change_related: bool = None,
-        can_delete_related: bool = None,
-        can_view_related: bool = None,
-    ) -> None:
-        super().__init__(
-            widget,
-            rel,
-            site,
-            # [FIXME] Add button still working
-            can_add_related=False,
-            can_change_related=False,
-            can_delete_related=False,
-            can_view_related=False,
-        )
-
-
 class TagsInput(Input):
     template_name = "widgets/tags_input.html"
 
@@ -147,14 +123,19 @@ class TagsInput(Input):
         css = {"all": ("css/widgets/tags-input.css",)}
 
 
-class SplitDateTimeWithDefaultTime(AdminSplitDateTime):
+class SplitDateTimeWithDefaultTime(forms.SplitDateTimeWidget):
+    template_name = "admin/lab/widgets/split_datetime.html"
+
     def __init__(
         self,
-        attrs: Optional[dict[str, str]] = None,
-        default_time_value: time = None,
-    ) -> None:
+        default_time_value=None,
+        attrs=None,
+    ):
         self.default_time_value = default_time_value
-        super().__init__(attrs)
+        super().__init__(
+            attrs,
+            "%Y-%m-%d",
+        )
 
     def get_context(
         self, name: str, value: Any, attrs: Optional[dict[str, str]]
@@ -165,6 +146,8 @@ class SplitDateTimeWithDefaultTime(AdminSplitDateTime):
             and not context["widget"]["subwidgets"][1]["value"]
         ):
             context["widget"]["subwidgets"][1]["value"] = self.default_time_value
+        context["widget"]["subwidgets"][0]["type"] = "date"
+        context["widget"]["subwidgets"][1]["type"] = "time"
         return context
 
 

@@ -1,6 +1,6 @@
-<select class="other-select" name="{{ widget.name }}">{% for group_name, group_choices, group_index in widget.optgroups %}{% if group_name %}
+<select class="other-select fr-select" name="{{ widget.name }}">{% for group_name, group_choices, group_index in widget.optgroups %}{% if group_name %}
   <optgroup label="{{ group_name }}">{% endif %}{% for option in group_choices %}
   {% include option.template_name with widget=option value_is_other=widget.value_is_other %}{% endfor %}{% if group_name %}
   </optgroup>{% endif %}{% endfor %}
 </select>
-<input class="other-input" name="{{ widget.name }}" {% if widget.value_is_other %}value="{{ widget.value.0|stringformat:'s' }}"{% endif %}>
+<input class="other-input fr-input" name="{{ widget.name }}" {% if widget.value_is_other %}value="{{ widget.value.0|stringformat:'s' }}"{% endif %}>

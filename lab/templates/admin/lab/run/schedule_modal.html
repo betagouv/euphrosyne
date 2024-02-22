@@ -1,0 +1,30 @@
+{% load i18n %}
+<form id="{{ schedule_modal.id }}-form" method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="_action" value="schedule_run">
+    <input type="hidden" name="_continue" value="1">
+    <dialog aria-labelledby="{{ schedule_modal.id }}-title-modal" role="dialog" id="{{ schedule_modal.id }}" class="fr-modal">
+        <div class="fr-container fr-container--fluid fr-container-md">
+            <div class="fr-grid-row fr-grid-row--center">
+                <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                    <div class="fr-modal__body">
+                        <div class="fr-modal__header">
+                            <button class="fr-btn--close fr-btn" title="{% translate "Close" %}" aria-controls="{{ schedule_modal.id }}">{% translate "Close" %}</button>
+                        </div>
+                        <div class="fr-modal__content">
+                            <h1 id="fr-modal-title-modal" class="fr-modal__title"><span class="fr-icon-arrow-right-line fr-icon--lg"></span>{% translate "Schedule run" %}</h1>
+                            {{ schedule_modal.form }}
+                        </div>
+                        <div class="fr-modal__footer">
+                            <div class="fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-lg fr-btns-group--icon-left">
+                                <button class="fr-btn fr-icon-checkbox-circle-line fr-btn--icon-left" type="submit">
+                                    {% translate "Save" %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+</form>

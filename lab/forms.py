@@ -1,13 +1,17 @@
-from typing import Any
+from datetime import time
+from typing import Any, Mapping
 
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.forms.fields import BooleanField, EmailField
+from django.core.files.base import File
+from django.db.models.base import Model
+from django.forms.fields import BooleanField, EmailField, SplitDateTimeField
 from django.forms.forms import Form
 from django.forms.models import ModelForm
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput, Select
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User, UserInvitation
@@ -153,32 +157,12 @@ def _get_energy_levels_choices(
     return [(level, level) for level in RECOMMENDED_ENERGY_LEVELS[particle_type]]
 
 
-@controlled_datalist_form(
-    controller_field_name="particle_type",
-    controlled_field_name="energy_in_keV",
-    choices={
-        particle_type: _get_energy_levels_choices(particle_type)
-        for particle_type in models.Run.ParticleType
-    },
-)
-class RunDetailsForm(ModelForm):
+class BaseRunDetailsForm(ModelForm):
     class Meta:
         model = models.Run
-        fields = (
-            "label",
-            "start_date",
-            "end_date",
-            "beamline",
-            *[f.name for f in models.Run.get_method_fields()],
-            *[f.name for f in models.Run.get_detector_fields()],
-            *[f.name for f in models.Run.get_filters_fields()],
-        )
+        fields = []
 
         widgets = {
-            "project": widgets.ProjectWidgetWrapper(
-                widgets.DisabledSelectWithHidden(),
-                models.Run.project.field.remote_field,  # pylint: disable=no-member
-            ),
             **{
                 filter_fieldname: (
                     Select(choices=[(c, c) for c in ["", *choices]])
@@ -196,29 +180,11 @@ class RunDetailsForm(ModelForm):
         cleaned_data = super().clean()
         errors = {}
 
-        cleaned_data, errors = self._clean_dates(cleaned_data, errors)
         cleaned_data, errors = self._clean_methods(cleaned_data, errors)
 
         if errors:
             raise ValidationError(errors)
         return cleaned_data
-
-    @staticmethod
-    def _clean_dates(cleaned_data, errors):
-        cleaned_start_date = cleaned_data.get("start_date")
-        cleaned_end_date = cleaned_data.get("end_date")
-
-        if (
-            cleaned_start_date
-            and cleaned_end_date
-            and cleaned_end_date < cleaned_start_date
-        ):
-            errors["end_date"] = ValidationError(
-                _("The end date must be after the start date"),
-                code="start_date_after_end_date",
-            )
-
-        return cleaned_data, errors
 
     def _clean_methods(self, cleaned_data, errors):
         # Reset detectors whose method is not selected:
@@ -247,6 +213,92 @@ class RunDetailsForm(ModelForm):
                     _("Invalid filter choice"), code="invalid-filters-choice"
                 )
         return cleaned_data, errors
+
+
+@controlled_datalist_form(
+    controller_field_name="particle_type",
+    controlled_field_name="energy_in_keV",
+    choices={
+        particle_type: _get_energy_levels_choices(particle_type)
+        for particle_type in models.Run.ParticleType
+    },
+)
+class RunDetailsForm(BaseRunDetailsForm):
+    class Meta(BaseRunDetailsForm.Meta):
+        fields = (
+            "label",
+            "beamline",
+            *[f.name for f in models.Run.get_method_fields()],
+            *[f.name for f in models.Run.get_detector_fields()],
+            *[f.name for f in models.Run.get_filters_fields()],
+        )
+
+
+@controlled_datalist_form(
+    controller_field_name="particle_type",
+    controlled_field_name="energy_in_keV",
+    choices={
+        particle_type: _get_energy_levels_choices(particle_type)
+        for particle_type in models.Run.ParticleType
+    },
+)
+class RunDetailsAdminForm(BaseRunDetailsForm):
+    class Meta(BaseRunDetailsForm.Meta):
+        fields = fields = (
+            "label",
+            "beamline",
+            *[f.name for f in models.Run.get_method_fields()],
+            *[f.name for f in models.Run.get_detector_fields()],
+            *[f.name for f in models.Run.get_filters_fields()],
+        )
+
+
+class RunCreateForm(ModelForm):
+    class Meta:
+        model = models.Run
+        fields = ("label",)
+
+    def save(self, commit: bool = False) -> Any:
+        self.instance.embargo_date = timezone.now() + timezone.timedelta(days=365 * 2)
+        return super().save(commit)
+
+
+class RunCreateAdminForm(ModelForm):
+    class Meta:
+        model = models.Run
+        fields = ("label", "embargo_date")
+
+    # pylint: disable=too-many-arguments
+    def __init__(
+        self,
+        data: Mapping[str, Any] | None = None,
+        files: Mapping[str, File] | None = None,
+        auto_id: bool | str = "id_%s",
+        prefix: str | None = None,
+        initial: dict[str, Any] | None = None,
+        error_class: ErrorList = ErrorList,
+        label_suffix: str | None = None,
+        empty_permitted: bool = False,
+        instance: Model | None = None,
+        use_required_attribute: bool | None = None,
+        renderer: Any = None,
+    ):
+        if not initial:
+            initial = {}
+        initial["embargo_date"] = timezone.now() + timezone.timedelta(days=365 * 2)
+        super().__init__(
+            data,
+            files,
+            auto_id,
+            prefix,
+            initial,
+            error_class,
+            label_suffix,
+            empty_permitted,
+            instance,
+            use_required_attribute,
+            renderer,
+        )
 
 
 class RunStatusBaseForm(ModelForm):
@@ -319,6 +371,83 @@ class RunStatusMemberForm(RunStatusBaseForm):
                 code="run_rewinding_not_allowed_to_members",
             )
         return status
+
+
+class RunScheduleForm(ModelForm):
+    start_date = SplitDateTimeField(
+        widget=widgets.SplitDateTimeWithDefaultTime(default_time_value=time(9)),
+    )
+    end_date = SplitDateTimeField(
+        widget=widgets.SplitDateTimeWithDefaultTime(default_time_value=time(18)),
+    )
+
+    class Meta:
+        model = models.Run
+        fields = ("start_date", "end_date", "embargo_date")
+
+    # pylint: disable=too-many-arguments
+    def __init__(
+        self,
+        data: Mapping[str, Any] | None = None,
+        files: Mapping[str, File] | None = None,
+        auto_id: bool | str = "id_%s",
+        prefix: str | None = None,
+        initial: dict[str, Any] | None = None,
+        error_class: ErrorList = ErrorList,
+        label_suffix: str | None = None,
+        empty_permitted: bool = False,
+        instance: Model | None = None,
+        use_required_attribute: bool | None = None,
+        renderer: Any = None,
+    ) -> None:
+        if not initial:
+            initial = {}
+        if (
+            not instance or not instance.embargo_date
+        ) and "embargo_date" not in initial:
+            initial["embargo_date"] = timezone.now() + timezone.timedelta(days=365 * 2)
+        super().__init__(
+            data,
+            files,
+            auto_id,
+            prefix,
+            initial,
+            error_class,
+            label_suffix,
+            empty_permitted,
+            instance,
+            use_required_attribute,
+            renderer,
+        )
+        self.fields["embargo_date"].widget.format = "%Y-%m-%d"
+        self.fields["embargo_date"].widget.input_type = "date"
+
+    def clean(self):
+        cleaned_data = super().clean()
+        errors = {}
+
+        cleaned_data, errors = self._clean_dates(cleaned_data, errors)
+
+        if errors:
+            raise ValidationError(errors)
+        return cleaned_data
+
+    @staticmethod
+    def _clean_dates(cleaned_data, errors):
+        cleaned_start_date = cleaned_data.get("start_date")
+        cleaned_end_date = cleaned_data.get("end_date")
+
+        if (
+            cleaned_start_date
+            and cleaned_end_date
+            and cleaned_end_date < cleaned_start_date
+        ):
+            errors["end_date"] = ValidationError(
+                _("The end date must be after the start date"),
+                code="start_date_after_end_date",
+            )
+
+        return cleaned_data, errors
 
 
 class BeamTimeRequestForm(ModelForm):

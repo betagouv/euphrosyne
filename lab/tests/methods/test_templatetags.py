@@ -38,13 +38,14 @@ def adminform():
     # pylint: disable=line-too-long
     # Raincoat: pypi package: Django==4.1.2 path: django/contrib/admin/options.py element: ModelAdmin._changeform_view
 
+    run = Run(id=1)
     run_admin = RunAdmin(model=Run, admin_site=AdminSite())
-    request = RequestFactory().get(reverse("admin:lab_run_add"))
+    request = RequestFactory().get(reverse("admin:lab_run_change", args=[str(run.id)]))
     request.user = AnonymousUser()
 
-    fieldsets = run_admin.get_fieldsets(request, None)
+    fieldsets = run_admin.get_fieldsets(request, run)
     ModelForm = run_admin.get_form(  # pylint: disable=invalid-name
-        request, None, change=False, fields=flatten_fieldsets(fieldsets)
+        request, run, change=True, fields=flatten_fieldsets(fieldsets)
     )
     initial = run_admin.get_changeform_initial_data(request)
     form = ModelForm(initial=initial)
@@ -52,7 +53,7 @@ def adminform():
         form,
         list(fieldsets),
         {},
-        readonly_fields=run_admin.get_readonly_fields(request, None),
+        readonly_fields=run_admin.get_readonly_fields(request, run),
         model_admin=run_admin,
     )
 
