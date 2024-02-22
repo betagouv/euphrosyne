@@ -1,4 +1,3 @@
-import { getMethodInputs, toggleSubFieldsWrapper } from "../run/methods.js";
 import {
   getDeleteRunButtons,
   handleDelete,
@@ -9,11 +8,6 @@ import {
 } from "../run/changelist.js";
 
 document.addEventListener("DOMContentLoaded", function () {
-  getMethodInputs().forEach((el) => {
-    toggleSubFieldsWrapper(el);
-    el.addEventListener("click", () => toggleSubFieldsWrapper(el), false);
-  });
-
   getDeleteRunButtons().forEach((el) => {
     const runid = el.dataset.runid;
     el.addEventListener("click", (e) => {

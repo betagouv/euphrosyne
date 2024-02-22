@@ -2,10 +2,6 @@ body.change-form {
   background-color: var(--background-alt-grey);
 }
 
-select {
-  height: auto;
-}
-
 .related-widget-wrapper {
   align-items: center;
 }

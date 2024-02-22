@@ -31,6 +31,10 @@ body {
     "Bitstream Vera Sans", Verdana, Arial, sans-serif;
 }
 
+select {
+  height: auto;
+}
+
 input[type="button"]:not(:disabled):hover, input[type="image"]:not(:disabled):hover, input[type="reset"]:not(:disabled):hover, input[type="submit"]:not(:disabled):hover {
   --hover: var(--background-action-high-blue-france-hover);
 }
@@ -53,6 +57,9 @@ a:visited {
 }
 a.fr-btn {
   color: var(--text-inverted-blue-france);
+}
+a.fr-btn.fr-btn--secondary {
+  color: var(--text-action-high-blue-france);
 }
 
 .content h1 {
@@ -131,10 +138,6 @@ label.required:after {
   padding: 0 !important;
 }
 
-.change-form .object-tools {
-  margin-top: -64px;
-}
-
 .project-tabs {
   margin-bottom: 30px;
 }
@@ -173,6 +176,11 @@ label.required:after {
 
 ul li {
   list-style-type: none;
+}
+
+.aglae-object-tools {
+  display: flex;
+  justify-content: end;
 }
 
 /* purgecss ignore */

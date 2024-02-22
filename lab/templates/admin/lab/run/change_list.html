@@ -1,5 +1,5 @@
 {% extends "admin/change_list.html" %}
-{% load projects run_list admin_urls i18n admin_list %}
+{% load static projects run_list admin_urls i18n admin_list %}
 
 {% block content_title %}{% endblock %}
 
@@ -37,3 +37,8 @@
 
 <!-- Hide filters -->
 {% block filters %}{% endblock %}
+
+{% block footer %}
+<script type="text/javascript" src="{% static 'pages/run-change-list.js' %}"></script>
+{{ block.super }}
+{% endblock %}
