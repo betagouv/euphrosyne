@@ -57,5 +57,5 @@ def filters_field(
     return None
 
 
-def run_methods_repr(run: Run) -> dict[Literal["method"], list[MethodDTO]]:
+def run_methods_repr(run: Run) -> dict[Literal["methods"], list[MethodDTO]]:
     return {"methods": method_model_to_dto(run)}

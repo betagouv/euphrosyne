@@ -63,6 +63,26 @@ body {
   width: 33%;
 }
 
+.change-form .detector-field-wrapper  {
+  margin-bottom: 0rem;
+}
+
+.change-form .method-field-wrapper, .change-form .detector-field-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.change-form .method-field-wrapper label, .change-form .detector-field-wrapper label {
+  width: auto;
+  min-width: auto;
+  margin-right: 1rem;
+  padding: 0;
+}
+
+.form-row {
+  max-width: 500px;
+}
+
 .run-list .fr-grid-row--gutters {
   margin: 0;
 }

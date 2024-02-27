@@ -10,7 +10,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
-from lab.objects.c2rmf import ErosHTTPError, fetch_partial_objectgroup_from_eros
+from ..objects.c2rmf import ErosHTTPError, fetch_partial_objectgroup_from_eros
 
 logger = logging.getLogger(__name__)
 

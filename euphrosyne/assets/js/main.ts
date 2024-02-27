@@ -5,6 +5,7 @@ import { createElement } from "react";
 import { renderComponent } from "./react";
 import HeaderNav from "./components/header/HeaderNav";
 import Header from "./components/header/Header";
+import { getTemplateJSONData } from "../../../shared/js/utils";
 
 import { NavItem } from "./INav";
 import { Project } from "./IProject";
@@ -23,18 +24,6 @@ interface HeaderData {
 interface UserData {
   fullName: string;
   isLabAdmin: boolean;
-}
-
-function getTemplateJSONData<Type>(elementId: string): Type | null {
-  const element = document.querySelector<HTMLScriptElement>(`#${elementId}`);
-  if (!element || !element.text) {
-    return null;
-  }
-  try {
-    return JSON.parse(element.text);
-  } catch (e) {
-    return null;
-  }
 }
 
 function getUserData(): UserData {

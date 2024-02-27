@@ -57,8 +57,7 @@ class ObjectImportC2RMFView(StaffUserRequiredMixin, CreateView):
         return {
             **super().get_context_data(**kwargs),
             **site.each_context(self.request),
-            "title": "Add object",
-            "subtitle": _("EROS import"),
+            "title": _("EROS import"),
             "is_popup": IS_POPUP_VAR in self.request.GET,
             "is_popup_var": IS_POPUP_VAR,
         }
