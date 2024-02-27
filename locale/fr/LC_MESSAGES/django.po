@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-22 16:43+0100\n"
+"POT-Creation-Date: 2024-02-27 17:39+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -146,6 +146,9 @@ msgstr "Voir plus"
 msgid "Calendar"
 msgstr "Calendrier"
 
+msgid "Delete"
+msgstr "Supprimer"
+
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -159,9 +162,6 @@ msgstr "Sauvegarder et ajouter un autre"
 
 msgid "Close"
 msgstr "Fermer"
-
-msgid "Delete"
-msgstr "Supprimer"
 
 msgid "Sign in"
 msgstr "Inscription"
@@ -315,12 +315,6 @@ msgstr "Projets"
 
 msgid "To schedule"
 msgstr "A planifier"
-
-msgid "Object / Sample"
-msgstr "Objet / Échantillon"
-
-msgid "Object(s) / Sample(s)"
-msgstr "Objet(s) / Échantillon(s)"
 
 msgid "Experimental conditions"
 msgstr "Conditions expérimentales"
@@ -607,6 +601,9 @@ msgstr "Collection"
 msgid "%(object_count)s objects"
 msgstr "%(object_count)s objets"
 
+msgid "Object / Sample"
+msgstr "Objet / Échantillon"
+
 msgid "Object(s) / Sample(s"
 msgstr "Objet(s) / Échantillon(s)"
 
@@ -763,6 +760,9 @@ msgstr "Embargo"
 msgid "No embargo date"
 msgstr "Pas de date d'embargo"
 
+msgid "Object(s) / Sample(s)"
+msgstr "Objet(s) / Échantillon(s)"
+
 msgid "No run yet"
 msgstr "Aucun run pour le moment"
 
@@ -794,12 +794,6 @@ msgstr "Créer un nouveau run"
 
 msgid "Schedule run"
 msgstr "Planifier le run"
-
-msgid "Save and continue editing"
-msgstr "Sauvegarder et continuer l'édition"
-
-msgid "Save and view"
-msgstr "Sauvegarder et voir"
 
 msgid ""
 "Use the search field to import an object from Eros. The name of the object "
@@ -842,9 +836,6 @@ msgstr "Rejoindre le projet"
 
 msgid "Country"
 msgstr "Pays"
-
-msgid "Select an object or a group of objects"
-msgstr "Choisissez un object ou groupe d'objets"
 
 #, python-format
 msgid "Change selected %(model)s"

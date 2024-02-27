@@ -1,8 +1,7 @@
-from typing import Any, List, Optional, Tuple, Type
+from typing import Any, Optional, Tuple
 
 from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
-from django.contrib.admin.options import InlineModelAdmin
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import PermissionDenied
 from django.db.models.query import QuerySet
@@ -22,61 +21,9 @@ from ..forms import (
     RunScheduleForm,
 )
 from ..models import Project, Run
-from ..objects.fields import ObjectGroupChoiceField
 from ..permissions import LabRole, is_lab_admin
-from ..widgets import RelatedObjectRunWidgetWrapper
 from .mixins import LabPermission, LabPermissionMixin
 from .run_actions import change_state
-
-
-class ObjectGroupInline(admin.TabularInline):
-    template = "admin/edit_inline/tabular_objectgroup_in_run.html"
-    parent_instance: Run
-    model = Run.run_object_groups.through
-    verbose_name = _("Object / Sample")
-    verbose_name_plural = _("Object(s) / Sample(s)")
-    extra = 0
-
-    class Media:
-        js = ("pages/objectgroup-inline.js",)
-
-    def has_view_permission(
-        self, request: HttpRequest, obj: Optional[Run] = None
-    ) -> bool:
-        return True
-
-    def has_change_permission(
-        self, request: HttpRequest, obj: Optional[Run] = None
-    ) -> bool:
-        return False
-
-    def has_add_permission(
-        self, request: HttpRequest, obj: Optional[Run] = None
-    ) -> bool:
-        return True
-
-    def has_delete_permission(
-        self, request: HttpRequest, obj: Optional[Run] = None
-    ) -> bool:
-        return True
-
-    def formfield_callback(self, field, **kwargs):
-        if field.name == "objectgroup":
-            # pylint: disable=no-member
-            return ObjectGroupChoiceField(
-                project_id=self.parent_instance.project_id,
-                widget=RelatedObjectRunWidgetWrapper(
-                    self.parent_instance,
-                    admin_site=self.admin_site,
-                    can_add_related=True,
-                ),
-            )
-        return field.formfield(**kwargs)
-
-    def get_formset(self, request: Any, obj: Optional[Run] = None, **kwargs: Any):
-        return super().get_formset(
-            request, obj=obj, formfield_callback=self.formfield_callback, **kwargs
-        )
 
 
 class RunChangeList(ChangeList):
@@ -208,23 +155,6 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
 
     def get_changelist(self, request, **kwargs):
         return RunChangeList
-
-    def get_inlines(
-        self, request: HttpRequest, obj: Optional[Run] = None
-    ) -> List[Type[InlineModelAdmin]]:
-        if obj:
-            return [ObjectGroupInline]
-        return []
-
-    def get_inline_instances(
-        self, request: HttpRequest, obj: Optional[Run] = None
-    ) -> List[InlineModelAdmin]:
-        inlines = super().get_inline_instances(request, obj=obj)
-        if obj:
-            for inline in inlines:
-                if isinstance(inline, ObjectGroupInline):
-                    inline.parent_instance = obj
-        return inlines
 
     def get_queryset(self, request: HttpRequest):
         runs_queryset = super().get_queryset(request)

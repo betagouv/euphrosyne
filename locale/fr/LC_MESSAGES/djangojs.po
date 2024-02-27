@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-12 14:37+0100\n"
+"POT-Creation-Date: 2024-02-27 17:39+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -74,6 +74,12 @@ msgstr "Le fichier %s a été supprimé."
 #, javascript-format
 msgid "The following file formats are not accepted : %s"
 msgstr "Ces formats de fichier ne sont pas acceptés : %s"
+
+msgid "No object in this run yet"
+msgstr "Aucun objet dans ce run"
+
+msgid "An error occurred."
+msgstr "Une erreur s'est produite."
 
 msgid "Search for a valid C2RMF ID before submitting the form."
 msgstr ""

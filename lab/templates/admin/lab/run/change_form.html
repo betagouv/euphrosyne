@@ -53,7 +53,7 @@
 
 {% block field_sets %}
 <div class="fr-grid-row fr-grid-row--gutters">
-    <div class="fr-col-12 fr-col-md-7">
+    <div class="fr-col-12{% if change %} fr-col-md-7{% endif %}">
     {% for fieldset in adminform %}
         {% if fieldset.name == "METHODS" %}
             {% include "admin/lab/run/includes/methods_fieldset.html" %}
@@ -62,22 +62,23 @@
         {% endif %}
     {% endfor %}
     </div>
+
+    {% if change %}
     <div class="fr-col-12 fr-col-md-5">
-        {% for inline_admin_formset in inline_admin_formsets  %}
-        {% if inline_admin_formset.opts.opts.label == "lab.Run_run_object_groups" %}
-        {% include inline_admin_formset.opts.template %}
-        {% endif %}
-        {% endfor %}
+        <fieldset class="module">
+            <h2 class="fr-mb-1w">{% translate "Object(s) / Sample(s)" %}</h2>
+            <div id="run-objectgroup-form"></div>
+        </fieldset>
     </div>
+    {% endif %}
+
 </div>
 {% endblock %}
 
 {% block inline_field_sets %}
     <div class="fr-grid-row">
     {% for inline_admin_formset in inline_admin_formsets  %}
-    {% if inline_admin_formset.opts.opts.label != "lab.Run_run_object_groups" %}
     {% include inline_admin_formset.opts.template %}
-    {% endif %}
     {% endfor %}
     </div>
 {% endblock %}
@@ -91,4 +92,12 @@
 {% block footer %}
 {{ block.super }}
 <script type="text/javascript" src="{% static 'pages/run-change-form.js' %}"></script>
+<script id="run-change-form-data" type="application/json">
+    {
+      "run": {
+        "id": "{{ original.id }}",
+        "label": "{{ original.label }}"
+      }
+    }
+</script>
 {% endblock %}
