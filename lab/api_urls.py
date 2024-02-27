@@ -1,9 +1,14 @@
 from django.urls import path
 
 from .api_views.calendar import CalendarView
-from .api_views.objects import get_eros_object
+from .api_views.objectgroup import get_eros_object
 from .api_views.project import ProjectList, UpcomingProjectList
 from .api_views.run import RunMethodsView
+from .api_views.run_objectgroup import (
+    RunObjectGroupAvailableListView,
+    RunObjectGroupDeleteView,
+    RunObjectGroupView,
+)
 
 urlpatterns = [
     path(
@@ -20,6 +25,21 @@ urlpatterns = [
         "projects/upcoming",
         UpcomingProjectList.as_view(),
         name="project-upcoming-list",
+    ),
+    path(
+        "runs/<int:run_id>/objectgroups",
+        RunObjectGroupView.as_view(),
+        name="run-objectgroup-list",
+    ),
+    path(
+        "runs/<int:run_id>/available-objectgroups",
+        RunObjectGroupAvailableListView.as_view(),
+        name="run-objectgroup-list",
+    ),
+    path(
+        "run_objectgroups/<int:pk>",
+        RunObjectGroupDeleteView.as_view(),
+        name="run-objectgroup-list",
     ),
     path(
         "runs/<int:pk>/methods",

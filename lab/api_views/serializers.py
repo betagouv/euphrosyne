@@ -109,3 +109,29 @@ class RunMethodsSerializer(serializers.ModelSerializer):
             "filters_for_detector_HE3",
             "filters_for_detector_HE4",
         )
+
+
+class _RunObjectGroupObjectGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ObjectGroup
+        fields = ("label", "id", "object_count", "dating", "materials")
+
+
+class RunObjectGroupSerializer(serializers.ModelSerializer):
+    objectgroup = _RunObjectGroupObjectGroupSerializer()
+
+    class Meta:
+        model = Run.run_object_groups.through
+        fields = ("id", "objectgroup")
+
+
+class AvailableObjectGroupSerializer(_RunObjectGroupObjectGroupSerializer):
+    pass
+
+
+class RunObjectGroupCreateSerializer(serializers.ModelSerializer):
+    objectgroup = serializers.PrimaryKeyRelatedField(queryset=ObjectGroup.objects.all())
+
+    class Meta:
+        model = Run.run_object_groups.through
+        fields = ("objectgroup",)
