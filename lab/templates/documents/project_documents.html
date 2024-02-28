@@ -14,18 +14,24 @@
 {% endblock %}
 
 {% block content %}
-{% project_tabs project.id request %}
+<div class="fr-container">
+    {% project_tabs project.id request %}
+</div>
 
-
-<div id="content-main">
+<div id="content-main" class="fr-container">
     <ul class="messagelist"></ul>
-    {% include "components/file_upload_form.html" with component=document_upload_form %}
-    <div class="documents-wrapper">
-        <h2>{% translate 'Documents' %}</h2>
-        <div>
-            {% include "components/file_table.html" with component=file_table %}
+    <fieldset class="module aligned">
+        <h2>{% translate 'Upload a document' %}</h2>
+        <div class="fr-p-1w">
+        {% include "components/file_upload_form.html" with component=document_upload_form %}
         </div>
-    </div>
+        <div class="documents-wrapper fr-p-1w">
+            <h2>{% translate 'Documents' %}</h2>
+            <div>
+                {% include "components/file_table.html" with component=file_table %}
+            </div>
+        </div>
+    </fieldset>
 </div>
 <script>
     window.projectName = "{{ project.name }}"
