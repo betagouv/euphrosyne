@@ -51,13 +51,13 @@ export default function UpcomingProjects(): JSX.Element {
           upcomingProjects.map((project) => (
             <div
               key={`upcoming-project-${project.name}`}
-              className="fr-col-6 fr-col-sm-3"
+              className="fr-col-6 fr-col-sm-4 fr-col-lg-3"
             >
               <UpcomingProjectCard project={project} />
             </div>
           ))
         ) : (
-          <div className="fr-col-6 fr-col-sm-3">
+          <div className="fr-col-6 fr-col-sm-4 fr-col-md-3">
             <PlaceholderCard />{" "}
           </div>
         )}

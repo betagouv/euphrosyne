@@ -58,7 +58,10 @@ class UpcomingProjectSerializer(serializers.ModelSerializer):
         ordered_start_dates = [
             r.start_date
             for r in sorted(
-                filter(lambda r: r.start_date >= timezone.now(), obj.runs.all()),
+                filter(
+                    lambda r: r.start_date and r.start_date >= timezone.now(),
+                    obj.runs.all(),
+                ),
                 key=lambda r: r.start_date,
             )
         ]
