@@ -2,6 +2,7 @@ from collections import OrderedDict
 from unittest import mock
 
 from django.test import SimpleTestCase, TestCase
+from django.utils import timezone
 
 from ...api_views.serializers import (
     ProjectRunSerializer,
@@ -106,7 +107,7 @@ class TestRunMethodsSerializer(SimpleTestCase):
 class TestUpcomingProjectSerializer(TestCase):
     def test_upcoming_project_serializer(self):
         run = factories.RunFactory()
-        serializer = UpcomingProjectSerializer(run.project)
+        serializer = UpcomingProjectSerializer(instance=run.project)
         serializer.context["request"] = mock.MagicMock()
 
         assert serializer.data["change_url"].endswith(
@@ -119,3 +120,14 @@ class TestUpcomingProjectSerializer(TestCase):
             "label": run.project.status.value[1],
             "class_name": run.project.status.name.lower(),
         }
+
+    def test_upcomnig_project_serializer_start_date_when_one_has_not(self):
+        run_with_no_startdate = factories.RunFactory(start_date=None)
+        run = factories.RunFactory(
+            start_date=timezone.now() + timezone.timedelta(days=1),
+            project=run_with_no_startdate.project,
+        )
+        serializer = UpcomingProjectSerializer(instance=run.project)
+        serializer.context["request"] = mock.MagicMock()
+
+        assert serializer.data["start_date"] == run.start_date
