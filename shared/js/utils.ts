@@ -3,9 +3,5 @@ export function getTemplateJSONData<Type>(elementId: string): Type | null {
   if (!element || !element.text) {
     return null;
   }
-  try {
-    return JSON.parse(element.text);
-  } catch (e) {
-    return null;
-  }
+  return JSON.parse(element.text);
 }

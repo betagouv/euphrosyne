@@ -21,21 +21,14 @@
 <div id="content-main" class="fr-container">
     <ul class="messagelist"></ul>
     <fieldset class="module aligned">
-        <h2>{% translate 'Upload a document' %}</h2>
+        <h2>{% translate 'Documents' %}</h2>
         <div class="fr-p-1w">
-        {% include "components/file_upload_form.html" with component=document_upload_form %}
-        </div>
-        <div class="documents-wrapper fr-p-1w">
-            <h2>{% translate 'Documents' %}</h2>
-            <div>
-                {% include "components/file_table.html" with component=file_table %}
-            </div>
+            <div id="document-manager"></div>
         </div>
     </fieldset>
 </div>
-<script>
-    window.projectName = "{{ project.name }}"
-    window.projectSlug = "{{ project.slug }}"
+<script id="project-documents-data" type="application/json">
+    {{ json_data|safe }}
 </script>
 <script src="{% static 'pages/document.js' %}"></script>
 
