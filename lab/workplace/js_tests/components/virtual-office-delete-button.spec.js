@@ -1,4 +1,3 @@
-import { jest } from "@jest/globals";
 import "../../../js_tests/_jsdom_mocks/gettext";
 import euphrosyneToolsService from "../../assets/js/euphrosyne-tools-service";
 import VirtualOfficeDeleteButton from "../../assets/js/components/virtual-office-delete-button";
@@ -10,17 +9,17 @@ describe("Test VirtualOfficeDeleteButton", () => {
   VirtualOfficeDeleteButton.init();
 
   beforeEach(() => {
-    jest.spyOn(window, "dispatchEvent");
-    jest.spyOn(euphrosyneToolsService, "deleteVM");
-    jest.spyOn(utils, "displayMessage");
-    jest.spyOn(window, "confirm").mockReturnValue(true);
+    vi.spyOn(window, "dispatchEvent");
+    vi.spyOn(euphrosyneToolsService, "deleteVM");
+    vi.spyOn(utils, "displayMessage");
+    vi.spyOn(window, "confirm").mockReturnValue(true);
 
     voDeleteButton = new VirtualOfficeDeleteButton();
     voDeleteButton.setAttribute("project-name", "projet tango");
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("creates the button properly", async () => {

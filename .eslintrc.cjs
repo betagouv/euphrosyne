@@ -24,12 +24,6 @@ module.exports = {
         sourceType: "script",
       },
     },
-    {
-      files: ["**/*.spec.js", "**/*.spec.jsx"],
-      env: {
-        jest: true,
-      },
-    },
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {

@@ -1,3 +1,4 @@
+export const template: string = `
 <form method="post" id="objectgroup_form" novalidate enctype="multipart/form-data">
     <div>
         <input type="hidden" name="_popup" value="1">
@@ -132,3 +133,4 @@
         </div>
     </div>
 </form>
+`;
