@@ -1,3 +1,4 @@
+export const template: string = `
 <div class="js-inline-admin-formset inline-group overflow-auto" id="object_set-group" data-inline-type="tabular">
     <table>
         <tbody>
@@ -24,3 +25,4 @@
         </tbody>
     </table>
 </div>
+`;

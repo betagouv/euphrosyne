@@ -1,4 +1,3 @@
-import { jest } from "@jest/globals";
 import "../../../js_tests/_jsdom_mocks/gettext";
 import euphrosyneToolsService from "../../assets/js/euphrosyne-tools-service";
 import VirtualOfficeButton from "../../assets/js/components/virtual-office-button";
@@ -10,18 +9,18 @@ describe("Test VirtualOfficeButton", () => {
   VirtualOfficeButton.init();
 
   beforeEach(() => {
-    fetchVMMock = jest.spyOn(euphrosyneToolsService, "fetchVMConnectionLink");
-    fetchDeploymentMock = jest.spyOn(
+    fetchVMMock = vi.spyOn(euphrosyneToolsService, "fetchVMConnectionLink");
+    fetchDeploymentMock = vi.spyOn(
       euphrosyneToolsService,
       "fetchDeploymentStatus"
     );
-    jest.spyOn(utils, "displayMessage");
+    vi.spyOn(utils, "displayMessage");
 
     voButton = new VirtualOfficeButton();
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("Button init", () => {
@@ -44,9 +43,10 @@ describe("Test VirtualOfficeButton", () => {
       });
 
       it("wait for deploy if it has not failed", async () => {
-        jest
-          .spyOn(VirtualOfficeButton.prototype, "waitForDeploymentComplete")
-          .mockImplementation(() => Promise.resolve());
+        vi.spyOn(
+          VirtualOfficeButton.prototype,
+          "waitForDeploymentComplete"
+        ).mockImplementation(() => Promise.resolve());
         fetchDeploymentMock.mockResolvedValueOnce("Running");
         await voButton.initButton();
 
@@ -55,7 +55,7 @@ describe("Test VirtualOfficeButton", () => {
         VirtualOfficeButton.prototype.waitForDeploymentComplete.mockRestore();
       });
       it("calls failed deployment callback otherwise", async () => {
-        jest.spyOn(VirtualOfficeButton.prototype, "onFailedDeployment");
+        vi.spyOn(VirtualOfficeButton.prototype, "onFailedDeployment");
         fetchDeploymentMock.mockResolvedValueOnce("Failed");
         await voButton.initButton();
 
@@ -77,7 +77,7 @@ describe("Test VirtualOfficeButton", () => {
     });
 
     it("fetches connection URL when deployment has succeeded", async () => {
-      const clearIntervalSpy = jest.spyOn(global, "clearInterval");
+      const clearIntervalSpy = vi.spyOn(global, "clearInterval");
       voButton.deploymentStatus = "Succeeded";
       fetchVMMock.mockResolvedValueOnce("url");
       await voButton.checkDeploymentProgress();
@@ -90,10 +90,11 @@ describe("Test VirtualOfficeButton", () => {
     });
 
     it("handles failed deployment correctly", async () => {
-      jest
-        .spyOn(VirtualOfficeButton.prototype, "onFailedDeployment")
-        .mockImplementation(() => {});
-      const clearIntervalSpy = jest.spyOn(global, "clearInterval");
+      vi.spyOn(
+        VirtualOfficeButton.prototype,
+        "onFailedDeployment"
+      ).mockImplementation(() => {});
+      const clearIntervalSpy = vi.spyOn(global, "clearInterval");
       voButton.deploymentStatus = "Failed";
       fetchDeploymentMock.mockResolvedValueOnce("Failed");
       await voButton.checkDeploymentProgress();
@@ -107,18 +108,20 @@ describe("Test VirtualOfficeButton", () => {
   });
 
   describe("clicking on button", () => {
+    vi.stubGlobal("open", vi.fn());
+
     it("opens a new window on click when connection url is set", async () => {
       voButton.connectionUrl = "url";
-      const openSpy = jest.spyOn(window, "open");
+      const openSpy = vi.spyOn(window, "open");
       voButton.click();
       expect(openSpy).toHaveBeenCalledWith("url", "_blank");
     });
 
     it("deploys otherwise [success]", async () => {
-      const deployMock = jest
+      const deployMock = vi
         .spyOn(euphrosyneToolsService, "deployVM")
         .mockImplementationOnce(() => Promise.resolve());
-      const waitDeployMock = jest
+      const waitDeployMock = vi
         .spyOn(VirtualOfficeButton.prototype, "waitForDeploymentComplete")
         .mockImplementationOnce(() => {});
       voButton.setAttribute("project-slug", "projet-tango");
@@ -132,7 +135,7 @@ describe("Test VirtualOfficeButton", () => {
     });
 
     it("deploys otherwise [failure]", async () => {
-      const deployMock = jest
+      const deployMock = vi
         .spyOn(euphrosyneToolsService, "deployVM")
         .mockImplementationOnce(() => Promise.reject());
       voButton.setAttribute("project-slug", "projet-tango");
@@ -166,19 +169,20 @@ describe("Test VirtualOfficeButton", () => {
 
   describe("waiting for deployment complete", () => {
     it("reset button and display an error message", () => {
-      jest
-        .spyOn(VirtualOfficeButton.prototype, "checkDeploymentProgress")
-        .mockImplementation(() => Promise.resolve());
-      jest.useFakeTimers();
+      vi.spyOn(
+        VirtualOfficeButton.prototype,
+        "checkDeploymentProgress"
+      ).mockImplementation(() => Promise.resolve());
+      vi.useFakeTimers();
       voButton.waitForDeploymentComplete();
 
       expect(voButton.innerText).toBe("Creating virtual office...");
       expect(voButton.checkDeploymentProgress).toHaveBeenNthCalledWith(1);
       expect(voButton.checkDeploymentIntervalId).toBeTruthy();
 
-      jest.advanceTimersByTime(8000);
+      vi.advanceTimersByTime(8000);
       expect(voButton.checkDeploymentProgress).toHaveBeenNthCalledWith(2);
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
   });
 

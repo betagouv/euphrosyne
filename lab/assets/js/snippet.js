@@ -1,4 +1,4 @@
-import formsetRowSnippet from "./snippets/tabular_formset_row.html";
+import { snippet as formsetRowSnippet } from "./snippets/tabular_formset_row.ts";
 
 export function loadFormsetRow(
   formsetPrefix,

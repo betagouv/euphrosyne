@@ -1,3 +1,4 @@
+export const snippet = `
 <tr class="form-row has_original dynamic-{{ formsetPrefix }}" id="{{ formsetPrefix }}-{{ formIndex }}">
     <td class="original">
         <p>
@@ -18,3 +19,4 @@
     <td class="delete"><input type="checkbox" name="{{ formsetPrefix }}-{{ formIndex }}-DELETE"
             id="id_{{ formsetPrefix }}-{{ formIndex }}-DELETE"></td>
 </tr>
+`;
