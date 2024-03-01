@@ -1,10 +1,12 @@
 "use strict";
 
-import { FileService } from "../../../assets/js/file-service.js";
-import { jwtFetch } from "../../../assets/js/jwt.js";
+import { FileService } from "../../../assets/js/file-service";
+import { jwtFetch } from "../../../assets/js/jwt";
 
 export class DocumentFileService extends FileService {
-  constructor(projectName, projectSlug) {
+  uploadPresignURL: string;
+
+  constructor(projectName: string, projectSlug: string) {
     super(
       `/data/${projectSlug}/documents`,
       `/data/documents/shared_access_signature`
@@ -12,16 +14,16 @@ export class DocumentFileService extends FileService {
     this.uploadPresignURL = `${process.env.EUPHROSYNE_TOOLS_API_URL}/data/${projectName}/documents/upload/shared_access_signature`;
   }
 
-  async uploadFiles(files) {
+  async uploadFiles(files: File[]) {
     return await Promise.allSettled(
-      Array.from(files).map(async (file) => {
+      files.map(async (file) => {
         const url = await this.fetchUploadPresignedURL(file.name);
         return this.uploadFile(file, url);
       })
     );
   }
 
-  async uploadFile(file, url) {
+  async uploadFile(file: File, url: string) {
     // File upload in an Azure Fileshare is divided in two steps :
 
     // 1. Creation of an empty file
@@ -51,14 +53,14 @@ export class DocumentFileService extends FileService {
     // Throw error if any upload fail
     for (const promise of allSettledPromises) {
       if (promise.status === "rejected") {
-        throw { file, value: promise.value };
+        throw { file, value: promise.reason };
       }
     }
 
     return { file };
   }
 
-  async fetchUploadPresignedURL(fileName) {
+  async fetchUploadPresignedURL(fileName: string) {
     if (!this.uploadPresignURL) {
       throw new Error("uploadPresignURL must be specified");
     }
@@ -68,6 +70,7 @@ export class DocumentFileService extends FileService {
         method: "GET",
       }
     );
+    if (!response?.ok) throw new Error("Failed to fetch upload presigned URL");
     return (await response.json()).url;
   }
 }

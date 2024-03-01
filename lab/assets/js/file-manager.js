@@ -17,7 +17,7 @@ export class FileManager {
 
     this.fileForm?.addEventListener("submit", (event) => {
       const { files } = event.target.elements.namedItem("files");
-      this.uploadFiles(files);
+      this.uploadFiles(Array.from(files));
     });
   }
 

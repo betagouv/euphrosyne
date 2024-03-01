@@ -8,6 +8,7 @@
     "jsxImportSource": "@emotion/react",
     "allowJs": true,
     "moduleResolution": "node",
+    "downlevelIteration": true,
     /* Type Checking */
     "strict": true /* Enable all strict type-checking options. */
   },
