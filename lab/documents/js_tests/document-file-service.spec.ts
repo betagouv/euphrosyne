@@ -1,8 +1,7 @@
-import { jest } from "@jest/globals";
-import { DocumentFileService } from "../assets/js/document-file-service.js";
+import { DocumentFileService } from "../assets/js/document-file-service";
 
 describe("Test document file service", () => {
-  let fileService;
+  let fileService: DocumentFileService;
 
   beforeEach(() => {
     fileService = new DocumentFileService(
@@ -13,31 +12,36 @@ describe("Test document file service", () => {
 
   describe("Test uploadFile", () => {
     it("uploads file in several batches", async () => {
-      const createEmptyFileSpy = jest
+      const createEmptyFileSpy = vi
           .spyOn(fileService, "createEmptyFile")
           .mockImplementation(() => Promise.resolve()),
-        uploadBytesToFileSpy = jest
+        uploadBytesToFileSpy = vi
           .spyOn(fileService, "uploadBytesToFile")
-          .mockImplementation(() => Promise.resolve());
+          .mockImplementation(() =>
+            Promise.resolve(
+              new Response("body", { status: 200, statusText: "OK" })
+            )
+          );
 
-      const { file } = await fileService.uploadFile({
-        size: 6000000,
-        slice: (start, end) => end - start,
-        name: "hello",
-      });
+      const { file } = await fileService.uploadFile(
+        new File([new ArrayBuffer(6000000)], "hello", {
+          type: "text/plain",
+        }),
+        "url"
+      );
 
       expect(createEmptyFileSpy).toHaveBeenCalled();
       expect(uploadBytesToFileSpy).toHaveBeenNthCalledWith(
         1,
-        undefined,
-        4000000,
+        "url",
+        new Blob(),
         0,
         4000000 - 1
       );
       expect(uploadBytesToFileSpy).toHaveBeenNthCalledWith(
         2,
-        undefined,
-        2000000,
+        "url",
+        new Blob(),
         4000000,
         6000000 - 1
       );
@@ -45,23 +49,23 @@ describe("Test document file service", () => {
     });
 
     it("throws error if one upload fail", async () => {
-      jest
-        .spyOn(fileService, "createEmptyFile")
-        .mockImplementation(() => Promise.resolve());
-      const uploadBytesToFileSpy = jest
+      vi.spyOn(fileService, "createEmptyFile").mockImplementation(() =>
+        Promise.resolve()
+      );
+      const uploadBytesToFileSpy = vi
         .spyOn(fileService, "uploadBytesToFile")
-        .mockImplementation(() => Promise.resolve())
+        .mockImplementation(() =>
+          Promise.resolve(
+            new Response("body", { status: 200, statusText: "OK" })
+          )
+        )
         .mockImplementationOnce(() => Promise.reject()); // Reject on second call
 
-      const file = {
-        size: 6000000,
-        slice: (start, end) => end - start,
-        name: "hello",
-      };
+      const file = new File([new ArrayBuffer(6000000)], "hello");
 
       let hasError;
       try {
-        await fileService.uploadFile(file);
+        await fileService.uploadFile(file, "url");
       } catch (error) {
         hasError = true;
         expect(error).toMatchObject({ file, value: undefined });
@@ -73,16 +77,16 @@ describe("Test document file service", () => {
 
   describe("Test uploadFiles", () => {
     it("fetches presigned URL and upload file", async () => {
-      const fetchPresignedURLSpy = jest
+      const fetchPresignedURLSpy = vi
           .spyOn(fileService, "fetchUploadPresignedURL")
           .mockImplementation(() => Promise.resolve("url")),
-        uploadFileSpy = jest
+        uploadFileSpy = vi
           .spyOn(fileService, "uploadFile")
           .mockImplementation((file) => Promise.resolve({ file }));
 
       const allSettledPromise = await fileService.uploadFiles([
-        { name: "file-1.txt" },
-        { name: "file-2.txt" },
+        new File([], "file-1.txt"),
+        new File([], "file-2.txt"),
       ]);
 
       expect(allSettledPromise).toBeInstanceOf(Array);

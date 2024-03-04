@@ -1,5 +1,5 @@
-body.change-form {
-  background-color: var(--background-alt-grey);
+body.change-list {
+  background-color: var(--background-default-grey);
 }
 
 .related-widget-wrapper {
@@ -32,7 +32,6 @@ body.change-form {
 
 #content-main {
   background-color: var(--body-bg);
-  float: none;
 }
 
 #content-main.project-change {

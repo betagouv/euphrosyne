@@ -1,4 +1,4 @@
 <div class="tags-input">
-    <input type="text" class="tags-input__input" size="1" {% include "django/forms/widgets/attrs.html" %}>
+    <input type="text" class="tags-input__input fr-input" size="1" {% include "django/forms/widgets/attrs.html" %}>
     <input type="hidden" name="{{ widget.name }}" {% if widget.value != None %} value="{{ widget.value }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}>
 </div>

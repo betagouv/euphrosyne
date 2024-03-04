@@ -29,6 +29,7 @@
 body {
   font-family: "Marianne", "Roboto", "Lucida Grande", "DejaVu Sans",
     "Bitstream Vera Sans", Verdana, Arial, sans-serif;
+  background-color: var(--background-alt-grey) !important;
 }
 
 select {
@@ -60,6 +61,10 @@ a.fr-btn {
 }
 a.fr-btn.fr-btn--secondary {
   color: var(--text-action-high-blue-france);
+}
+
+#content-main {
+  float: none;
 }
 
 .content h1 {
@@ -220,9 +225,6 @@ ul li {
   box-shadow: inset 0 0 0 1px var(--text-default-error);
 }
 
-/* purgecss end ignore */
-
-/*
-purgecss 
-.fr-error-text 
-*/
+.workplace .fr-tabs__panel {
+  background-color: var(--background-default-grey);
+}

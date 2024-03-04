@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-27 17:39+0100\n"
+"POT-Creation-Date: 2024-03-04 09:16+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -29,8 +29,17 @@ msgstr "Sélectionner un langage"
 msgid "User"
 msgstr "Utilisateur"
 
-msgid "No file yet"
-msgstr "Aucun fichier"
+#, javascript-format
+msgid "Delete the document %s ?"
+msgstr "Supprimer le document %s ?"
+
+#, javascript-format
+msgid "File %s could not be removed."
+msgstr "Le fichier %s n'a pas pu être supprimé."
+
+#, javascript-format
+msgid "File %s has been removed."
+msgstr "Le fichier %s a été supprimé."
 
 msgid "Download file"
 msgstr "Télécharger le fichier"
@@ -38,15 +47,21 @@ msgstr "Télécharger le fichier"
 msgid "Delete file"
 msgstr "Supprimer le fichier"
 
+msgid "Filter"
+msgstr "Filtrer"
+
+#, javascript-format
+msgid "%s results"
+msgstr "%s résultats"
+
+msgid "No file yet"
+msgstr "Aucun fichier"
+
 msgid "Show less"
 msgstr "Afficher moins"
 
 msgid "Show more"
 msgstr "Afficher plus"
-
-#, javascript-format
-msgid "Delete the document %s ?"
-msgstr "Supprimer le document %s ?"
 
 msgid ""
 "An error has occured while generating the presigned URL. Please contact the "
@@ -63,13 +78,20 @@ msgstr "Le fichier %s a été téléversé."
 msgid "File %s could not be uploaded."
 msgstr "Le fichier %s n'a pas pu être sauvegardé."
 
-#, javascript-format
-msgid "File %s could not be removed."
-msgstr "Le fichier %s n'a pas pu être supprimé."
+msgid "File"
+msgstr "Fichier"
 
-#, javascript-format
-msgid "File %s has been removed."
-msgstr "Le fichier %s a été supprimé."
+msgid "Last modified"
+msgstr "Modifié le"
+
+msgid "Size"
+msgstr "Taille"
+
+msgid "Add a document"
+msgstr "Ajouter un document"
+
+msgid "Please select a file"
+msgstr "Choisissez un fichier"
 
 #, javascript-format
 msgid "The following file formats are not accepted : %s"
@@ -102,6 +124,9 @@ msgid ""
 msgstr ""
 "Une erreur s'est produite lors de la recherche de l'object sur Eros. Si "
 "l'erreur persiste, veuillez contacter l'équipe AGLAE."
+
+msgid "Runs data"
+msgstr "Données des runs"
 
 msgid "Create virtual office"
 msgstr "Créer le bureau virtuel"

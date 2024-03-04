@@ -1,7 +1,7 @@
 "use strict";
 
-import template from "./objectgroup-form.html";
-import inlineRowsWithCollectionAndInventoryTemplate from "./inline-rows-with-collection-inventory.html";
+import { template } from "./html-templates/object-group-form";
+import { template as inlineRowsWithCollectionAndInventoryTemplate } from "./html-templates/inline-rows-with-collection-inventory";
 import {
   displayObjectGroupForm,
   displaySingleObjectForm,
