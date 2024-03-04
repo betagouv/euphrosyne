@@ -30,10 +30,10 @@
     {% if user.is_lab_admin %}
     <fieldset class="module aligned fr-mt-3w">
         <h2>{% trans "Administration" %}</h2>
-        <div class="form-row">
-            <div>   
+        <div class="form-row fr-grid-row">
+            <div class="fr-select-group fr-col-12 fr-col-md-6">   
                 <label for="vm-size-select">{% trans "Project type" %}</label>
-                <select name="vm_size" id="vm-size-select" is="vm-size-select" project-name="{{ project.name }}">
+                <select name="vm_size" id="vm-size-select" is="vm-size-select" project-name="{{ project.name }}" class="fr-select">
                     <option selected value="">{% trans "Default" %}</option>
                     <option value="IMAGERY">{% trans "Imagery" %}</option>
                 </select>
@@ -47,6 +47,8 @@
         </div>
     </fieldset>
     {% endif %}
+
+    <div id="workplace-run-tabs"/>
 
     <div class="fr-tabs">
         <ul class="fr-tabs__list" role="tablist" aria-label="{% trans "Runs data" %}">
@@ -125,6 +127,9 @@
 
 {% block footer %}
 {{ block.super }}
+<script id="workplace-data" type="application/json">
+    {{ json_data|safe }}
+</script>
 <script>
     window.projectName = "{{ project.name }}"
     window.projectSlug = "{{ project.slug }}"

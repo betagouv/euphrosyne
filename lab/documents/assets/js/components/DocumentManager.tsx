@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { css } from "@emotion/react";
 
-import FileTable, { Col } from "../../../../assets/js/components/FileTable";
-import { DocumentFileService } from "../document-file-service";
+import { formatBytes } from "../../../../assets/js/utils";
 import { EuphrosyneFile } from "../../../../assets/js/file-service";
-import DocumentTableActionCell from "./DocumentTableActionCell";
-import { displayMessage, formatBytes } from "../../../../assets/js/utils";
+import { DocumentFileService } from "../document-file-service";
+
+import FileTable, { Col } from "../../../../assets/js/components/FileTable";
+import BaseTableActionCell from "../../../../assets/js/components/BaseTableActionCell";
 import DocumentUploadModal from "./DocumentUploadModal";
 
 interface DocumentManagerProps {
@@ -58,39 +59,6 @@ export default function DocumentManager({
     setIsLoading(false);
   };
 
-  const deleteFile = async (name: string, path: string) => {
-    if (
-      !window.confirm(
-        window.interpolate(window.gettext("Delete the document %s ?"), [name])
-      )
-    ) {
-      return;
-    }
-    setIsLoading(true);
-    try {
-      await fileService.deleteFile(path);
-    } catch (error) {
-      displayMessage(
-        window.interpolate(window.gettext("File %s could not be removed."), [
-          name,
-        ]),
-        "error"
-      );
-      setIsLoading(false);
-    }
-    fetchFiles();
-    setIsLoading(false);
-    displayMessage(
-      window.interpolate(window.gettext("File %s has been removed."), [name]),
-      "success"
-    );
-  };
-
-  const downloadFile = async (path: string) => {
-    const url = await fileService.fetchPresignedURL(path);
-    window.open(url, "_blank");
-  };
-
   useEffect(() => {
     fetchFiles();
   }, []);
@@ -112,10 +80,11 @@ export default function DocumentManager({
         cols={tableCols}
         isLoading={isLoading}
         actionCell={
-          <DocumentTableActionCell
+          <BaseTableActionCell
             canDelete={table.canDelete}
-            onDeleteClick={deleteFile}
-            onDownloadClick={downloadFile}
+            onDeleteSuccess={fetchFiles}
+            fileService={fileService}
+            setIsLoading={setIsLoading}
           />
         }
       />
