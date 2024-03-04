@@ -106,7 +106,7 @@ jobs:
           node-version: 18.15
           cache: "npm"
       - name: Install modules
-        run: npm install --only=prod
+        run: npm ci
       - name: Build files with webpack
         run: npm run build
       # -- endblock install --
