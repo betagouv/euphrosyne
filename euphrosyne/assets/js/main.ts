@@ -58,16 +58,24 @@ if (
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  const { currentPath, items } = getNavItemsData();
-  renderComponent(
-    "header-nav",
-    createElement(HeaderNav, { currentPath, items })
-  );
+  if (document.querySelector("#header-nav")) {
+    const { currentPath, items } = getNavItemsData();
+    renderComponent(
+      "header-nav",
+      createElement(HeaderNav, { currentPath, items })
+    );
+  } else {
+    console.info("No header-nav element found. Not rendering header nav.");
+  }
 
-  const { project, backLink } = getHeaderData();
-  const currentUser = getUserData();
-  renderComponent(
-    "header-main",
-    createElement(Header, { project, backLink, currentUser })
-  );
+  if (document.querySelector("#header-main")) {
+    const { project, backLink } = getHeaderData();
+    const currentUser = getUserData();
+    renderComponent(
+      "header-main",
+      createElement(Header, { project, backLink, currentUser })
+    );
+  } else {
+    console.info("No header-main element found. Not rendering header.");
+  }
 });
