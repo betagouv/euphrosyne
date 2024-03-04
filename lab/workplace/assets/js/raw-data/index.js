@@ -1,7 +1,7 @@
 "use strict";
 
 import { FileManager } from "../../../../assets/js/file-manager.js";
-import { RawDataFileService } from "./raw-data-file-service.js";
+import { RawDataFileService } from "./raw-data-file-service";
 
 export function initRawData() {
   window.runs.forEach((run) => {

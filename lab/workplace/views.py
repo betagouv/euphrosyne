@@ -1,3 +1,4 @@
+import json
 from typing import Any, Dict
 
 from django.contrib.admin import site
@@ -26,26 +27,6 @@ class WorkplaceView(ProjectMembershipRequiredMixin, TemplateView):
             {
                 "id": id,
                 "label": label,
-                "raw_data_table": {
-                    "attrs": {"id": f"run-{id}-raw-data-table"},
-                    "can_delete": is_lab_admin(self.request.user),
-                },
-                "processed_data_table": {
-                    "attrs": {"id": f"run-{id}-processed-data-table"},
-                    "can_delete": is_lab_admin(self.request.user),
-                },
-                "raw_data_upload_form": {
-                    "attrs": {
-                        "id": f"run-{id}-raw-data-upload-form",
-                        "project-id": self.project.id,
-                    }
-                },
-                "processed_data_upload_form": {
-                    "attrs": {
-                        "id": f"run-{id}-processed-data-upload-form",
-                        "project-id": self.project.id,
-                    }
-                },
             }
             for (id, label) in self.project.runs.values_list("id", "label")
         )
@@ -55,4 +36,25 @@ class WorkplaceView(ProjectMembershipRequiredMixin, TemplateView):
             "project": self.project,
             "subtitle": "{} | {}".format(self.project.name, _("Workplace")),
             "runs": runs,
+            "json_data": json.dumps(
+                {
+                    "project": {
+                        "name": self.project.name,
+                        "slug": self.project.slug,
+                    },
+                    "runs": [
+                        {
+                            "id": run["id"],
+                            "label": run["label"],
+                            "rawDataTable": {
+                                "canDelete": is_lab_admin(self.request.user),
+                            },
+                            "processedDataTable": {
+                                "canDelete": is_lab_admin(self.request.user),
+                            },
+                        }
+                        for run in runs
+                    ],
+                }
+            ),
         }
