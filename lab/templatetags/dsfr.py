@@ -1,5 +1,5 @@
 from django import template
-from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -22,4 +22,4 @@ def attrs_with_dsfr(context):
 
 @register.simple_tag
 def label_tag_with_dsfr(label_html: str):
-    return format_html(label_html.replace("<label", '<label class="fr-label"'))
+    return mark_safe(label_html.replace("<label", '<label class="fr-label"'))

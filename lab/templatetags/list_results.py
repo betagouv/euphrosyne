@@ -26,21 +26,22 @@ def _get_status_cell(project: Project) -> str:
     class_name = choice_identifier.lower()
     return format_html(
         '<td class="field-status">'
-        f'<span class="fr-tag fr-tag--sm {class_name}">'
-        f"{project_status.value[1]}"
-        "</span>"
-        "</td>"
+        '<span class="fr-tag fr-tag--sm {}">'
+        "{}"
+        "</span>",
+        class_name,
+        project_status.value[1],
     )
 
 
 def _get_admin_cell(project: Project) -> str:
     admin_text = project.admin.get_full_name() if project.admin else ""
-    return format_html('<td class="field-admin">' f"{admin_text}" "</td>")
+    return format_html('<td class="field-admin">{}</td>', admin_text)
 
 
 def _get_leader_cell(project: Project) -> str:
     leader_text = project.leader.user.get_full_name() if project.leader else ""
-    return format_html('<td class="field-leader">' f"{leader_text}" "</td>")
+    return format_html('<td class="field-leader">{}</td>', leader_text)
 
 
 def update_result(
