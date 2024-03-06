@@ -39,7 +39,7 @@ export default function FileTable({
   const [isExpanded, setIsExpanded] = useState(false);
   const [filterText, setFilterText] = useState("");
 
-  const numCols = actionCell ? cols.length : cols.length + 1;
+  const numCols = actionCell ? cols.length + 1 : cols.length;
 
   const filteredRows = rows.filter((row) =>
     filterText !== "" ? row.name.includes(filterText) : true
@@ -100,7 +100,7 @@ export default function FileTable({
         <tbody>
           {isLoading ? (
             <tr className="loading">
-              {[...Array(numCols + 1)].map((_, i) => (
+              {[...Array(numCols)].map((_, i) => (
                 <td key={`loading-cell-${i}`}>
                   <div>&nbsp;</div>
                 </td>
