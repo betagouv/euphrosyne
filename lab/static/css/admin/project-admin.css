@@ -107,3 +107,7 @@ td.field-status {
 .dynamic-beamtimerequest h3 {
   display: none;
 }
+
+#changelist .paginator {
+  background-color: transparent;
+}
