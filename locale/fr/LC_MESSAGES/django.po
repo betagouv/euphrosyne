@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-04 11:22+0100\n"
+"POT-Creation-Date: 2024-03-06 15:16+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -10,17 +10,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
+msgid "Related project"
+msgstr "Projet apparenté"
+
+msgid "Related projects"
+msgstr "Projet apparentés"
+
+msgid "Status"
+msgstr "Statut"
+
+msgid "Invitation completed"
+msgstr "Invitation complétée"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "No"
+msgstr "Non"
+
 msgid "Profile"
 msgstr "Profil"
+
+msgid "Permissions"
+msgstr "Permissions"
 
 msgid "Superuser"
 msgstr "Superutilisateur"
 
-msgid "Invite new user"
-msgstr "Inviter un utilisateur"
-
-msgid "Invitation completed"
-msgstr "Invitation complétée"
+msgid "Users"
+msgstr "Utilisateurs"
 
 msgid "Send invitation e-mail again"
 msgstr "Ré-envoyer les invitations"
@@ -34,6 +52,27 @@ msgid ""
 msgstr ""
 "Les invitations n'ont pas été envoyées à ces comptes car l'enregistrement a "
 "déjà été effectué : {}"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Last institution"
+msgstr "Dernière institution"
+
+msgid "Password"
+msgstr "Mot de passe"
+
+msgid "this form"
+msgstr "ce formulaire"
+
+msgid "Change password using {}."
+msgstr "Modifier le mot de passe en utilisant {}."
+
+msgid "No password. You can set one using {}."
+msgstr "Aucun mot de passe. Vous pouvez en définir un en utilisant {}."
+
+msgid "Invite new user"
+msgstr "Inviter un utilisateur"
 
 msgid "[Euphrosyne] Invitation to register"
 msgstr "[Euphrosyne] Invitation à s'inscrire"
@@ -80,6 +119,9 @@ msgstr "Invitation utilisateur"
 msgid "User invitations"
 msgstr "Invitations utilisateur"
 
+msgid "Invite user"
+msgstr "Inviter un utilisateur"
+
 msgid ""
 "First, enter an email and password. Then, you'll be able to edit more user "
 "options."
@@ -92,9 +134,6 @@ msgstr "Entrez un email et un mot de passe"
 
 msgid "Create your account"
 msgstr "Créer votre compte"
-
-msgid "Password"
-msgstr "Mot de passe"
 
 msgid "Confirm password"
 msgstr "Confirmez le mot de passe"
@@ -145,6 +184,22 @@ msgstr "Voir plus"
 
 msgid "Calendar"
 msgstr "Calendrier"
+
+msgid "Search"
+msgstr "Rechercher"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s résultat"
+msgstr[1] "%(counter)s résultats"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s total"
+
+msgid "Show all"
+msgstr "Montrer tout"
 
 msgid "Delete"
 msgstr "Supprimer"
@@ -717,24 +772,8 @@ msgstr "Annuler"
 msgid "Yes, abandon changes"
 msgstr "Oui, abandonner les modifications"
 
-msgid "Show all"
-msgstr "Montrer tout"
-
 msgid "Search projects"
 msgstr "Rechercher des projets"
-
-msgid "Search"
-msgstr "Recherche"
-
-#, python-format
-msgid "%(counter)s result"
-msgid_plural "%(counter)s results"
-msgstr[0] "%(counter)s résultat"
-msgstr[1] "%(counter)s résultats"
-
-#, python-format
-msgid "%(full_result_count)s total"
-msgstr "%(full_result_count)s total"
 
 #, python-format
 msgid "%(counter)s project"
@@ -893,17 +932,17 @@ msgstr "Télécharger les données travaillées du run %(label)s"
 msgid "Dashboard"
 msgstr ""
 
-msgid "Users"
-msgstr "Utilisateurs"
-
-msgid "Invitations"
-msgstr "Invitations"
+msgid "Account"
+msgstr "Compte"
 
 msgid "Run(s)"
 msgstr "Run(s)"
 
 msgid "Workplace"
 msgstr "Workplace"
+
+msgid "Invitations"
+msgstr "Invitations"
 
 msgid "Only alphanumeric, underscore, hyphen and space characters are allowed"
 msgstr ""

@@ -6,6 +6,8 @@ from django.http import HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from lab.permissions import is_lab_admin
+
 register = template.Library()
 
 
@@ -30,35 +32,41 @@ def nav_items_json(request: HttpRequest):
         }
     ]
 
-    if request.user and request.user.is_lab_admin:
-        items.insert(
-            0,
-            {
-                "title": str(_("Dashboard")),
-                "href": reverse("admin:index"),
-                "iconName": "fr-icon-calendar-line",
-                "exactPath": True,
-                "extraPath": [],
-            },
-        )
-        items.append(
-            {
-                "title": str(_("Users")),
-                "href": reverse("admin:euphro_auth_user_changelist"),
-                "iconName": "fr-icon-user-line",
-                "exactPath": False,
-                "extraPath": [],
-            }
-        )
-        items.append(
-            {
-                "title": str(_("Invitations")),
-                "href": reverse("admin:euphro_auth_userinvitation_changelist"),
-                "iconName": "fr-icon-mail-line",
-                "exactPath": False,
-                "extraPath": [],
-            }
-        )
+    if request.user:
+        if is_lab_admin(request.user):
+            items.insert(
+                0,
+                {
+                    "title": str(_("Dashboard")),
+                    "href": reverse("admin:index"),
+                    "iconName": "fr-icon-calendar-line",
+                    "exactPath": True,
+                    "extraPath": [],
+                },
+            )
+            items.append(
+                {
+                    "title": str(_("Users")),
+                    "href": reverse("admin:euphro_auth_user_changelist"),
+                    "iconName": "fr-icon-user-line",
+                    "exactPath": False,
+                    "extraPath": [
+                        reverse("admin:euphro_auth_userinvitation_changelist")
+                    ],
+                }
+            )
+        else:  # non-admin user
+            items.append(
+                {
+                    "title": str(_("Account")),
+                    "href": reverse(
+                        "admin:euphro_auth_user_change", args=[request.user.id]
+                    ),
+                    "iconName": "fr-icon-user-line",
+                    "exactPath": False,
+                    "extraPath": [],
+                }
+            )
 
     data = json.dumps({"currentPath": request.path, "items": items})
     return data
