@@ -44,15 +44,19 @@ export default function WorkplaceRunTabs({ runs }: WorkplaceRunTabsProps) {
     EuphrosyneFile[],
     React.Dispatch<React.SetStateAction<EuphrosyneFile[]>>
   ][] = runs.map(() => useState<EuphrosyneFile[]>([]));
+  const rawLoadingStates = runs.map(() => useState(false));
+  const processedLoadingStates = runs.map(() => useState(false));
 
   useEffect(() => {
     runRawData.forEach(async ([, setFiles], index) => {
       const files = await runs[index].rawDataFileService.listData();
       setFiles(files);
+      rawLoadingStates[index][1](false);
     });
     runProcessedData.forEach(async ([, setFiles], index) => {
       const files = await runs[index].processedDataFileService.listData();
       setFiles(files);
+      processedLoadingStates[index][1](false);
     });
   }, []);
   return (
@@ -95,7 +99,7 @@ export default function WorkplaceRunTabs({ runs }: WorkplaceRunTabsProps) {
                 <h3>{window.gettext("Raw data")}</h3>
                 <FileTable
                   rows={runRawData[index][0]}
-                  isLoading={!runRawData[index][0].length}
+                  isLoading={rawLoadingStates[index][0]}
                   cols={tableCols}
                   isSearchable={true}
                   actionCell={
@@ -119,7 +123,7 @@ export default function WorkplaceRunTabs({ runs }: WorkplaceRunTabsProps) {
                 <h3>{window.gettext("Processed data")}</h3>
                 <FileTable
                   rows={runProcessedData[index][0]}
-                  isLoading={!runProcessedData[index][0].length}
+                  isLoading={processedLoadingStates[index][0]}
                   cols={tableCols}
                   isSearchable={true}
                   actionCell={
