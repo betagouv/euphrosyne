@@ -143,6 +143,14 @@ label.required:after {
   padding: 0 !important;
 }
 
+#changelist-filter h3 {
+  font-size: 0.9rem;
+}
+
+#changelist-filter li.selected {
+  border-left: none !important;
+}
+
 .project-tabs {
   margin-bottom: 30px;
 }
