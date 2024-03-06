@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
+import { css } from "@emotion/react";
+
+import { UpcomingProject } from "../IProject";
+
 import UpcomingProjectCard from "./UpcomingProjectCard";
 import PlaceholderCard from "./PlaceholderCard";
-import { UpcomingProject } from "../IProject";
-import { css } from "@emotion/react";
+import UpcomingProjectNoDataCard from "./UpcomingProjectNoDataCard";
 
 interface UpcomingProjectsResponseElement {
   name: string;
@@ -35,8 +38,12 @@ export default function UpcomingProjects(): JSX.Element {
   const [upcomingProjects, setUpcomingProjects] = useState<UpcomingProject[]>(
     []
   );
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-    fetchUpcomingProjects().then(setUpcomingProjects);
+    fetchUpcomingProjects().then((projects) => {
+      setUpcomingProjects(projects);
+      setIsLoading(false);
+    });
   }, []);
 
   return (
@@ -47,19 +54,27 @@ export default function UpcomingProjects(): JSX.Element {
           min-height: 226px;
         `}
       >
-        {upcomingProjects.length ? (
-          upcomingProjects.map((project) => (
-            <div
-              key={`upcoming-project-${project.name}`}
-              className="fr-col-6 fr-col-sm-4 fr-col-lg-3"
-            >
-              <UpcomingProjectCard project={project} />
-            </div>
-          ))
-        ) : (
+        {isLoading ? (
           <div className="fr-col-6 fr-col-sm-4 fr-col-md-3">
             <PlaceholderCard />{" "}
           </div>
+        ) : (
+          <>
+            {upcomingProjects.length ? (
+              upcomingProjects.map((project) => (
+                <div
+                  key={`upcoming-project-${project.name}`}
+                  className="fr-col-6 fr-col-sm-4 fr-col-lg-3"
+                >
+                  <UpcomingProjectCard project={project} />
+                </div>
+              ))
+            ) : (
+              <div className="fr-col-6 fr-col-sm-4 fr-col-md-3">
+                <UpcomingProjectNoDataCard />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
