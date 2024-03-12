@@ -61,7 +61,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
     this.checkDeploymentProgress();
     this.checkDeploymentIntervalId = setInterval(
       this.checkDeploymentProgress.bind(this),
-      7000
+      10000
     );
   }
 

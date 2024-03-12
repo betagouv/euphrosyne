@@ -180,7 +180,7 @@ describe("Test VirtualOfficeButton", () => {
       expect(voButton.checkDeploymentProgress).toHaveBeenNthCalledWith(1);
       expect(voButton.checkDeploymentIntervalId).toBeTruthy();
 
-      vi.advanceTimersByTime(8000);
+      vi.advanceTimersByTime(22000);
       expect(voButton.checkDeploymentProgress).toHaveBeenNthCalledWith(2);
       vi.useRealTimers();
     });

@@ -9,6 +9,7 @@ import { getTemplateJSONData } from "../../../../../shared/js/utils";
 import VirtualOfficeButton from "../components/virtual-office-button.js";
 import VirtualOfficeDeleteButton from "../components/virtual-office-delete-button.js";
 import VMSizeSelect from "../components/vm-size-select.js";
+import ProjectImageDefinitionSelect from "../components/ProjectImageDefinitionSelect";
 import downloadRunData from "../../../../assets/js/run-data-downloader.js";
 import WorkplaceRunTabs, {
   WorkplaceRunTabsProps,
@@ -49,6 +50,11 @@ document.addEventListener("DOMContentLoaded", () => {
         ),
       })),
     })
+  );
+
+  renderComponent(
+    "project-config-image-definitions",
+    createElement(ProjectImageDefinitionSelect, { projectSlug: project.slug })
   );
 
   document.querySelectorAll(".run-data-download-btn").forEach((btn) => {
