@@ -8,9 +8,9 @@ from django.test.testcases import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from euphro_auth.models import UserInvitation
+from euphro_auth.models import User
 
-from ...admin import UserInvitationAdmin
+from ...admin import UserAdmin
 
 
 class MockedMessages(list):
@@ -21,7 +21,7 @@ class MockedMessages(list):
 class TestSendInvitationMailAction(TestCase):
     def setUp(self):
         self.request_factory = RequestFactory()
-        self.model_admin = UserInvitationAdmin(UserInvitation, AdminSite())
+        self.model_admin = UserAdmin(User, AdminSite())
         admin_user = get_user_model()(
             email="admin@test.test", is_staff=True, is_lab_admin=True
         )
@@ -45,7 +45,7 @@ class TestSendInvitationMailAction(TestCase):
     def test_send_email_to_non_registered_users(self):
         actions = self.model_admin.get_actions(self.request)
         actions["send_invitation_mail_action"][0](
-            self.model_admin, self.request, UserInvitation.objects.all()
+            self.model_admin, self.request, User.objects.all()
         )
         assert len(mail.outbox) == 1
         assert mail.outbox[0].to[0], self.pending_registration_user.email

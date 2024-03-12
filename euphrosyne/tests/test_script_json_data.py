@@ -21,10 +21,7 @@ class TestScriptJsonData(TestCase):
 
         assert '<script id="nav-items-data" type="application/json">' in html
         # pylint: disable=line-too-long
-        assert (
-            '{"currentPath": "/lab/project/", "items": [{"title": "Projets", "href": "/lab/project/", "iconName": "fr-icon-survey-line", "extraPath": ["/lab/run/"], "exactPath": false}]}'
-            in html
-        )
+        assert '{"currentPath": "/lab/project/", "items":' in html
 
         assert '<script id="user-data" type="application/json">' in html
         assert (

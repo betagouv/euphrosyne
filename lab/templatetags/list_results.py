@@ -28,7 +28,7 @@ def _get_status_cell(project: Project) -> str:
         '<td class="field-status">'
         '<span class="fr-tag fr-tag--sm {}">'
         "{}"
-        "</span>",
+        "</span></td>",
         class_name,
         project_status.value[1],
     )

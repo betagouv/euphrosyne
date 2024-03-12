@@ -20,14 +20,6 @@ def test_custom_result_list():
 
     changelist = mock.MagicMock(list_display=["status", "admin", "leader_user"])
 
-    print(
-        project_results(
-            changelist,
-            [["old status repr", "old_admin_repr", "old_leader_user_repr"]],
-            [project],
-        )
-    )
-
     assert project_results(
         changelist,
         [["old status repr", "old_admin_repr", "old_leader_user_repr"]],
