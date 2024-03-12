@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-06 15:16+0100\n"
+"POT-Creation-Date: 2024-03-12 17:43+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -841,21 +841,6 @@ msgstr ""
 "Utilisez le champs de recherche pour importer un object à partir d'Eros. Le "
 "nom de l'objet sera affiché dans le champs suivant."
 
-msgid "File name"
-msgstr "Fichier"
-
-msgid "Last modified"
-msgstr "Modifié le"
-
-msgid "Size"
-msgstr "Taille"
-
-msgid "Add files"
-msgstr "Ajouter des fichiers"
-
-msgid "Upload"
-msgstr "Téléverser"
-
 msgid "Documents"
 msgstr "Documents"
 
@@ -940,9 +925,6 @@ msgstr "Run(s)"
 
 msgid "Workplace"
 msgstr "Workplace"
-
-msgid "Invitations"
-msgstr "Invitations"
 
 msgid "Only alphanumeric, underscore, hyphen and space characters are allowed"
 msgstr ""
