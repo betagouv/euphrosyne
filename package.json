@@ -34,7 +34,7 @@
     "@fullcalendar/core": "^6.1.8",
     "@fullcalendar/daygrid": "^6.1.11",
     "@fullcalendar/list": "^6.1.11",
-    "@gouvfr/dsfr": "^1.11.1",
+    "@gouvfr/dsfr": "^1.11.2",
     "css-loader": "^6.10.0",
     "css-minimizer-webpack-plugin": "^6.0.0",
     "dotenv": "^16.4.5",
