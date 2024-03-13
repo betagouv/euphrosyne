@@ -50,14 +50,14 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
         window.gettext(
           "The virtual office is being created. This can take up to 10 minutes."
         ),
-        "success"
+        "info"
       );
-      this.waitForDeploymentComplete();
+      this.innerText = window.gettext("Creating virtual office...");
+      setTimeout(() => this.waitForDeploymentComplete(), 10000); // Wait 10 seconds before checking deployment status
     }
   }
 
   waitForDeploymentComplete() {
-    this.innerText = window.gettext("Creating virtual office...");
     this.checkDeploymentProgress();
     this.checkDeploymentIntervalId = setInterval(
       this.checkDeploymentProgress.bind(this),
@@ -81,6 +81,13 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
         if (deploymentStatus === "Failed") {
           this.onFailedDeployment();
         } else {
+          this.innerText = window.gettext("Creating virtual office...");
+          utils.displayMessage(
+            window.gettext(
+              "The virtual office is being created. This can take up to 10 minutes."
+            ),
+            "info"
+          );
           this.waitForDeploymentComplete();
         }
       } else {
@@ -91,35 +98,65 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
   }
 
   async checkDeploymentProgress() {
-    if (this.deploymentStatus && this.deploymentStatus === "Succeeded") {
-      const url = await euphrosyneToolsService.fetchVMConnectionLink(
-        this.projectSlug
+    const deploymentStatus = await euphrosyneToolsService.fetchDeploymentStatus(
+      this.projectSlug
+    );
+    if (deploymentStatus === "Failed") {
+      this.onFailedDeployment();
+      clearInterval(this.checkDeploymentIntervalId);
+      this.checkDeploymentIntervalId = null;
+    } else if (!deploymentStatus | (deploymentStatus === "Succeeded")) {
+      utils.displayMessage(
+        window.gettext(
+          "The virtual machine has been deployed and is being configured."
+        ),
+        "info"
       );
-      if (url) {
-        this.connectionUrl = url;
-        clearInterval(this.checkDeploymentIntervalId);
-        this.checkDeploymentIntervalId = null;
-        this.disabled = false;
-        this.innerText = window.gettext("Access virtual office");
-        utils.displayMessage(
-          window.gettext(
-            "The virtual office is ready. You can now access it by clicking Access virtual office button."
-          ),
-          "success"
-        );
-        this.onConnectReady();
-      }
-    } else {
-      const deploymentStatus =
-        await euphrosyneToolsService.fetchDeploymentStatus(this.projectSlug);
-      if (deploymentStatus) {
-        this.deploymentStatus = deploymentStatus;
-        if (this.deploymentStatus === "Failed") {
-          this.onFailedDeployment();
-          clearInterval(this.checkDeploymentIntervalId);
-          this.checkDeploymentIntervalId = null;
-        }
-      }
+      clearInterval(this.checkDeploymentIntervalId);
+      this.checkDeploymentIntervalId = null;
+      this.checkConnectionLinkIntervalId = setInterval(
+        () => this.waitForConnectionLink(),
+        10000
+      );
+      setTimeout(
+        () => this.reportNoConnectionLinkTimeoutError(),
+        2 * 60 * 1000
+      ); // Wait 3 minutes before reporting a timeout error
+    }
+  }
+
+  async waitForConnectionLink() {
+    const url = await euphrosyneToolsService.fetchVMConnectionLink(
+      this.projectSlug
+    );
+    if (url) {
+      this.connectionUrl = url;
+      clearInterval(this.checkConnectionLinkIntervalId);
+      this.checkConnectionLinkIntervalId = null;
+      this.disabled = false;
+      this.innerText = window.gettext("Access virtual office");
+      utils.displayMessage(
+        window.gettext(
+          "The virtual office is ready. You can now access it by clicking Access virtual office button."
+        ),
+        "success"
+      );
+      this.onConnectReady();
+    }
+  }
+
+  async reportNoConnectionLinkTimeoutError() {
+    if (!this.connectionUrl) {
+      clearInterval(this.checkConnectionLinkIntervalId);
+      this.checkConnectionLinkIntervalId = null;
+      this.disabled = false;
+      this.innerText = window.gettext("Create virtual office");
+      utils.displayMessage(
+        window.gettext(
+          "Configuration took too long. Something wrong occured. Please contact an administrator."
+        ),
+        "error"
+      );
     }
   }
 
