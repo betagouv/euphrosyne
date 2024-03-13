@@ -124,6 +124,10 @@ tr:nth-child(2n + 1) + .row-form-errors .errorlist {
 ul.messagelist li {
   cursor: pointer;
 }
+ul.messagelist li.info {
+  background-color: var(--background-contrast-grey);
+
+}
 ul.messagelist li span.close {
   float: right;
   font-weight: 800;
