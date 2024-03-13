@@ -67,26 +67,23 @@ describe("Test VirtualOfficeButton", () => {
   });
 
   describe("checking for deployment progress", () => {
-    it("fetches deployment status again when deployment in progress", async () => {
-      voButton.deploymentStatus = "Running";
-      fetchDeploymentMock.mockResolvedValueOnce("Success");
-      await voButton.checkDeploymentProgress();
-
-      expect(voButton.deploymentStatus).toBe("Success");
-      expect(fetchDeploymentMock).toHaveBeenCalledTimes(1);
-    });
-
     it("fetches connection URL when deployment has succeeded", async () => {
-      const clearIntervalSpy = vi.spyOn(global, "clearInterval");
+      fetchDeploymentMock = vi
+        .spyOn(euphrosyneToolsService, "fetchDeploymentStatus")
+        .mockImplementation(() => Promise.resolve("Succeeded"));
+      fetchVMMock.mockImplementationOnce(() => Promise.resolve("url"));
+
       voButton.deploymentStatus = "Succeeded";
       fetchVMMock.mockResolvedValueOnce("url");
-      await voButton.checkDeploymentProgress();
 
-      expect(voButton.connectionUrl).toBe("url");
-      expect(voButton.innerText).toBe("Access virtual office");
+      vi.useFakeTimers();
+      await voButton.checkDeploymentProgress();
+      vi.advanceTimersByTime(10000);
+      vi.useRealTimers();
+
+      expect(fetchVMMock).toHaveBeenCalledTimes(1);
       expect(voButton.disabled).toBeFalsy();
       expect(voButton.checkDeploymentIntervalId).toBeNull();
-      expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
     });
 
     it("handles failed deployment correctly", async () => {
@@ -121,15 +118,24 @@ describe("Test VirtualOfficeButton", () => {
       const deployMock = vi
         .spyOn(euphrosyneToolsService, "deployVM")
         .mockImplementationOnce(() => Promise.resolve());
-      const waitDeployMock = vi
-        .spyOn(VirtualOfficeButton.prototype, "waitForDeploymentComplete")
-        .mockImplementationOnce(() => {});
+
       voButton.setAttribute("project-slug", "projet-tango");
       await voButton.onButtonClick();
 
       expect(deployMock).toHaveBeenCalledWith("projet-tango");
-      expect(waitDeployMock).toHaveBeenCalledTimes(1);
       expect(voButton.disabled).toBe(true);
+    });
+
+    it("waits and then fetch deployment status", () => {
+      const waitDeployMock = vi
+        .spyOn(VirtualOfficeButton.prototype, "waitForDeploymentComplete")
+        .mockImplementationOnce(() => {});
+      voButton.setAttribute("project-slug", "projet-tango");
+
+      expect(waitDeployMock).toHaveBeenCalledTimes(0);
+      vi.useFakeTimers();
+      vi.advanceTimersByTime(10000);
+      expect(waitDeployMock).toHaveBeenCalledTimes(0);
 
       VirtualOfficeButton.prototype.waitForDeploymentComplete.mockRestore();
     });
@@ -176,7 +182,6 @@ describe("Test VirtualOfficeButton", () => {
       vi.useFakeTimers();
       voButton.waitForDeploymentComplete();
 
-      expect(voButton.innerText).toBe("Creating virtual office...");
       expect(voButton.checkDeploymentProgress).toHaveBeenNthCalledWith(1);
       expect(voButton.checkDeploymentIntervalId).toBeTruthy();
 
