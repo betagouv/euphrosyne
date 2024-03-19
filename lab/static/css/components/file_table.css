@@ -1,9 +1,7 @@
 .file-table {
   width: 100%;
 }
-.file-table tr.no_data {
-  text-align: center;
-}
+
 .file-table tr.loading td div {
   max-width: 150px;
   background-image: linear-gradient(

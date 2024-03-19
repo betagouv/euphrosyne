@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-06 09:50+0100\n"
+"POT-Creation-Date: 2024-03-13 17:08+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -11,11 +11,44 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-msgid "Upcoming"
-msgstr "A venir"
+msgid "Virtual machine"
+msgstr "Machine virtuelle"
 
-msgid "No file yet"
-msgstr "Aucun fichier"
+msgid "No running virtual machines"
+msgstr "Aucune machine virtuelle en cours d'exécution"
+
+msgid "No upcoming projects"
+msgstr "Aucun projet à venir"
+
+msgid "Menu"
+msgstr "Menu"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Log out"
+msgstr "Déconnexion"
+
+msgid "Close"
+msgstr "Fermer"
+
+msgid "Select a language"
+msgstr "Sélectionner un langage"
+
+msgid "User"
+msgstr "Utilisateur"
+
+#, javascript-format
+msgid "Delete the document %s ?"
+msgstr "Supprimer le document %s ?"
+
+#, javascript-format
+msgid "File %s could not be removed."
+msgstr "Le fichier %s n'a pas pu être supprimé."
+
+#, javascript-format
+msgid "File %s has been removed."
+msgstr "Le fichier %s a été supprimé."
 
 msgid "Download file"
 msgstr "Télécharger le fichier"
@@ -23,15 +56,12 @@ msgstr "Télécharger le fichier"
 msgid "Delete file"
 msgstr "Supprimer le fichier"
 
-msgid "Show less"
-msgstr "Afficher moins"
-
-msgid "Show more"
-msgstr "Afficher plus"
+msgid "Filter"
+msgstr "Filtrer"
 
 #, javascript-format
-msgid "Delete the document %s ?"
-msgstr "Supprimer le document %s ?"
+msgid "%s results"
+msgstr "%s résultats"
 
 msgid ""
 "An error has occured while generating the presigned URL. Please contact the "
@@ -48,17 +78,30 @@ msgstr "Le fichier %s a été téléversé."
 msgid "File %s could not be uploaded."
 msgstr "Le fichier %s n'a pas pu être sauvegardé."
 
-#, javascript-format
-msgid "File %s could not be removed."
-msgstr "Le fichier %s n'a pas pu être supprimé."
+msgid "File"
+msgstr "Fichier"
 
-#, javascript-format
-msgid "File %s has been removed."
-msgstr "Le fichier %s a été supprimé."
+msgid "Last modified"
+msgstr "Modifié le"
+
+msgid "Size"
+msgstr "Taille"
+
+msgid "Add a document"
+msgstr "Ajouter un document"
+
+msgid "Please select a file"
+msgstr "Choisissez un fichier"
 
 #, javascript-format
 msgid "The following file formats are not accepted : %s"
 msgstr "Ces formats de fichier ne sont pas acceptés : %s"
+
+msgid "No object in this run yet"
+msgstr "Aucun objet dans ce run"
+
+msgid "An error occurred."
+msgstr "Une erreur s'est produite."
 
 msgid "Search for a valid C2RMF ID before submitting the form."
 msgstr ""
@@ -82,6 +125,9 @@ msgstr ""
 "Une erreur s'est produite lors de la recherche de l'object sur Eros. Si "
 "l'erreur persiste, veuillez contacter l'équipe AGLAE."
 
+msgid "Runs data"
+msgstr "Données des runs"
+
 msgid "Create virtual office"
 msgstr "Créer le bureau virtuel"
 
@@ -100,6 +146,9 @@ msgstr ""
 msgid "Creating virtual office..."
 msgstr "Création du bureau distant..."
 
+msgid "The virtual machine has been deployed and is being configured."
+msgstr "La machine virtuelle a été déployée et est en cours de configuration."
+
 msgid "Access virtual office"
 msgstr "Accéder au bureau distant"
 
@@ -109,6 +158,13 @@ msgid ""
 msgstr ""
 "Le bureau virtual est prêt. Vous pouvez y accéder en cliquant sur le bouton "
 "Accéder au bureau virtuel."
+
+msgid ""
+"Configuration took too long. Something wrong occured. Please contact an "
+"administrator."
+msgstr ""
+"La configuration met trop de temps. Nous n'avons pas réussi à créer le "
+"bureau distant. Veuillez contacter un administrateur."
 
 msgid ""
 "We could not create the virtual office. Please contact an administrator."

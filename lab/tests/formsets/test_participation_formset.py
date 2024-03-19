@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.contrib.auth import get_user_model
 from django.forms.models import inlineformset_factory
 from django.test.testcases import TestCase
@@ -46,3 +48,10 @@ class TestParticipationFormSet(TestCase):
 
     def test_qs_is_ordered_by_is_leader(self):
         assert self.formset.get_queryset().query.order_by[0] == "-is_leader"
+
+    @mock.patch.object(BaseParticipationForm, "try_populate_institution")
+    def test_call_try_populate_institution_on_full_clean(
+        self, mock_method: mock.MagicMock
+    ):
+        self.formset.full_clean()
+        mock_method.assert_called()

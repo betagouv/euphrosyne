@@ -1,7 +1,14 @@
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils import timezone
 
-from lab.api_views.project import IsLabAdminUser, ProjectList, ProjectSerializer
+from lab.api_views.project import (
+    IsLabAdminUser,
+    ProjectList,
+    ProjectSerializer,
+    UpcomingProjectList,
+    UpcomingProjectSerializer,
+)
 
 from .. import factories
 
@@ -97,5 +104,45 @@ class TestProjectListView(TestCase):
                 self.june_project.name,
                 self.july_project.name,
                 self.august_project.name,
+            ]
+        ) == set(project["name"] for project in response.json())
+
+
+class TestUpcomingProjectListView(TestCase):
+    def setUp(self):
+        self.client = client = Client()
+        self.api_url = reverse("api:project-upcoming-list")
+
+        client.force_login(factories.LabAdminUserFactory())
+
+        self.last_month_project = factories.RunFactory(
+            start_date=timezone.now() - timezone.timedelta(days=30),
+            end_date=timezone.now() - timezone.timedelta(days=1),
+        ).project
+        self.next_projects = [
+            (
+                factories.RunFactory(
+                    start_date=timezone.now() + timezone.timedelta(days=i * i),
+                    end_date=timezone.now() + timezone.timedelta(days=(i * i) + 1),
+                ).project
+            )
+            for i in range(10)
+        ]
+
+    def test_conf(self):
+        assert UpcomingProjectList.serializer_class == UpcomingProjectSerializer
+        assert IsLabAdminUser in UpcomingProjectList.permission_classes
+
+    def test_upcoming_project_list(self):
+        response = self.client.get(self.api_url)
+
+        assert response.status_code == 200
+        assert len(response.json()) == 4
+        assert set(
+            [
+                self.next_projects[0].name,
+                self.next_projects[1].name,
+                self.next_projects[2].name,
+                self.next_projects[3].name,
             ]
         ) == set(project["name"] for project in response.json())

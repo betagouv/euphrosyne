@@ -1,0 +1,23 @@
+{% extends "admin/change_form.html" %}
+
+{% block field_sets %}
+<div class="fr-container">
+    <div class="fr-grid-row fr-grid-row--gutters">
+        <div class="fr-col-12 fr-col-sm-6">
+        {% for fieldset in adminform %}
+        {% include "admin/includes/fieldset.html" %}
+        {% endfor %}
+        </div>
+{% endblock %}
+
+{% block after_field_sets %}{% endblock %}
+
+{% block inline_field_sets %}
+        <div class="fr-col-12 fr-col-sm-6">
+        {% for inline_admin_formset in inline_admin_formsets %}
+            {% include inline_admin_formset.opts.template %}
+        {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

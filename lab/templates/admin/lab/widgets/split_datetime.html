@@ -1,0 +1,8 @@
+<div class="flex-container">
+    <div>
+        {{ date_label }} {% with widget=widget.subwidgets.0 %}{% include widget.template_name %}{% endwith %}<br>
+    </div>
+    <div class="fr-ml-1w">
+        {{ time_label }} {% with widget=widget.subwidgets.1 %}{% include widget.template_name %}{% endwith %}
+    </div>
+</div>

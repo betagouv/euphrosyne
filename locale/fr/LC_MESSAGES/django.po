@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-06 09:51+0100\n"
+"POT-Creation-Date: 2024-03-13 17:53+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -10,17 +10,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
+msgid "Related project"
+msgstr "Projet apparenté"
+
+msgid "Related projects"
+msgstr "Projet apparentés"
+
+msgid "Status"
+msgstr "Statut"
+
+msgid "Invitation completed"
+msgstr "Invitation complétée"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "No"
+msgstr "Non"
+
 msgid "Profile"
 msgstr "Profil"
+
+msgid "Permissions"
+msgstr "Permissions"
 
 msgid "Superuser"
 msgstr "Superutilisateur"
 
-msgid "Invite new user"
-msgstr "Inviter un utilisateur"
-
-msgid "Invitation completed"
-msgstr "Invitation complétée"
+msgid "Users"
+msgstr "Utilisateurs"
 
 msgid "Send invitation e-mail again"
 msgstr "Ré-envoyer les invitations"
@@ -34,6 +52,27 @@ msgid ""
 msgstr ""
 "Les invitations n'ont pas été envoyées à ces comptes car l'enregistrement a "
 "déjà été effectué : {}"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Last institution"
+msgstr "Dernière institution"
+
+msgid "Password"
+msgstr "Mot de passe"
+
+msgid "this form"
+msgstr "ce formulaire"
+
+msgid "Change password using {}."
+msgstr "Modifier le mot de passe en utilisant {}."
+
+msgid "No password. You can set one using {}."
+msgstr "Aucun mot de passe. Vous pouvez en définir un en utilisant {}."
+
+msgid "Invite new user"
+msgstr "Inviter un utilisateur"
 
 msgid "[Euphrosyne] Invitation to register"
 msgstr "[Euphrosyne] Invitation à s'inscrire"
@@ -80,6 +119,9 @@ msgstr "Invitation utilisateur"
 msgid "User invitations"
 msgstr "Invitations utilisateur"
 
+msgid "Invite user"
+msgstr "Inviter un utilisateur"
+
 msgid ""
 "First, enter an email and password. Then, you'll be able to edit more user "
 "options."
@@ -92,9 +134,6 @@ msgstr "Entrez un email et un mot de passe"
 
 msgid "Create your account"
 msgstr "Créer votre compte"
-
-msgid "Password"
-msgstr "Mot de passe"
 
 msgid "Confirm password"
 msgstr "Confirmez le mot de passe"
@@ -131,20 +170,56 @@ msgstr "L'équipe Euphrosyne"
 msgid "Enter your information"
 msgstr "Entrez vos informations"
 
-msgid "Log out"
-msgstr "Déconnexion"
+msgid "History"
+msgstr "Historique"
 
-msgid "Admin"
-msgstr "Admin"
+msgid "View on site"
+msgstr "Voir sur le site"
 
-msgid "User"
-msgstr "Utilisateur"
+msgid "Upcoming projects"
+msgstr "Projets à venir"
+
+msgid "See more"
+msgstr "Voir plus"
 
 msgid "Calendar"
 msgstr "Calendrier"
 
-msgid "Main menu"
-msgstr "Menu principal"
+msgid "Running virtual machines"
+msgstr "Machine virtuelles en cours d'exécution"
+
+msgid "Search"
+msgstr "Rechercher"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s résultat"
+msgstr[1] "%(counter)s résultats"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s total"
+
+msgid "Show all"
+msgstr "Montrer tout"
+
+msgid "Delete"
+msgstr "Supprimer"
+
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Save as new"
+msgstr "Sauvegarder comme nouveau"
+
+#, fuzzy
+#| msgid "Save and view"
+msgid "Save and add another"
+msgstr "Sauvegarder et ajouter un autre"
+
+msgid "Close"
+msgstr "Fermer"
 
 msgid "Sign in"
 msgstr "Inscription"
@@ -243,10 +318,18 @@ msgid "The online board to track your %(aglae_tag)s search projects"
 msgstr "L'outil en ligne pour gérer vos projets de recherche %(aglae_tag)s"
 
 msgid "Please correct the error below."
-msgstr "Merci de corriger l'erreur ci-dessous"
+msgid_plural "Please correct the errors below."
+msgstr[0] "Merci de corriger l'erreur ci-dessous"
+msgstr[1] "Merci de corriger les erreurs ci-dessous"
 
 msgid "Please correct the errors below."
 msgstr "Merci de corriger les erreurs ci-dessous"
+
+msgid "Project"
+msgstr "Projet"
+
+msgid "status"
+msgstr "statut"
 
 msgid "Project member"
 msgstr "Membre du projet"
@@ -260,26 +343,46 @@ msgstr "Chef de projet"
 msgid "First run"
 msgstr "Premier run"
 
+msgid "First run date"
+msgstr "Date du premier run"
+
+msgid "No scheduled run."
+msgstr "Aucun run planifié."
+
+msgid "See runs"
+msgstr "Voir les runs"
+
 msgid "Runs"
 msgstr "Runs"
 
 msgid "Basic information"
 msgstr "Informations essentielles"
 
+msgid "Create new project"
+msgstr "Créer un nouveau projet"
+
+msgid ""
+"To create a project on Euphrosyne, you are required to acknowledge and agree "
+"to the platform's general terms of use."
+msgstr ""
+"Pour créer un projet sur Euphrosyne, vous devez lire et accepter les "
+"conditions générales d'utilisation de la plateforme."
+
 msgid "Projects"
 msgstr "Projets"
 
-msgid "Object / Sample"
-msgstr "Objet / Échantillon"
-
-msgid "Object(s) / Sample(s)"
-msgstr "Objet(s) / Échantillon(s)"
-
-msgid "Project"
-msgstr "Projet"
+msgid "To schedule"
+msgstr "A planifier"
 
 msgid "Experimental conditions"
 msgstr "Conditions expérimentales"
+
+msgid ""
+"You do not have permission for this project. If you think this is an error, "
+"please contact the New AGLAE team."
+msgstr ""
+"Vous n'avez pas les droits pour ce projet. Si vous pensez que c'est une "
+"erreur, contactez l'équipe New AGLAE."
 
 #, python-brace-format
 msgid ""
@@ -324,20 +427,26 @@ msgstr ""
 msgid "[Euphrosyne] Invitation to join project {project.name}"
 msgstr "[Euphrosyne] Invitation à rejoindre le projet {project.name}"
 
+msgid "User"
+msgstr "Utilisateur"
+
 msgid "Institution"
 msgstr "Institution"
 
 msgid "No leader"
 msgstr "Aucun chef de projet"
 
-msgid "The end date must be after the start date"
-msgstr "La date de fin doit être après la date de début"
-
 msgid "Invalid filter choice"
 msgstr "Choix de filtre invalide"
 
 msgid "Only Admin users might rewind runs."
 msgstr "Seuls les utilisateurs Admin peuvent remettre un run en arrière."
+
+msgid "The end date must be after the start date"
+msgstr "La date de fin doit être après la date de début"
+
+msgid "I have read and accepted the general conditions of Euphrosyne."
+msgstr "J'ai lu et accepté les conditions générales d'Euphrosyne."
 
 msgid "{} analysis technique"
 msgstr "technique d'analyse {}"
@@ -359,9 +468,6 @@ msgstr "nom"
 
 msgid "country"
 msgstr "pays"
-
-msgid "To schedule"
-msgstr "A planifier"
 
 msgid "Scheduled"
 msgstr "Planifié"
@@ -436,7 +542,7 @@ msgid "Problem statement"
 msgstr "Question posée"
 
 msgid "Description of the problematic being studied with the beam analysis"
-msgstr "Description de a problématique étudiée par analyse de faisceau"
+msgstr "Description de la problématique étudiée par analyse de faisceau"
 
 msgid "Form type"
 msgstr "Type du formulaire"
@@ -460,10 +566,10 @@ msgid "Run status"
 msgstr "Statut du run"
 
 msgid "Start date"
-msgstr "Démarré"
+msgstr "Date de début"
 
 msgid "End date"
-msgstr "Date d'embargo"
+msgstr "Date de fin"
 
 msgid "Embargo date"
 msgstr "Date d'embargo"
@@ -553,6 +659,9 @@ msgstr "Collection"
 msgid "%(object_count)s objects"
 msgstr "%(object_count)s objets"
 
+msgid "Object / Sample"
+msgstr "Objet / Échantillon"
+
 msgid "Object(s) / Sample(s"
 msgstr "Objet(s) / Échantillon(s)"
 
@@ -564,9 +673,6 @@ msgstr "Cet object a déjà été ajouté à ce run."
 
 msgid "EROS import"
 msgstr "Import EROS"
-
-msgid "Save"
-msgstr "Enregistrer"
 
 msgid "Differentiate objects"
 msgstr "Différencier les objets"
@@ -605,14 +711,51 @@ msgstr "Modification"
 msgid "View"
 msgstr "Voir"
 
-msgid "View on site"
-msgstr "Voir sur le site"
-
 msgid "Popup closing…"
 msgstr "Fenêtre pop-up en cours de fermeture…"
 
-msgid "Close"
-msgstr "Fermer"
+msgid "Delete selected projects"
+msgstr "Supprimer les projets sélectionnés"
+
+msgid "Filter"
+msgstr "Filtrer"
+
+msgid "No project yet"
+msgstr "Aucun projet pour le moment"
+
+msgid "We couldn't find any projects attached to your account."
+msgstr "Nous n'avons pu trouver aucun projet attaché à votre compte."
+
+msgid ""
+"On this page you can find all of your research projects carried out at New "
+"AGLAE."
+msgstr ""
+"Sur cette page, vous pouvez trouver tous vos projets de recherche menés à "
+"New AGLAE."
+
+msgid ""
+"If a project has already been created by a member of your team, they can "
+"send you an invitation link to join it."
+msgstr ""
+"Si un projet a déjà été créé par un membre de votre équipe, ils peuvent vous "
+"envoyer un lien d'invitation pour le rejoindre."
+
+msgid "Create my first project"
+msgstr "Créer mon premier projet"
+
+msgid "Remove from sorting"
+msgstr "Enlever du tri"
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Priorité de tri : %(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "Changer l'ordre de tri"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "Par %(filter_title)s "
 
 msgid "Are you sure you want to close this form?"
 msgstr "Êtes-vous sûr(e) de vouloir fermer ce formulaire ?"
@@ -632,26 +775,67 @@ msgstr "Annuler"
 msgid "Yes, abandon changes"
 msgstr "Oui, abandonner les modifications"
 
-msgid "Filter"
-msgstr "Filtrer"
+msgid "Search projects"
+msgstr "Rechercher des projets"
 
-msgid "Clear all filters"
-msgstr "Effacer tous les filtres"
+#, python-format
+msgid "%(counter)s project"
+msgid_plural "%(counter)s projects"
+msgstr[0] "%(counter)s projet"
+msgstr[1] "%(counter)s projets"
 
-msgid "Create a run"
-msgstr "Créer un run"
+msgid "Reschedule"
+msgstr "Re-planifier"
+
+msgid "Schedule"
+msgstr "Planifier"
+
+msgid "Start"
+msgstr "Début"
+
+msgid "End"
+msgstr "Fin"
+
+msgid "Embargo"
+msgstr "Embargo"
+
+msgid "No embargo date"
+msgstr "Pas de date d'embargo"
+
+msgid "Object(s) / Sample(s)"
+msgstr "Objet(s) / Échantillon(s)"
+
+msgid "No run yet"
+msgstr "Aucun run pour le moment"
+
+#, fuzzy
+#| msgid ""
+#| "A run is a series of analyses performed on one or multiple objects under "
+#| "the same experimental conditions. A starting date will be assigned to "
+#| "each run by a New AGLAE administrator."
+msgid ""
+"A run is a series of analyses performed on one or multiple objects under the "
+"same experimental conditions. A starting date will be assigned to each run "
+"by a new AGLAE administrator."
+msgstr ""
+"Un run est une série d'analyses réalisées sur un ou plusieurs objets dans "
+"les mêmes conditions expérimentales. Une date de début sera attribuée à "
+"chaque run par un administrateur New AGLAE."
+
+msgid "Create a first run"
+msgstr "Créer un premier run"
 
 msgid "Methods"
 msgstr "Méthodes"
 
-msgid "Delete"
-msgstr "Supprimer"
+msgid "Energy"
+msgstr "Energie"
 
-msgid "Save and continue editing"
-msgstr "Sauvegarder et continuer l'édition"
+msgid "Create new run"
+msgstr "Créer un nouveau run"
 
-msgid "Save and view"
-msgstr "Sauvegarder et voir"
+msgid "Schedule run"
+msgstr "Planifier le run"
 
 msgid ""
 "Use the search field to import an object from Eros. The name of the object "
@@ -659,21 +843,6 @@ msgid ""
 msgstr ""
 "Utilisez le champs de recherche pour importer un object à partir d'Eros. Le "
 "nom de l'objet sera affiché dans le champs suivant."
-
-msgid "File name"
-msgstr "Fichier"
-
-msgid "Last modified"
-msgstr "Modifié le"
-
-msgid "Size"
-msgstr "Taille"
-
-msgid "Add files"
-msgstr "Ajouter des fichiers"
-
-msgid "Upload"
-msgstr "Téléverser"
 
 msgid "Documents"
 msgstr "Documents"
@@ -692,14 +861,8 @@ msgstr "Vous pouvez accéder à l'invitation ici :"
 msgid "Join project"
 msgstr "Rejoindre le projet"
 
-msgid "Search"
-msgstr "Recherche"
-
-msgid "Change leader"
-msgstr "Modification du chef de projet"
-
-msgid "Select an object or a group of objects"
-msgstr "Choisissez un object ou groupe d'objets"
+msgid "Country"
+msgstr "Pays"
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -743,15 +906,6 @@ msgstr "Utilisé pour déterminer la taille de la machine virtuelle."
 msgid "Delete virtual office"
 msgstr "Supprimer le bureau virtuel"
 
-msgid "Runs data"
-msgstr "Données des runs"
-
-msgid "Raw data"
-msgstr "Données brutes"
-
-msgid "Processed data"
-msgstr "Données travaillées"
-
 msgid "Download run data"
 msgstr "Télécharger les données du run"
 
@@ -766,11 +920,8 @@ msgstr "Télécharger les données travaillées du run %(label)s"
 msgid "Dashboard"
 msgstr ""
 
-msgid "Users"
-msgstr "Utilisateurs"
-
-msgid "Invitations"
-msgstr "Invitations"
+msgid "Account"
+msgstr "Compte"
 
 msgid "Run(s)"
 msgstr "Run(s)"
@@ -782,6 +933,9 @@ msgid "Only alphanumeric, underscore, hyphen and space characters are allowed"
 msgstr ""
 "Seuls les lettres, chiffres, tirets bas, traits d'union et espaces sont des "
 "caractères valides"
+
+msgid "Change leader"
+msgstr "Modification du chef de projet"
 
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"

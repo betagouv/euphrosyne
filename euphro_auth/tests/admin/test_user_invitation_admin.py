@@ -26,12 +26,18 @@ class TestUserInvitationAdmin(TestCase):
         self.client.force_login(self.admin_user)
 
     def test_add_user_invitation_creates_user_with_right_permissions(self):
-        self.client.post(self.view_url, data={"email": "test@test.test"})
+        self.client.post(
+            self.view_url,
+            data={"email": "test@test.test", "first_name": "Test", "last_name": "Test"},
+        )
         user = get_user_model().objects.get(email="test@test.test")
         assert user.is_staff
 
     def test_add_user_invitation_sends_invitation_email(self):
-        self.client.post(self.view_url, data={"email": "test@test.test"})
+        self.client.post(
+            self.view_url,
+            data={"email": "test@test.test", "first_name": "Test", "last_name": "Test"},
+        )
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject, gettext("[Euphrosyne] Invitation to register")

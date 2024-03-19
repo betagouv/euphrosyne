@@ -1,7 +1,5 @@
 @import url("./dsrf-overrides.css");
 @import url("./components/fieldset.css");
-@import url("./components/nav.css");
-@import url("./components/header.css");
 @import url("./utils.css");
 
 :root {
@@ -11,6 +9,8 @@
   --black-euphro: #383838;
 
   --primary: var(--blue-france);
+
+  --body-bg: var(--background-default-grey);
 
   --header-bg: var(--background-default-grey);
   --header-color: var(--text-title-grey);
@@ -29,9 +29,12 @@
 body {
   font-family: "Marianne", "Roboto", "Lucida Grande", "DejaVu Sans",
     "Bitstream Vera Sans", Verdana, Arial, sans-serif;
-  background-color: var(--background-default-grey);
+  background-color: var(--background-alt-grey) !important;
 }
 
+select {
+  height: auto;
+}
 
 input[type="button"]:not(:disabled):hover, input[type="image"]:not(:disabled):hover, input[type="reset"]:not(:disabled):hover, input[type="submit"]:not(:disabled):hover {
   --hover: var(--background-action-high-blue-france-hover);
@@ -52,6 +55,16 @@ button.fr-btn--tertiary:hover, button.fr-btn--secondary:hover {
 a:link,
 a:visited {
   color: inherit;
+}
+a.fr-btn {
+  color: var(--text-inverted-blue-france);
+}
+a.fr-btn.fr-btn--secondary {
+  color: var(--text-action-high-blue-france);
+}
+
+#content-main {
+  float: none;
 }
 
 .content h1 {
@@ -111,6 +124,10 @@ tr:nth-child(2n + 1) + .row-form-errors .errorlist {
 ul.messagelist li {
   cursor: pointer;
 }
+ul.messagelist li.info {
+  background-color: var(--background-contrast-grey);
+
+}
 ul.messagelist li span.close {
   float: right;
   font-weight: 800;
@@ -126,8 +143,16 @@ label.required:after {
   margin-top: -128px;
 }
 
-.change-form .object-tools {
-  margin-top: -64px;
+#changelist .actions {
+  padding: 0 !important;
+}
+
+#changelist-filter h3 {
+  font-size: 0.9rem;
+}
+
+#changelist-filter li.selected {
+  border-left: none !important;
 }
 
 .project-tabs {
@@ -170,6 +195,15 @@ ul li {
   list-style-type: none;
 }
 
+.aglae-object-tools {
+  display: flex;
+  justify-content: end;
+}
+
+.fr-header .fr-btns-group {
+  align-items: baseline;
+}
+
 /* purgecss ignore */
 #toolbar input#searchbar {
   height: 1.93rem;
@@ -196,9 +230,17 @@ ul li {
   height: unset;
 }
 
-/* purgecss end ignore */
+.submit-row {
+  background: none !important;
+  border: none !important;
+  justify-content: right;
+}
 
-/*
-purgecss 
-.fr-error-text 
-*/
+.submit-row .delete-btn {
+  color: var(--text-default-error) !important;
+  box-shadow: inset 0 0 0 1px var(--text-default-error);
+}
+
+.workplace .fr-tabs__panel {
+  background-color: var(--background-default-grey);
+}

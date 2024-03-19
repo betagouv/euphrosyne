@@ -1,17 +1,5 @@
-#METHODS h2 {
-  font-size: 13px;
-  font-weight: bold;
-  color: var(--body-fg);
-  padding-left: 10px;
-}
-
-#METHODS h2::after {
-  content: ": *";
-}
-
 .method-container {
-  margin: 1em;
-  padding: 1em;
+  margin: 10px;
 }
 
 .detector-container {

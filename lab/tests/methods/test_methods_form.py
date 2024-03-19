@@ -273,6 +273,7 @@ def test_form_assigns_choices_to_optional_freeform_filters():
 
 def test_freeform_filter_widget_contains_input_text_field():
     form = RunDetailsForm()
-    assert '<input class="other-input" name="filters_for_detector_HE1" >' in str(
-        form["filters_for_detector_HE1"]
+    assert (
+        '<input class="other-input fr-input" name="filters_for_detector_HE1" >'
+        in str(form["filters_for_detector_HE1"])
     )

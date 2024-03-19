@@ -1,0 +1,21 @@
+{% if result_hidden_fields %}
+<div class="hiddenfields">{# DIV for HTML validation #}
+{% for item in result_hidden_fields %}{{ item }}{% endfor %}
+</div>
+{% endif %}
+{% if results %}
+<div class="results">
+{% if do_regroup %}
+{% for group in grouped_results %}
+<h3>{{ group.0 |date:"F Y" }}</h3>
+{% include "admin/lab/project/change_list_results_table.html" with results=group.1%}
+{% endfor %}
+
+{% else %}
+{% include "admin/lab/project/change_list_results_table.html" %}
+
+{% endif %}
+
+
+</div>
+{% endif %}

@@ -28,3 +28,8 @@ form .aligned ul {
 input[type="submit"][disabled].default {
   color: white;
 }
+
+.import-from-input .fr-search-bar {
+  max-width: 500px;
+  margin-bottom: 1rem;
+}

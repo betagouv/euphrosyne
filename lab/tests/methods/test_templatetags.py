@@ -13,13 +13,16 @@ from django.urls import reverse
 from lab.widgets import DisabledSelectWithHidden
 
 from ...admin.run import RunAdmin
+from ...methods.dto import method_model_to_dto
 from ...models import Run
 from ...templatetags.methods import (
     _get_adminfield_name,
     detector_fields,
     filters_field,
     method_fields,
+    run_methods_repr,
 )
+from .. import factories
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -35,13 +38,14 @@ def adminform():
     # pylint: disable=line-too-long
     # Raincoat: pypi package: Django==4.1.2 path: django/contrib/admin/options.py element: ModelAdmin._changeform_view
 
+    run = Run(id=1)
     run_admin = RunAdmin(model=Run, admin_site=AdminSite())
-    request = RequestFactory().get(reverse("admin:lab_run_add"))
+    request = RequestFactory().get(reverse("admin:lab_run_change", args=[str(run.id)]))
     request.user = AnonymousUser()
 
-    fieldsets = run_admin.get_fieldsets(request, None)
+    fieldsets = run_admin.get_fieldsets(request, run)
     ModelForm = run_admin.get_form(  # pylint: disable=invalid-name
-        request, None, change=False, fields=flatten_fieldsets(fieldsets)
+        request, run, change=True, fields=flatten_fieldsets(fieldsets)
     )
     initial = run_admin.get_changeform_initial_data(request)
     form = ModelForm(initial=initial)
@@ -49,7 +53,7 @@ def adminform():
         form,
         list(fieldsets),
         {},
-        readonly_fields=run_admin.get_readonly_fields(request, None),
+        readonly_fields=run_admin.get_readonly_fields(request, run),
         model_admin=run_admin,
     )
 
@@ -87,3 +91,14 @@ def test_LE0_filters_fields_returns_corresponding_filter_fieldnames_in_order(adm
         filters_field(adminform, "detector_LE0").field.name
         == "filters_for_detector_LE0"
     )
+
+
+@pytest.mark.django_db
+def test_run_methods_repr():
+    run = factories.RunFactory(
+        method_PIXE=True,
+        detector_LE0=True,
+        filters_for_detector_LE0="Helium",
+    )
+
+    assert run_methods_repr(run) == {"methods": method_model_to_dto(run)}

@@ -1,18 +1,38 @@
+.dashboard .content {
+    background-color: var(--background-alt-grey);
+}
+
 .dashboard #content {
     width: auto;
 }
 
 .calendar {
-    float: left;
-    width: 100%;
-    max-width: 900px;
+    background-color: var(--background-raised-grey);
+    filter: drop-shadow(var(--raised-shadow));
+    z-index: calc(var(--ground) + 750);
 }
+
+.calendar td :nth-child(2n + 1) {
+  background: inherit;
+}
+
+.upcoming-projects-banner {
+    display: flex;
+    justify-content: space-between;
+}
+
+.upcoming-projects-banner a {
+    color: var(--text-action-high-blue-france);
+}
+
 
 /** FULL CALENDAR */
 :root {
     --fc-event-text-color: unset !important;
     --fc-button-bg-color: transparent !important;
     --fc-button-text-color: var(--text-action-high-blue-france) !important;
+    --fc-button-border-color: transparent;
+    --fc-border-color : transparent;
 
     --fc-button-active-bg-color: var(--background-action-high-blue-france) !important;
     --fc-button-active-border-color: transparent !important;
@@ -21,12 +41,10 @@
     --fc-button-hover-bg-color: var(--hover-tint);
     --fc-button-hover-border-color: unset;
     --fc-button-hover-text-color: inherit;
+
 }
 .fc-event-title {
     font-size: .8rem;
-}
-.fc-button {
-    box-shadow:  0 0 0 1px var(--border-action-high-blue-france);
 }
 .fc-daygrid-event, .fc-button {
     border-radius: 0 !important;
@@ -45,6 +63,11 @@
 .fc-daygrid-event-dot {
     display: none;
 }
+
+.calendar .fc .fc-prev-button {
+    margin-right: 1rem;;
+}
+
 @media (min-width: 1080px) {
     .dashboard .module table td a {
         padding: .6em;

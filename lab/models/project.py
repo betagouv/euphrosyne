@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from slugify import slugify
 
+from lab.models.run import Run
 from shared.models import TimestampedModel
 
 from ..validators import valid_filename
@@ -15,11 +16,35 @@ from .participation import Participation
 
 
 class ProjectQuerySet(models.QuerySet):
+    def only_to_schedule(self):
+        to_schedule_runs = Run.objects.filter(start_date__isnull=False)
+        return self.exclude(runs__in=to_schedule_runs)
+
     def only_finished(self):
         return self.filter(runs__end_date__lt=timezone.now())
 
     def only_public(self):
         return self.filter(confidential=False)
+
+    def filter_by_status(self, status: "Project.Status"):
+        if status == Project.Status.TO_SCHEDULE:
+            return self.filter(runs__start_date__isnull=True)
+        if status == Project.Status.SCHEDULED:
+            return self.filter(runs__start_date__gte=timezone.now())
+        if status == Project.Status.ONGOING:
+            return self.filter(
+                runs__start_date__lte=timezone.now(), runs__end_date__gte=timezone.now()
+            )
+        if status == Project.Status.FINISHED:
+            return self.filter(
+                runs__end_date__lt=timezone.now(), is_data_available=False
+            )
+        if status == Project.Status.DATA_AVAILABLE:
+            return self.filter(is_data_available=True)
+        raise ValueError(f"Unknown status {status}")
+
+    def annotate_first_run_date(self):
+        return self.annotate(first_run_date=models.Min("runs__start_date"))
 
 
 class ProjectManager(models.Manager):
@@ -31,6 +56,15 @@ class ProjectManager(models.Manager):
 
     def only_public(self):
         return self.get_queryset().only_public()
+
+    def only_to_schedule(self):
+        return self.get_queryset().only_to_schedule()
+
+    def filter_by_status(self, status: "Project.Status"):
+        return self.get_queryset().filter_by_status(status)
+
+    def annotate_first_run_date(self):
+        return self.get_queryset().annotate_first_run_date()
 
 
 class Project(TimestampedModel):

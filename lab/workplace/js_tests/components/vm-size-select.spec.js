@@ -1,4 +1,3 @@
-import { jest } from "@jest/globals";
 import "../../../js_tests/_jsdom_mocks/gettext";
 import euphrosyneToolsService from "../../assets/js/euphrosyne-tools-service";
 import VMSizeSelect from "../../assets/js/components/vm-size-select";
@@ -8,15 +7,15 @@ describe("Test VMSizeSelect", () => {
   VMSizeSelect.init();
 
   beforeEach(() => {
-    jest.spyOn(euphrosyneToolsService, "fetchProjectVmSize");
-    jest.spyOn(euphrosyneToolsService, "setProjectVmSize");
+    vi.spyOn(euphrosyneToolsService, "fetchProjectVmSize");
+    vi.spyOn(euphrosyneToolsService, "setProjectVmSize");
 
     vmSizeSelect = new VMSizeSelect();
     vmSizeSelect.setAttribute("project-name", "projet tango");
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("creates the button properly", async () => {

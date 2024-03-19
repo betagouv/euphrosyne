@@ -1,0 +1,73 @@
+#changelist {
+    flex-direction: column-reverse;
+}
+
+#changelist table {
+    table-layout: fixed ;
+}
+
+#changelist table thead th {
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+#changelist th.column-invitation_completed_display, 
+#changelist th.column-is_lab_admin,
+#changelist th.column-is_superuser {
+    width: 100px;
+}
+
+#changelist th.action-checkbox-column {
+    width: 2.5rem !important;
+}
+
+#changelist table td.field-last_institution_display {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#changelist th.field-full_name_display {
+    width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#changelist td.field-email {
+    word-wrap: anywhere;
+}
+
+#changelist #changelist-filter {
+    margin: 0;
+    flex: none;
+    width: 100%;
+}
+
+#changelist #changelist-filter a {
+    display: inline-flex;
+    color: var(--text-action-high-blue-france);
+}
+
+#changelist .actions {
+    display: flex;
+    align-items: end;
+    margin-bottom: 15px;
+    padding-left: 10px !important;
+}
+
+#changelist .actions button[type="submit"] {
+    margin-left: 2rem;
+}
+
+#changelist #changelist-search #euphrosyne-searchbar {
+    max-width: 600px;
+}
+
+.change-form .fr-tag {
+    padding: .25rem .75rem;
+}
+
+.object-tools {
+    display: none;
+}

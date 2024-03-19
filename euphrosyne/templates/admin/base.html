@@ -1,10 +1,16 @@
-{% load i18n static %}<!DOCTYPE html>
+{% load i18n static nav %}<!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
 <head>
 <title>{% block title %}{% endblock %}</title>
 <link rel="stylesheet" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
+{% if user.is_authenticated %}
 <link rel="stylesheet" type="text/css" href="{% static "main.css"%}"></link>
+{% else %}
+<link rel="stylesheet" href="{% static "anonymous.css" %}">
+{% endif %}
+<link rel="stylesheet" href="{% static "dsfr.css" %}">
+<link rel="stylesheet" href="{% static "icons.css" %}">
 <link rel="stylesheet" href="{% block dark-mode-vars %}{% static "admin/css/dark_mode.css" %}{% endblock %}">
 {% if not is_popup and is_nav_sidebar_enabled %}
   <link rel="stylesheet" href="{% static "admin/css/nav_sidebar.css" %}">
@@ -13,7 +19,13 @@
 {% block extrastyle %}{% endblock %}
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}">{% endif %}
 {% block extrahead %}
+{% if user.is_authenticated %}
+<script src="{% url 'javascript-catalog' %}"></script>
+<script type="text/javascript"  src="{% static 'dsfr.js' %}"></script>
 <script type="text/javascript" src="{% static 'main.js' %}"></script>
+{% else %}
+<script type="text/javascript" src="{% static 'anonymous.js' %}"></script>
+{% endif %}
 {% endblock %}
 {% block responsive %}
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
@@ -34,37 +46,16 @@
             {% if user.is_superuser %}
                 {% include "admin/nav_sidebar.html" %}
             {% endif %}
-            {% include "./sidebar/main_sidebar.html" %}
         {% endblock %}
       {% endif %}
       <div class="content">
         {% if not is_popup and user.is_authenticated %}
         <!-- Header -->
         {% block header %}
-            <header role="banner" class="fr-header">
-                <div id="top-header" class="fr-px-5v fr-header__body">
-                    <div id="header-left-content">
-                        {% block top_header %}{% endblock %}
-                    </div>
-                    <div id="user-info">
-                        <div id="user-info-left">
-                            <div id="user-info-fullname">
-                                {% firstof user.get_full_name user.get_username %} /
-                                <a href="{% url 'admin:logout' %}" id="logout-link">{% translate 'Log out' %}</a>
-                            </div>
-                            <div id="user-info-role">
-                                {% if user.is_superuser or user.is_lab_admin %}
-                                    {% translate "Admin" %}
-                                {% else %}
-                                    {% translate "User" %}
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% comment %} <div id="user-info-profile-picture" class="fr-ml-1w">
-                        </div> {% endcomment %}
-                    </div>
-                </div>
-            </header>
+        <header role="banner" class="fr-header">
+            <div id="header-main"></div> 
+            <div id="header-nav"></div> 
+        </header>
         {% endblock %}
         <!-- END Header -->
         {% endif %}
@@ -96,5 +87,27 @@
   {% include "footer.html" %}
   {% endif %}
 <!-- END Container -->
+{%if not is_popup and user.is_authenticated %}
+  <script id="top-header-data" type="application/json">
+    {% autoescape off %}
+    {% block top_header_data %}
+      {"project": null, "backLink": null}
+    {% endblock %}
+    {% endautoescape %}
+  </script>
+  <script id="nav-items-data" type="application/json">
+    {% if request.user and request.user.is_authenticated %}
+    {% autoescape off %}
+    {% nav_items_json request %}
+    {% endautoescape %}
+    {% endif %}
+  </script>
+  <script id="user-data" type="application/json">
+    {
+      "fullName": "{{ user.get_full_name }}",
+      "isLabAdmin": {{ user.is_lab_admin|yesno:"true,false" }}
+    }
+  </script>
+{% endif %}
 </body>
 </html>

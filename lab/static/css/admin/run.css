@@ -1,9 +1,14 @@
+body {
+  background-color: var(--background-alt-grey);
+}
+
 #changelist {
   background: unset;
 }
 
-.mt-30 {
-  margin-top: 30px;
+.module h4 {
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .action-select {
@@ -20,8 +25,7 @@
 }
 
 .run-clickable-card__selected {
-  border: 3px solid var(--breadcrumbs-bg);
-  padding: 3px;
+  outline: 3px solid var(--border-default-blue-france);
 }
 
 .run-footer {
@@ -44,6 +48,56 @@
   color: var(--text-active-blue-france);
 }
 
+.change-form .run-dates {
+  display: flex;
+}
+
+.change-form .run-dates span.fr-icon {
+  color: var(--text-action-high-blue-france);
+}
+
+.change-form fieldset.flex-flow--wrap h2 {
+  width: 100%;
+}
+.change-form fieldset.flex-flow--wrap .form-row {
+  width: 33%;
+}
+
+.change-form .detector-field-wrapper  {
+  margin-bottom: 0rem;
+}
+
+.change-form .method-field-wrapper, .change-form .detector-field-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.change-form .method-field-wrapper label, .change-form .detector-field-wrapper label {
+  width: auto;
+  min-width: auto;
+  margin-right: 1rem;
+  padding: 0;
+}
+
+.form-row {
+  max-width: 500px;
+}
+
 .run-list .fr-grid-row--gutters {
   margin: 0;
+}
+
+.card-add-run {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-style: dashed;
+  height: 100%;
+  border-color: var(--border-default-grey);
+  min-height: 300px;
+}
+
+.module .fr-card__desc p {
+  padding-left: 0;
+  padding-right: 0;
 }

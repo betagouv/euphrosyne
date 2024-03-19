@@ -6,7 +6,7 @@
 
         {% for method_field in adminform|method_fields %}
             <div class="method-container">
-                <div class="method-field-wrapper">
+                <div class="method-field-wrapper fr-checkbox-group">
                     {% if not method_field.is_readonly %}{{ method_field.errors }}{% endif %}
                     {% if method_field.is_checkbox %}
                         {{ method_field.field }}{{ method_field.label_tag }}
@@ -23,11 +23,11 @@
                 <div class="detector-fields">
                     {% for detector_field in adminform|detector_fields:method_field.field.name %}
                         <div class="detector-container">
-                            <div class="detector-field-wrapper">
+                            <div class="detector-field-wrapper {% if detector_field.is_checkbox%}fr-checkbox-group{% else %}fr-input-group{% endif %}">
                                 {% if not detector_field.is_readonly %}{{ detector_field.errors }}{% endif %}
-                                {% if detector_field.is_checkbox %}
-                                    {{ detector_field.field }}{{ detector_field.label_tag }}
-                                {% else %}
+                                    {% if detector_field.is_checkbox %}
+                                        {{ detector_field.field }}{{ detector_field.label_tag }}
+                                    {% else %}
                                     {{ detector_field.label_tag }}
                                     {% if detector_field.is_readonly %}
                                         <div class="readonly">{{ detector_field.contents }}</div>

@@ -1,10 +1,8 @@
-from datetime import time
 from typing import Any, Optional, Tuple
 
 from django import forms
 from django.contrib.admin import site
-from django.contrib.admin.sites import AdminSite
-from django.contrib.admin.widgets import AdminSplitDateTime, RelatedFieldWidgetWrapper
+from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.forms.widgets import (
     ChoiceWidget,
@@ -15,9 +13,6 @@ from django.forms.widgets import (
     Widget,
 )
 from django.urls import reverse
-
-from euphro_auth.models import User
-from lab.models.run import Run
 
 
 class UserWidgetWrapper(RelatedFieldWidgetWrapper):
@@ -47,6 +42,35 @@ class UserWidgetWrapper(RelatedFieldWidgetWrapper):
         return super().get_related_url(info, action, *args)
 
 
+class InstitutionAutoCompleteWidget(Widget):
+    input_type = "text"
+    template_name = "widgets/institution_autocomplete_widget.html"
+
+    def __init__(self, attrs: dict[str, Any] | None = None, choices=None) -> None:
+        self.choices = choices
+        super().__init__(attrs)
+
+    def get_context(
+        self, name: str, value: Any, attrs: dict[str, Any] | None
+    ) -> dict[str, Any]:
+        attrs = attrs or {}
+        attrs["class"] = "fr-input"
+        context = super().get_context(name, value, attrs)
+        context["widget"]["choices"] = self.choices
+        context["widget"]["instance"] = next(
+            (
+                choice[0].instance
+                for choice in list(self.choices)
+                if choice[0] and choice[0].instance.id == value
+            ),
+            None,
+        )
+        return context
+
+    class Media:
+        js = ("js/widgets/institution-autocomplete-widget.js",)
+
+
 class InstitutionWidgetWrapper(RelatedFieldWidgetWrapper):
     # pylint: disable=too-many-arguments
     def __init__(
@@ -69,26 +93,6 @@ class InstitutionWidgetWrapper(RelatedFieldWidgetWrapper):
         )
 
 
-class LeaderReadonlyWidget(Widget):
-    template_name = "widgets/leader_readonly.html"
-
-    class Media:
-        js = ("js/admin/ViewObjectLookups.js",)
-
-    def __init__(self, project_id: int, user: User = None, attrs=None):
-        self.user = user
-        self.project_id = project_id
-        super().__init__(attrs)
-
-    def get_context(self, name, value, attrs):
-        context = super().get_context(name, value, attrs)
-        return {
-            **context,
-            "user": self.user,
-            "project_id": self.project_id,
-        }
-
-
 class DisabledSelectWithHidden(Select):
     hidden_widget: HiddenInput
 
@@ -108,29 +112,6 @@ class DisabledSelectWithHidden(Select):
         return self.hidden_widget.value_from_datadict(data, files, name)
 
 
-class ProjectWidgetWrapper(RelatedFieldWidgetWrapper):
-    # pylint: disable=too-many-arguments
-    def __init__(
-        self,
-        widget: forms.Widget,
-        rel: ForeignObjectRel,
-        can_add_related: Optional[bool] = None,
-        can_change_related: bool = None,
-        can_delete_related: bool = None,
-        can_view_related: bool = None,
-    ) -> None:
-        super().__init__(
-            widget,
-            rel,
-            site,
-            # [FIXME] Add button still working
-            can_add_related=False,
-            can_change_related=False,
-            can_delete_related=False,
-            can_view_related=False,
-        )
-
-
 class TagsInput(Input):
     template_name = "widgets/tags_input.html"
 
@@ -139,14 +120,19 @@ class TagsInput(Input):
         css = {"all": ("css/widgets/tags-input.css",)}
 
 
-class SplitDateTimeWithDefaultTime(AdminSplitDateTime):
+class SplitDateTimeWithDefaultTime(forms.SplitDateTimeWidget):
+    template_name = "admin/lab/widgets/split_datetime.html"
+
     def __init__(
         self,
-        attrs: Optional[dict[str, str]] = None,
-        default_time_value: time = None,
-    ) -> None:
+        default_time_value=None,
+        attrs=None,
+    ):
         self.default_time_value = default_time_value
-        super().__init__(attrs)
+        super().__init__(
+            attrs,
+            "%Y-%m-%d",
+        )
 
     def get_context(
         self, name: str, value: Any, attrs: Optional[dict[str, str]]
@@ -157,6 +143,8 @@ class SplitDateTimeWithDefaultTime(AdminSplitDateTime):
             and not context["widget"]["subwidgets"][1]["value"]
         ):
             context["widget"]["subwidgets"][1]["value"] = self.default_time_value
+        context["widget"]["subwidgets"][0]["type"] = "date"
+        context["widget"]["subwidgets"][1]["type"] = "time"
         return context
 
 
@@ -167,47 +155,8 @@ class CounterTextarea(Textarea):
         js = ("js/widgets/counter-textarea.js",)
 
 
-class PlaceholderSelect(Select):
-    template_name = "widgets/placeholder_select.html"
-
-
 class ChoiceTag(ChoiceWidget):
     template_name = "widgets/choice_tag.html"
 
     class Media:
         js = ("js/widgets/choice-tag.js",)
-
-
-class RelatedObjectRunWidgetWrapper(RelatedFieldWidgetWrapper):
-    template_name = "widgets/related_object_run_widget_wrapper.html"
-
-    # pylint: disable=too-many-arguments
-    def __init__(
-        self,
-        run: Run,
-        admin_site: AdminSite,
-        can_add_related=None,
-        can_change_related=False,
-        can_delete_related=False,
-        can_view_related=False,
-    ) -> None:
-        self.run = run
-        super().__init__(
-            PlaceholderSelect(),
-            # pylint: disable=no-member
-            Run.run_object_groups.rel,
-            admin_site,
-            can_add_related,
-            can_change_related,
-            can_delete_related,
-            can_view_related,
-        )
-
-    def get_context(
-        self, name: str, value: Any, attrs: Optional[dict[str, Any]]
-    ) -> dict[str, Any]:
-        context = super().get_context(name, value, attrs)
-        context["url_params"] += f"&run={self.run.id}"
-        return {
-            **context,
-        }

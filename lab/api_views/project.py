@@ -1,9 +1,12 @@
+from django.utils import timezone
 from django_filters import rest_framework as filters
 from rest_framework import generics
 
+from lab.models.run import Run
+
 from ..models import Project
 from .permissions import IsLabAdminUser
-from .serializers import ProjectSerializer
+from .serializers import ProjectSerializer, UpcomingProjectSerializer
 
 
 class ProjectFilter(filters.FilterSet):
@@ -39,3 +42,14 @@ class ProjectList(generics.ListAPIView):
     permission_classes = [IsLabAdminUser]
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = ProjectFilter
+
+
+class UpcomingProjectList(generics.ListAPIView):
+    runs = Run.objects.filter(start_date__gte=timezone.now()).distinct("project")[:5]
+    queryset = (
+        Project.objects.filter(runs__in=runs)
+        .distinct()
+        .order_by("runs__start_date")[:4]
+    )
+    serializer_class = UpcomingProjectSerializer
+    permission_classes = [IsLabAdminUser]

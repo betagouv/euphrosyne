@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "es6",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "downlevelIteration": true,
+    /* Type Checking */
+    "strict": true /* Enable all strict type-checking options. */,
+    "types": ["vitest/globals"]
+  },
+
+  "include": ["**/*.ts", "**/*.tsx", "**/**/*.ts", "**/**/*.tsx"],
+  "exclude": ["node_modules", "_static", "euphrosyne/assets/dist"]
+}

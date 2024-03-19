@@ -1,8 +1,10 @@
+import json
 from typing import Any, Dict
 
 from django.contrib.admin import site
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
@@ -28,16 +30,19 @@ class ProjectDocumentsView(ProjectMembershipRequiredMixin, TemplateView):
             **site.each_context(self.request),
             "subtitle": self.project.name + " | " + _("Upload documents"),
             "project": self.project,
-            "file_table": {
-                "attrs": {"id": "document_list"},
-                "can_delete": True,
-            },
-            "document_upload_form": {
-                "attrs": {"id": "upload-form", "project-id": self.project.id},
-                "component_name": "document-upload-form",
-                "hint_text": _(
-                    "Multiple files allowed. "
-                    "Allowed files: images, documents and archives."
-                ),
-            },
+            "json_data": json.dumps(
+                {
+                    "project": {
+                        "name": self.project.name,
+                        "slug": self.project.slug,
+                    },
+                    "table": {"canDelete": True},
+                    "form": {
+                        "hintText": gettext(
+                            "Multiple files allowed. "
+                            "Allowed files: images, documents and archives."
+                        )
+                    },
+                }
+            ),
         }

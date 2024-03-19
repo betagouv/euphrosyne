@@ -13,4 +13,4 @@ def show_run_list(request, change_list):
         result.change_state_action_name = get_change_state_text(
             is_lab_admin(request.user), result
         )
-    return {"runs": result_list}
+    return {"runs": result_list, "project_id": request.GET.get("project")}

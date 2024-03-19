@@ -1,4 +1,3 @@
-import { jest } from "@jest/globals";
 import { tabClickHandler, handleModalClose } from "./tabs.js";
 
 describe("Test tabClickHandler", () => {
@@ -23,14 +22,14 @@ describe("Test tabClickHandler", () => {
         },
       };
       eventMock = {
-        preventDefault: jest.fn(),
+        preventDefault: vi.fn(),
         target: {
           href: "href",
         },
       };
-      discloseFn = jest.fn();
+      discloseFn = vi.fn();
       dsfr = global.dsfr;
-      global.dsfr = jest.fn();
+      global.dsfr = vi.fn();
       global.dsfr.mockReturnValue({
         modal: {
           disclose: discloseFn,
@@ -56,8 +55,8 @@ describe("Test tabClickHandler", () => {
 describe("Test handleModalClose", () => {
   it("conceals the modal", () => {
     const modal = {},
-      concealMock = jest.fn();
-    global.dsfr = jest.fn();
+      concealMock = vi.fn();
+    global.dsfr = vi.fn();
     global.dsfr.mockReturnValue({
       modal: {
         conceal: concealMock,

@@ -23,7 +23,7 @@ class TestProjectListView(TestCase):
 
     def test_call_eros(self):
         with mock.patch(
-            "lab.api_views.objects.fetch_partial_objectgroup_from_eros"
+            "lab.api_views.objectgroup.fetch_partial_objectgroup_from_eros"
         ) as mock_fn:
             obj = {"label": "atitle", "c2rmf_id": "1"}
             mock_fn.return_value = obj
@@ -35,7 +35,7 @@ class TestProjectListView(TestCase):
 
     def test_eros_error_return_not_found(self):
         with mock.patch(
-            "lab.api_views.objects.fetch_partial_objectgroup_from_eros"
+            "lab.api_views.objectgroup.fetch_partial_objectgroup_from_eros"
         ) as mock_fn:
             mock_fn.side_effect = ErosHTTPError
             response = self.client.post(self.api_url, {"query": "abc"})
@@ -45,7 +45,7 @@ class TestProjectListView(TestCase):
 
     def test_eros_return_none_return_not_found(self):
         with mock.patch(
-            "lab.api_views.objects.fetch_partial_objectgroup_from_eros"
+            "lab.api_views.objectgroup.fetch_partial_objectgroup_from_eros"
         ) as mock_fn:
             mock_fn.return_value = None
             response = self.client.post(self.api_url, {"query": "abc"})

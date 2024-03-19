@@ -1,0 +1,3 @@
+{% load dsfr %}
+<textarea name="{{ widget.name }}"{% attrs_with_dsfr %}>
+    {% if widget.value %}{{ widget.value }}{% endif %}</textarea>

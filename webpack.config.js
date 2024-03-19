@@ -14,9 +14,18 @@ export default {
     main: [
       "promise-polyfill/src/polyfill",
       "whatwg-fetch",
-      "./euphrosyne/assets/js/main.js",
-      "@gouvfr/dsfr/dist/core/core.module.min.js",
+      "./euphrosyne/assets/js/main.ts",
+      "./euphrosyne/assets/css/base.css",
+    ],
+    anonymous: [
+      "./euphrosyne/assets/js/anonymous.ts",
+      "./euphrosyne/assets/css/base.css",
+    ],
+    dsfr: [
       "@gouvfr/dsfr/dist/dsfr/dsfr.min.css",
+      "@gouvfr/dsfr/dist/dsfr.module.min.js",
+    ],
+    icons: [
       // We have to import each stylesheet icon separately due to a webpack
       // compile error if we import utility.css or icons.css directly.
       // See https://github.com/GouvernementFR/dsfr/issues/309
@@ -25,13 +34,15 @@ export default {
       "@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.min.css",
       "@gouvfr/dsfr/dist/utility/icons/icons-document/icons-document.min.css",
       "@gouvfr/dsfr/dist/utility/icons/icons-business/icons-business.min.css",
+      "@gouvfr/dsfr/dist/utility/icons/icons-user/icons-user.min.css",
+      "@gouvfr/dsfr/dist/utility/icons/icons-map/icons-map.min.css",
+      "@gouvfr/dsfr/dist/utility/icons/icons-media/icons-media.min.css",
       "@gouvfr/dsfr/dist/utility/colors/colors.min.css",
       "remixicon/fonts/remixicon.css",
-      "./euphrosyne/assets/css/base.css",
     ],
     ...Object.assign(
       {},
-      ...globSync("./**/assets/js/pages/*.js", { dotRelative: true }).map(
+      ...globSync("./**/assets/js/pages/*.{js,ts}", { dotRelative: true }).map(
         (file) => {
           return {
             [file.split("/").pop().split(".").shift()]: {
@@ -59,6 +70,11 @@ export default {
         use: ["source-map-loader"],
       },
       {
+        test: /\.tsx?$/,
+        use: "ts-loader",
+        exclude: /node_modules/,
+      },
+      {
         test: /\.css$/i,
         use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
@@ -80,6 +96,9 @@ export default {
       },
     ],
   },
+  resolve: {
+    extensions: [".ts", ".tsx", ".js"],
+  },
   optimization: {
     minimizer: [new CssMinimizerPlugin()],
   },
@@ -94,6 +113,10 @@ export default {
         nodir: true,
         dotRelative: true,
       }),
+      safelist: {
+        greedy: [/^fr-/],
+      },
     }),
   ],
+  devtool: "source-map",
 };

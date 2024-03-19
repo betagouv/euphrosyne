@@ -1,11 +1,16 @@
 {% extends 'admin/index.html' %}
 {% load static i18n %}
 
+{% block coltype %}colM{% endblock %}
+
 {% block nav-sidebar %}
     {% if user.is_superuser %}
         {% include 'admin/nav_sidebar.html' %}
     {% endif %}
-    {% include "./sidebar/main_sidebar.html" %}
+{% endblock %}
+
+<!-- Remove recent action panel -->
+{% block sidebar  %}
 {% endblock %}
 
 {% block extrastyle %}
@@ -14,15 +19,29 @@
 {% endblock %}
 
 {% block content %}
-<div class="module calendar">
+<div class="fr-container">
+    <div class="upcoming-projects-banner">
+        <h3>{% trans "Upcoming projects" %}</h3>
+        <div>
+            <a className="fr-link fr-btn fr-link--lg" href="/lab/project">{% trans "See more" %}</a>
+        </div>
+    </div>
+    <div id="upcoming-projects" class="fr-mb-5w"></div>
+    
     <h3>{% trans "Calendar" %}</h3>
-    <div is="admin-calendar" id="admin-calendar"></div>
+    <div class="module calendar fr-p-3w">
+        <div is="admin-calendar" id="admin-calendar"></div>
+    </div>
+
+    <h3>{% trans "Running virtual machines" %}</h3>
+    <div class="module calendar fr-p-3w fr-col-6">
+        <div id="running-vms"></div>
+    </div>
 </div>
 
 {% endblock %}
 
 {% block footer %}
 {{ block.super }}
-<script src="{% url 'javascript-catalog' %}"></script>
 <script type="text/javascript" src="{% static 'pages/index.js' %}"></script>
 {% endblock %}

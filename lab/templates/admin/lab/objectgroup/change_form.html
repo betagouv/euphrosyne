@@ -1,19 +1,8 @@
 {% extends 'admin/change_form.html' %}
-{% load i18n %}
 
-{% block top_header %}
-{% if objectgroup_run %}
-    <div class="context-header">
-        <a href="{% url 'admin:lab_run_change' objectgroup_run.id %}" class="header-back-link">
-            <div class="context-header-back">
-                <div class="context-header-back-icon">
-                    <i class="ri-arrow-left-line fr-mr-1w" aria-hidden="true"></i>
-                </div>
-                <div class="header-back-link-title fr-text--md">
-                    {{ objectgroup_run.label }}
-                </div>
-            </div>
-        </a>
-    </div>
-{% endif %}
+{% block top_header_data %}
+  {"project": null, "backLink": {
+    "href": "{% url 'admin:lab_run_change' objectgroup_run.id %}",
+    "title": "{{ objectgroup_run.label }}"
+  }}
 {% endblock %}
