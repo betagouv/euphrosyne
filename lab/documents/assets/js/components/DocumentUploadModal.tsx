@@ -29,6 +29,17 @@ export default function DocumentUploadModal({
   onUploadFile,
   onUploadError,
 }: DocumentUploadModalProps) {
+  const t = {
+    "An error has occured while generating the presigned URL. Please contact the support team.":
+      window.gettext(
+        "An error has occured while generating the presigned URL. Please contact the support team."
+      ),
+    "File %s has been uploaded.": window.gettext("File %s has been uploaded."),
+    Close: window.gettext("Close"),
+    "Add files": window.gettext("Add files"),
+    Upload: window.gettext("Upload"),
+    "Add a document": window.gettext("Add a document"),
+  };
   const [isSubmitting, setIsSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -50,9 +61,9 @@ export default function DocumentUploadModal({
     } catch (error) {
       console.log("error uploading...", error);
       displayMessage(
-        window.gettext(
+        t[
           "An error has occured while generating the presigned URL. Please contact the support team."
-        ),
+        ],
         "error"
       );
       setIsSubmitting(false);
@@ -62,7 +73,7 @@ export default function DocumentUploadModal({
       console.log("result...", result);
       if (result.status === "fulfilled") {
         displayMessage(
-          window.interpolate(window.gettext("File %s has been uploaded."), [
+          window.interpolate(t["File %s has been uploaded."], [
             result.value.file.name,
           ]),
           "success"
@@ -103,22 +114,22 @@ export default function DocumentUploadModal({
               <div className="fr-modal__header">
                 <button
                   className="fr-btn--close fr-btn"
-                  title={window.gettext("Close")}
+                  title={t["Close"]}
                   aria-controls={id}
                 >
-                  {window.gettext("Close")}
+                  {t["Close"]}
                 </button>
               </div>
               <div className="fr-modal__content">
                 <h1 id={`${id}-title`} className="fr-modal__title">
                   <span className="fr-icon-arrow-right-line fr-icon--lg"></span>
-                  {window.gettext("Add a document")}
+                  {t["Add a document"]}
                 </h1>
                 <form onSubmit={onSubmit} ref={formRef}>
                   <div className="fr-mb-4w">
                     <div className="fr-upload-group">
                       <label className="fr-label" htmlFor="file-upload">
-                        {window.gettext("Add files")}
+                        {t["Add files"]}
                         {hintText && (
                           <span className="fr-hint-text">{hintText}</span>
                         )}
@@ -133,7 +144,7 @@ export default function DocumentUploadModal({
                       />
                     </div>
                     <input
-                      value={window.gettext("Upload")}
+                      value={t["Upload"]}
                       className="button fr-mt-2w"
                       type="submit"
                       id="upload-button"

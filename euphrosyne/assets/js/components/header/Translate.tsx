@@ -1,5 +1,9 @@
 import { useState, useEffect } from "react";
 export default function Translate() {
+  const t = {
+    "Select a language": window.gettext("Select a language"),
+  };
+
   const locales: [string, string][] = [
     ["fr", "FR - Français"],
     ["en", "EN - English"],
@@ -34,7 +38,7 @@ export default function Translate() {
           className="fr-translate__btn fr-btn fr-btn--tertiary"
           aria-controls="translate-collaspse"
           aria-expanded="false"
-          title={window.gettext("Select a language")}
+          title={t["Select a language"]}
         >
           {currentLangLabel.split("-")[0]}
           <span className="fr-hidden-lg">

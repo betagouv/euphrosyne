@@ -16,6 +16,11 @@ export default function ObjectGroupTable({
   runObjectGroups,
   onRowDelete,
 }: ObjectGroupTableProps) {
+  const t = {
+    "No object in this run yet": window.gettext("No object in this run yet"),
+    "Remove from run": window.gettext("Remove from run"),
+  };
+
   const [deleting, setDeleting] = useState(false);
 
   const breakWordCellStyle = css({
@@ -47,7 +52,7 @@ export default function ObjectGroupTable({
         <tbody>
           {runObjectGroups.length === 0 && (
             <tr>
-              <td colSpan={4}>{window.gettext("No object in this run yet")}</td>
+              <td colSpan={4}>{t["No object in this run yet"]}</td>
             </tr>
           )}
           {runObjectGroups.map(({ objectGroup, id }) => (
@@ -75,7 +80,7 @@ export default function ObjectGroupTable({
               <td css={actionCellStyle}>
                 <button
                   className="fr-btn fr-icon-close-line delete-btn fr-btn--tertiary-no-outline"
-                  title={window.gettext("Remove from run")}
+                  title={t["Remove from run"]}
                   type="button"
                   disabled={deleting}
                   onClick={() => onDeleteClick(id)}

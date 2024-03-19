@@ -26,6 +26,12 @@ export default function Header({
   project,
   currentUser,
 }: HeaderProps) {
+  const t = {
+    Menu: window.gettext("Menu"),
+    "Log out": window.gettext("Log out"),
+    Admin: window.gettext("Admin"),
+  };
+
   return (
     <div className="fr-header__body">
       <div className="fr-container">
@@ -40,9 +46,9 @@ export default function Header({
                   aria-controls="header-modal"
                   aria-haspopup="menu"
                   id="header-modal-btn"
-                  title={window.gettext("Menu")}
+                  title={t["Menu"]}
                 >
-                  {window.gettext("Menu")}
+                  {t["Menu"]}
                 </button>
               </div>
             </div>
@@ -65,7 +71,7 @@ export default function Header({
                   {currentUser.isLabAdmin && (
                     <>
                       <br />
-                      <p className="fr-text--sm">{window.gettext("Admin")}</p>
+                      <p className="fr-text--sm">{t["Admin"]}</p>
                     </>
                   )}
                 </li>
@@ -76,7 +82,7 @@ export default function Header({
                       css={errorTextStyle}
                       type="submit"
                     >
-                      <span>{window.gettext("Log out")}</span>
+                      <span>{t["Log out"]}</span>
                       <input
                         type="hidden"
                         name="csrfmiddlewaretoken"

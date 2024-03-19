@@ -21,6 +21,9 @@ const statusContainerStyle = css({
 export default function ProjectLeftContent({
   project,
 }: ProjectLeftContentProps) {
+  const t = {
+    Leader: window.gettext("Leader"),
+  };
   return (
     <div css={headerSection}>
       <i className="ri-arrow-right-s-line" aria-hidden="true"></i>
@@ -31,7 +34,7 @@ export default function ProjectLeftContent({
         </span>
       </div>
       <div css={leaderContainerStyle}>
-        <span className="fr-text--xs">{window.gettext("Leader")}</span>
+        <span className="fr-text--xs">{t["Leader"]}</span>
         <span className="fr-text--sm">{project.leader}</span>
       </div>
     </div>
