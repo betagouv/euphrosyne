@@ -10,7 +10,7 @@
 
   const isInvalid = (tags, stringInput) => {
     const inputs = Array.from(tags).map(
-      (input) => input.firstElementChild.textContent
+      (input) => input.firstElementChild.textContent,
     );
 
     return (
@@ -33,7 +33,7 @@
 
     addTag(event.target.parentElement, event.target.value);
     setHiddenInputValue(
-      event.target.parentNode.querySelector("input[type='hidden']")
+      event.target.parentNode.querySelector("input[type='hidden']"),
     );
     event.target.value = "";
   }
@@ -59,7 +59,7 @@
 
     tagsInputEl.insertBefore(
       tag,
-      tagsInputEl.querySelector('input[type="text"]')
+      tagsInputEl.querySelector('input[type="text"]'),
     );
   }
 

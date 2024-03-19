@@ -2,7 +2,7 @@ export function tabClickHandler(
   initialFormData,
   newFormData,
   onCloseModal,
-  event
+  event,
 ) {
   if (JSON.stringify(newFormData) !== JSON.stringify(initialFormData)) {
     event.preventDefault();

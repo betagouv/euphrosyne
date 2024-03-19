@@ -7,7 +7,7 @@ body.change-list {
 }
 
 .related-widget-wrapper select.fr-select {
-  width: calc(100% - 100px)
+  width: calc(100% - 100px);
 }
 
 #participation_set-group .field-user input {
@@ -28,7 +28,6 @@ body.change-list {
   text-transform: uppercase;
   font-size: 0.6875rem;
 }
-
 
 #content-main {
   background-color: var(--body-bg);

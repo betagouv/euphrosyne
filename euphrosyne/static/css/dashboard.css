@@ -1,15 +1,15 @@
 .dashboard .content {
-    background-color: var(--background-alt-grey);
+  background-color: var(--background-alt-grey);
 }
 
 .dashboard #content {
-    width: auto;
+  width: auto;
 }
 
 .calendar {
-    background-color: var(--background-raised-grey);
-    filter: drop-shadow(var(--raised-shadow));
-    z-index: calc(var(--ground) + 750);
+  background-color: var(--background-raised-grey);
+  filter: drop-shadow(var(--raised-shadow));
+  z-index: calc(var(--ground) + 750);
 }
 
 .calendar td :nth-child(2n + 1) {
@@ -17,60 +17,60 @@
 }
 
 .upcoming-projects-banner {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .upcoming-projects-banner a {
-    color: var(--text-action-high-blue-france);
+  color: var(--text-action-high-blue-france);
 }
-
 
 /** FULL CALENDAR */
 :root {
-    --fc-event-text-color: unset !important;
-    --fc-button-bg-color: transparent !important;
-    --fc-button-text-color: var(--text-action-high-blue-france) !important;
-    --fc-button-border-color: transparent;
-    --fc-border-color : transparent;
+  --fc-event-text-color: unset !important;
+  --fc-button-bg-color: transparent !important;
+  --fc-button-text-color: var(--text-action-high-blue-france) !important;
+  --fc-button-border-color: transparent;
+  --fc-border-color: transparent;
 
-    --fc-button-active-bg-color: var(--background-action-high-blue-france) !important;
-    --fc-button-active-border-color: transparent !important;
-    --fc-button-text-color:var(--text-inverted-blue-france) !important;
+  --fc-button-active-bg-color: var(
+    --background-action-high-blue-france
+  ) !important;
+  --fc-button-active-border-color: transparent !important;
+  --fc-button-text-color: var(--text-inverted-blue-france) !important;
 
-    --fc-button-hover-bg-color: var(--hover-tint);
-    --fc-button-hover-border-color: unset;
-    --fc-button-hover-text-color: inherit;
-
+  --fc-button-hover-bg-color: var(--hover-tint);
+  --fc-button-hover-border-color: unset;
+  --fc-button-hover-text-color: inherit;
 }
 .fc-event-title {
-    font-size: .8rem;
+  font-size: 0.8rem;
 }
-.fc-daygrid-event, .fc-button {
-    border-radius: 0 !important;
+.fc-daygrid-event,
+.fc-button {
+  border-radius: 0 !important;
 }
 .fc .fc-button-primary:hover {
-    background-color: var(--hover-tint) !important;
+  background-color: var(--hover-tint) !important;
 }
-.fc .fc-button-primary[aria-pressed='false'] {
-    --hover: inherit;
-    color: inherit !important;
+.fc .fc-button-primary[aria-pressed="false"] {
+  --hover: inherit;
+  color: inherit !important;
 }
-.fc .fc-button-primary[aria-pressed='true'] {
-    --hover: var(--background-action-high-blue-france-hover);
+.fc .fc-button-primary[aria-pressed="true"] {
+  --hover: var(--background-action-high-blue-france-hover);
 }
 
 .fc-daygrid-event-dot {
-    display: none;
+  display: none;
 }
 
 .calendar .fc .fc-prev-button {
-    margin-right: 1rem;;
+  margin-right: 1rem;
 }
 
 @media (min-width: 1080px) {
-    .dashboard .module table td a {
-        padding: .6em;
-    }
+  .dashboard .module table td a {
+    padding: 0.6em;
   }
-  
+}

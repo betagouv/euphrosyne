@@ -16,7 +16,7 @@ export function displayMessage(message, tag) {
     (event.target === messageElement
       ? event.target
       : event.target.parentElement
-    ).remove()
+    ).remove(),
   );
   document.querySelector("ul.messagelist")?.appendChild(messageElement);
 }

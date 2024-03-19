@@ -12,7 +12,7 @@ export async function jwtFetch(input, init = {}) {
   while (attemps <= 1) {
     if (attemps > 0) {
       console.info(
-        "Received an unauthorized status code. Trying to refresh auth token."
+        "Received an unauthorized status code. Trying to refresh auth token.",
       );
     }
     const shouldRefreshToken = attemps > 0;

@@ -7,7 +7,7 @@ describe("Test tabClickHandler", () => {
         initialFormData = "a";
 
       expect(tabClickHandler(initialFormData, newFormData, {}, {})).toEqual(
-        undefined
+        undefined,
       );
     });
   });
@@ -42,7 +42,7 @@ describe("Test tabClickHandler", () => {
 
     it("returns false when form data changed", () => {
       expect(
-        tabClickHandler(initialFormData, newFormData, modalMock, eventMock)
+        tabClickHandler(initialFormData, newFormData, modalMock, eventMock),
       ).toEqual(false);
     });
     it("calls dsfr modal disclose", () => {

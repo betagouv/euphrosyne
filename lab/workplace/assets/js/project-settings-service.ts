@@ -6,7 +6,7 @@ interface ListImageDefinitionsResponse {
 
 export async function fetchImageDefinitions() {
   const response = await jwtFetch(
-    `${process.env.EUPHROSYNE_TOOLS_API_URL}/vms/image-definitions`
+    `${process.env.EUPHROSYNE_TOOLS_API_URL}/vms/image-definitions`,
   );
   if (response?.ok) {
     const data = (await response.json()) as ListImageDefinitionsResponse;
@@ -17,7 +17,7 @@ export async function fetchImageDefinitions() {
 
 export async function fetchProjectImageDefinition(projectSlug: string) {
   const response = await jwtFetch(
-    `${process.env.EUPHROSYNE_TOOLS_API_URL}/config/${projectSlug}/image-definition`
+    `${process.env.EUPHROSYNE_TOOLS_API_URL}/config/${projectSlug}/image-definition`,
   );
   if (response?.ok) {
     const data = await response.json();
@@ -29,14 +29,14 @@ export async function fetchProjectImageDefinition(projectSlug: string) {
 
 export async function setProjectImageDefinition(
   projectSlug: string,
-  imageDefinition: string
+  imageDefinition: string,
 ) {
   const response = await jwtFetch(
     `${process.env.EUPHROSYNE_TOOLS_API_URL}/config/${projectSlug}/image-definition`,
     {
       method: "POST",
       body: JSON.stringify(imageDefinition),
-    }
+    },
   );
   if (!response?.ok) {
     throw new Error("Failed to set project image definition");

@@ -7,7 +7,7 @@
     const parentElement = event.target.parentElement;
     const options = parentElement.querySelectorAll("datalist option");
     const index = Array.from(options).findIndex(
-      (o) => o.value === event.target.value
+      (o) => o.value === event.target.value,
     );
     if (index === -1) {
       parentElement.querySelector(`${baseSelector}__id`).value = "";
@@ -24,7 +24,7 @@
     document.querySelectorAll(`${baseSelector}`).forEach((el) => {
       el.querySelector(`${baseSelector}__name`).addEventListener(
         "input",
-        onNameInput
+        onNameInput,
       );
     });
 
@@ -34,7 +34,7 @@
         .addEventListener("click", function () {
           console.log("clicked");
           const elements = document.querySelectorAll(
-            ".dynamic-participation_set"
+            ".dynamic-participation_set",
           );
           const lastElement = elements[elements.length - 1];
           console.log(lastElement);

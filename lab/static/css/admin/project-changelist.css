@@ -1,64 +1,64 @@
 a.fr-btn {
-    color: var(--text-inverted-blue-france);
+  color: var(--text-inverted-blue-france);
 }
 
 table {
-    display: table !important;
+  display: table !important;
 }
 
 .changelist-filters ul {
-    margin-left: 0;
+  margin-left: 0;
 }
 
 .admin-actions {
-    display: flex;
-    justify-content: end;;
+  display: flex;
+  justify-content: end;
 }
 
 .action-delete-btn {
-    color: var(--text-default-error);
+  color: var(--text-default-error);
 }
 
-.paginator a, .paginator .this-page {
-    --text-spacing: 0;
-    --title-spacing: 0;
-    align-items: center;
-    justify-content: center;
-    display: inline-flex;
-    flex-direction: row;
-    font-size: .875rem;
-    line-height: 1.5rem;
-    margin-bottom: 1rem;
-    margin-left: .5rem;
-    margin-right: .5rem;
-    min-height: 2rem;
-    min-width: 2rem;
-    padding: .25rem .75rem;
-    position: relative;
-    width: -moz-fit-content;
-    width: fit-content;
+.paginator a,
+.paginator .this-page {
+  --text-spacing: 0;
+  --title-spacing: 0;
+  align-items: center;
+  justify-content: center;
+  display: inline-flex;
+  flex-direction: row;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  margin-bottom: 1rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  min-height: 2rem;
+  min-width: 2rem;
+  padding: 0.25rem 0.75rem;
+  position: relative;
+  width: -moz-fit-content;
+  width: fit-content;
 }
 
 .paginator {
-    display: flex;
-    justify-content: center;
-
+  display: flex;
+  justify-content: center;
 }
 
 .paginator span.this-page {
-    background-color: var(--background-active-blue-france);
-    color: var(--text-inverted-blue-france);
+  background-color: var(--background-active-blue-france);
+  color: var(--text-inverted-blue-france);
 }
 
 .paginator a {
-    background-color: unset !important;
-    color: var(--text-default-grey) !important;
-    --hover-tint: var(--hover);
-    --underline-img: none;
-    --underline-hover-width: var(--underline-max-width);
+  background-color: unset !important;
+  color: var(--text-default-grey) !important;
+  --hover-tint: var(--hover);
+  --underline-img: none;
+  --underline-hover-width: var(--underline-max-width);
 }
 
 .paginator a:hover {
-    background-color: var(--background-active-blue-france) !important;
-    color: var(--text-inverted-blue-france) !important;
+  background-color: var(--background-active-blue-france) !important;
+  color: var(--text-inverted-blue-france) !important;
 }

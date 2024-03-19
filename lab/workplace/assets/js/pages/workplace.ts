@@ -46,15 +46,15 @@ document.addEventListener("DOMContentLoaded", () => {
         rawDataFileService: new RawDataFileService(project.slug, run.label),
         processedDataFileService: new ProcessedDataFileService(
           project.slug,
-          run.label
+          run.label,
         ),
       })),
-    })
+    }),
   );
 
   renderComponent(
     "project-config-image-definitions",
-    createElement(ProjectImageDefinitionSelect, { projectSlug: project.slug })
+    createElement(ProjectImageDefinitionSelect, { projectSlug: project.slug }),
   );
 
   document.querySelectorAll(".run-data-download-btn").forEach((btn) => {
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
       downloadRunData(
         project.slug,
         target.dataset.runName,
-        target.dataset.runDataType
+        target.dataset.runDataType,
       );
     });
   });

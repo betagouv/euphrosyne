@@ -36,14 +36,14 @@ export class FileService {
             file.name,
             file.path,
             new Date(file.last_modified),
-            file.size
-          )
+            file.size,
+          ),
       );
     } else if (response.status === 404) {
       return [];
     } else {
       throw new Error(
-        `Failed to fetch file list. Response status: ${response.status}`
+        `Failed to fetch file list. Response status: ${response.status}`,
       );
     }
   }
@@ -57,7 +57,7 @@ export class FileService {
       return response;
     } else {
       throw new Error(
-        `Failed to delete file. Response status: ${response.status}`
+        `Failed to delete file. Response status: ${response.status}`,
       );
     }
   }
@@ -67,7 +67,7 @@ export class FileService {
       `${this.presignURL}?path=${encodeURIComponent(path)}`,
       {
         method: "GET",
-      }
+      },
     );
     return (await response.json()).url;
   }

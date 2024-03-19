@@ -22,10 +22,10 @@ export default function RunObjectGroupForm({
 }: RunObjectGroupFormProps) {
   const t = {
     "Add new object group or object": window.gettext(
-      "Add new object group or object"
+      "Add new object group or object",
     ),
     "Import object from same project": window.gettext(
-      "Import object from same project"
+      "Import object from same project",
     ),
     "Import with C2RMF ID": window.gettext("Import with C2RMF ID"),
     "An error occurred.": window.gettext("An error occurred."),
@@ -36,7 +36,7 @@ export default function RunObjectGroupForm({
     ObjectGroup[]
   >([]);
   const [addObjectGroupError, setAddObjectGroupError] = useState<string | null>(
-    null
+    null,
   );
   const openModalBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -46,7 +46,7 @@ export default function RunObjectGroupForm({
     const response = await deleteRunObjectGroup(runObjectGroupId);
     if (response && response.ok) {
       setRunObjectGroups(
-        runObjectGroups.filter((ro) => ro.id !== runObjectGroupId)
+        runObjectGroups.filter((ro) => ro.id !== runObjectGroupId),
       );
       fetchAvailableObjectGroups(run.id).then(setAvailableObjectGroups);
     }
@@ -67,7 +67,7 @@ export default function RunObjectGroupForm({
         }
         // Refetch available object groups
         setAvailableObjectGroups(
-          availableObjectGroups.filter((og) => og.id !== objectGroupId)
+          availableObjectGroups.filter((og) => og.id !== objectGroupId),
         );
       } else {
         // Show error on select in modal

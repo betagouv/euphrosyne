@@ -12,7 +12,7 @@ describe("Test VirtualOfficeButton", () => {
     fetchVMMock = vi.spyOn(euphrosyneToolsService, "fetchVMConnectionLink");
     fetchDeploymentMock = vi.spyOn(
       euphrosyneToolsService,
-      "fetchDeploymentStatus"
+      "fetchDeploymentStatus",
     );
     vi.spyOn(utils, "displayMessage");
 
@@ -45,7 +45,7 @@ describe("Test VirtualOfficeButton", () => {
       it("wait for deploy if it has not failed", async () => {
         vi.spyOn(
           VirtualOfficeButton.prototype,
-          "waitForDeploymentComplete"
+          "waitForDeploymentComplete",
         ).mockImplementation(() => Promise.resolve());
         fetchDeploymentMock.mockResolvedValueOnce("Running");
         await voButton.initButton();
@@ -89,7 +89,7 @@ describe("Test VirtualOfficeButton", () => {
     it("handles failed deployment correctly", async () => {
       vi.spyOn(
         VirtualOfficeButton.prototype,
-        "onFailedDeployment"
+        "onFailedDeployment",
       ).mockImplementation(() => {});
       const clearIntervalSpy = vi.spyOn(global, "clearInterval");
       voButton.deploymentStatus = "Failed";
@@ -168,7 +168,7 @@ describe("Test VirtualOfficeButton", () => {
       expect(utils.displayMessage).toHaveBeenNthCalledWith(
         1,
         "We could not create the virtual office. Please contact an administrator.",
-        "error"
+        "error",
       );
     });
   });
@@ -177,7 +177,7 @@ describe("Test VirtualOfficeButton", () => {
     it("reset button and display an error message", () => {
       vi.spyOn(
         VirtualOfficeButton.prototype,
-        "checkDeploymentProgress"
+        "checkDeploymentProgress",
       ).mockImplementation(() => Promise.resolve());
       vi.useFakeTimers();
       voButton.waitForDeploymentComplete();

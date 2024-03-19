@@ -4,13 +4,13 @@ export function dismissAddRelatedObjectGroupPopup(
   win,
   newId,
   newRepr,
-  objectGroupRunRunIds
+  objectGroupRunRunIds,
 ) {
   const pageRunId = parseInt(
-    document.getElementById("id_Run_run_object_groups-__prefix__-run").value
+    document.getElementById("id_Run_run_object_groups-__prefix__-run").value,
   );
   const [relatedObjectGroupRunRunIds] = objectGroupRunRunIds.filter(
-    ([, runId]) => pageRunId === runId
+    ([, runId]) => pageRunId === runId,
   );
   if (!relatedObjectGroupRunRunIds) {
     window.dismissAddRelatedObjectPopup(win, newId, newRepr);
@@ -29,13 +29,13 @@ export function dismissAddRelatedObjectGroupPopup(
     `/lab/objectgroup/${newId}/change/?next=/lab/run/${pageRunId}/change/&run=${pageRunId}`,
     newRepr,
     "run",
-    pageRunId
+    pageRunId,
   );
 
   elem.closest("tr").replaceWith(newRow);
 
   const intialFormsInput = document.querySelector(
-    "input[name='Run_run_object_groups-INITIAL_FORMS']"
+    "input[name='Run_run_object_groups-INITIAL_FORMS']",
   );
   intialFormsInput.value = parseInt(intialFormsInput.value) + 1;
 

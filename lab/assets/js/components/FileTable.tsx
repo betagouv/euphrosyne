@@ -52,7 +52,7 @@ export default function FileTable({
   const filteredRows = rows.filter((row) =>
     filterText !== ""
       ? row.name.toLowerCase().includes(filterText.toLowerCase())
-      : true
+      : true,
   );
 
   const displayedRows = isExpanded

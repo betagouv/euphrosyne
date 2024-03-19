@@ -25,7 +25,7 @@ describe("Test object form module", function () {
         objectCountField = document.querySelector(".field-object_count"),
         objectsInlineFieldset = document.getElementById("object_set-fieldset"),
         accordionButton = document.querySelector(
-          'button[aria-controls="differentiation-accordion"]'
+          'button[aria-controls="differentiation-accordion"]',
         );
       expect(objectCountInput.value).toBe("2");
       expect(objectCountInput.getAttribute("min")).toBe("2");
@@ -59,17 +59,17 @@ describe("Test object form module", function () {
       expect(
         document
           .querySelector(".field-object_count")
-          .classList.contains("hidden")
+          .classList.contains("hidden"),
       ).toBe(true);
       expect(
         document
           .getElementById("object_set-fieldset")
-          .classList.contains("hidden")
+          .classList.contains("hidden"),
       ).toBe(true);
       expect(
         document.querySelectorAll(
-          "#object_set-group tbody tr.dynamic-object_set"
-        ).length
+          "#object_set-group tbody tr.dynamic-object_set",
+        ).length,
       ).toBe(0);
     });
   });
@@ -95,10 +95,10 @@ describe("Test object form module", function () {
     it("disables collection inputs", function () {
       toggleInlineInputsDisabledOnParentChange("collection", "abc");
       expect(
-        document.getElementById("id_object_set-0-collection").disabled
+        document.getElementById("id_object_set-0-collection").disabled,
       ).toBeTruthy();
       expect(
-        document.getElementById("id_object_set-1-collection").disabled
+        document.getElementById("id_object_set-1-collection").disabled,
       ).toBeTruthy();
     });
 
@@ -108,20 +108,20 @@ describe("Test object form module", function () {
       document.body.innerHTML = inlineRowsWithCollectionAndInventoryTemplate;
       toggleInlineInputsDisabledOnParentChange("collection", "");
       expect(
-        document.getElementById("id_object_set-0-collection").disabled
+        document.getElementById("id_object_set-0-collection").disabled,
       ).toBeFalsy();
       expect(
-        document.getElementById("id_object_set-1-collection").disabled
+        document.getElementById("id_object_set-1-collection").disabled,
       ).toBeFalsy();
     });
 
     it("disables inventory inputs", function () {
       toggleInlineInputsDisabledOnParentChange("inventory", "abc");
       expect(
-        document.getElementById("id_object_set-0-inventory").disabled
+        document.getElementById("id_object_set-0-inventory").disabled,
       ).toBeTruthy();
       expect(
-        document.getElementById("id_object_set-1-inventory").disabled
+        document.getElementById("id_object_set-1-inventory").disabled,
       ).toBeTruthy();
     });
 
@@ -131,10 +131,10 @@ describe("Test object form module", function () {
       document.body.innerHTML = inlineRowsWithCollectionAndInventoryTemplate;
       toggleInlineInputsDisabledOnParentChange("inventory", "");
       expect(
-        document.getElementById("id_object_set-0-inventory").disabled
+        document.getElementById("id_object_set-0-inventory").disabled,
       ).toBeFalsy();
       expect(
-        document.getElementById("id_object_set-1-inventory").disabled
+        document.getElementById("id_object_set-1-inventory").disabled,
       ).toBeFalsy();
     });
   });

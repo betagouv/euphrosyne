@@ -41,7 +41,7 @@ body {
 
 #changelist .fr-card__title a {
   background-image: none;
-  color: var(--text-action-high-blue-france)
+  color: var(--text-action-high-blue-france);
 }
 
 #changelist .add-row a {
@@ -63,16 +63,18 @@ body {
   width: 33%;
 }
 
-.change-form .detector-field-wrapper  {
+.change-form .detector-field-wrapper {
   margin-bottom: 0rem;
 }
 
-.change-form .method-field-wrapper, .change-form .detector-field-wrapper {
+.change-form .method-field-wrapper,
+.change-form .detector-field-wrapper {
   display: flex;
   align-items: center;
 }
 
-.change-form .method-field-wrapper label, .change-form .detector-field-wrapper label {
+.change-form .method-field-wrapper label,
+.change-form .detector-field-wrapper label {
   width: auto;
   min-width: auto;
   margin-right: 1rem;

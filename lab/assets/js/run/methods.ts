@@ -1,6 +1,6 @@
 export function getMethodInputs() {
   return document.querySelectorAll(
-    ".method-field-wrapper > input,.detector-field-wrapper > input"
+    ".method-field-wrapper > input,.detector-field-wrapper > input",
   ) as NodeListOf<HTMLElement>;
 }
 

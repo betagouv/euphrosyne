@@ -6,10 +6,10 @@ import {
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = Array.from(document.forms).filter(
-    (f) => f.id == "project_form"
+    (f) => f.id == "project_form",
   )[0];
   const otherTabsAnchors = document.querySelectorAll(
-    "#runs-tab > a,#documents-tab > a"
+    "#runs-tab > a,#documents-tab > a",
   );
   const onCloseModal = document.getElementById("fr-modal-prdformclose");
 
@@ -21,8 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
         initialFormData,
         Array.from(new FormData(form)),
         onCloseModal,
-        e
-      )
+        e,
+      ),
     );
   });
 

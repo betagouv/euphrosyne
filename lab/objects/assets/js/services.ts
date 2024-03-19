@@ -15,7 +15,7 @@ interface RunObjectGroupsResponseElement {
 }
 
 export async function fetchRunObjectGroups(
-  runId: string
+  runId: string,
 ): Promise<RunObjectGroup[]> {
   const runObjectGroups = (await (
     await fetch(`/api/lab/runs/${runId}/objectgroups`)
@@ -33,7 +33,7 @@ export async function fetchRunObjectGroups(
 }
 
 export async function fetchAvailableObjectGroups(
-  runId: string
+  runId: string,
 ): Promise<ObjectGroup[]> {
   const availableObjectGroups = (await (
     await fetch(`/api/lab/runs/${runId}/available-objectgroups`)
@@ -49,7 +49,7 @@ export async function fetchAvailableObjectGroups(
 
 export async function addObjectGroupToRun(
   runId: string,
-  objectGroupId: string
+  objectGroupId: string,
 ) {
   let response;
   try {

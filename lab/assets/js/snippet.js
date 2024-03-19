@@ -8,7 +8,7 @@ export function loadFormsetRow(
   objectChangeUrl,
   objectRepr,
   parentObjectName,
-  parentObjectId
+  parentObjectId,
 ) {
   let template = formsetRowSnippet;
   const variablesMapping = {
@@ -22,7 +22,7 @@ export function loadFormsetRow(
     parentObjectId,
   };
   Object.entries(variablesMapping).forEach(
-    ([key, value]) => (template = template.replaceAll(`{{ ${key} }}`, value))
+    ([key, value]) => (template = template.replaceAll(`{{ ${key} }}`, value)),
   );
   const parentTempEl = document.createElement("table");
   parentTempEl.innerHTML = template;

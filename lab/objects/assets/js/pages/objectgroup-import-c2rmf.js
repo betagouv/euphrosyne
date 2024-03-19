@@ -3,7 +3,7 @@ function onFormSubmit(event) {
     c2rmfIdInput = document.querySelector(".import-from-input input");
   if (!labeInput.value) {
     c2rmfIdInput.setCustomValidity(
-      window.gettext("Search for a valid C2RMF ID before submitting the form.")
+      window.gettext("Search for a valid C2RMF ID before submitting the form."),
     );
     event.target.reportValidity();
     event.preventDefault();

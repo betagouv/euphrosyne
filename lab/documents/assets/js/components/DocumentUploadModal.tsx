@@ -18,7 +18,7 @@ const validateFileInput = (event: React.FormEvent<HTMLInputElement>) => {
   const fileInput = event.target as HTMLInputElement;
   const { files } = fileInput;
   fileInput.setCustomValidity(
-    getFileInputCustomValidity(Array.from(files || []))
+    getFileInputCustomValidity(Array.from(files || [])),
   );
 };
 
@@ -32,7 +32,7 @@ export default function DocumentUploadModal({
   const t = {
     "An error has occured while generating the presigned URL. Please contact the support team.":
       window.gettext(
-        "An error has occured while generating the presigned URL. Please contact the support team."
+        "An error has occured while generating the presigned URL. Please contact the support team.",
       ),
     "File %s has been uploaded.": window.gettext("File %s has been uploaded."),
     Close: window.gettext("Close"),
@@ -64,7 +64,7 @@ export default function DocumentUploadModal({
         t[
           "An error has occured while generating the presigned URL. Please contact the support team."
         ],
-        "error"
+        "error",
       );
       setIsSubmitting(false);
       throw error;
@@ -76,7 +76,7 @@ export default function DocumentUploadModal({
           window.interpolate(t["File %s has been uploaded."], [
             result.value.file.name,
           ]),
-          "success"
+          "success",
         );
       } else {
         displayMessage(
@@ -85,7 +85,7 @@ export default function DocumentUploadModal({
           ]) +
             " " +
             result.reason.message,
-          "error"
+          "error",
         );
         await onUploadError(result.reason.file?.name || "");
       }

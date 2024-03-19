@@ -30,6 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   getRunChangeStateActionButton()?.addEventListener(
     "click",
-    handleSubmitChangeStateAction
+    handleSubmitChangeStateAction,
   );
 });

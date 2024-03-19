@@ -10,7 +10,7 @@ export default function Translate() {
   ];
   const [currentLang, setCurrentLang] = useState("fr");
   const currentLangLabel = (locales.find(
-    (locale) => locale[0] === currentLang
+    (locale) => locale[0] === currentLang,
   ) || locales[0])[1];
 
   const changeLang = (lang: string) => {
@@ -27,7 +27,7 @@ export default function Translate() {
       document.cookie
         .split("; ")
         .find((row) => row.startsWith("django_language="))
-        ?.split("=")[1] || "fr"
+        ?.split("=")[1] || "fr",
     );
   }, []);
 

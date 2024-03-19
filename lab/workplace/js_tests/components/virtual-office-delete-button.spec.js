@@ -28,11 +28,11 @@ describe("Test VirtualOfficeDeleteButton", () => {
 
     expect(euphrosyneToolsService.deleteVM).toHaveBeenCalled();
     expect(window.dispatchEvent).toHaveBeenLastCalledWith(
-      new CustomEvent("vm-deleted")
+      new CustomEvent("vm-deleted"),
     );
     expect(utils.displayMessage).toHaveBeenLastCalledWith(
       "The virtual office has been deleted.",
-      "success"
+      "success",
     );
   });
 
@@ -49,7 +49,7 @@ describe("Test VirtualOfficeDeleteButton", () => {
     expect(hadError).toBe(true);
     expect(utils.displayMessage).toHaveBeenLastCalledWith(
       "An error occured while deleting the virtual office.",
-      "error"
+      "error",
     );
   });
 });

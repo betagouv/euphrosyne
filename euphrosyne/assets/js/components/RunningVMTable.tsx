@@ -30,7 +30,7 @@ export default function RunningVMTable() {
   const t = {
     "Virtual machine": window.gettext("Virtual machine"),
     "No running virtual machines": window.gettext(
-      "No running virtual machines"
+      "No running virtual machines",
     ),
   };
 

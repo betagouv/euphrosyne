@@ -50,14 +50,14 @@ export default {
               filename: "./pages/[name].js",
             },
           };
-        }
-      )
+        },
+      ),
     ),
   },
   output: {
     path: path.resolve(
       dirname(fileURLToPath(import.meta.url)),
-      "euphrosyne/assets/dist"
+      "euphrosyne/assets/dist",
     ),
     publicPath: "/static/",
     filename: "[name].js",
