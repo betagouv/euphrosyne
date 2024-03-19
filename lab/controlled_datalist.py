@@ -4,6 +4,7 @@ Useful to have two fields play together: one controller, one controlled.
 Controlled field must be a nullable integer field.
 Controller must be a text field rendered as a select.
 """
+
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Union
 
 from django.forms.fields import Field, IntegerField
