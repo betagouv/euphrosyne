@@ -21,6 +21,15 @@ export default function BaseTableActionCell({
   onDeleteSuccess,
   setIsLoading,
 }: BaseTableActionCellProps) {
+  const t = {
+    "Delete the document %s ?": window.gettext("Delete the document %s ?"),
+    "File %s could not be removed.": window.gettext(
+      "File %s could not be removed."
+    ),
+    "File %s has been removed.": window.gettext("File %s has been removed."),
+    "Download file": window.gettext("Download file"),
+    "Delete file": window.gettext("Delete file"),
+  };
   const file = useContext(FileContext);
 
   const downloadFile = async (path: string) => {
@@ -30,9 +39,7 @@ export default function BaseTableActionCell({
 
   const deleteFile = async (name: string, path: string) => {
     if (
-      !window.confirm(
-        window.interpolate(window.gettext("Delete the document %s ?"), [name])
-      )
+      !window.confirm(window.interpolate(t["Delete the document %s ?"], [name]))
     ) {
       return;
     }
@@ -41,9 +48,7 @@ export default function BaseTableActionCell({
       await fileService.deleteFile(path);
     } catch (error) {
       displayMessage(
-        window.interpolate(window.gettext("File %s could not be removed."), [
-          name,
-        ]),
+        window.interpolate(t["File %s could not be removed."], [name]),
         "error"
       );
       setIsLoading && setIsLoading(false);
@@ -51,7 +56,7 @@ export default function BaseTableActionCell({
     if (onDeleteSuccess) onDeleteSuccess(name);
     setIsLoading && setIsLoading(false);
     displayMessage(
-      window.interpolate(window.gettext("File %s has been removed."), [name]),
+      window.interpolate(t["File %s has been removed."], [name]),
       "success"
     );
   };
@@ -65,7 +70,7 @@ export default function BaseTableActionCell({
               className="download-btn fr-btn fr-icon-download-line fr-btn--secondary"
               onClick={() => downloadFile(file.path)}
             >
-              {window.gettext("Download file")}
+              {t["Download file"]}
             </button>
           </li>
           {canDelete && (
@@ -74,7 +79,7 @@ export default function BaseTableActionCell({
                 className="delete-btn fr-btn fr-icon-delete-line fr-btn--secondary"
                 onClick={() => deleteFile(file.name, file.path)}
               >
-                {window.gettext("Delete file")}
+                {t["Delete file"]}
               </button>
             </li>
           )}

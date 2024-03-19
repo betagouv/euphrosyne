@@ -47,6 +47,10 @@ export default function DocumentManager({
   table,
   form,
 }: DocumentManagerProps) {
+  const t = {
+    "Add a document": window.gettext("Add a document"),
+  };
+
   const [isLoading, setIsLoading] = useState(true);
   const [files, setFiles] = useState<EuphrosyneFile[]>([]);
 
@@ -72,7 +76,7 @@ export default function DocumentManager({
         aria-controls={uploadModalId}
         css={modalBtnStyle}
       >
-        {window.gettext("Add a document")}
+        {t["Add a document"]}
       </button>
 
       <FileTable

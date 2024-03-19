@@ -1,4 +1,7 @@
 export default function UpcomingProjectNoDataCard() {
+  const t = {
+    "No upcoming projects": window.gettext("No upcoming projects"),
+  };
   return (
     <div className="fr-card fr-card--shadow fr-card--horizontal">
       <div className="fr-card__body">
@@ -7,7 +10,7 @@ export default function UpcomingProjectNoDataCard() {
           <p className="fr-card__desc">
             <span className="fr-icon-goblet-line" aria-hidden="true"></span>
             <br className="fr-mb-1w" />
-            {window.gettext("No upcoming projects")}
+            {t["No upcoming projects"]}
           </p>
           <div className="fr-card__start"></div>
           <div className="fr-card__end">

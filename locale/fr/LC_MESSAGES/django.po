@@ -186,7 +186,7 @@ msgid "Calendar"
 msgstr "Calendrier"
 
 msgid "Running virtual machines"
-msgstr "Machine virtuelles en cours d'exécution"
+msgstr "Machines virtuelles en cours d'exécution"
 
 msgid "Search"
 msgstr "Rechercher"

@@ -13,6 +13,18 @@ interface ProjectImageDefinitionSelectProps {
 export default function ProjectImageDefinitionSelect({
   projectSlug,
 }: ProjectImageDefinitionSelectProps) {
+  const t = {
+    "Image definition": window.gettext("Image definition"),
+    Default: window.gettext("Default"),
+    "Used to determine the image definition used to create the VM.":
+      window.gettext(
+        "Used to determine the image definition used to create the VM."
+      ),
+    "An error ocurred while setting project image definition": window.gettext(
+      "An error ocurred while setting project image definition"
+    ),
+  };
+
   const [imageDefinitions, setImageDefinitions] = useState<string[]>([]);
   const [imageDefinition, setImageDefinition] = useState<string>("");
   const [hasError, setHasError] = useState<boolean>(false);
@@ -39,9 +51,7 @@ export default function ProjectImageDefinitionSelect({
 
   return (
     <div className={`fr-select-group ${hasError && "fr-select-group--error"}`}>
-      <label htmlFor="vm-size-select">
-        {window.gettext("Image definition")}
-      </label>
+      <label htmlFor="vm-size-select">{t["Image definition"]}</label>
       <select
         name="image_definition"
         className={`fr-select ${hasError && "fr-select--error"}`}
@@ -50,7 +60,7 @@ export default function ProjectImageDefinitionSelect({
         aria-describedby={`${projectSlug}-image-definition-select--error`}
         disabled={isLoading}
       >
-        <option value="">{window.gettext("Default")}</option>
+        <option value="">{t["Default"]}</option>
         {imageDefinitions.map((imageDefinition) => (
           <option key={imageDefinition} value={imageDefinition}>
             {imageDefinition}
@@ -62,15 +72,11 @@ export default function ProjectImageDefinitionSelect({
           id={`${projectSlug}-image-definition-select--error`}
           className="fr-error-text"
         >
-          {window.gettext(
-            "An error ocurred while setting project image definition"
-          )}
+          {t["An error ocurred while setting project image definition"]}
         </p>
       )}
       <div className="help">
-        {window.gettext(
-          "Used to determine the image definition used to create the VM."
-        )}
+        {t["Used to determine the image definition used to create the VM."]}
       </div>
     </div>
   );

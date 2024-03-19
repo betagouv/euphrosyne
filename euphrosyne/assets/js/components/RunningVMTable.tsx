@@ -27,6 +27,13 @@ function DeleteButton({ vmName }: { vmName: string }) {
 }
 
 export default function RunningVMTable() {
+  const t = {
+    "Virtual machine": window.gettext("Virtual machine"),
+    "No running virtual machines": window.gettext(
+      "No running virtual machines"
+    ),
+  };
+
   const [isLoading, setIsLoading] = useState(true);
   const [vms, setVms] = useState([]);
 
@@ -48,7 +55,7 @@ export default function RunningVMTable() {
       <table>
         <thead>
           <tr>
-            <th scope="col">{window.gettext("Virtual machine")}</th>
+            <th scope="col">{t["Virtual machine"]}</th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -70,9 +77,7 @@ export default function RunningVMTable() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={2}>
-                    {window.gettext("No running virtual machines")}
-                  </td>
+                  <td colSpan={2}>{t["No running virtual machines"]}</td>
                 </tr>
               )}
             </>

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-13 17:08+0100\n"
+"POT-Creation-Date: 2024-03-19 14:55+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -23,14 +23,17 @@ msgstr "Aucun projet à venir"
 msgid "Menu"
 msgstr "Menu"
 
-msgid "Admin"
-msgstr "Admin"
-
 msgid "Log out"
 msgstr "Déconnexion"
 
+msgid "Admin"
+msgstr "Admin"
+
 msgid "Close"
 msgstr "Fermer"
+
+msgid "Leader"
+msgstr "Chef.fe de projet"
 
 msgid "Select a language"
 msgstr "Sélectionner un langage"
@@ -59,9 +62,18 @@ msgstr "Supprimer le fichier"
 msgid "Filter"
 msgstr "Filtrer"
 
+msgid "No file yet"
+msgstr "Aucun fichier"
+
 #, javascript-format
 msgid "%s results"
 msgstr "%s résultats"
+
+msgid "Show less"
+msgstr "Montrer moins"
+
+msgid "Show more"
+msgstr "Montrer plus"
 
 msgid ""
 "An error has occured while generating the presigned URL. Please contact the "
@@ -90,6 +102,12 @@ msgstr "Taille"
 msgid "Add a document"
 msgstr "Ajouter un document"
 
+msgid "Add files"
+msgstr "Ajouter des fichiers"
+
+msgid "Upload"
+msgstr "Téléverser"
+
 msgid "Please select a file"
 msgstr "Choisissez un fichier"
 
@@ -100,8 +118,36 @@ msgstr "Ces formats de fichier ne sont pas acceptés : %s"
 msgid "No object in this run yet"
 msgstr "Aucun objet dans ce run"
 
+msgid "Remove from run"
+msgstr "Supprimer du run"
+
+msgid "Add new object group or object"
+msgstr "Ajouter un groupe d'objets ou un objet"
+
+msgid "Import object from same project"
+msgstr "Importer un objet du même projet"
+
+msgid "Import with C2RMF ID"
+msgstr "Importer avec un numéro C2RMF"
+
 msgid "An error occurred."
 msgstr "Une erreur s'est produite."
+
+msgid "Import an object group or object from project"
+msgstr "Importer un groupe d'objets ou un objet du projet"
+
+msgid "Select an existing object group"
+msgstr "Sélectionner un groupe d'objets existant"
+
+#, javascript-format
+msgid "%s objects are available for import."
+msgstr "%s objets sont disponibles pour l'import."
+
+msgid "Select an object"
+msgstr "Sélectionner un objet"
+
+msgid "Add object to run"
+msgstr "Ajouter l'objet au run"
 
 msgid "Search for a valid C2RMF ID before submitting the form."
 msgstr ""
@@ -125,8 +171,28 @@ msgstr ""
 "Une erreur s'est produite lors de la recherche de l'object sur Eros. Si "
 "l'erreur persiste, veuillez contacter l'équipe AGLAE."
 
+msgid "Image definition"
+msgstr "Définition d'image"
+
+msgid "Default"
+msgstr "Défaut"
+
+msgid "Used to determine the image definition used to create the VM."
+msgstr ""
+"Utilisé pour déterminer la définition d'image utilisée pour créer la VM."
+
+msgid "An error ocurred while setting project image definition"
+msgstr ""
+"Une erreur s'est produite en paramétrant la définition d'image du projet."
+
 msgid "Runs data"
 msgstr "Données des runs"
+
+msgid "Raw data"
+msgstr "Données brutes"
+
+msgid "Processed data"
+msgstr "Données travaillées"
 
 msgid "Create virtual office"
 msgstr "Créer le bureau virtuel"

@@ -24,6 +24,21 @@ export default function RunObjectGroupProjectImportModal({
   error,
   onAdd,
 }: RunObjectGroupProjectImportModalProps) {
+  const t = {
+    Close: window.gettext("Close"),
+    "Import an object group or object from project": window.gettext(
+      "Import an object group or object from project"
+    ),
+    "Select an existing object group": window.gettext(
+      "Select an existing object group"
+    ),
+    "%s objects are available for import.": window.gettext(
+      "%s objects are available for import."
+    ),
+    "Select an object": window.gettext("Select an object"),
+    "Add object to run": window.gettext("Add object to run"),
+  };
+
   let selectedValue = "";
   return (
     <dialog
@@ -42,14 +57,12 @@ export default function RunObjectGroupProjectImportModal({
                   aria-controls={id}
                   type="button"
                 >
-                  {window.gettext("Close")}
+                  {t["Close"]}
                 </button>
               </div>
               <div className="fr-modal__content">
                 <h1 className="fr-modal__title">
-                  {window.gettext(
-                    "Import an object group or object from project"
-                  )}
+                  {t["Import an object group or object from project"]}
                 </h1>
                 <div
                   className={`fr-select-group ${
@@ -61,10 +74,10 @@ export default function RunObjectGroupProjectImportModal({
                   }`}
                 >
                   <label className="fr-label" htmlFor={`${id}-select`}>
-                    {window.gettext("Select an existing object group")}
+                    {t["Select an existing object group"]}
                     <span className="fr-hint-text">
                       {window.interpolate(
-                        window.gettext("%s objects are available for import."),
+                        t["%s objects are available for import."],
                         [availableObjectGroups.length.toString()]
                       )}
                     </span>
@@ -81,7 +94,7 @@ export default function RunObjectGroupProjectImportModal({
                     }}
                   >
                     <option value="" disabled hidden>
-                      {window.gettext("Select an object")}
+                      {t["Select an object"]}
                     </option>
                     {availableObjectGroups.map((og) => (
                       <option key={og.id} value={og.id}>
@@ -106,7 +119,7 @@ export default function RunObjectGroupProjectImportModal({
                     type="button"
                     onClick={() => onAdd(selectedValue)}
                   >
-                    {window.gettext("Add object to run")}
+                    {t["Add object to run"]}
                   </button>
                 </div>
               </div>

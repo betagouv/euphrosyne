@@ -35,6 +35,12 @@ export interface WorkplaceRunTabsProps {
 }
 
 export default function WorkplaceRunTabs({ runs }: WorkplaceRunTabsProps) {
+  const t = {
+    "Runs data": window.gettext("Runs data"),
+    "Raw data": window.gettext("Raw data"),
+    "Processed data": window.gettext("Processed data"),
+  };
+
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const runRawData: [
     EuphrosyneFile[],
@@ -61,11 +67,7 @@ export default function WorkplaceRunTabs({ runs }: WorkplaceRunTabsProps) {
   }, []);
   return (
     <div className="fr-tabs">
-      <ul
-        className="fr-tabs__list"
-        role="tablist"
-        aria-label={window.gettext("Runs data")}
-      >
+      <ul className="fr-tabs__list" role="tablist" aria-label={t["Runs data"]}>
         {runs.map((run, index) => (
           <li role="presentation" key={`run-tab-${run.id}`}>
             <button
@@ -96,7 +98,7 @@ export default function WorkplaceRunTabs({ runs }: WorkplaceRunTabsProps) {
           <div className="fr-grid-row fr-grid-row--gutters">
             <div className="fr-col-12 fr-col-lg-6">
               <div className="fr-background-default--grey fr-p-3v">
-                <h3>{window.gettext("Raw data")}</h3>
+                <h3>{t["Raw data"]}</h3>
                 <FileTable
                   rows={runRawData[index][0]}
                   isLoading={rawLoadingStates[index][0]}
@@ -120,7 +122,7 @@ export default function WorkplaceRunTabs({ runs }: WorkplaceRunTabsProps) {
             </div>
             <div className="fr-col-12 fr-col-lg-6">
               <div className="fr-background-default--grey fr-p-3v">
-                <h3>{window.gettext("Processed data")}</h3>
+                <h3>{t["Processed data"]}</h3>
                 <FileTable
                   rows={runProcessedData[index][0]}
                   isLoading={processedLoadingStates[index][0]}

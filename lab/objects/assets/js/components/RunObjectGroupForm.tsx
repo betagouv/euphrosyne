@@ -20,6 +20,17 @@ export default function RunObjectGroupForm({
   run,
   popupObjectGroupEventTarget,
 }: RunObjectGroupFormProps) {
+  const t = {
+    "Add new object group or object": window.gettext(
+      "Add new object group or object"
+    ),
+    "Import object from same project": window.gettext(
+      "Import object from same project"
+    ),
+    "Import with C2RMF ID": window.gettext("Import with C2RMF ID"),
+    "An error occurred.": window.gettext("An error occurred."),
+  };
+
   const [runObjectGroups, setRunObjectGroups] = useState<RunObjectGroup[]>([]);
   const [availableObjectGroups, setAvailableObjectGroups] = useState<
     ObjectGroup[]
@@ -60,7 +71,7 @@ export default function RunObjectGroupForm({
         );
       } else {
         // Show error on select in modal
-        setAddObjectGroupError(window.gettext("An error occurred."));
+        setAddObjectGroupError(t["An error occurred."]);
       }
     });
   };
@@ -84,7 +95,7 @@ export default function RunObjectGroupForm({
               className="related-widget-wrapper-link fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-add-circle-line"
               data-popup="yes"
             >
-              {window.gettext("Add new object group or object")}
+              {t["Add new object group or object"]}
             </a>
           </li>
           <li>
@@ -96,7 +107,7 @@ export default function RunObjectGroupForm({
               type="button"
               ref={openModalBtnRef}
             >
-              {window.gettext("Import object from same project")}
+              {t["Import object from same project"]}
             </button>
           </li>
           <li>
@@ -105,7 +116,7 @@ export default function RunObjectGroupForm({
               className="related-widget-wrapper-link fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-download-line"
               data-popup="yes"
             >
-              {window.gettext("Import with C2RMF ID")}
+              {t["Import with C2RMF ID"]}
             </a>
           </li>
         </ul>

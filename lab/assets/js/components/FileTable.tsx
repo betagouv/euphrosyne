@@ -36,6 +36,14 @@ export default function FileTable({
   isSearchable,
   actionCell,
 }: FileTableProps) {
+  const t = {
+    Filter: window.gettext("Filter"),
+    "No file yet": window.gettext("No file yet"),
+    "%s results": window.gettext("%s results"),
+    "Show less": window.gettext("Show less"),
+    "Show more": window.gettext("Show more"),
+  };
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [filterText, setFilterText] = useState("");
 
@@ -57,23 +65,23 @@ export default function FileTable({
         <div className="fr-mb-1w">
           <div className="fr-search-bar" id="header-search" role="search">
             <label className="fr-label" htmlFor={filterInputId}>
-              {window.gettext("Filter")}
+              {t["Filter"]}
             </label>
             <input
               className="fr-input"
-              placeholder={window.gettext("Filter")}
+              placeholder={t["Filter"]}
               type="search"
               id={filterInputId}
               onInput={(e) =>
                 setFilterText((e.target as HTMLInputElement).value)
               }
             />
-            <button className="fr-btn" title={window.gettext("Filter")}>
-              {window.gettext("Filter")}
+            <button className="fr-btn" title={t["Filter"]}>
+              {t["Filter"]}
             </button>
           </div>
           <p className="fr-hint-text">
-            {window.interpolate(window.gettext("%s results"), [
+            {window.interpolate(t["%s results"], [
               (filterText === ""
                 ? rows.length
                 : filteredRows.length
@@ -128,7 +136,7 @@ export default function FileTable({
               ) : (
                 <tr className="no_data">
                   <td colSpan={numCols} css={noDataCellStyle}>
-                    {window.gettext("No file yet")}
+                    {t["No file yet"]}
                   </td>
                 </tr>
               )}
@@ -150,8 +158,8 @@ export default function FileTable({
                   onClick={() => setIsExpanded(!isExpanded)}
                 >
                   {isExpanded
-                    ? window.gettext("Show less")
-                    : window.gettext("Show more") +
+                    ? t["Show less"]
+                    : t["Show more"] +
                       ` (${filteredRows.length - COLLAPSED_ROW_NUM})`}
                 </button>
               </td>
