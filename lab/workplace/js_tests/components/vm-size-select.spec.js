@@ -20,7 +20,7 @@ describe("Test VMSizeSelect", () => {
 
   it("creates the button properly", async () => {
     euphrosyneToolsService.fetchProjectVmSize.mockImplementation(() =>
-      Promise.resolve()
+      Promise.resolve(),
     );
     vmSizeSelect.connectedCallback();
     expect(euphrosyneToolsService.fetchProjectVmSize).toHaveBeenCalled();
@@ -28,12 +28,12 @@ describe("Test VMSizeSelect", () => {
 
   it("calls service on change", async () => {
     euphrosyneToolsService.setProjectVmSize.mockImplementation(() =>
-      Promise.resolve()
+      Promise.resolve(),
     );
     await vmSizeSelect.onSelectChange({ target: { value: "value" } });
     expect(euphrosyneToolsService.setProjectVmSize).toHaveBeenCalledWith(
       "projet tango",
-      "value"
+      "value",
     );
   });
 });

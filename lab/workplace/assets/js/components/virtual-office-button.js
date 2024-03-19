@@ -40,17 +40,17 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
         this.disabled = false;
         utils.displayMessage(
           window.gettext(
-            "An error occured while creating the virtual office. Please contact an administrator or try again later."
+            "An error occured while creating the virtual office. Please contact an administrator or try again later.",
           ),
-          "error"
+          "error",
         );
         throw error;
       }
       utils.displayMessage(
         window.gettext(
-          "The virtual office is being created. This can take up to 10 minutes."
+          "The virtual office is being created. This can take up to 10 minutes.",
         ),
-        "info"
+        "info",
       );
       this.innerText = window.gettext("Creating virtual office...");
       setTimeout(() => this.waitForDeploymentComplete(), 10000); // Wait 10 seconds before checking deployment status
@@ -61,13 +61,13 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
     this.checkDeploymentProgress();
     this.checkDeploymentIntervalId = setInterval(
       this.checkDeploymentProgress.bind(this),
-      10000
+      10000,
     );
   }
 
   async initButton() {
     const url = await euphrosyneToolsService.fetchVMConnectionLink(
-      this.projectSlug
+      this.projectSlug,
     );
     if (url) {
       this.connectionUrl = url;
@@ -84,9 +84,9 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
           this.innerText = window.gettext("Creating virtual office...");
           utils.displayMessage(
             window.gettext(
-              "The virtual office is being created. This can take up to 10 minutes."
+              "The virtual office is being created. This can take up to 10 minutes.",
             ),
-            "info"
+            "info",
           );
           this.waitForDeploymentComplete();
         }
@@ -99,7 +99,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
 
   async checkDeploymentProgress() {
     const deploymentStatus = await euphrosyneToolsService.fetchDeploymentStatus(
-      this.projectSlug
+      this.projectSlug,
     );
     if (deploymentStatus === "Failed") {
       this.onFailedDeployment();
@@ -108,26 +108,26 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
     } else if (!deploymentStatus | (deploymentStatus === "Succeeded")) {
       utils.displayMessage(
         window.gettext(
-          "The virtual machine has been deployed and is being configured."
+          "The virtual machine has been deployed and is being configured.",
         ),
-        "info"
+        "info",
       );
       clearInterval(this.checkDeploymentIntervalId);
       this.checkDeploymentIntervalId = null;
       this.checkConnectionLinkIntervalId = setInterval(
         () => this.waitForConnectionLink(),
-        10000
+        10000,
       );
       setTimeout(
         () => this.reportNoConnectionLinkTimeoutError(),
-        2 * 60 * 1000
+        2 * 60 * 1000,
       ); // Wait 3 minutes before reporting a timeout error
     }
   }
 
   async waitForConnectionLink() {
     const url = await euphrosyneToolsService.fetchVMConnectionLink(
-      this.projectSlug
+      this.projectSlug,
     );
     if (url) {
       this.connectionUrl = url;
@@ -137,9 +137,9 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
       this.innerText = window.gettext("Access virtual office");
       utils.displayMessage(
         window.gettext(
-          "The virtual office is ready. You can now access it by clicking Access virtual office button."
+          "The virtual office is ready. You can now access it by clicking Access virtual office button.",
         ),
-        "success"
+        "success",
       );
       this.onConnectReady();
     }
@@ -153,9 +153,9 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
       this.innerText = window.gettext("Create virtual office");
       utils.displayMessage(
         window.gettext(
-          "Configuration took too long. Something wrong occured. Please contact an administrator."
+          "Configuration took too long. Something wrong occured. Please contact an administrator.",
         ),
-        "error"
+        "error",
       );
     }
   }
@@ -164,9 +164,9 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
     this.innerText = window.gettext("Access virtual office");
     utils.displayMessage(
       window.gettext(
-        "We could not create the virtual office. Please contact an administrator."
+        "We could not create the virtual office. Please contact an administrator.",
       ),
-      "error"
+      "error",
     );
   }
 

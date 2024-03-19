@@ -27,13 +27,13 @@ export default function RunObjectGroupProjectImportModal({
   const t = {
     Close: window.gettext("Close"),
     "Import an object group or object from project": window.gettext(
-      "Import an object group or object from project"
+      "Import an object group or object from project",
     ),
     "Select an existing object group": window.gettext(
-      "Select an existing object group"
+      "Select an existing object group",
     ),
     "%s objects are available for import.": window.gettext(
-      "%s objects are available for import."
+      "%s objects are available for import.",
     ),
     "Select an object": window.gettext("Select an object"),
     "Add object to run": window.gettext("Add object to run"),
@@ -78,7 +78,7 @@ export default function RunObjectGroupProjectImportModal({
                     <span className="fr-hint-text">
                       {window.interpolate(
                         t["%s objects are available for import."],
-                        [availableObjectGroups.length.toString()]
+                        [availableObjectGroups.length.toString()],
                       )}
                     </span>
                   </label>

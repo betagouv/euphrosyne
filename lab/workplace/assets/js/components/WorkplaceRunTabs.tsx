@@ -44,11 +44,11 @@ export default function WorkplaceRunTabs({ runs }: WorkplaceRunTabsProps) {
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const runRawData: [
     EuphrosyneFile[],
-    React.Dispatch<React.SetStateAction<EuphrosyneFile[]>>
+    React.Dispatch<React.SetStateAction<EuphrosyneFile[]>>,
   ][] = runs.map(() => useState<EuphrosyneFile[]>([]));
   const runProcessedData: [
     EuphrosyneFile[],
-    React.Dispatch<React.SetStateAction<EuphrosyneFile[]>>
+    React.Dispatch<React.SetStateAction<EuphrosyneFile[]>>,
   ][] = runs.map(() => useState<EuphrosyneFile[]>([]));
   const rawLoadingStates = runs.map(() => useState(false));
   const processedLoadingStates = runs.map(() => useState(false));
@@ -110,8 +110,8 @@ export default function WorkplaceRunTabs({ runs }: WorkplaceRunTabsProps) {
                       onDeleteSuccess={(fileName) =>
                         runRawData[index][1](
                           runRawData[index][0].filter(
-                            (file) => file.name !== fileName
-                          )
+                            (file) => file.name !== fileName,
+                          ),
                         )
                       }
                       fileService={run.rawDataFileService}
@@ -134,8 +134,8 @@ export default function WorkplaceRunTabs({ runs }: WorkplaceRunTabsProps) {
                       onDeleteSuccess={(fileName) =>
                         runProcessedData[index][1](
                           runProcessedData[index][0].filter(
-                            (file) => file.name !== fileName
-                          )
+                            (file) => file.name !== fileName,
+                          ),
                         )
                       }
                       fileService={run.processedDataFileService}

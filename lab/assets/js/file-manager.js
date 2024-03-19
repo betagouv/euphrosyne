@@ -36,7 +36,7 @@ export class FileManager {
   async deleteFile(name, path) {
     if (
       !window.confirm(
-        window.interpolate(window.gettext("Delete the document %s ?"), [name])
+        window.interpolate(window.gettext("Delete the document %s ?"), [name]),
       )
     ) {
       return;
@@ -59,9 +59,9 @@ export class FileManager {
     } catch (error) {
       displayMessage(
         window.gettext(
-          "An error has occured while generating the presigned URL. Please contact the support team."
+          "An error has occured while generating the presigned URL. Please contact the support team.",
         ),
-        "error"
+        "error",
       );
       this.fileForm.toggleSubmitButton(false);
       throw error;
@@ -72,7 +72,7 @@ export class FileManager {
           window.interpolate(window.gettext("File %s has been uploaded."), [
             result.value.file.name,
           ]),
-          "success"
+          "success",
         );
       } else {
         displayMessage(
@@ -81,7 +81,7 @@ export class FileManager {
           ]) +
             " " +
             result.reason.message,
-          "error"
+          "error",
         );
         await this.fileService.deleteFile(result.reason.file.name);
       }
@@ -99,7 +99,7 @@ export class FileManager {
       window.interpolate(window.gettext("File %s could not be removed."), [
         name,
       ]),
-      "error"
+      "error",
     );
     this.fileTable.displayFiles();
   }
@@ -108,7 +108,7 @@ export class FileManager {
     this.fetchFiles();
     displayMessage(
       window.interpolate(window.gettext("File %s has been removed."), [name]),
-      "success"
+      "success",
     );
   }
 }

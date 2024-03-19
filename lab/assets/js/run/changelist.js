@@ -6,7 +6,7 @@ const getDeleteSelectedOption = () =>
   getActionOptions().filter((opt) => opt.value == "delete_selected")[0];
 const getRunSelectInputs = () =>
   Array.from(getChangeListForm().elements).filter(
-    (el) => el.tagName == "INPUT" && el.classList.contains("action-select")
+    (el) => el.tagName == "INPUT" && el.classList.contains("action-select"),
   );
 const getRunSelectInput = (runId) =>
   getRunSelectInputs().filter((el) => el.value == runId)[0];

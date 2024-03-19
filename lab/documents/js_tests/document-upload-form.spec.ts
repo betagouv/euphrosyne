@@ -18,7 +18,7 @@ describe("Test getFileInputCustomValidity", () => {
     it("rejects unsupported file formats", () => {
       const invalidFile = new File([""], "test.awrongformat");
       expect(getFileInputCustomValidity([invalidFile])).toBe(
-        "The following file formats are not accepted : %s"
+        "The following file formats are not accepted : %s",
       );
     });
 

@@ -1,3 +1,5 @@
 _static/**
 **/assets/dist/**
 .github/workflows/automerge-dependabot.yaml
+.mypy_cache/**
+*.html

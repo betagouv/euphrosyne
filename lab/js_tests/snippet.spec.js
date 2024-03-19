@@ -10,7 +10,7 @@ describe("Test snippet.js", function () {
       "https://url.test",
       "A nice object",
       "Jacqueline",
-      3
+      3,
     );
 
     it("renders a tr tag", function () {

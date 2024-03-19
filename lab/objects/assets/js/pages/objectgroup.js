@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function onFormsetChange() {
     if (!getAreObjectsDifferentiated()) {
       getObjectCountInput().value = document.querySelectorAll(
-        "#object_set-group tbody tr.dynamic-object_set"
+        "#object_set-group tbody tr.dynamic-object_set",
       ).length;
     }
   }
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
     .addEventListener("change", (event) => {
       toggleInlineInputsDisabledOnParentChange(
         "collection",
-        event.target.value
+        event.target.value,
       );
     });
 

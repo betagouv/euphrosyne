@@ -2,7 +2,7 @@
 {
   const initData = JSON.parse(
     document.getElementById("euphro-admin-popup-response-constants").dataset
-      .popupResponse
+      .popupResponse,
   );
   opener.dismissViewObjectPopup(window, initData.obj);
 }

@@ -62,7 +62,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const { currentPath, items } = getNavItemsData();
     renderComponent(
       "header-nav",
-      createElement(HeaderNav, { currentPath, items })
+      createElement(HeaderNav, { currentPath, items }),
     );
   } else {
     console.info("No header-nav element found. Not rendering header nav.");
@@ -73,7 +73,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const currentUser = getUserData();
     renderComponent(
       "header-main",
-      createElement(Header, { project, backLink, currentUser })
+      createElement(Header, { project, backLink, currentUser }),
     );
   } else {
     console.info("No header-main element found. Not rendering header.");

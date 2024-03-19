@@ -51,7 +51,7 @@ export class FileService {
       return [];
     } else {
       throw new Error(
-        `Failed to fetch file list. Response status: ${response?.status}`
+        `Failed to fetch file list. Response status: ${response?.status}`,
       );
     }
   }
@@ -65,7 +65,7 @@ export class FileService {
       return response;
     } else {
       throw new Error(
-        `Failed to delete file. Response status: ${response.status}`
+        `Failed to delete file. Response status: ${response.status}`,
       );
     }
   }
@@ -75,7 +75,7 @@ export class FileService {
       `${this.presignURL}?path=${encodeURIComponent(path)}`,
       {
         method: "GET",
-      }
+      },
     );
     if (!response?.ok) throw new Error("Failed to fetch presigned URL");
     return (await response.json()).url;
@@ -100,7 +100,7 @@ export class FileService {
     presignedURL: string,
     blob: BodyInit,
     fileByteStart: number,
-    fileByteEnd: number
+    fileByteEnd: number,
   ) {
     return fetch(presignedURL + "&comp=range", {
       method: "PUT",

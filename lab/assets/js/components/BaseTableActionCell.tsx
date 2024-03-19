@@ -24,7 +24,7 @@ export default function BaseTableActionCell({
   const t = {
     "Delete the document %s ?": window.gettext("Delete the document %s ?"),
     "File %s could not be removed.": window.gettext(
-      "File %s could not be removed."
+      "File %s could not be removed.",
     ),
     "File %s has been removed.": window.gettext("File %s has been removed."),
     "Download file": window.gettext("Download file"),
@@ -49,7 +49,7 @@ export default function BaseTableActionCell({
     } catch (error) {
       displayMessage(
         window.interpolate(t["File %s could not be removed."], [name]),
-        "error"
+        "error",
       );
       setIsLoading && setIsLoading(false);
     }
@@ -57,7 +57,7 @@ export default function BaseTableActionCell({
     setIsLoading && setIsLoading(false);
     displayMessage(
       window.interpolate(t["File %s has been removed."], [name]),
-      "success"
+      "success",
     );
   };
 

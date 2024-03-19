@@ -11,7 +11,7 @@ input.tags-input__input {
   min-height: 24px;
   min-width: 100px;
   width: 100%;
-  margin-top: .5rem;
+  margin-top: 0.5rem;
 }
 
 .tags-input__tag {

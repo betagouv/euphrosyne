@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
   const runChangeFormData = getTemplateJSONData<RunChangeFormData>(
-    "run-change-form-data"
+    "run-change-form-data",
   );
   if (!runChangeFormData) {
     throw new Error("Run ID not found in run-change-form-data script tag.");
@@ -38,6 +38,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     createElement(RunObjectGroupForm, {
       run,
       popupObjectGroupEventTarget,
-    })
+    }),
   );
 });

@@ -25,13 +25,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
   if (!projectDocumentsPageData) {
     throw new Error(
-      "Project data not found in project-documents-data script tag."
+      "Project data not found in project-documents-data script tag.",
     );
   }
   const { project, table, form } = projectDocumentsPageData;
 
   renderComponent(
     "document-manager",
-    createElement(DocumentManager, { project, table, form })
+    createElement(DocumentManager, { project, table, form }),
   );
 });

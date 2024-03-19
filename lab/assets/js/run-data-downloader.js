@@ -3,7 +3,7 @@ import { jwtFetch } from "./jwt.js";
 export default async function downloadRunData(
   projectSlug,
   runName,
-  runDataType
+  runDataType,
 ) {
   // First, get token to download data
   const path = `projects/${projectSlug}/runs/${runName}/${runDataType}`;
@@ -11,7 +11,7 @@ export default async function downloadRunData(
     `${process.env.EUPHROSYNE_TOOLS_API_URL}/data/${projectSlug}/token?path=${path}`,
     {
       method: "GET",
-    }
+    },
   );
   const { token } = await response.json();
   if (!token) {
@@ -19,6 +19,6 @@ export default async function downloadRunData(
   }
   window.open(
     `${process.env.EUPHROSYNE_TOOLS_API_URL}/data/run-data-zip?path=${path}&token=${token}`,
-    "_blank"
+    "_blank",
   );
 }

@@ -10,7 +10,7 @@ export default class VirtualOfficeDeleteButton extends HTMLButtonElement {
       VirtualOfficeDeleteButton,
       {
         extends: "button",
-      }
+      },
     );
   }
 
@@ -41,13 +41,13 @@ export default class VirtualOfficeDeleteButton extends HTMLButtonElement {
       this.disabled = false;
       utils.displayMessage(
         window.gettext("An error occured while deleting the virtual office."),
-        "error"
+        "error",
       );
       throw error;
     }
     utils.displayMessage(
       window.gettext("The virtual office has been deleted."),
-      "success"
+      "success",
     );
     window.dispatchEvent(new CustomEvent("vm-deleted"));
   }

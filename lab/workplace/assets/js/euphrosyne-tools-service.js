@@ -5,7 +5,7 @@ async function fetchVMConnectionLink(projectSlug) {
     `${process.env.EUPHROSYNE_TOOLS_API_URL}/connect/${projectSlug}`,
     {
       method: "GET",
-    }
+    },
   );
   if (response.ok) {
     return (await response.json())["url"];
@@ -20,7 +20,7 @@ async function fetchDeploymentStatus(projectSlug) {
     `${process.env.EUPHROSYNE_TOOLS_API_URL}/deployments/${projectSlug}`,
     {
       method: "GET",
-    }
+    },
   );
   if (response.ok) {
     return (await response.json())["status"];
@@ -28,7 +28,7 @@ async function fetchDeploymentStatus(projectSlug) {
     return null;
   }
   throw new Error(
-    `An error occured while fetching project ${projectSlug} deployment status`
+    `An error occured while fetching project ${projectSlug} deployment status`,
   );
 }
 
@@ -37,7 +37,7 @@ function deployVM(projectSlug) {
     `${process.env.EUPHROSYNE_TOOLS_API_URL}/deployments/${projectSlug}`,
     {
       method: "POST",
-    }
+    },
   );
 }
 
@@ -46,7 +46,7 @@ function deleteVM(projectSlug) {
     `${process.env.EUPHROSYNE_TOOLS_API_URL}/vms/${projectSlug}`,
     {
       method: "DELETE",
-    }
+    },
   );
 }
 
@@ -55,7 +55,7 @@ async function fetchProjectVmSize(projectSlug) {
     `${process.env.EUPHROSYNE_TOOLS_API_URL}/config/${projectSlug}/vm-size`,
     {
       method: "GET",
-    }
+    },
   );
   if (response.ok) {
     return (await response.json())["vm_size"];
@@ -68,7 +68,7 @@ async function setProjectVmSize(projectSlug, vmSize) {
     {
       method: "POST",
       body: JSON.stringify({ vm_size: vmSize }),
-    }
+    },
   );
 }
 

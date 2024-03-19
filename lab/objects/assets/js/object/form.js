@@ -62,7 +62,7 @@ export function updateObjectRows(newObjectCount) {
     }
   } else if (objectRows.length > newObjectCount) {
     const toDeleteRows = Array.from(objectRows).splice(
-      newObjectCount - objectRows.length
+      newObjectCount - objectRows.length,
     );
     deleteRows(toDeleteRows);
   }
@@ -70,11 +70,11 @@ export function updateObjectRows(newObjectCount) {
 
 export function toggleInlineInputsDisabledOnParentChange(
   fieldName,
-  inputValue
+  inputValue,
 ) {
   const parentHasValue = inputValue !== "",
     inlineInputs = getObjectsInlineEl().querySelectorAll(
-      `.field-${fieldName} input`
+      `.field-${fieldName} input`,
     );
   inlineInputs.forEach((el) => (el.disabled = parentHasValue));
 }

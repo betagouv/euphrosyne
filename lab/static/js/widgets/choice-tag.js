@@ -11,7 +11,7 @@
           });
         event.target.setAttribute("aria-pressed", true);
         const input = event.target.parentElement.querySelector(
-          "input[type='hidden']"
+          "input[type='hidden']",
         );
         input.value = event.target.dataset.value;
         input.dispatchEvent(new Event("change"));

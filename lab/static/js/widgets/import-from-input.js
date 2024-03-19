@@ -28,7 +28,7 @@
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": document.querySelector(
-          "input[name='csrfmiddlewaretoken']"
+          "input[name='csrfmiddlewaretoken']",
         ).value,
       },
       body: JSON.stringify({
@@ -72,7 +72,7 @@
     // Check if the input value is empty
     if (!inputEl.value) {
       inputEl.setCustomValidity(
-        window.gettext("You must enter a valid value for this field.")
+        window.gettext("You must enter a valid value for this field."),
       );
       importFromInputEl.closest("form").reportValidity();
       return;
@@ -93,7 +93,7 @@
         if (response.status === 404) {
           displayErrorMessage(
             importFromInputEl,
-            window.gettext("No results found.")
+            window.gettext("No results found."),
           );
           return;
         } else if (!response.ok) {
@@ -106,7 +106,7 @@
           if (datasetKey in importFromInputEl.dataset) {
             // Update the corresponding input field with the fetched data
             document.getElementById(
-              importFromInputEl.dataset[datasetKey]
+              importFromInputEl.dataset[datasetKey],
             ).value = data[key];
           }
         }
@@ -117,8 +117,8 @@
         displayErrorMessage(
           importFromInputEl,
           window.gettext(
-            "An error occured while retrieving the object. Please contact AGLAE team if the error persists."
-          )
+            "An error occured while retrieving the object. Please contact AGLAE team if the error persists.",
+          ),
         );
       })
       .finally(() => {

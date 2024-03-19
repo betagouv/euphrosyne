@@ -36,7 +36,7 @@ async function fetchUpcomingProjects(): Promise<UpcomingProject[]> {
 
 export default function UpcomingProjects(): JSX.Element {
   const [upcomingProjects, setUpcomingProjects] = useState<UpcomingProject[]>(
-    []
+    [],
   );
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {

@@ -53,7 +53,7 @@ export const getFileInputCustomValidity = (files: File[] | null) => {
   if (notSupportedFormats.length > 0) {
     return window.interpolate(
       window.gettext("The following file formats are not accepted : %s"),
-      [notSupportedFormats.join(", ")]
+      [notSupportedFormats.join(", ")],
     );
   }
 

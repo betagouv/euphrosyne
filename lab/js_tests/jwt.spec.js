@@ -36,7 +36,7 @@ describe("Test getToken", () => {
       expect(fetchTokenMock).toHaveBeenCalled();
       expect(setItemMock).toHaveBeenCalledWith(
         "euphrosyne-jwt-access",
-        "remote token"
+        "remote token",
       );
     });
 
@@ -52,7 +52,7 @@ describe("Test getToken", () => {
       expect(fetchTokenMock).toHaveBeenCalled();
       expect(setItemMock).toHaveBeenCalledWith(
         "euphrosyne-jwt-access",
-        "remote token"
+        "remote token",
       );
     });
   });

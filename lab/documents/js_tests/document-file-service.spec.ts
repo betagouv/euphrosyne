@@ -6,7 +6,7 @@ describe("Test document file service", () => {
   beforeEach(() => {
     fileService = new DocumentFileService(
       "http://listfileurl",
-      "https://fetchpresignedurl"
+      "https://fetchpresignedurl",
     );
   });
 
@@ -19,15 +19,15 @@ describe("Test document file service", () => {
           .spyOn(fileService, "uploadBytesToFile")
           .mockImplementation(() =>
             Promise.resolve(
-              new Response("body", { status: 200, statusText: "OK" })
-            )
+              new Response("body", { status: 200, statusText: "OK" }),
+            ),
           );
 
       const { file } = await fileService.uploadFile(
         new File([new ArrayBuffer(6000000)], "hello", {
           type: "text/plain",
         }),
-        "url"
+        "url",
       );
 
       expect(createEmptyFileSpy).toHaveBeenCalled();
@@ -36,28 +36,28 @@ describe("Test document file service", () => {
         "url",
         new Blob(),
         0,
-        4000000 - 1
+        4000000 - 1,
       );
       expect(uploadBytesToFileSpy).toHaveBeenNthCalledWith(
         2,
         "url",
         new Blob(),
         4000000,
-        6000000 - 1
+        6000000 - 1,
       );
       expect(file.name).toBe("hello");
     });
 
     it("throws error if one upload fail", async () => {
       vi.spyOn(fileService, "createEmptyFile").mockImplementation(() =>
-        Promise.resolve()
+        Promise.resolve(),
       );
       const uploadBytesToFileSpy = vi
         .spyOn(fileService, "uploadBytesToFile")
         .mockImplementation(() =>
           Promise.resolve(
-            new Response("body", { status: 200, statusText: "OK" })
-          )
+            new Response("body", { status: 200, statusText: "OK" }),
+          ),
         )
         .mockImplementationOnce(() => Promise.reject()); // Reject on second call
 

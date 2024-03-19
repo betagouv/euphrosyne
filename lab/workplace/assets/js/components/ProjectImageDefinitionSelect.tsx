@@ -18,10 +18,10 @@ export default function ProjectImageDefinitionSelect({
     Default: window.gettext("Default"),
     "Used to determine the image definition used to create the VM.":
       window.gettext(
-        "Used to determine the image definition used to create the VM."
+        "Used to determine the image definition used to create the VM.",
       ),
     "An error ocurred while setting project image definition": window.gettext(
-      "An error ocurred while setting project image definition"
+      "An error ocurred while setting project image definition",
     ),
   };
 
@@ -37,7 +37,7 @@ export default function ProjectImageDefinitionSelect({
   }, []);
 
   const onSelectionChange = async (
-    event: React.ChangeEvent<HTMLSelectElement>
+    event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     if (hasError) setHasError(false);
     const { value } = event.target;
