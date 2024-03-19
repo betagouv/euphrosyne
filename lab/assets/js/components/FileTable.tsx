@@ -50,14 +50,16 @@ export default function FileTable({
   const numCols = actionCell ? cols.length + 1 : cols.length;
 
   const filteredRows = rows.filter((row) =>
-    filterText !== "" ? row.name.includes(filterText) : true
+    filterText !== ""
+      ? row.name.toLowerCase().includes(filterText.toLowerCase())
+      : true
   );
 
   const displayedRows = isExpanded
     ? filteredRows
     : filteredRows.slice(0, COLLAPSED_ROW_NUM);
 
-  const filterInputId = "search-" + Math.random().toString(36).substr(2, 16);
+  const filterInputId = "search-" + Math.random().toString(36).substring(2, 16);
 
   return (
     <>
