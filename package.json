@@ -45,7 +45,7 @@
     "@fullcalendar/react": "^6.1.11",
     "@gouvfr/dsfr": "^1.11.2",
     "@types/react": "^18.2.61",
-    "@types/react-dom": "^18.2.18",
+    "@types/react-dom": "^18.2.22",
     "css-loader": "^6.10.0",
     "css-minimizer-webpack-plugin": "^6.0.0",
     "dotenv": "^16.4.5",
