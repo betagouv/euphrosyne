@@ -296,6 +296,21 @@ class TestProjectChangeList(TestCase):
         assert hasattr(result, "first_run_date")
         assert hasattr(result, "number_of_runs")
 
+    def test_projects_with_one_date_is_included(self):
+        scheduled_project = RunFactory(
+            start_date=timezone.now() + timezone.timedelta(days=1)
+        ).project
+        RunFactory(start_date=None, end_date=None, project=scheduled_project)
+
+        project_admin = ProjectAdmin(model=Project, admin_site=AdminSite())
+        request = RequestFactory().get(reverse("admin:lab_project_changelist"))
+        request.user = LabAdminUserFactory()
+
+        cl = project_admin.get_changelist_instance(request)
+        qs = cl.get_queryset(request)
+
+        assert qs.filter(id=scheduled_project.id).exists()
+
 
 class TestProjectDisplayMixin(TestCase):
     def setUp(self):
