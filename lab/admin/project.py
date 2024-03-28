@@ -51,8 +51,9 @@ class ProjectChangeList(ChangeList):
         qs = super().get_queryset(request, exclude_parameters)
         if request.method == "POST" and request.POST.get("action") == "delete_selected":
             return qs  # use more general queryset for delete action
+        to_schedule_ids = qs.only_to_schedule().values_list("id", flat=True)
         return (
-            qs.exclude(runs__start_date__isnull=True)
+            qs.exclude(id__in=to_schedule_ids)
             .distinct()
             .annotate_first_run_date()
             .annotate(number_of_runs=Count("runs"))
