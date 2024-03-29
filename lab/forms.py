@@ -226,7 +226,6 @@ class BaseRunDetailsForm(ModelForm):
 class RunDetailsForm(BaseRunDetailsForm):
     class Meta(BaseRunDetailsForm.Meta):
         fields = (
-            "label",
             "beamline",
             *[f.name for f in models.Run.get_method_fields()],
             *[f.name for f in models.Run.get_detector_fields()],

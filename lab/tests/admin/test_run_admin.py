@@ -220,6 +220,43 @@ class TestRunAdminViewAsLeader(TestCase):
 
         assert response.status_code == 302
 
+    @patch("django.middleware.csrf.CsrfViewMiddleware._check_token", lambda *args: None)
+    def test_changing_run(self):
+        run = factories.RunFactory(label="Run 1", project=self.project)
+        data = {
+            "particle_type": "Proton",
+            "energy_in_keV_Proton": "1000",
+            "energy_in_keV_Alpha+particle": "",
+            "energy_in_keV_Deuton": "",
+            "beamline": "Microbeam",
+            "method_PIXE": "on",
+            "detector_LE0": "on",
+            "filters_for_detector_LE0": "Helium",
+            "filters_for_detector_HE1": "",
+            "filters_for_detector_HE2": "",
+            "filters_for_detector_HE3": "",
+            "filters_for_detector_HE4": "",
+            "detector_IBIL_other": "",
+            "detector_FORS_other": "",
+            "detector_ERDA": "",
+            "detector_NRA": "",
+        }
+
+        self.client.force_login(self.project_leader_user)
+        self.client.post(
+            reverse("admin:lab_run_change", args=[run.id]),
+            data=data,
+        )
+
+        run = Run.objects.get(pk=run.id)
+        assert run.particle_type == "Proton"
+        assert run.energy_in_keV == 1000
+        assert run.beamline == "Microbeam"
+        assert run.method_PIXE
+        assert run.detector_LE0
+        assert run.filters_for_detector_LE0 == "Helium"
+        assert not run.filters_for_detector_HE1
+
 
 class TestRunAdminViewAsAdmin(TestCase):
     def setUp(self):

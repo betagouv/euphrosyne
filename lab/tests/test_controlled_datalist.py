@@ -92,7 +92,7 @@ def test_form_fails_gracefully_with_incoherent_controller_input():
 def test_form_doesnt_raise_for_energy_when_other_errors():
     form = RunDetailsForm(
         data={
-            "beamline": "Microbeam",
+            "beamline": "WRONG",
             "energy_in_keV_Proton": 1,
             "energy_in_keV_Alpha particle": 2,
             "energy_in_keV_Deuton": "",
@@ -103,5 +103,5 @@ def test_form_doesnt_raise_for_energy_when_other_errors():
     )
     with patch.object(QuerySet, "exists", return_value=False):
         assert not form.is_valid()
-    assert form.has_error("label")
+    assert form.has_error("beamline")
     assert not form.has_error("energy_in_keV")
