@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models.constraints import UniqueConstraint
 from django.utils.translation import gettext_lazy as _
 
-from shared.models import LowerCharField, TimestampedModel
+from shared.models import TimestampedModel
 
 
 class Participation(TimestampedModel):
@@ -40,9 +40,17 @@ class Participation(TimestampedModel):
 
 
 class Institution(models.Model):
-    name = LowerCharField(verbose_name=_("name"), max_length=255)
-    country = LowerCharField(
+    name = models.CharField(verbose_name=_("name"), max_length=255)
+    country = models.CharField(
         verbose_name=_("country"), max_length=255, blank=True, null=True
+    )
+
+    ror_id = models.CharField(
+        verbose_name="ROR ID",
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Research Organization Registry ID",
     )
 
     class Meta:

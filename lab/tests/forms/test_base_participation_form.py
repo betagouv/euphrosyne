@@ -1,36 +1,41 @@
 import pytest
 
 from lab.models import Institution
+from lab.tests.factories import ParticipationFactory
 
 from ...forms import BaseParticipationForm
 from ...widgets import InstitutionAutoCompleteWidget
 
 
 @pytest.mark.django_db
-def test_form_institution_widget_choices():
-    Institution.objects.create(name="I2", country="france")
-    Institution.objects.create(name="I1", country="spain")
+def test_form_institution_widget_instance_when_editing():
+    participation = ParticipationFactory()
 
+    form = BaseParticipationForm(instance=participation)
+
+    assert isinstance(form.fields["institution"].widget, InstitutionAutoCompleteWidget)
+    assert form.fields["institution"].widget.instance == participation.institution
+
+
+def test_form_institution_widget_instance_when_creating():
     form = BaseParticipationForm()
 
     assert isinstance(form.fields["institution"].widget, InstitutionAutoCompleteWidget)
-
-    choices = list(form.fields["institution"].widget.choices)
-    assert len(choices) == 3
-    assert choices[0] == ("", "---------")
-    assert choices[1][1] == ("i2, france")
-    assert choices[2][1] == ("i1, spain")
+    assert form.fields["institution"].widget.instance is None
 
 
 @pytest.mark.django_db
 def test_try_populate_institution_find_institution():
-    institution = Institution.objects.create(name="institution", country="france")
+    institution = Institution.objects.create(
+        name="institution", country="france", ror_id="test"
+    )
 
     form = BaseParticipationForm()
     form.prefix = prefix = "inst"
     form.data = {
         f"{prefix}-institution__name": "institution",
         f"{prefix}-institution__country": "france",
+        f"{prefix}-institution__ror_id": "test",
     }
 
     form.try_populate_institution()
@@ -42,6 +47,7 @@ def test_try_populate_institution_find_institution():
 def test_try_populate_institution_create_institution():
     name = "some_institution"
     country = "azerty"
+    ror_id = "test"
 
     form = BaseParticipationForm()
     form.prefix = prefix = "inst"
@@ -49,9 +55,10 @@ def test_try_populate_institution_create_institution():
     form.data = {
         f"{prefix}-institution__name": name,
         f"{prefix}-institution__country": country,
+        f"{prefix}-institution__ror_id": ror_id,
     }
 
     form.try_populate_institution()
 
-    institution = Institution.objects.get(name=name, country=country)
+    institution = Institution.objects.get(name=name, country=country, ror_id=ror_id)
     assert form.data[f"{prefix}-institution"] == institution.pk

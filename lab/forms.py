@@ -32,6 +32,8 @@ class BaseParticipationForm(ModelForm):
             initial = {**(initial or {}), "user": instance.user.email}
         super().__init__(initial=initial, instance=instance, **kwargs)
         self.fields["user"].widget.attrs["placeholder"] = _("Email")
+        if instance:
+            self.fields["institution"].widget.instance = instance.institution
 
     def try_populate_institution(self):
         if not self.data.get(f"{self.prefix}-institution") and self.data.get(
@@ -43,6 +45,7 @@ class BaseParticipationForm(ModelForm):
             ) = models.Institution.objects.get_or_create(
                 name=self.data[f"{self.prefix}-institution__name"],
                 country=self.data.get(f"{self.prefix}-institution__country"),
+                ror_id=self.data.get(f"{self.prefix}-institution__ror_id"),
             )
             self.data[f"{self.prefix}-institution"] = institution.pk
 
@@ -59,6 +62,7 @@ class BaseParticipationForm(ModelForm):
 
     def save(self, commit: bool = ...) -> models.Participation:
         is_new = self.instance.pk is None
+        self.instance.is_leader = False
         instance = super().save(commit=commit)
         if is_new:
             user: User = instance.user
@@ -71,13 +75,7 @@ class BaseParticipationForm(ModelForm):
     class Meta:
         model = models.Participation
         fields = ("user", "institution")
-        widgets = {
-            "institution": widgets.InstitutionAutoCompleteWidget(
-                choices=models.Institution.objects.values_list(
-                    "id", "name", "country"
-                ).order_by("-name")
-            )
-        }
+        widgets = {"institution": widgets.InstitutionAutoCompleteWidget()}
         labels = {"institution": _("Institution")}
 
 
@@ -102,8 +100,10 @@ class LeaderParticipationForm(BaseParticipationForm):
         self.fields["user"].label = _("Leader")
 
     def save(self, commit: bool = ...) -> models.Participation:
+        super().save(commit=False)
         self.instance.is_leader = True
-        return super().save(commit=commit)
+        self.instance.save()
+        self._save_m2m()
 
 
 class ChangeLeaderForm(Form):
