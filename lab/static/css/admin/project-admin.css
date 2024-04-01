@@ -12,7 +12,7 @@ body.change-list {
 
 #participation_set-group .field-user input {
   max-width: unset;
-  width: 30rem;
+  width: 100%;
 }
 
 #participation_set-group td.delete input {
@@ -22,6 +22,22 @@ body.change-list {
 
 #participation_set-group td .autocomplete-input {
   min-width: 500px;
+}
+
+#participation_set-group .typeahead-field {
+  width: 60%;
+}
+
+#participation_set-group .autocomplete-input__country {
+  width: 40%;
+}
+
+#participation_set-group .delete {
+  vertical-align: middle;
+}
+
+#participation_set-group.inline-group {
+  overflow: inherit !important; /* for typeahead list to be absolute */
 }
 
 #participation_set-group tbody th {

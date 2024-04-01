@@ -14,6 +14,8 @@ from django.forms.widgets import (
 )
 from django.urls import reverse
 
+from lab.models.participation import Institution
+
 
 class UserWidgetWrapper(RelatedFieldWidgetWrapper):
     # pylint: disable=too-many-arguments
@@ -46,9 +48,7 @@ class InstitutionAutoCompleteWidget(Widget):
     input_type = "text"
     template_name = "widgets/institution_autocomplete_widget.html"
 
-    def __init__(self, attrs: dict[str, Any] | None = None, choices=None) -> None:
-        self.choices = choices
-        super().__init__(attrs)
+    instance: Institution | None = None
 
     def get_context(
         self, name: str, value: Any, attrs: dict[str, Any] | None
@@ -56,19 +56,17 @@ class InstitutionAutoCompleteWidget(Widget):
         attrs = attrs or {}
         attrs["class"] = "fr-input"
         context = super().get_context(name, value, attrs)
-        context["widget"]["choices"] = self.choices
-        context["widget"]["instance"] = next(
-            (
-                choice[0].instance
-                for choice in list(self.choices)
-                if choice[0] and choice[0].instance.id == value
-            ),
-            None,
-        )
+        if self.instance:
+            context["widget"]["instance"] = self.instance
+        elif value:
+            context["widget"]["instance"] = Institution.objects.get(pk=value)
+        else:
+            context["widget"]["instance"] = None
         return context
 
     class Media:
         js = ("js/widgets/institution-autocomplete-widget.js",)
+        css = {"all": ("css/widgets/institution-autocomplete-widget.css",)}
 
 
 class InstitutionWidgetWrapper(RelatedFieldWidgetWrapper):
