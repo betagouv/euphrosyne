@@ -3,13 +3,16 @@
 (function () {
   const baseSelector = ".autocomplete-input";
 
-  let fetchTimeoutId = null; // for debouncing when fetching from ROR API
+  function onResultClicked(event) {
+    const {
+      id,
+      attrs: { country, name },
+    } = event.detail.result;
 
-  function onResultClicked(event, { country, name, rorId }) {
     const parentField = event.target.closest(".field-institution");
     parentField.querySelector(".autocomplete-input__name").value = name;
     parentField.querySelector(".autocomplete-input__country").value = country;
-    parentField.querySelector(".autocomplete-input__ror_id").value = rorId;
+    parentField.querySelector(".autocomplete-input__ror_id").value = id;
 
     parentField.querySelector(".typeahead-list").classList.add("hidden");
   }
@@ -23,77 +26,21 @@
     }
   }
 
-  function onCountryInput(event) {
-    onCountryOrNameInput(event);
-  }
-
-  async function onNameInput(event) {
-    // On institution name input, fetch institutions from ROR API
-    const parentElement = event.target.parentElement;
-
-    onCountryOrNameInput(event);
-
-    if (fetchTimeoutId) {
-      clearTimeout(fetchTimeoutId); // debounce
-    }
-
-    fetchTimeoutId = setTimeout(async () => {
-      const response = await fetch(
-        "https://api.ror.org/organizations?query=" +
-          encodeURIComponent(event.target.value),
-      );
-
-      if (!response.ok) {
-        return;
-      }
-
-      const results = (await response.json()).items;
-
-      const typeaheadList = parentElement.querySelector(".typeahead-list");
-
-      typeaheadList.classList.remove("hidden");
-
-      typeaheadList.querySelectorAll("button").forEach((o) => o.remove());
-      results.forEach((result) => {
-        const buttonElement = document.createElement("button");
-        buttonElement.textContent = `${result.name}, ${result.country?.country_name}`;
-        buttonElement.id = result.id;
-        buttonElement.type = "button";
-        buttonElement.addEventListener("click", (event) =>
-          onResultClicked(event, {
-            country: result.country?.country_name,
-            name: result.name,
-            rorId: result.id,
-          }),
-        );
-        parentElement
-          .querySelector(".typeahead-list")
-          .appendChild(buttonElement);
-      });
-    }, 500);
-  }
-
   document.addEventListener("DOMContentLoaded", function () {
     // Add event listeners to institution input elements
     document.querySelectorAll(`${baseSelector}`).forEach((el) => {
       el.querySelector(`${baseSelector}__name`).addEventListener(
         "input",
-        onNameInput,
+        onCountryOrNameInput,
       );
       el.querySelector(`${baseSelector}__country`).addEventListener(
         "input",
-        onCountryInput,
+        onCountryOrNameInput,
       );
-    });
-
-    document.addEventListener("click", function (event) {
-      // Hide typeahead list when clicking outside
-      document.querySelectorAll(".typeahead-list").forEach((el) => {
-        const isInside = el.contains(event.target);
-        if (!isInside && !el.classList.contains("hidden")) {
-          el.classList.add("hidden");
-        }
-      });
+      el.querySelector("div[is='institution-type-ahead']").addEventListener(
+        "result-click",
+        onResultClicked,
+      );
     });
 
     setTimeout(() => {
@@ -107,10 +54,19 @@
           const lastElement = elements[elements.length - 1];
           lastElement
             .querySelector(`${baseSelector}__name`)
-            .addEventListener("input", onNameInput);
+            .addEventListener("input", onCountryOrNameInput);
           lastElement
             .querySelector(`${baseSelector}__country`)
-            .addEventListener("input", onCountryInput);
+            .addEventListener("input", onCountryOrNameInput);
+          lastElement
+            .querySelector("div[is='institution-type-ahead']")
+            .setAttribute(
+              "html-for",
+              lastElement.querySelector(`${baseSelector}__name`).id,
+            );
+          lastElement
+            .querySelector("div[is='institution-type-ahead']")
+            .addEventListener("result-click", onResultClicked);
         });
     }, 300);
   });

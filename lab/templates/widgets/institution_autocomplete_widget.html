@@ -2,11 +2,11 @@
 
 <div class="autocomplete-input flex-container">
   <div class="typeahead-field fr-mr-1w">
-    <input name="{{ widget.name }}__name" {% if widget.instance %}value="{{ widget.instance.name }}"{% endif %} id="{{widget.id}}__name" class="fr-input autocomplete-input__name" placeholder="{% translate "Institution" %}"  autocomplete="off">
-    <div class="typeahead-list"></div>
+    <input name="{{ widget.name }}__name" {% if widget.instance %}value="{{ widget.instance.name }}"{% endif %} id="{{widget.attrs.id}}__name" class="fr-input autocomplete-input__name" placeholder="{% translate "Institution" %}"  autocomplete="off">
+    <div is="institution-type-ahead" class="typeahead-list" html-for="{{ widget.attrs.id }}__name"></div>
   </div>
-  <input name="{{ widget.name }}__country" {% if widget.instance %}value="{{ widget.instance.country }}"{% endif %} id="{{widget.id}}__country" class="fr-input autocomplete-input__country" placeholder="{% translate "Country" %}">
+  <input name="{{ widget.name }}__country" {% if widget.instance %}value="{{ widget.instance.country }}"{% endif %} id="{{widget.attrs.id}}__country" class="fr-input autocomplete-input__country" placeholder="{% translate "Country" %}">
   
-  <input type="hidden" {% if widget.value %}value="{{ widget.value }}"{% endif %} name="{{ widget.name }}" id="{{widget.id}}" class="fr-input autocomplete-input__id">
-  <input type="hidden" {% if widget.instance %}value="{{ widget.instance.ror_id }}"{% endif %} name="{{ widget.name }}__ror_id" id="{{widget.id}}__ror_id" class="fr-input autocomplete-input__ror_id">
+  <input type="hidden" {% if widget.value %}value="{{ widget.value }}"{% endif %} name="{{ widget.name }}" id="{{widget.attrs.id}}" class="fr-input autocomplete-input__id">
+  <input type="hidden" {% if widget.instance %}value="{{ widget.instance.ror_id }}"{% endif %} name="{{ widget.name }}__ror_id" id="{{widget.attrs.id}}__ror_id" class="fr-input autocomplete-input__ror_id">
 </div>

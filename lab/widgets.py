@@ -65,7 +65,10 @@ class InstitutionAutoCompleteWidget(Widget):
         return context
 
     class Media:
-        js = ("js/widgets/institution-autocomplete-widget.js",)
+        js = (
+            "web-components/institution-type-ahead.js",
+            "js/widgets/institution-autocomplete-widget.js",
+        )
         css = {"all": ("css/widgets/institution-autocomplete-widget.css",)}
 
 
