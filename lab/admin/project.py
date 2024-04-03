@@ -87,7 +87,7 @@ class ParticipationFormSet(BaseInlineFormSet):
                 form.fields["DELETE"].disabled = True
 
     def get_queryset(self):
-        return super().get_queryset().order_by("-is_leader")
+        return super().get_queryset().order_by("-is_leader", "created")
 
     def full_clean(self):
         for form in self:
