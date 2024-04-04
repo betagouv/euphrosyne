@@ -1,7 +1,8 @@
+import pytest
 from django.forms import widgets
 
 from ...forms import ObjectGroupAddChoices, ObjectGroupForm
-from ...models import ObjectGroup
+from ...models import Location, ObjectGroup
 
 
 def test_form_render_single_object_initial_values():
@@ -29,3 +30,88 @@ def test_set_add_type_when_instance_is_group():
 def test_set_object_count_widget_when_instance_is_group():
     object_form = ObjectGroupForm(instance=ObjectGroup(id=1, object_count=30))
     assert isinstance(object_form.fields["object_count"].widget, widgets.NumberInput)
+
+
+@pytest.mark.django_db
+def test_try_populate_discovery_place_location_find_discovery_place_location():
+    discovery_place_location = Location.objects.create(
+        label="Location, France", geonames_id=1234
+    )
+
+    form = ObjectGroupForm()
+    form.data = {
+        "discovery_place_location__label": "Location, France",
+        "discovery_place_location__geonames_id": 1234,
+    }
+
+    form.try_populate_discovery_place_location()
+
+    assert form.data["discovery_place_location"] == discovery_place_location.pk
+
+
+@pytest.mark.django_db
+def test_try_populate_discovery_place_location_create_discovery_place_location():
+    label = "Location, France"
+    geonames_id = 1234
+
+    form = ObjectGroupForm()
+
+    form.data = {
+        "discovery_place_location__label": label,
+        "discovery_place_location__geonames_id": geonames_id,
+    }
+
+    form.try_populate_discovery_place_location()
+
+    discovery_place_location = Location.objects.get(
+        label=label, geonames_id=geonames_id
+    )
+    assert form.data["discovery_place_location"] == discovery_place_location.pk
+
+
+@pytest.mark.django_db
+def test_try_populate_discovery_place_location_created_with_lat_and_long():
+    label = "Location, France"
+    geonames_id = 1234
+    latitude = 48.8566
+    longitude = 2.3522
+
+    form = ObjectGroupForm()
+
+    form.data = {
+        "discovery_place_location__label": label,
+        "discovery_place_location__geonames_id": geonames_id,
+        "discovery_place_location__latitude": latitude,
+        "discovery_place_location__longitude": longitude,
+    }
+
+    form.try_populate_discovery_place_location()
+
+    assert Location.objects.get(
+        label=label, geonames_id=geonames_id, latitude=latitude, longitude=longitude
+    )
+
+
+@pytest.mark.django_db
+def test_try_populate_discovery_place_location_updates_lat_and_long():
+    label = "Location, France"
+    geonames_id = 1234
+    latitude = 48.8566
+    longitude = 2.3522
+
+    Location.objects.create(label=label, geonames_id=geonames_id)
+
+    form = ObjectGroupForm()
+
+    form.data = {
+        "discovery_place_location__label": label,
+        "discovery_place_location__geonames_id": geonames_id,
+        "discovery_place_location__latitude": latitude,
+        "discovery_place_location__longitude": longitude,
+    }
+
+    form.try_populate_discovery_place_location()
+
+    assert Location.objects.get(
+        label=label, geonames_id=geonames_id, latitude=latitude, longitude=longitude
+    )

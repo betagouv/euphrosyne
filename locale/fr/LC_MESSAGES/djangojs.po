@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-19 14:55+0100\n"
+"POT-Creation-Date: 2024-04-04 19:03+0200\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -40,6 +40,12 @@ msgstr "Sélectionner un langage"
 
 msgid "User"
 msgstr "Utilisateur"
+
+msgid "An error occured while fetching results"
+msgstr "Une erreur s'est produite lors la recherche"
+
+msgid "No results"
+msgstr "Aucun résultat"
 
 #, javascript-format
 msgid "Delete the document %s ?"

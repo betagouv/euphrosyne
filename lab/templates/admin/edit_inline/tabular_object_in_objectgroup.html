@@ -6,7 +6,7 @@
       <h3 class="fr-accordion__title">
         <button type="button" 
           class="fr-accordion__btn" 
-          aria-expanded="{% if are_objects_differentiated or inline_admin_formset.formset.csv_differentiation_errors %}true{% else %}false{% endif %}" 
+          aria-expanded="{% if inline_admin_formset.formset.csv_differentiation_errors %}true{% else %}false{% endif %}" 
           aria-controls="differentiation-accordion-csv"
         >
           {% translate "Differentiate objects" %} ({% translate "CSV upload" %})

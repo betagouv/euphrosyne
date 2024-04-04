@@ -4,6 +4,7 @@ import pytest
 from django.utils import timezone
 from graphene.test import Client
 
+from lab.objects.models import Location
 from lab.schema import schema
 
 from .factories import FinishedProject, ObjectGroupFactory, ProjectFactory, RunFactory
@@ -115,7 +116,8 @@ def test_resolve_project_detail(client):
 
 @pytest.mark.django_db
 def test_resolve_object_group_detail(client):
-    objectgroup = ObjectGroupFactory()
+    location = Location.objects.create(label="Location")
+    objectgroup = ObjectGroupFactory(discovery_place_location=location)
     objectgroup.runs.add(FinishedProject().runs.first())
     executed = client.execute(
         """

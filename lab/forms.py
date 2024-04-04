@@ -62,7 +62,6 @@ class BaseParticipationForm(ModelForm):
 
     def save(self, commit: bool = ...) -> models.Participation:
         is_new = self.instance.pk is None
-        self.instance.is_leader = False
         instance = super().save(commit=commit)
         if is_new:
             user: User = instance.user

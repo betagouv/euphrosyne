@@ -40,6 +40,7 @@ export default {
       "@gouvfr/dsfr/dist/utility/colors/colors.min.css",
       "remixicon/fonts/remixicon.css",
     ],
+    // js/ts page files
     ...Object.assign(
       {},
       ...globSync("./**/assets/js/pages/*.{js,ts}", { dotRelative: true }).map(
@@ -52,6 +53,20 @@ export default {
           };
         },
       ),
+    ),
+    // js/ts web-components files
+    ...Object.assign(
+      {},
+      ...globSync("./**/assets/js/web-components/*.{js,ts}", {
+        dotRelative: true,
+      }).map((file) => {
+        return {
+          [file.split("/").pop().split(".").shift()]: {
+            import: file,
+            filename: "./web-components/[name].js",
+          },
+        };
+      }),
     ),
   },
   output: {
@@ -106,6 +121,7 @@ export default {
     new webpack.EnvironmentPlugin({
       MATOMO_SITE_ID: null,
       EUPHROSYNE_TOOLS_API_URL: null,
+      GEONAMES_USERNAME: "",
     }),
     new MiniCssExtractPlugin(),
     new PurgeCSSPlugin({
