@@ -33,3 +33,12 @@ input[type="submit"][disabled].default {
   max-width: 500px;
   margin-bottom: 1rem;
 }
+
+.field-discovery_place_location {
+  overflow: initial;
+}
+
+.location-autocomplete-input__label {
+  width: 20em;
+  margin-top: .5rem;
+}

@@ -1,18 +1,18 @@
 import pytest
 
 from ...models.participation import Institution
-from ...widgets import InstitutionAutoCompleteWidget
+from ...widgets import AutoCompleteWidget
 
 
 def test_context_when_instance_is_none():
-    widget = InstitutionAutoCompleteWidget()
+    widget = AutoCompleteWidget()
     context = widget.get_context("name", None, {"attrs": "attrs"})
     assert context["widget"]["instance"] is None
 
 
 def test_context_when_instance_is_not_none():
     institution = Institution()
-    widget = InstitutionAutoCompleteWidget()
+    widget = AutoCompleteWidget()
     widget.instance = institution
     context = widget.get_context("name", None, {"attrs": "attrs"})
     assert context["widget"]["instance"] == institution
@@ -21,6 +21,7 @@ def test_context_when_instance_is_not_none():
 @pytest.mark.django_db
 def test_context_when_value():
     institution = Institution.objects.create(name="I", country="france")
-    widget = InstitutionAutoCompleteWidget()
+    widget = AutoCompleteWidget()
+    widget.model = Institution
     context = widget.get_context("name", institution.pk, {"attrs": "attrs"})
     assert context["widget"]["instance"] == institution

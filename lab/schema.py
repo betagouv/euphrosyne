@@ -26,6 +26,7 @@ class ObjectType(DjangoObjectType):
 
 class ObjectGroupType(DjangoObjectType):
     data_available = graphene.Boolean(required=True)
+    discovery_place = graphene.String()
 
     class Meta:
         model = ObjectGroup
@@ -51,6 +52,9 @@ class ObjectGroupType(DjangoObjectType):
                 https://docs.djangoproject.com/en/4.2/topics/db/aggregation/"
             )
         return self.is_data_available
+
+    def resolve_discovery_place(self, info):
+        return self.discovery_place_location.label if self.discovery_place else ""
 
 
 class InstitutionType(DjangoObjectType):

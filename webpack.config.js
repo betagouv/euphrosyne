@@ -121,6 +121,7 @@ export default {
     new webpack.EnvironmentPlugin({
       MATOMO_SITE_ID: null,
       EUPHROSYNE_TOOLS_API_URL: null,
+      GEONAMES_USERNAME: "",
     }),
     new MiniCssExtractPlugin(),
     new PurgeCSSPlugin({

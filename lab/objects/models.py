@@ -5,6 +5,25 @@ from django.utils.translation import gettext_lazy as _
 from shared.models import TimestampedModel
 
 
+class Location(models.Model):
+    label: str = models.CharField(_("Name"), max_length=255)
+    latitude = models.FloatField(_("Latitude"), blank=True, null=True)
+    longitude = models.FloatField(_("Longitude"), blank=True, null=True)
+
+    geonames_id = models.IntegerField("Geonames ID", blank=True, null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["label"], name="unique_label"),
+            models.UniqueConstraint(
+                fields=["latitude", "longitude"], name="unique_lat_long"
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return str(self.label)
+
+
 class ObjectGroup(TimestampedModel):
     c2rmf_id = models.CharField(
         _("C2RMF ID"),
@@ -34,16 +53,24 @@ class ObjectGroup(TimestampedModel):
         verbose_name=_("Materials"),
         default=list,
     )
-    discovery_place = models.CharField(
-        _("Place of discovery"),
-        max_length=255,
+    discovery_place_location = models.ForeignKey(
+        Location,
+        on_delete=models.PROTECT,
+        verbose_name=_("Place of discovery"),
         blank=True,
+        null=True,
     )
     collection = models.CharField(
         _("Collection"),
         max_length=255,
         blank=True,
     )
+
+    @property
+    def discovery_place(self) -> str:
+        if not self.discovery_place_location:
+            return ""
+        return self.discovery_place_location.label
 
     def __str__(self) -> str:
         label = self.label

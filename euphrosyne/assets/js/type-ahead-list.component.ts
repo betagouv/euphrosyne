@@ -58,13 +58,22 @@ export abstract class TypeAheadList extends HTMLDivElement {
     }
 
     this.timeoutId = setTimeout(async () => {
-      const results = await this.fetchResults(query);
-      this.populateResults(results);
+      try {
+        const results = await this.fetchResults(query);
+        if (results.length === 0) {
+          this.displayNoResultsBanner();
+        } else {
+          this.populateResults(results);
+        }
+      } catch (error) {
+        console.error(error);
+        this.displayErrorBanner();
+      }
     }, 500);
   }
 
   populateResults(results: Result[]) {
-    this.querySelectorAll("button").forEach((o) => o.remove());
+    this.cleanList();
     results.forEach((result) => {
       const button = document.createElement("button");
       button.textContent = result.label;
@@ -77,5 +86,29 @@ export abstract class TypeAheadList extends HTMLDivElement {
       this.appendChild(button);
       this.classList.remove("hidden");
     });
+  }
+
+  cleanList() {
+    Array.from(this.children).forEach((el) => {
+      el.remove();
+    });
+  }
+
+  displayErrorBanner() {
+    const banner = document.createElement("div");
+    banner.textContent = window.gettext(
+      "An error occured while fetching results",
+    );
+    this.cleanList();
+    this.appendChild(banner);
+    this.classList.remove("hidden");
+  }
+
+  displayNoResultsBanner() {
+    const banner = document.createElement("div");
+    banner.textContent = window.gettext("No results");
+    this.cleanList();
+    this.appendChild(banner);
+    this.classList.remove("hidden");
   }
 }

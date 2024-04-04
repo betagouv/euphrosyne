@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from lab import widgets
 
 from .c2rmf import ErosHTTPError, fetch_partial_objectgroup_from_eros
-from .models import ObjectGroup
+from .models import Location, ObjectGroup
 from .widgets import ImportFromInput
 
 logger = logging.getLogger(__name__)
@@ -41,13 +41,17 @@ class ObjectGroupForm(forms.ModelForm):
             "object_count",
             "dating",
             "materials",
-            "discovery_place",
+            "discovery_place_location",
             "inventory",
             "collection",
         )
-        help_texts = {"materials": _("Separate each material with a comma")}
+        help_texts = {
+            "materials": _("Separate each material with a comma"),
+            "discovery_place_location": _("Start typing to search for a location"),
+        }
         widgets = {
             "materials": widgets.TagsInput(),
+            "discovery_place_location": widgets.LocationAutoCompleteWidget(),
         }
 
     def __init__(self, *args, **kwargs: dict[str, Any]):
@@ -68,6 +72,41 @@ class ObjectGroupForm(forms.ModelForm):
             )
             if self.instance.id:
                 self.fields["add_type"].widget.attrs["disabled"] = "disabled"
+
+        if "instance" in kwargs:
+            self.fields["discovery_place_location"].widget.instance = (
+                self.instance.discovery_place_location
+            )
+
+    def full_clean(self):
+        self.try_populate_discovery_place_location()
+        return super().full_clean()
+
+    def try_populate_discovery_place_location(self):
+        if not self.data.get("discovery_place_location") and self.data.get(
+            "discovery_place_location__label"
+        ):
+            (
+                location,
+                _,
+            ) = Location.objects.get_or_create(
+                label=self.data["discovery_place_location__label"],
+                geonames_id=self.data.get("discovery_place_location__geonames_id"),
+            )
+            latitude = self.data.get("discovery_place_location__latitude")
+            longitude = self.data.get("discovery_place_location__longitude")
+            if (
+                latitude
+                and longitude
+                and not location.latitude
+                and not location.longitude
+            ):
+                location.latitude = float(latitude)
+                location.longitude = float(longitude)
+                location.save()
+            # First make a copy of the data because self.data is immutable
+            self.data = self.data.copy()
+            self.data["discovery_place_location"] = location.pk
 
     def is_multipart(self) -> Any:
         if not self.instance.id:
@@ -141,7 +180,7 @@ class ObjectGroupImportC2RMFReadonlyForm(forms.ModelForm):
             "object_count",
             "dating",
             "materials",
-            "discovery_place",
+            "discovery_place_location",
             "inventory",
             "collection",
         )

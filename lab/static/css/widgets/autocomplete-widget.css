@@ -7,7 +7,7 @@
   background-color: var(--background-default-grey);
   position: absolute;
   z-index: 1000;
-  top: 41px;
+  top: 48px;
   width: 300px;
   max-height: 500px;
   overflow: scroll;
@@ -15,7 +15,7 @@
   right: 0;
 }
 
-.typeahead-field .typeahead-list button {
+.typeahead-field .typeahead-list button, .typeahead-field .typeahead-list div {
   text-align: left;
   padding: .75rem 1rem;
   width: 100%;

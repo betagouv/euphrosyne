@@ -1,8 +1,9 @@
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Tuple, Type
 
 from django import forms
 from django.contrib.admin import site
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
+from django.db import models
 from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.forms.widgets import (
     ChoiceWidget,
@@ -15,6 +16,7 @@ from django.forms.widgets import (
 from django.urls import reverse
 
 from lab.models.participation import Institution
+from lab.objects.models import Location
 
 
 class UserWidgetWrapper(RelatedFieldWidgetWrapper):
@@ -44,11 +46,11 @@ class UserWidgetWrapper(RelatedFieldWidgetWrapper):
         return super().get_related_url(info, action, *args)
 
 
-class InstitutionAutoCompleteWidget(Widget):
-    input_type = "text"
-    template_name = "widgets/institution_autocomplete_widget.html"
+class AutoCompleteWidget(Widget):
+    template_name = ""
 
-    instance: Institution | None = None
+    model: Type[models.Model] | None = None
+    instance: models.Model | None = None
 
     def get_context(
         self, name: str, value: Any, attrs: dict[str, Any] | None
@@ -59,17 +61,40 @@ class InstitutionAutoCompleteWidget(Widget):
         if self.instance:
             context["widget"]["instance"] = self.instance
         elif value:
-            context["widget"]["instance"] = Institution.objects.get(pk=value)
+            if self.model is None:
+                raise ValueError("model is required")
+            context["widget"]["instance"] = self.model.objects.get(pk=value)
         else:
             context["widget"]["instance"] = None
         return context
+
+
+class InstitutionAutoCompleteWidget(AutoCompleteWidget):
+    input_type = "text"
+    template_name = "widgets/institution_autocomplete_widget.html"
+
+    model = Institution
 
     class Media:
         js = (
             "web-components/institution-type-ahead.js",
             "js/widgets/institution-autocomplete-widget.js",
         )
-        css = {"all": ("css/widgets/institution-autocomplete-widget.css",)}
+        css = {"all": ("css/widgets/autocomplete-widget.css",)}
+
+
+class LocationAutoCompleteWidget(Widget):
+    input_type = "text"
+    template_name = "widgets/location_autocomplete_widget.html"
+
+    model = Location
+
+    class Media:
+        js = (
+            "web-components/location-type-ahead.js",
+            "js/widgets/location-autocomplete-widget.js",
+        )
+        css = {"all": ("css/widgets/autocomplete-widget.css",)}
 
 
 class InstitutionWidgetWrapper(RelatedFieldWidgetWrapper):

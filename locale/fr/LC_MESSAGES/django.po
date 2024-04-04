@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-13 17:53+0100\n"
+"POT-Creation-Date: 2024-04-04 19:05+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -625,11 +625,20 @@ msgstr "Groupe d'objets"
 msgid "Separate each material with a comma"
 msgstr "Séparez chaque matériau par une virgule"
 
+msgid "Start typing to search for a location"
+msgstr "Commencez à taper pour rechercher un lieu"
+
 msgid "An error occured when importing data from Eros."
 msgstr "Une erreur est survenue lors de l'import via Eros."
 
 msgid "This ID was not found in Eros."
 msgstr "Ce numéro n'a pas été trouvé dans Eros."
+
+msgid "Latitude"
+msgstr "Latitude"
+
+msgid "Longitude"
+msgstr "Longitude"
 
 msgid "C2RMF ID"
 msgstr "Numéro C2RMF"
