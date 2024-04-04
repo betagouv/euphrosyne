@@ -52,7 +52,7 @@
     "glob": "^10.3.12",
     "mini-css-extract-plugin": "^2.8.1",
     "promise-polyfill": "8.3.0",
-    "purgecss-webpack-plugin": "^5.0.0",
+    "purgecss-webpack-plugin": "^6.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "remixicon": "^4.2.0",
