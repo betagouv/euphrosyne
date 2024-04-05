@@ -14,7 +14,7 @@ from django.http import HttpResponse, HttpResponseRedirect, QueryDict
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
-from lab.models.run import Run
+from lab.models import Project, Run
 from lab.permissions import is_lab_admin
 
 from .c2rmf import fetch_full_objectgroup_from_eros
@@ -25,6 +25,30 @@ from .models import Object, ObjectGroup
 
 class CSVValidationError(ValidationError):
     pass
+
+
+class ProjectInline(admin.TabularInline):
+    model = Run.run_object_groups.through
+    verbose_name = "Run"
+    verbose_name_plural = "Runs"
+    extra = 0
+
+    fields = ("run",)
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: Project | None = None
+    ) -> bool:
+        return False
+
+    def has_delete_permission(
+        self, request: HttpRequest, obj: Project | None = None
+    ) -> bool:
+        return False
+
+    def has_add_permission(
+        self, request: HttpRequest, obj: Project | None = None
+    ) -> bool:
+        return False
 
 
 class ObjectFormSet(BaseInlineFormSet):
@@ -185,6 +209,7 @@ class ObjectInline(admin.TabularInline):
 class ObjectGroupAdmin(ModelAdmin):
     inlines = (ObjectInline,)
     form = ObjectGroupForm
+    list_display = ("label", "project_num", "c2rmf_id")
 
     class Media:
         js = ("pages/objectgroup.js",)
@@ -244,6 +269,11 @@ class ObjectGroupAdmin(ModelAdmin):
             )
         ]
         return fieldsets
+
+    def get_inlines(self, request: HttpRequest, obj: ObjectGroup | None):
+        if "run" not in request.GET and is_lab_admin(request.user):
+            return (ObjectInline, ProjectInline)
+        return (ObjectInline,)
 
     def get_object(
         self, request: HttpRequest, object_id: str, from_field=None
@@ -333,6 +363,11 @@ class ObjectGroupAdmin(ModelAdmin):
         if "next" in request.GET:
             return HttpResponseRedirect(request.GET["next"])
         return response
+
+    @admin.display
+    def project_num(self, obj: ObjectGroup) -> int:
+        run_ids = obj.runs.values_list("id", flat=True)
+        return Project.objects.filter(runs__id__in=run_ids).distinct().count()
 
     @staticmethod
     def get_are_objects_differentiated(request: HttpRequest, obj: ObjectGroup = None):

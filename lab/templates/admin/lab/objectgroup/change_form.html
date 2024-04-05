@@ -1,8 +1,24 @@
 {% extends 'admin/change_form.html' %}
+{% load i18n %}
 
 {% block top_header_data %}
+{% if objectgroup_run %}
   {"project": null, "backLink": {
-    "href": "{% url 'admin:lab_run_change' objectgroup_run.id %}",
-    "title": "{{ objectgroup_run.label }}"
-  }}
+      "href": "{% url 'admin:lab_run_change' objectgroup_run.id %}",
+      "title": "{{ objectgroup_run.label }}"
+    }
+  }
+{% elif request.user.is_lab_admin %}
+  {"project": null, "backLink": {
+      "href": "{% url 'admin:lab_objectgroup_changelist' %}",
+      "title": "{% trans "Object groups" %}"
+    } 
+  }
+{% else %}
+  {"project": null, "backLink": {
+      "href": "{% url 'admin:lab_project_changelist' %}",
+      "title": "{% trans "Projects" %}"
+    } 
+  }
+{% endif %}
 {% endblock %}
