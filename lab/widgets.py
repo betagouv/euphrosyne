@@ -83,8 +83,7 @@ class InstitutionAutoCompleteWidget(AutoCompleteWidget):
         css = {"all": ("css/widgets/autocomplete-widget.css",)}
 
 
-class LocationAutoCompleteWidget(Widget):
-    input_type = "text"
+class LocationAutoCompleteWidget(AutoCompleteWidget):
     template_name = "widgets/location_autocomplete_widget.html"
 
     model = Location
