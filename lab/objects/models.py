@@ -5,6 +5,25 @@ from django.utils.translation import gettext_lazy as _
 from shared.models import TimestampedModel
 
 
+class Period(models.Model):
+    label: str = models.CharField(_("Name"), max_length=255)
+
+    theso_joconde_id = models.CharField(
+        "Joconde Thesorus ID", max_length=255, null=True, blank=True
+    )
+
+    def __str__(self) -> str:
+        return str(self.label)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["label"], name="period_unique_label"),
+            models.UniqueConstraint(
+                fields=["theso_joconde_id"], name="period_unique_theso_joconde_id"
+            ),
+        ]
+
+
 class Location(models.Model):
     label: str = models.CharField(_("Name"), max_length=255)
     latitude = models.FloatField(_("Latitude"), blank=True, null=True)
@@ -43,10 +62,12 @@ class ObjectGroup(TimestampedModel):
         max_length=255,
         blank=True,
     )
-    dating = models.CharField(
-        _("Dating"),
-        max_length=255,
+    dating = models.ForeignKey(
+        Period,
+        on_delete=models.PROTECT,
+        verbose_name=_("Dating"),
         blank=True,
+        null=True,
     )
     materials = ArrayField(
         models.CharField(max_length=255),

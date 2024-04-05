@@ -16,7 +16,7 @@ from django.forms.widgets import (
 from django.urls import reverse
 
 from lab.models.participation import Institution
-from lab.objects.models import Location
+from lab.objects.models import Location, Period
 
 
 class UserWidgetWrapper(RelatedFieldWidgetWrapper):
@@ -55,8 +55,6 @@ class AutoCompleteWidget(Widget):
     def get_context(
         self, name: str, value: Any, attrs: dict[str, Any] | None
     ) -> dict[str, Any]:
-        attrs = attrs or {}
-        attrs["class"] = "fr-input"
         context = super().get_context(name, value, attrs)
         if self.instance:
             context["widget"]["instance"] = self.instance
@@ -70,7 +68,6 @@ class AutoCompleteWidget(Widget):
 
 
 class InstitutionAutoCompleteWidget(AutoCompleteWidget):
-    input_type = "text"
     template_name = "widgets/institution_autocomplete_widget.html"
 
     model = Institution
@@ -92,6 +89,19 @@ class LocationAutoCompleteWidget(AutoCompleteWidget):
         js = (
             "web-components/location-type-ahead.js",
             "js/widgets/location-autocomplete-widget.js",
+        )
+        css = {"all": ("css/widgets/autocomplete-widget.css",)}
+
+
+class DatingAutoCompleteWidget(AutoCompleteWidget):
+    template_name = "widgets/dating_autocomplete_widget.html"
+
+    model = Period
+
+    class Media:
+        js = (
+            "web-components/period-type-ahead.js",
+            "js/widgets/dating-autocomplete-widget.js",
         )
         css = {"all": ("css/widgets/autocomplete-widget.css",)}
 

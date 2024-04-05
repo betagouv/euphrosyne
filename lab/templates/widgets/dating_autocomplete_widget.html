@@ -1,0 +1,9 @@
+<div class="dating-autocomplete-input autocomplete-input flex-container">
+  <div class="typeahead-field fr-mr-1w">
+    <input {% if widget.instance %}value="{{ widget.instance.label }}"{% endif %} id="{{widget.attrs.id}}__dating" class="fr-input dating-autocomplete-input__label" name="{{ widget.name }}__label" autocomplete="off"/>
+    <div is="period-type-ahead" class="typeahead-list" html-for="{{ widget.attrs.id }}__dating"></div>
+  </div>
+  
+  <input type="hidden" {% if widget.value %}value="{{ widget.value }}"{% endif %} name="{{ widget.name }}" id="{{widget.attrs.id}}" class="fr-input dating-autocomplete-input__id">
+  <input type="hidden" {% if widget.instance %}value="{{ widget.instance.geonames_id }}"{% endif %} name="{{ widget.name }}__geonames_id" id="{{widget.attrs.id}}__geonames_id" class="fr-input dating-autocomplete-input__theso_joconde_id">
+</div>

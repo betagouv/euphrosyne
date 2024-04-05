@@ -4,7 +4,7 @@ import factory
 import factory.fuzzy
 from django.contrib.auth import get_user_model
 
-from ..models import Object, ObjectGroup, Participation, Project, Run
+from ..models import Object, ObjectGroup, Participation, Period, Project, Run
 
 NOW = datetime.now(tz=timezone.utc)
 
@@ -112,6 +112,13 @@ class RunReadyToAskExecFactory(RunFactory):
     method_PIXE = True
 
 
+class PeriodFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Period
+
+    label = factory.Faker("date")
+
+
 class ObjectFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Object
@@ -124,7 +131,7 @@ class ObjectGroupFactory(factory.django.DjangoModelFactory):
         model = ObjectGroup
 
     label = factory.Faker("name")
-    dating = factory.fuzzy.FuzzyChoice(["XXe", "XIXe", "XVIIIe", "XVIIe"])
+    dating = factory.SubFactory(PeriodFactory)
     materials = factory.fuzzy.FuzzyChoice(["wood", "stone", "glass", "metal"], list)
     object_count = 3
 

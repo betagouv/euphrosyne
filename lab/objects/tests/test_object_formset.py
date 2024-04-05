@@ -11,7 +11,7 @@ from django.urls import reverse
 from lab.tests.factories import ObjectGroupFactory
 
 from ..admin import CSVValidationError, ObjectFormSet, ObjectInline
-from ..models import ObjectGroup
+from ..models import ObjectGroup, Period
 
 
 class TestObjectFormset(TestCase):
@@ -147,7 +147,7 @@ class TestObjectFormsetWithTemplateUpload(TestCase):
         self.inline = ObjectInline(ObjectGroup, admin_site=AdminSite())
         self.objectgroup = ObjectGroup(
             label="Object group",
-            dating="XIXe",
+            dating=Period.objects.get_or_create(label="XIXe")[0],
             materials=["wood"],
             object_count=0,
         )
