@@ -1,6 +1,6 @@
 import { TypeAheadList, Result } from "../type-ahead-list.component";
 
-interface OpentThesoResult {
+interface OpenThesoResult {
   id: string;
   arkId: string;
   label: string;
@@ -22,7 +22,7 @@ class PeriodTypeAhead extends TypeAheadList {
     if (!data || !data.length) {
       return [];
     }
-    return data.map((item: OpentThesoResult[]) => ({
+    return data.map((item: OpenThesoResult[]) => ({
       label: item.map((i) => i.label).join(" > "),
       id: item.slice(-1)[0].id,
     }));
