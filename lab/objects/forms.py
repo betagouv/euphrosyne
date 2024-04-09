@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from lab import widgets
 
 from .c2rmf import ErosHTTPError, fetch_partial_objectgroup_from_eros
-from .models import Location, ObjectGroup
+from .models import Location, ObjectGroup, Period
 from .widgets import ImportFromInput
 
 logger = logging.getLogger(__name__)
@@ -48,14 +48,18 @@ class ObjectGroupForm(forms.ModelForm):
         help_texts = {
             "materials": _("Separate each material with a comma"),
             "discovery_place_location": _("Start typing to search for a location"),
+            "dating": _("Start typing to search for a period"),
         }
         widgets = {
             "materials": widgets.TagsInput(),
             "discovery_place_location": widgets.LocationAutoCompleteWidget(),
+            "dating": widgets.DatingAutoCompleteWidget(),
         }
 
-    def __init__(self, *args, **kwargs: dict[str, Any]):
-        super().__init__(*args, **kwargs)
+    def __init__(
+        self, *args, instance: ObjectGroup | None = None, **kwargs: dict[str, Any]
+    ):
+        super().__init__(*args, instance=instance, **kwargs)
         # We must check if attribute is in self.fields because it can be removed
         # in admin view when page is readlonly.
         if "dating" in self.fields:
@@ -73,13 +77,15 @@ class ObjectGroupForm(forms.ModelForm):
             if self.instance.id:
                 self.fields["add_type"].widget.attrs["disabled"] = "disabled"
 
-        if "instance" in kwargs:
+        if instance:
             self.fields["discovery_place_location"].widget.instance = (
-                self.instance.discovery_place_location
+                instance.discovery_place_location
             )
+            self.fields["dating"].widget.instance = instance.dating
 
     def full_clean(self):
         self.try_populate_discovery_place_location()
+        self.try_populate_dating()
         return super().full_clean()
 
     def try_populate_discovery_place_location(self):
@@ -104,9 +110,21 @@ class ObjectGroupForm(forms.ModelForm):
                 location.latitude = float(latitude)
                 location.longitude = float(longitude)
                 location.save()
-            # First make a copy of the data because self.data is immutable
-            self.data = self.data.copy()
+            self.data = (
+                self.data.copy()
+            )  # make a copy of the data because self.data is immutable
             self.data["discovery_place_location"] = location.pk
+
+    def try_populate_dating(self):
+        if not self.data.get("dating") and self.data.get("dating__label"):
+            period, _ = Period.objects.get_or_create(
+                label=self.data["dating__label"],
+                theso_joconde_id=self.data.get("dating__theso_joconde_id"),
+            )
+            self.data = (
+                self.data.copy()
+            )  # make a copy of the data because self.data is immutable
+            self.data["dating"] = period.pk
 
     def is_multipart(self) -> Any:
         if not self.instance.id:

@@ -2,7 +2,7 @@ import pytest
 from django.forms import widgets
 
 from ...forms import ObjectGroupAddChoices, ObjectGroupForm
-from ...models import Location, ObjectGroup
+from ...models import Location, ObjectGroup, Period
 
 
 def test_form_render_single_object_initial_values():
@@ -115,3 +115,36 @@ def test_try_populate_discovery_place_location_updates_lat_and_long():
     assert Location.objects.get(
         label=label, geonames_id=geonames_id, latitude=latitude, longitude=longitude
     )
+
+
+@pytest.mark.django_db
+def test_try_populate_dating_create_period():
+    label = "Moyen âge"
+    theso_joconde_id = 1234
+
+    form = ObjectGroupForm()
+
+    form.data = {
+        "dating__label": label,
+        "dating__theso_joconde_id": theso_joconde_id,
+    }
+
+    form.try_populate_dating()
+
+    dating = Period.objects.get(label=label, theso_joconde_id=theso_joconde_id)
+    assert form.data["dating"] == dating.pk
+
+
+@pytest.mark.django_db
+def test_try_populate_dating_find_dating():
+    dating = Period.objects.create(label="Moyen âge", theso_joconde_id=1234)
+
+    form = ObjectGroupForm()
+    form.data = {
+        "dating__label": "Moyen âge",
+        "dating__theso_joconde_id": 1234,
+    }
+
+    form.try_populate_dating()
+
+    assert form.data["dating"] == dating.pk
