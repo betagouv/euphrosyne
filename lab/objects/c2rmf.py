@@ -3,7 +3,7 @@ from typing import Any
 
 import requests
 
-from ..models import ObjectGroup
+from ..models import ObjectGroup, Period
 
 
 class ErosHTTPError(requests.RequestException):
@@ -48,7 +48,7 @@ def fetch_full_objectgroup_from_eros(
     updated_og.object_count = 1
     updated_og.c2rmf_id = c2rmf_id
     updated_og.label = data["title"]
-    updated_og.dating = data.get("dtfrom") or data.get("period")
+    updated_og.dating = Period(label=data.get("dtfrom") or data.get("period"))
     updated_og.collection = data.get("collection")
     updated_og.inventory = data.get("inv")
     updated_og.materials = (data.get("support") or "").split(" / ")
