@@ -151,7 +151,10 @@ class TagsInput(Input):
     template_name = "widgets/tags_input.html"
 
     class Media:
-        js = ("js/widgets/tags-input.js",)
+        js = (
+            "web-components/material-type-ahead.js",
+            "js/widgets/tags-input.js",
+        )
         css = {"all": ("css/widgets/tags-input.css",)}
 
 

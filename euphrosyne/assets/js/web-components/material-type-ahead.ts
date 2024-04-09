@@ -7,11 +7,11 @@ interface OpenThesoResult {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-class PeriodTypeAhead extends TypeAheadList {
+class MaterialTypeAhead extends TypeAheadList {
   async fetchResults(query: string): Promise<Result[]> {
     const q = encodeURIComponent(query);
     const response = await fetch(
-      `https://opentheso.huma-num.fr/opentheso/openapi/v1/concept/th289/search/fullpath?q=${q}&lang=fr&exactMatch=false`,
+      `https://opentheso.huma-num.fr/opentheso/openapi/v1/concept/th291/autocomplete/${q}?lang=fr&exactMatch=false`,
     );
 
     if (response && response.status === 404) {
@@ -25,13 +25,13 @@ class PeriodTypeAhead extends TypeAheadList {
     if (!data || !data.length) {
       return [];
     }
-    return data.map((item: OpenThesoResult[]) => ({
-      label: item.map((i) => i.label).join(" > "),
-      id: item.slice(-1)[0].id,
+    return data.map((item: OpenThesoResult) => ({
+      label: item.label,
+      id: item.id,
     }));
   }
 }
 
-customElements.define("period-type-ahead", PeriodTypeAhead, {
+customElements.define("material-type-ahead", MaterialTypeAhead, {
   extends: "div",
 });

@@ -77,8 +77,20 @@
       .focus();
   }
 
+  function onKeyUp(event) {
+    if (event.key === ",") {
+      modifyTags(event);
+    }
+  }
+
   function resizeInput(event) {
     event.target.size = event.target.value?.length || 1;
+  }
+
+  function onSuggestionClicked(event) {
+    const { label } = event.detail.result;
+    if (!isInvalid(getTags(event.target.parentNode), label))
+      addTag(event.target.parentElement, label);
   }
 
   function checkTagDeletion(event) {
@@ -90,16 +102,6 @@
       const tags = getTags(event.target.parentNode);
       deleteTag(tags[tags.length - 1]);
     }
-  }
-
-  function onKeyUp(event) {
-    if (event.key === ",") {
-      modifyTags(event);
-    }
-  }
-
-  function onBlur(event) {
-    modifyTags(event);
   }
 
   function setup() {
@@ -126,8 +128,8 @@
         .querySelector(".tags-input input")
         .addEventListener("keyup", onKeyUp);
       document
-        .querySelector(".tags-input input")
-        .addEventListener("blur", onBlur);
+        .querySelector(".tags-input div[is='material-type-ahead']")
+        .addEventListener("result-click", onSuggestionClicked);
     }
   }
 

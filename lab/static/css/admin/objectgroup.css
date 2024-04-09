@@ -34,11 +34,20 @@ input[type="submit"][disabled].default {
   margin-bottom: 1rem;
 }
 
-.field-discovery_place_location, .field-dating {
+.field-discovery_place_location, .field-dating, .field-materials {
   overflow: initial;
 }
 
 .autocomplete-input input {
   width: 20em;
   margin-top: .5rem;
+}
+
+.autocomplete-input input {
+  width: 20em;
+  margin-top: .5rem;
+}
+
+.tags-input.typeahead-field .typeahead-list {
+  top: 84px;
 }
