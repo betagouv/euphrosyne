@@ -46,7 +46,10 @@ class ObjectGroupForm(forms.ModelForm):
             "collection",
         )
         help_texts = {
-            "materials": _("Separate each material with a comma"),
+            "materials": _(
+                "Start typing to search for a material. \
+                Click on suggestion or add a comma to add to the list."
+            ),
             "discovery_place_location": _("Start typing to search for a location"),
             "dating": _("Start typing to search for a period"),
         }
