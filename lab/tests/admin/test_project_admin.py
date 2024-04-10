@@ -101,6 +101,18 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         self.change_request.user = self.admin_user
         self.add_request.user = self.admin_user
 
+    def test_create_project(self):
+        response = self.client.post(
+            self.add_view_url,
+            data={
+                "name": "some project name",
+                "confidential": True,
+            },
+        )
+        assert response.status_code == 302
+        project = Project.objects.get(name="some project name")
+        assert project.confidential is True
+
     def test_add_project_set_admin_as_admin(self):
         project = Project.objects.create(name="some project name")
         change_view_url = reverse("admin:lab_project_change", args=[project.id])
@@ -165,6 +177,27 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
             self.change_request, self.change_project
         )
         assert ParticipationInline in inlines
+
+    def test_create_project(self):
+        response = self.client.post(
+            self.add_view_url,
+            data={
+                "name": "some project name",
+                "has_accepted_cgu": True,
+            },
+        )
+        assert response.status_code == 302
+        assert Project.objects.get(name="some project name")
+
+    def test_create_project_should_accept_cgu(self):
+        response = self.client.post(
+            self.add_view_url,
+            data={
+                "name": "some project name",
+            },
+        )
+        assert response.status_code == 200
+        assert not Project.objects.filter(name="some project name").exists()
 
     def test_change_leader_link_is_hidden(self):
         response = self.client.get(

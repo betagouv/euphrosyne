@@ -17,9 +17,10 @@ from euphro_tools.hooks import initialize_project_directory
 
 from ..forms import (
     BaseParticipationForm,
+    BaseProjectForm,
     BeamTimeRequestForm,
     LeaderParticipationForm,
-    ProjectForm,
+    MemberProjectForm,
 )
 from ..models import BeamTimeRequest, Participation, Project
 from ..permissions import is_lab_admin, is_project_leader
@@ -279,7 +280,9 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         **kwargs: dict[str, Any],
     ):
         if not obj:
-            return ProjectForm
+            if is_lab_admin(request.user):
+                return BaseProjectForm
+            return MemberProjectForm
         return super().get_form(request, obj, change, **kwargs)
 
     def get_exclude(self, request: HttpRequest, obj: Optional[Project] = None):
