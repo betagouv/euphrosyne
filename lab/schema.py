@@ -27,6 +27,7 @@ class ObjectType(DjangoObjectType):
 class ObjectGroupType(DjangoObjectType):
     data_available = graphene.Boolean(required=True)
     discovery_place = graphene.String()
+    dating = graphene.String()
 
     class Meta:
         model = ObjectGroup
@@ -55,6 +56,9 @@ class ObjectGroupType(DjangoObjectType):
 
     def resolve_discovery_place(self, info):
         return self.discovery_place_location.label if self.discovery_place else ""
+
+    def resolve_dating(self, info):
+        return self.dating.label if self.dating else ""
 
 
 class InstitutionType(DjangoObjectType):
