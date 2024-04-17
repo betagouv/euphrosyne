@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import path, reverse
 from django.urls.resolvers import URLResolver
+from django.utils.translation import gettext_lazy as _
 
 from lab.documents.views import ProjectDocumentsView
 from lab.objects.views import ObjectImportC2RMFView
@@ -17,7 +18,7 @@ class AdminSite(admin.AdminSite):
 
     site_title = "Euphrosyne"
     site_header = "Euphrosyne"
-    index_title = ""
+    index_title = _("Dashboard")
 
     def get_urls(self) -> List[URLResolver]:
         return [
