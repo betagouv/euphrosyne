@@ -11,7 +11,6 @@ from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 
-from euphro_auth.models import User
 from lab.tests.factories import (
     LabAdminUserFactory,
     ProjectFactory,
@@ -25,42 +24,7 @@ from ...admin.project import (
     ProjectAdmin,
     ProjectChangeList,
 )
-from ...models import Institution, Participation, Project
-
-
-def get_existing_particiation_post_data(index: int, participation: Participation):
-    return {
-        f"participation_set-{index}-user": participation.user_id,
-        f"participation_set-{index}-project": participation.project_id,
-        f"participation_set-{index}-id": participation.id,
-        f"participation_set-{index}-is_leader": participation.is_leader,
-        f"participation_set-{index}-institution": participation.institution_id,
-    }
-
-
-def get_add_participation_post_data(
-    index: int, project: Project, user: User, is_leader: bool, institution: Institution
-):
-    return {
-        f"participation_set-{index}-user": user.id,
-        f"participation_set-{index}-project": project.id,
-        f"participation_set-{index}-id": "",
-        f"participation_set-{index}-is_leader": is_leader,
-        f"participation_set-{index}-institution": institution.id,
-    }
-
-
-def get_empty_beam_time_request_post_data(project_id: int):
-    return {
-        "beamtimerequest-TOTAL_FORMS": "1",
-        "beamtimerequest-INITIAL_FORMS": "0",
-        "beamtimerequest-0-request_type": "",
-        "beamtimerequest-0-request_id": "",
-        "beamtimerequest-0-form_type": "",
-        "beamtimerequest-0-problem_statement": "",
-        "beamtimerequest-0-id": "",
-        "beamtimerequest-0-project": project_id,
-    }
+from ...models import Institution, Project
 
 
 class BaseTestCases:
@@ -155,6 +119,46 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
     def test_add_project_has_not_cgu_checkbox(self):
         fieldsets = self.project_admin.get_fieldsets(self.add_request)
         assert len(fieldsets) == 1
+
+    def test_change_project_set_first_participation_as_leader(self):
+        project = ProjectFactory()
+        another_member = get_user_model().objects.create(email="aneweuser@mail.com")
+
+        participation_data = {
+            "participation_set-TOTAL_FORMS": "2",
+            "participation_set-INITIAL_FORMS": "0",
+            "participation_set-MIN_NUM_FORMS": "1",
+            "participation_set-MAX_NUM_FORMS": "1000",
+            "participation_set-0-id": "",
+            "participation_set-0-project": project.id,
+            "participation_set-0-user": self.project_participant_user.email,
+            "participation_set-0-institution__name": "Louvre",
+            "participation_set-0-institution__country": "France",
+            "participation_set-1-id": "",
+            "participation_set-1-project": project.id,
+            "participation_set-1-user": another_member.email,
+            "participation_set-1-institution__name": "Louvre",
+            "participation_set-1-institution__country": "France",
+            # beamtime is mandatory
+            "beamtimerequest-TOTAL_FORMS": "1",
+            "beamtimerequest-INITIAL_FORMS": "0",
+            "beamtimerequest-MIN_NUM_FORMS": "0",
+            "beamtimerequest-MAX_NUM_FORMS": "1",
+            "beamtimerequest-0-request_type": "C2RMF",
+            "beamtimerequest-0-request_id": "",
+            "beamtimerequest-0-form_type": "",
+            "beamtimerequest-0-problem_statement": "problem statement",
+            "beamtimerequest-0-id": "",
+            "beamtimerequest-0-project": project.id,
+        }
+        response = self.client.post(
+            reverse("admin:lab_project_change", args=[project.id]),
+            data=participation_data,
+        )
+
+        assert response.status_code == 302
+        project.refresh_from_db()
+        assert project.leader.user == self.project_participant_user
 
 
 class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):

@@ -95,6 +95,12 @@ class ParticipationFormSet(BaseInlineFormSet):
             form.try_populate_institution()
         return super().full_clean()
 
+    def save(self, commit: bool = True):
+        # Set first participation as leader
+        if len(self) > 0:
+            self[0].instance.is_leader = True
+        return super().save(commit)
+
 
 class ParticipationInline(LabPermissionMixin, admin.TabularInline):
     model = Participation
