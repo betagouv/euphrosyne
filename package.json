@@ -15,8 +15,8 @@
     "format": "npm run prettier:fix && npm run lint:fix"
   },
   "engines": {
-    "node": "19.x",
-    "npm": "9.x"
+    "node": "20.x",
+    "npm": "10.x"
   },
   "repository": {
     "type": "git",
