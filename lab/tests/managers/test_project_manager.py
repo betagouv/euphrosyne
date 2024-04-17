@@ -19,10 +19,30 @@ class ProjectModelTestCase(TestCase):
         )
         self.assertEqual(Project.objects.only_finished().count(), 1)
 
-    def test_project_only_public(self):
+    def test_project_only_public_confidential(self):
         Project.objects.create(name="Public Project", confidential=False)
         Project.objects.create(name="Confidential Project", confidential=True)
         self.assertEqual(Project.objects.only_public().count(), 1)
+
+    def test_project_only_public_embargo(self):
+        public_project = Project.objects.create(
+            name="Public Project", confidential=False
+        )
+        RunFactory(
+            project=public_project,
+            embargo_date=timezone.now() - timezone.timedelta(days=1),
+        )
+        empbargoed_project = Project.objects.create(
+            name="Embargoes Project", confidential=False
+        )
+        RunFactory(
+            project=empbargoed_project,
+            embargo_date=timezone.now() + timezone.timedelta(days=1),
+        )
+
+        qs = Project.objects.only_public()
+        self.assertEqual(qs.count(), 1)
+        self.assertEqual(qs.first().id, public_project.id)
 
     def test_filter_by_status(self):
         to_schedule_ids = [
