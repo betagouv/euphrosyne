@@ -10,6 +10,23 @@ interface RorResult {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class InstitutionTypeAhead extends TypeAheadList {
+  constructor() {
+    super();
+
+    // Empty message ROR registration link
+    this.emptyResultMessageElement = document.createElement("span");
+    this.emptyResultMessageElement.textContent =
+      window.gettext(
+        "No results found. You can register a new institution using",
+      ) + " ";
+    const link = document.createElement("a");
+    link.target = "_blank";
+    link.href =
+      "https://docs.google.com/forms/d/e/1FAIpQLSdJYaMTCwS7muuTa-B_CnAtCSkKzt19lkirAKG4u7umH9Nosg/viewform";
+    link.textContent = window.gettext("this form");
+    this.emptyResultMessageElement.appendChild(link);
+  }
+
   async fetchResults(query: string): Promise<Result[]> {
     const response = await fetch(
       "https://api.ror.org/organizations?query=" + encodeURIComponent(query),

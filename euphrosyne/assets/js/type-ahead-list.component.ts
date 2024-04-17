@@ -4,6 +4,12 @@ export interface Result {
   attrs: object;
 }
 
+const buildDefaultErrorMessageElement = () => {
+  const span = document.createElement("span");
+  span.textContent = window.gettext("No results");
+  return span;
+};
+
 export abstract class TypeAheadList extends HTMLDivElement {
   abstract fetchResults(query: string): Promise<Result[]>;
 
@@ -12,6 +18,8 @@ export abstract class TypeAheadList extends HTMLDivElement {
   }
 
   timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  emptyResultMessageElement: HTMLElement = buildDefaultErrorMessageElement();
 
   connectedCallback() {
     document.addEventListener("click", (event) => {
@@ -106,7 +114,7 @@ export abstract class TypeAheadList extends HTMLDivElement {
 
   displayNoResultsBanner() {
     const banner = document.createElement("div");
-    banner.textContent = window.gettext("No results");
+    banner.appendChild(this.emptyResultMessageElement);
     this.cleanList();
     this.appendChild(banner);
     this.classList.remove("hidden");
