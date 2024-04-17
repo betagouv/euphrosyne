@@ -24,7 +24,10 @@ class ProjectQuerySet(models.QuerySet):
         return self.filter(runs__end_date__lt=timezone.now())
 
     def only_public(self):
-        return self.filter(confidential=False)
+        embargoed_projects = Run.objects.filter(
+            embargo_date__gt=timezone.now()
+        ).values_list("project_id", flat=True)
+        return self.filter(confidential=False).exclude(id__in=embargoed_projects)
 
     def filter_by_status(self, status: "Project.Status"):
         if status == Project.Status.TO_SCHEDULE:

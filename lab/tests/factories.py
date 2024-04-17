@@ -56,6 +56,7 @@ class FinishedProject(ProjectFactory):
             project=self,
             start_date=NOW - timedelta(days=2),
             end_date=NOW - timedelta(days=1),
+            embargo_date=NOW - timedelta(days=1),
         )
 
 
