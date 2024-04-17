@@ -89,8 +89,13 @@
 
   function onSuggestionClicked(event) {
     const { label } = event.detail.result;
-    if (!isInvalid(getTags(event.target.parentNode), label))
+    if (!isInvalid(getTags(event.target.parentNode), label)) {
+      const inputElement = event.target.parentElement.querySelector(
+        "input[type='hidden']",
+      );
       addTag(event.target.parentElement, label);
+      setHiddenInputValue(inputElement);
+    }
   }
 
   function checkTagDeletion(event) {
