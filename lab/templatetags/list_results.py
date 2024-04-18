@@ -98,7 +98,7 @@ def project_result_list(
     Returns:
         dict: A dictionary containing the updated result list to be used in template.
     """
-    if queryset:
+    if queryset is not None:
         changelist.result_list = queryset
     else:
         not_paginated = (
