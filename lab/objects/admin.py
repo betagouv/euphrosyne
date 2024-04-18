@@ -259,8 +259,8 @@ class ObjectGroupAdmin(ModelAdmin):
             description = _("This object was imported from EROS.")
         else:
             description = _(
-                "Fill up dating and inventory number if you object \
-                        group is undifferentiated."
+                # pylint: disable=line-too-long
+                "Fill up collection and inventory number if you object group is undifferentiated."
             )
         fieldsets = [
             (
