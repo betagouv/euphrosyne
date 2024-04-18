@@ -64,8 +64,10 @@
           {% endif %}
          
           {% for qs in extra_qs %}
+          {% if qs.qs %}
             <h3>{{ qs.title }}</h3>
             {% project_result_list cl qs.qs %}
+          {% endif %}
           {% endfor %}
 
           {% block result_list %}
