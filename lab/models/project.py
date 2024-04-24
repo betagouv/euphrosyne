@@ -4,6 +4,7 @@ from typing import Optional
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from slugify import slugify
@@ -24,10 +25,10 @@ class ProjectQuerySet(models.QuerySet):
         return self.filter(runs__end_date__lt=timezone.now())
 
     def only_public(self):
-        embargoed_projects = Run.objects.filter(
-            embargo_date__gt=timezone.now()
+        not_embargoed_projects = Run.objects.filter(
+            Q(embargo_date__lt=timezone.now())
         ).values_list("project_id", flat=True)
-        return self.filter(confidential=False).exclude(id__in=embargoed_projects)
+        return self.filter(confidential=False, id__in=not_embargoed_projects)
 
     def filter_by_status(self, status: "Project.Status"):
         if status == Project.Status.TO_SCHEDULE:
