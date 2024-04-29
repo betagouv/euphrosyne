@@ -52,6 +52,7 @@ def test_resolve_last_projects_are_confidential(client):
     public_project.runs.create(
         start_date=timezone.now() - timezone.timedelta(days=2),
         end_date=timezone.now() - timezone.timedelta(days=1),
+        embargo_date=timezone.now() - timezone.timedelta(days=1),
     )
     confidential_project = ProjectFactory(
         name="Not Finished Project", confidential=True

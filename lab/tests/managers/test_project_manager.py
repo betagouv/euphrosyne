@@ -20,8 +20,15 @@ class ProjectModelTestCase(TestCase):
         self.assertEqual(Project.objects.only_finished().count(), 1)
 
     def test_project_only_public_confidential(self):
-        Project.objects.create(name="Public Project", confidential=False)
-        Project.objects.create(name="Confidential Project", confidential=True)
+        public = Project.objects.create(name="Public Project", confidential=False)
+        confidential = Project.objects.create(
+            name="Confidential Project", confidential=True
+        )
+        for p in [public, confidential]:  # both have runs over embargo date
+            RunFactory(
+                project=p,
+                embargo_date=timezone.now() - timezone.timedelta(days=1),
+            )
         self.assertEqual(Project.objects.only_public().count(), 1)
 
     def test_project_only_public_embargo(self):
@@ -39,6 +46,20 @@ class ProjectModelTestCase(TestCase):
             project=empbargoed_project,
             embargo_date=timezone.now() + timezone.timedelta(days=1),
         )
+
+        qs = Project.objects.only_public()
+        self.assertEqual(qs.count(), 1)
+        self.assertEqual(qs.first().id, public_project.id)
+
+    def test_project_only_public_when_no_run(self):
+        public_project = Project.objects.create(
+            name="Public Project", confidential=False
+        )
+        RunFactory(
+            project=public_project,
+            embargo_date=timezone.now() - timezone.timedelta(days=1),
+        )
+        Project.objects.create(name="No run Project", confidential=False)
 
         qs = Project.objects.only_public()
         self.assertEqual(qs.count(), 1)
