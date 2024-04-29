@@ -91,18 +91,20 @@ export default function WorkplaceRunTabs({
           aria-labelledby={`tabpanel-run-${run.id}`}
           tabIndex={index}
         >
-          <div className="fr-grid-row fr-grid-row--gutters">
-            <div className="fr-col-12">
-              <div className="fr-background-default--grey fr-p-3v">
-                <h3>HDF5</h3>
-                <HDF5FileTable
-                  projectId={project.id}
-                  projectSlug={project.slug}
-                  runName={run.label}
-                />
+          {process.env.HDF5_ENABLE === "true" && (
+            <div className="fr-grid-row fr-grid-row--gutters">
+              <div className="fr-col-12">
+                <div className="fr-background-default--grey fr-p-3v">
+                  <h3>HDF5</h3>
+                  <HDF5FileTable
+                    projectId={project.id}
+                    projectSlug={project.slug}
+                    runName={run.label}
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
           <div className="fr-grid-row fr-grid-row--gutters">
             <div className="fr-col-12 fr-col-lg-6">
               <div className="fr-background-default--grey fr-p-3v">

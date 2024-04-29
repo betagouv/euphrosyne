@@ -123,6 +123,7 @@ export default {
       MATOMO_SITE_ID: null,
       EUPHROSYNE_TOOLS_API_URL: null,
       GEONAMES_USERNAME: "",
+      HDF5_ENABLE: "false",
     }),
     new MiniCssExtractPlugin(),
     new PurgeCSSPlugin({
