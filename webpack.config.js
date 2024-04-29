@@ -134,6 +134,7 @@ export default {
       safelist: {
         greedy: [/^fr-/],
       },
+      only: ["main", "anonymous", "dsfr", "icons"],
     }),
   ],
   devtool: "source-map",
