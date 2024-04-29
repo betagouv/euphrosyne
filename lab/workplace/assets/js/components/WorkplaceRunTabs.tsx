@@ -1,24 +1,17 @@
 import { useEffect, useState } from "react";
-import FileTable, { Col } from "../../../../assets/js/components/FileTable";
+import FileTable from "../../../../assets/js/components/FileTable";
 import { RawDataFileService } from "../raw-data/raw-data-file-service";
 import { ProcessedDataFileService } from "../processed-data/processed-data-file-service";
 import { EuphrosyneFile } from "../../../../assets/js/file-service";
-import { formatBytes } from "../../../../assets/js/utils";
 import BaseTableActionCell from "../../../../assets/js/components/BaseTableActionCell";
-
-const tableCols: Col<EuphrosyneFile>[] = [
-  { label: window.gettext("File"), key: "name" },
-  {
-    label: window.gettext("Size"),
-    key: "size",
-    formatter: (value: string) => formatBytes(parseInt(value)),
-  },
-];
+import { workplaceTableCols } from "../../../../assets/js/components/FileTableCols";
+import HDF5FileTable from "../../../../hdf5/assets/js/components/HDF5FileTable";
 
 export interface WorkplaceRunTabsProps {
   project: {
     name: string;
     slug: string;
+    id: string;
   };
   runs: {
     id: string;
@@ -34,7 +27,10 @@ export interface WorkplaceRunTabsProps {
   }[];
 }
 
-export default function WorkplaceRunTabs({ runs }: WorkplaceRunTabsProps) {
+export default function WorkplaceRunTabs({
+  runs,
+  project,
+}: WorkplaceRunTabsProps) {
   const t = {
     "Runs data": window.gettext("Runs data"),
     "Raw data": window.gettext("Raw data"),
@@ -96,13 +92,25 @@ export default function WorkplaceRunTabs({ runs }: WorkplaceRunTabsProps) {
           tabIndex={index}
         >
           <div className="fr-grid-row fr-grid-row--gutters">
+            <div className="fr-col-12">
+              <div className="fr-background-default--grey fr-p-3v">
+                <h3>HDF5</h3>
+                <HDF5FileTable
+                  projectId={project.id}
+                  projectSlug={project.slug}
+                  runName={run.label}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="fr-grid-row fr-grid-row--gutters">
             <div className="fr-col-12 fr-col-lg-6">
               <div className="fr-background-default--grey fr-p-3v">
                 <h3>{t["Raw data"]}</h3>
                 <FileTable
                   rows={runRawData[index][0]}
                   isLoading={rawLoadingStates[index][0]}
-                  cols={tableCols}
+                  cols={workplaceTableCols}
                   isSearchable={true}
                   actionCell={
                     <BaseTableActionCell
@@ -126,7 +134,7 @@ export default function WorkplaceRunTabs({ runs }: WorkplaceRunTabsProps) {
                 <FileTable
                   rows={runProcessedData[index][0]}
                   isLoading={processedLoadingStates[index][0]}
-                  cols={tableCols}
+                  cols={workplaceTableCols}
                   isSearchable={true}
                   actionCell={
                     <BaseTableActionCell

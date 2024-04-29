@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-17 15:06+0200\n"
+"POT-Creation-Date: 2024-04-29 21:18+0200\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -89,6 +89,12 @@ msgstr "Montrer moins"
 msgid "Show more"
 msgstr "Montrer plus"
 
+msgid "File"
+msgstr "Fichier"
+
+msgid "Size"
+msgstr "Taille"
+
 msgid ""
 "An error has occured while generating the presigned URL. Please contact the "
 "support team."
@@ -104,14 +110,8 @@ msgstr "Le fichier %s a été téléversé."
 msgid "File %s could not be uploaded."
 msgstr "Le fichier %s n'a pas pu être sauvegardé."
 
-msgid "File"
-msgstr "Fichier"
-
 msgid "Last modified"
 msgstr "Modifié le"
-
-msgid "Size"
-msgstr "Taille"
 
 msgid "Add a document"
 msgstr "Ajouter un document"
@@ -128,6 +128,9 @@ msgstr "Choisissez un fichier"
 #, javascript-format
 msgid "The following file formats are not accepted : %s"
 msgstr "Ces formats de fichier ne sont pas acceptés : %s"
+
+msgid "View file"
+msgstr "Voir le fichier"
 
 msgid "No object in this run yet"
 msgstr "Aucun objet dans ce run"
