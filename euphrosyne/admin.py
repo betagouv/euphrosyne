@@ -1,5 +1,6 @@
 from typing import List
 
+from django.conf import settings
 from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import path, reverse
@@ -7,6 +8,7 @@ from django.urls.resolvers import URLResolver
 from django.utils.translation import gettext_lazy as _
 
 from lab.documents.views import ProjectDocumentsView
+from lab.hdf5.views import HDF5View
 from lab.objects.views import ObjectImportC2RMFView
 from lab.views import ChangeLeaderView
 from lab.workplace.views import WorkplaceView
@@ -21,7 +23,7 @@ class AdminSite(admin.AdminSite):
     index_title = _("Dashboard")
 
     def get_urls(self) -> List[URLResolver]:
-        return [
+        urls = [
             path(
                 "lab/project/<project_id>/leader/change",
                 self.admin_view(ChangeLeaderView.as_view()),
@@ -42,8 +44,16 @@ class AdminSite(admin.AdminSite):
                 self.admin_view(ObjectImportC2RMFView.as_view()),
                 name="lab_objectgroup_c2rmfimport",
             ),
-            *super().get_urls(),
         ]
+        if settings.HDF5_ENABLE:
+            urls.append(
+                path(
+                    "lab/project/<project_id>/hdf5-viewer",
+                    self.admin_view(HDF5View.as_view()),
+                    name="lab_project_hdf5_viewer",
+                )
+            )
+        return [*urls, *super().get_urls()]
 
     def get_app_list(self, request, app_label=None):
         app_list = super().get_app_list(request, app_label)

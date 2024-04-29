@@ -1,0 +1,37 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static projects %}
+
+{% block coltype %}colM{% endblock %}
+
+{% block content_subtitle %}{% endblock %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static "hdf5.css" %}">
+<link rel="stylesheet" href="{% static "css/pages/hdf5-viewer.css" %}">
+{{ block.super }}
+{% endblock %}
+
+{%  block top_header_data %}
+{% project_header_json_data project.id %}
+{% endblock %}
+
+{% block content %}
+<div class="fr-container">
+    {% project_tabs project.id request %}
+</div>
+
+<div id="content-main" class="fr-container fr-mt-3w">
+    <ul class="messagelist"></ul>
+    <div id="root"></div>
+</div>
+
+{% endblock %}
+
+{% block footer %}
+{{ block.super }}
+<script src="{% url 'javascript-catalog' %}"></script>
+<script>
+    window.projectName = "{{ project.name }}"
+</script>
+<script src="{% static 'pages/hdf5-viewer.js' %}"></script>
+{% endblock %}

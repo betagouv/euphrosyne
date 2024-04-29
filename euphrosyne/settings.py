@@ -313,3 +313,5 @@ REST_FRAMEWORK = {
 }
 
 GRAPHENE = {"SCHEMA": "lab.schema.schema"}
+
+HDF5_ENABLE = os.getenv("HDF5_ENABLE", "false") == "true"

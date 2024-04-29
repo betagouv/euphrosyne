@@ -41,6 +41,7 @@ class WorkplaceView(ProjectMembershipRequiredMixin, TemplateView):
                     "project": {
                         "name": self.project.name,
                         "slug": self.project.slug,
+                        "id": self.project.id,
                     },
                     "runs": [
                         {
