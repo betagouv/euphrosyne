@@ -1,11 +1,7 @@
-import { useEffect, useState } from "react";
-import FileTable from "../../../../assets/js/components/FileTable";
+import { useState } from "react";
 import { RawDataFileService } from "../raw-data/raw-data-file-service";
 import { ProcessedDataFileService } from "../processed-data/processed-data-file-service";
-import { EuphrosyneFile } from "../../../../assets/js/file-service";
-import BaseTableActionCell from "../../../../assets/js/components/BaseTableActionCell";
-import { workplaceTableCols } from "../../../../assets/js/components/FileTableCols";
-import HDF5FileTable from "../../../../hdf5/assets/js/components/HDF5FileTable";
+import WorkplaceRunTab from "./WorkplaceRunTab";
 
 export interface WorkplaceRunTabsProps {
   project: {
@@ -38,29 +34,7 @@ export default function WorkplaceRunTabs({
   };
 
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
-  const runRawData: [
-    EuphrosyneFile[],
-    React.Dispatch<React.SetStateAction<EuphrosyneFile[]>>,
-  ][] = runs.map(() => useState<EuphrosyneFile[]>([]));
-  const runProcessedData: [
-    EuphrosyneFile[],
-    React.Dispatch<React.SetStateAction<EuphrosyneFile[]>>,
-  ][] = runs.map(() => useState<EuphrosyneFile[]>([]));
-  const rawLoadingStates = runs.map(() => useState(false));
-  const processedLoadingStates = runs.map(() => useState(false));
 
-  useEffect(() => {
-    runRawData.forEach(async ([, setFiles], index) => {
-      const files = await runs[index].rawDataFileService.listData();
-      setFiles(files);
-      rawLoadingStates[index][1](false);
-    });
-    runProcessedData.forEach(async ([, setFiles], index) => {
-      const files = await runs[index].processedDataFileService.listData();
-      setFiles(files);
-      processedLoadingStates[index][1](false);
-    });
-  }, []);
   return (
     <div className="fr-tabs">
       <ul className="fr-tabs__list" role="tablist" aria-label={t["Runs data"]}>
@@ -91,70 +65,7 @@ export default function WorkplaceRunTabs({
           aria-labelledby={`tabpanel-run-${run.id}`}
           tabIndex={index}
         >
-          {process.env.HDF5_ENABLE === "true" && (
-            <div className="fr-grid-row fr-grid-row--gutters">
-              <div className="fr-col-12">
-                <div className="fr-background-default--grey fr-p-3v">
-                  <h3>HDF5</h3>
-                  <HDF5FileTable
-                    projectId={project.id}
-                    projectSlug={project.slug}
-                    runName={run.label}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-          <div className="fr-grid-row fr-grid-row--gutters">
-            <div className="fr-col-12 fr-col-lg-6">
-              <div className="fr-background-default--grey fr-p-3v">
-                <h3>{t["Raw data"]}</h3>
-                <FileTable
-                  rows={runRawData[index][0]}
-                  isLoading={rawLoadingStates[index][0]}
-                  cols={workplaceTableCols}
-                  isSearchable={true}
-                  actionCell={
-                    <BaseTableActionCell
-                      canDelete={run.rawDataTable.canDelete}
-                      onDeleteSuccess={(fileName) =>
-                        runRawData[index][1](
-                          runRawData[index][0].filter(
-                            (file) => file.name !== fileName,
-                          ),
-                        )
-                      }
-                      fileService={run.rawDataFileService}
-                    />
-                  }
-                />
-              </div>
-            </div>
-            <div className="fr-col-12 fr-col-lg-6">
-              <div className="fr-background-default--grey fr-p-3v">
-                <h3>{t["Processed data"]}</h3>
-                <FileTable
-                  rows={runProcessedData[index][0]}
-                  isLoading={processedLoadingStates[index][0]}
-                  cols={workplaceTableCols}
-                  isSearchable={true}
-                  actionCell={
-                    <BaseTableActionCell
-                      canDelete={run.processedDataTable.canDelete}
-                      onDeleteSuccess={(fileName) =>
-                        runProcessedData[index][1](
-                          runProcessedData[index][0].filter(
-                            (file) => file.name !== fileName,
-                          ),
-                        )
-                      }
-                      fileService={run.processedDataFileService}
-                    />
-                  }
-                />
-              </div>
-            </div>
-          </div>
+          <WorkplaceRunTab run={run} project={project} />
         </div>
       ))}
     </div>
