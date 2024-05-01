@@ -6,8 +6,8 @@ import { EuphrosyneFile } from "../../../../assets/js/file-service";
 import { DocumentFileService } from "../document-file-service";
 
 import FileTable, { Col } from "../../../../assets/js/components/FileTable";
-import BaseTableActionCell from "../../../../assets/js/components/BaseTableActionCell";
 import DocumentUploadModal from "./DocumentUploadModal";
+import BaseFileActionCell from "../../../../assets/js/components/BaseFileActionCell";
 
 interface DocumentManagerProps {
   project: {
@@ -27,12 +27,14 @@ const tableCols: Col<EuphrosyneFile>[] = [
   {
     label: window.gettext("Last modified"),
     key: "lastModified",
-    formatter: (value: string) => new Date(value).toLocaleDateString(),
+    formatter: (value: string | null) =>
+      value ? new Date(value).toLocaleDateString() : "",
   },
   {
     label: window.gettext("Size"),
     key: "size",
-    formatter: (value: string) => formatBytes(parseInt(value)),
+    formatter: (value: string | null) =>
+      value ? formatBytes(parseInt(value)) : "",
   },
 ];
 
@@ -84,7 +86,7 @@ export default function DocumentManager({
         cols={tableCols}
         isLoading={isLoading}
         actionCell={
-          <BaseTableActionCell
+          <BaseFileActionCell
             canDelete={table.canDelete}
             onDeleteSuccess={fetchFiles}
             fileService={fileService}
