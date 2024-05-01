@@ -30,11 +30,20 @@ export default function WorkplaceDataTypeDisplay({
   ] = useState<EuphrosyneFile[]>([]);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [folder, setFolder] = useState<string[]>([]);
+
+  const appendFolder = (name: string) => {
+    setFolder((prev) => [...prev, name]);
+  };
+
+  const removeLastFolder = () => {
+    setFolder((prev) => prev.slice(0, -1));
+  };
 
   useEffect(() => {
     setIsLoading(true);
     fileService
-      .listData()
+      .listData(folder.join("/"))
       .then((files) => {
         setDataRows(files);
         setIsLoading(false);
@@ -44,7 +53,7 @@ export default function WorkplaceDataTypeDisplay({
         setDataRows([]);
         setIsLoading(false);
       });
-  }, []);
+  }, [folder]);
 
   return (
     <div className="fr-background-default--grey fr-p-3v">
@@ -54,6 +63,8 @@ export default function WorkplaceDataTypeDisplay({
         isLoading={isLoading}
         cols={displayedCols || workplaceTableCols}
         isSearchable={isSearchable}
+        folder={folder}
+        onPreviousFolderClick={removeLastFolder}
         actionCell={
           actionCell || (
             <BaseTableActionCell
@@ -62,6 +73,7 @@ export default function WorkplaceDataTypeDisplay({
                 setDataRows(dataRows.filter((file) => file.name !== fileName))
               }
               fileService={fileService}
+              onFolderOpen={appendFolder}
             />
           )
         }

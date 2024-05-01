@@ -7,6 +7,7 @@ export const workplaceTableCols: Col<EuphrosyneFile>[] = [
   {
     label: window.gettext("Size"),
     key: "size",
-    formatter: (value: string) => formatBytes(parseInt(value)),
+    formatter: (value: string | null) =>
+      value ? formatBytes(parseInt(value)) : "",
   },
 ];

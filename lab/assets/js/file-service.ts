@@ -2,11 +2,14 @@
 
 import { jwtFetch } from "./jwt.js";
 
+type FileType = "file" | "directory";
+
 export interface EuphrosyneFile {
   name: string;
   path: string;
   lastModified: Date;
-  size: number;
+  size: number | null;
+  isDir: boolean;
 }
 
 interface ListDataResponseItem {
@@ -14,6 +17,7 @@ interface ListDataResponseItem {
   path: string;
   last_modified: string;
   size: number;
+  type?: FileType;
 }
 
 class FileUploadError extends Error {
@@ -35,17 +39,23 @@ export class FileService {
     this.presignURL = `${process.env.EUPHROSYNE_TOOLS_API_URL}${fetchPresignedURL}`;
   }
 
-  async listData(): Promise<EuphrosyneFile[]> {
-    const response = await jwtFetch(this.listFileURL, {
+  async listData(folder?: string): Promise<EuphrosyneFile[]> {
+    let url = this.listFileURL;
+    if (folder && folder !== "") {
+      url += `?folder=${encodeURIComponent(folder)}`;
+    }
+    const fetchRequestInit: RequestInit = {
       method: "GET",
-    });
+    };
+    const response = await jwtFetch(url, fetchRequestInit);
     if (response?.ok) {
       const files = (await response.json()) as ListDataResponseItem[];
-      return files.map(({ name, path, last_modified, size }) => ({
+      return files.map(({ name, path, last_modified, size, type }) => ({
         name,
         path,
         size,
         lastModified: new Date(last_modified),
+        isDir: type === "directory",
       }));
     } else if (response?.status === 404) {
       return [];

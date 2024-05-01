@@ -2,22 +2,33 @@ import { useState } from "react";
 import { FileProvider } from "./FileContext";
 import { EuphrosyneFile } from "../file-service";
 import { css } from "@emotion/react";
+import { loadingDivStyle } from "./style";
 
 export interface Col<T> {
   label: string;
   key: keyof T;
-  formatter?: (value: string) => string;
+  formatter?: (value: string | null) => string;
 }
 
 interface FileTableProps {
   rows: EuphrosyneFile[];
   cols: Col<EuphrosyneFile>[];
+  folder?: string[];
   isLoading?: boolean;
   isSearchable?: boolean;
   actionCell?: React.ReactElement<"td">;
+  onPreviousFolderClick?: () => void;
 }
 
 const COLLAPSED_ROW_NUM = 25;
+
+const fileTableStyle = css({
+  width: "100%",
+});
+
+const cellStyle = css({
+  verticalAlign: "middle",
+});
 
 const noDataCellStyle = css({
   "&&": {
@@ -32,9 +43,11 @@ const theadCellStyle = css({
 export default function FileTable({
   cols,
   rows,
+  folder,
   isLoading,
   isSearchable,
   actionCell,
+  onPreviousFolderClick,
 }: FileTableProps) {
   const t = {
     Filter: window.gettext("Filter"),
@@ -92,7 +105,23 @@ export default function FileTable({
           </p>
         </div>
       )}
-      <table className="file-table fr-table">
+      {folder && folder.length > 0 && (
+        <div
+          css={css({
+            display: "flex",
+            justifyItems: "center",
+            alignItems: "center",
+          })}
+          className="fr-mb-1w"
+        >
+          <button
+            className="fr-btn fr-icon-arrow-left-line fr-btn--sm fr-btn--secondary fr-mr-1w"
+            onClick={onPreviousFolderClick}
+          />
+          <div>/{folder.join("/")}</div>
+        </div>
+      )}
+      <table className="fr-table" css={fileTableStyle}>
         <thead>
           <tr>
             {cols.map(({ label }) => (
@@ -111,8 +140,8 @@ export default function FileTable({
           {isLoading ? (
             <tr className="loading">
               {[...Array(numCols)].map((_, i) => (
-                <td key={`loading-cell-${i}`}>
-                  <div>&nbsp;</div>
+                <td key={`loading-cell-${i}`} css={cellStyle}>
+                  <div css={loadingDivStyle}>&nbsp;</div>
                 </td>
               ))}
             </tr>
@@ -123,9 +152,9 @@ export default function FileTable({
                   {displayedRows.map((row, i) => (
                     <tr key={`file-table-row-${i}`}>
                       {cols.map((col) => (
-                        <td key={`file-table-cell-${col.key}`}>
+                        <td key={`file-table-cell-${col.key}`} css={cellStyle}>
                           {col.formatter
-                            ? col.formatter(row[col.key].toString())
+                            ? col.formatter((row[col.key] || "").toString())
                             : String(row[col.key])}
                         </td>
                       ))}
@@ -137,7 +166,7 @@ export default function FileTable({
                 </>
               ) : (
                 <tr className="no_data">
-                  <td colSpan={numCols} css={noDataCellStyle}>
+                  <td colSpan={numCols} css={[cellStyle, noDataCellStyle]}>
                     {t["No file yet"]}
                   </td>
                 </tr>
@@ -148,7 +177,7 @@ export default function FileTable({
         {filteredRows.length > COLLAPSED_ROW_NUM && (
           <tfoot>
             <tr>
-              <td colSpan={numCols} style={{ width: "100%" }}>
+              <td colSpan={numCols} style={{ width: "100%" }} css={cellStyle}>
                 <button
                   className={`fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-btn--icon-left ${
                     isExpanded
@@ -162,7 +191,7 @@ export default function FileTable({
                   {isExpanded
                     ? t["Show less"]
                     : t["Show more"] +
-                      ` (${filteredRows.length - COLLAPSED_ROW_NUM})`}
+                      ` (${isLoading ? 0 : filteredRows.length - COLLAPSED_ROW_NUM})`}
                 </button>
               </td>
             </tr>

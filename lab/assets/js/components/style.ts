@@ -1,9 +1,11 @@
-.file-table {
-  width: 100%;
-}
+import { css } from "@emotion/react";
 
-.file-table tr.loading td div {
-  max-width: 150px;
+export const fileTableRowActionCellBtnStyle = css({
+  marginBottom: "0 !important",
+});
+
+export const loadingDivStyle = css`
+max-width: 150px;
   background-image: linear-gradient(
     90deg,
     var(--background-default-grey) 0px,
@@ -22,18 +24,4 @@
   40%,
   100% {
     background-position: 140px;
-  }
-}
-.file-table td {
-  vertical-align: middle;
-}
-.file-table td button.download-btn,
-.file-table td button.delete-btn {
-  margin-bottom: 0;
-}
-.file-table td ul.fr-btns-group {
-  margin: 0;
-}
-.file-table td.file-name-cell {
-  word-break: break-word;
-}
+  }`;
