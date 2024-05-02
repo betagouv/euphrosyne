@@ -2,9 +2,9 @@ import pytest
 
 from lab.models import Institution
 from lab.tests.factories import ParticipationFactory
+from lab.widgets import InstitutionAutoCompleteWidget
 
-from ...forms import BaseParticipationForm
-from ...widgets import InstitutionAutoCompleteWidget
+from ..forms import BaseParticipationForm
 
 
 @pytest.mark.django_db

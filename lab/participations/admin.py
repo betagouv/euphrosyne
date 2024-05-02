@@ -3,10 +3,10 @@ from typing import Optional
 from django.contrib import admin
 from django.http.request import HttpRequest
 
-from lab.models.participation import Participation
+from lab.participations.models import Participation
 
+from ..admin.mixins import LabAdminAllowedMixin
 from ..models import Institution
-from .mixins import LabAdminAllowedMixin
 
 
 class ParticipationInline(admin.TabularInline):

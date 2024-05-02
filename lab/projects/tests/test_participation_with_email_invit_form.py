@@ -5,8 +5,10 @@ from django.core import mail
 from django.forms.models import BaseModelForm
 from django.test import SimpleTestCase
 
-from ...forms import BaseParticipationForm
-from ...models import Participation, Project
+from lab.models import Participation
+from lab.projects.models import Project
+
+from ..forms import BaseParticipationForm
 
 
 class TestBaseParticipationForm(SimpleTestCase):

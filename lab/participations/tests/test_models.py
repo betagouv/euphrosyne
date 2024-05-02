@@ -2,7 +2,9 @@ from django.contrib.auth import get_user_model
 from django.db import IntegrityError
 from django.test import TestCase
 
-from ...models import Participation, Project
+from lab.models import Project
+
+from ..models import Participation
 
 
 class TestParticipationModel(TestCase):

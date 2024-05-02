@@ -15,8 +15,8 @@ from django.forms.widgets import (
 )
 from django.urls import reverse
 
-from lab.models.participation import Institution
 from lab.objects.models import Location, Period
+from lab.participations.models import Institution
 
 
 class UserWidgetWrapper(RelatedFieldWidgetWrapper):
