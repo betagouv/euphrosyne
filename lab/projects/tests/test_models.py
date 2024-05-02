@@ -3,7 +3,9 @@ from django.forms import ValidationError
 from django.test import TestCase
 from slugify import slugify
 
-from ...models import Participation, Project
+from lab.models import Participation
+
+from ..models import Project
 
 
 class TestProjectModel(TestCase):

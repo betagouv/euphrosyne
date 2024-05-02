@@ -1,11 +1,12 @@
 from django.test import TestCase
 from django.utils import timezone
 
-from ...models import Project
-from .. import factories
+from lab.tests import factories
+
+from ..models import Project
 
 
-class TestProjectModel(TestCase):
+class TestProjectModelStatusProperty(TestCase):
     def test_status_is_to_schedule_by_default(self):
         project = factories.ProjectFactory()
         assert project.status == Project.Status.TO_SCHEDULE

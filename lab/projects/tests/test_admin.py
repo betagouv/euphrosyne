@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 
+from lab.models import Institution
 from lab.tests.factories import (
     LabAdminUserFactory,
     ProjectFactory,
@@ -18,13 +19,13 @@ from lab.tests.factories import (
     RunFactory,
 )
 
-from ...admin.project import (
+from ..admin import (
     BeamTimeRequestInline,
     ParticipationInline,
     ProjectAdmin,
     ProjectChangeList,
 )
-from ...models import Institution, Project
+from ..models import Project
 
 
 class BaseTestCases:
@@ -280,7 +281,7 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
         assert project.members.count() == 1
         assert project.members.all()[0].id == self.project_member.id
 
-    @patch("lab.admin.project.initialize_project_directory")
+    @patch("lab.projects.admin.initialize_project_directory")
     def test_add_project_calls_init_directroy_hook(self, init_project_dir_mock):
         request = self.request_factory.post(self.add_view_url)
         request.user = self.project_member

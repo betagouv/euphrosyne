@@ -4,9 +4,9 @@ from django.contrib.auth import get_user_model
 from django.forms.models import inlineformset_factory
 from django.test.testcases import TestCase
 
-from lab.admin.project import ParticipationFormSet
 from lab.forms import BaseParticipationForm
 from lab.models import Participation, Project
+from lab.projects.admin import ParticipationFormSet
 
 
 class TestParticipationFormSet(TestCase):

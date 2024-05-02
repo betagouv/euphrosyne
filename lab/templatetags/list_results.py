@@ -13,7 +13,7 @@ from django.db.models.functions import TruncMonth
 from django.db.models.query import QuerySet
 from django.utils.html import format_html
 
-from lab.models.project import ProjectQuerySet
+from lab.projects.models import ProjectQuerySet
 
 from ..models import Project
 

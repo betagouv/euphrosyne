@@ -7,7 +7,6 @@ from django.core.exceptions import ValidationError
 from django.core.files.base import File
 from django.db.models.base import Model
 from django.forms.fields import BooleanField, EmailField, SplitDateTimeField
-from django.forms.forms import Form
 from django.forms.models import ModelForm
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput, Select
@@ -103,44 +102,6 @@ class LeaderParticipationForm(BaseParticipationForm):
         self.instance.is_leader = True
         self.instance.save()
         self._save_m2m()
-
-
-class ChangeLeaderForm(Form):
-    leader_participation = forms.ModelChoiceField(
-        queryset=None, empty_label=_("No leader"), label=_("Leader")
-    )
-
-    # pylint: disable=too-many-arguments
-    def __init__(
-        self,
-        project: models.Project,
-        data=None,
-        files=None,
-        auto_id="id_%s",
-        prefix=None,
-        initial=None,
-        error_class=ErrorList,
-        label_suffix=None,
-        empty_permitted=False,
-        field_order=None,
-        use_required_attribute=None,
-        renderer=None,
-    ) -> None:
-        initial = {"leader_participation": project.leader}
-        super().__init__(
-            data=data,
-            files=files,
-            auto_id=auto_id,
-            prefix=prefix,
-            initial=initial,
-            error_class=error_class,
-            label_suffix=label_suffix,
-            empty_permitted=empty_permitted,
-            field_order=field_order,
-            use_required_attribute=use_required_attribute,
-            renderer=renderer,
-        )
-        self.fields["leader_participation"].queryset = project.participation_set
 
 
 RECOMMENDED_ENERGY_LEVELS = {
@@ -446,23 +407,3 @@ class RunScheduleForm(ModelForm):
             )
 
         return cleaned_data, errors
-
-
-class BeamTimeRequestForm(ModelForm):
-    class Meta:
-        model = models.BeamTimeRequest
-        fields = ("request_type", "request_id", "form_type", "problem_statement")
-        widgets = {"problem_statement": widgets.CounterTextarea()}
-
-
-class BaseProjectForm(ModelForm):
-    class Meta:
-        model = models.Project
-        fields = ["name", "confidential"]
-
-
-class MemberProjectForm(BaseProjectForm):
-    has_accepted_cgu = forms.BooleanField(
-        required=True,
-        label=_("I have read and accepted the general conditions of Euphrosyne."),
-    )

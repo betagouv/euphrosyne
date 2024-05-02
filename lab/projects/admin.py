@@ -14,17 +14,13 @@ from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
 from euphro_tools.hooks import initialize_project_directory
+from lab.admin.mixins import LabPermission, LabPermissionMixin, LabRole
+from lab.forms import BaseParticipationForm, LeaderParticipationForm
+from lab.models import Participation
+from lab.permissions import is_lab_admin, is_project_leader
 
-from ..forms import (
-    BaseParticipationForm,
-    BaseProjectForm,
-    BeamTimeRequestForm,
-    LeaderParticipationForm,
-    MemberProjectForm,
-)
-from ..models import BeamTimeRequest, Participation, Project
-from ..permissions import is_lab_admin, is_project_leader
-from .mixins import LabPermission, LabPermissionMixin, LabRole
+from .forms import BaseProjectForm, BeamTimeRequestForm, MemberProjectForm
+from .models import BeamTimeRequest, Project
 
 
 class ProjectStatusListFilter(admin.SimpleListFilter):

@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.test.testcases import TestCase
 
-from ...forms import ChangeLeaderForm
-from ...models import Project
+from ..forms import ChangeLeaderForm
+from ..models import Project
 
 
 class TestParticipationLeaderForm(TestCase):

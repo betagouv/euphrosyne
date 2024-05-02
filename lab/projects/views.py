@@ -13,11 +13,12 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.edit import FormView
 
+from lab.models import Participation
 from lab.permissions import is_lab_admin
 from shared.view_mixins import StaffUserRequiredMixin
 
-from ..forms import ChangeLeaderForm
-from ..models import Participation, Project
+from .forms import ChangeLeaderForm
+from .models import Project
 
 
 class ChangeLeaderView(StaffUserRequiredMixin, FormView):

@@ -9,7 +9,7 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 
-from lab.models.project import Project
+from lab.projects.models import Project
 
 from ... import forms
 from ...admin import RunAdmin
