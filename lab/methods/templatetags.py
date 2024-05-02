@@ -2,7 +2,7 @@ from typing import Literal, Optional
 
 from django.contrib.admin.helpers import AdminField, AdminForm
 
-from lab.models.run import Run
+from lab.runs.models import Run
 
 from .dto import MethodDTO, method_model_to_dto
 from .models import MethodModel

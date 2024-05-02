@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from lab.documents.views import ProjectDocumentsView
 from lab.hdf5.views import HDF5View
 from lab.objects.views import ObjectImportC2RMFView
-from lab.views import ChangeLeaderView
+from lab.projects.views import ChangeLeaderView
 from lab.workplace.views import WorkplaceView
 
 

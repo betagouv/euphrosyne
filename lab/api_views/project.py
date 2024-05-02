@@ -2,7 +2,7 @@ from django.utils import timezone
 from django_filters import rest_framework as filters
 from rest_framework import generics
 
-from lab.models.run import Run
+from lab.runs.models import Run
 
 from ..models import Project
 from .permissions import IsLabAdminUser

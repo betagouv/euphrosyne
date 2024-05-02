@@ -1,6 +1,6 @@
 import pytest
 
-from ...models.participation import Institution
+from ...participations.models import Institution
 from ...widgets import AutoCompleteWidget
 
 

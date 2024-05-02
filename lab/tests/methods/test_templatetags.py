@@ -10,9 +10,9 @@ from django.contrib.auth.models import AnonymousUser
 from django.test.client import RequestFactory
 from django.urls import reverse
 
+from lab.runs.admin import RunAdmin
 from lab.widgets import DisabledSelectWithHidden
 
-from ...admin.run import RunAdmin
 from ...methods.dto import method_model_to_dto
 from ...models import Run
 from ...templatetags.methods import (

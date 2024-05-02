@@ -4,7 +4,7 @@ import pytest
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 
-from ..models.project import Project
+from ..projects.models import Project
 from ..templatetags.list_results import (
     _group_results,
     group_results_by_month,

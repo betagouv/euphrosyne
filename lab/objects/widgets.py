@@ -2,6 +2,10 @@ from typing import Any, Dict
 
 from django.forms import widgets
 
+from lab.widgets import AutoCompleteWidget
+
+from .models import Location, Period
+
 
 class ImportFromInput(widgets.TextInput):
     """Text input that does AJAX request to fetch information and fill up related
@@ -48,3 +52,29 @@ class ImportFromInput(widgets.TextInput):
             for key, field in self.field_id_mapping.items()
         )
         return context
+
+
+class LocationAutoCompleteWidget(AutoCompleteWidget):
+    template_name = "widgets/location_autocomplete_widget.html"
+
+    model = Location
+
+    class Media:
+        js = (
+            "web-components/location-type-ahead.js",
+            "js/widgets/location-autocomplete-widget.js",
+        )
+        css = {"all": ("css/widgets/autocomplete-widget.css",)}
+
+
+class DatingAutoCompleteWidget(AutoCompleteWidget):
+    template_name = "widgets/dating_autocomplete_widget.html"
+
+    model = Period
+
+    class Media:
+        js = (
+            "web-components/period-type-ahead.js",
+            "js/widgets/dating-autocomplete-widget.js",
+        )
+        css = {"all": ("css/widgets/autocomplete-widget.css",)}

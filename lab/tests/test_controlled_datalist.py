@@ -4,7 +4,8 @@ from unittest.mock import patch
 import pytest
 from django.db.models.query import QuerySet
 
-from ..forms import RunDetailsForm
+from lab.runs.forms import RunDetailsForm
+
 from .factories import RunFactory
 
 # [TODO] Test the front-end behavior with Cypress for example

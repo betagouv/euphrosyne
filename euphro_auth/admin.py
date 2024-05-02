@@ -13,7 +13,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
-from lab.models.participation import Participation
+from lab.participations.models import Participation
 from lab.permissions import is_lab_admin
 
 from .emails import send_invitation_email
