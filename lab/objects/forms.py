@@ -5,11 +5,11 @@ from typing import Any
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from lab import widgets
+from lab.widgets import ChoiceTag, TagsInput
 
+from . import widgets
 from .c2rmf import ErosHTTPError, fetch_partial_objectgroup_from_eros
 from .models import Location, ObjectGroup, Period
-from .widgets import ImportFromInput
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ class ObjectGroupForm(forms.ModelForm):
     add_type = forms.ChoiceField(
         label="",
         choices=ObjectGroupAddChoices.to_choices(),
-        widget=widgets.ChoiceTag(),
+        widget=ChoiceTag(),
         required=False,
         initial=ObjectGroupAddChoices.SINGLE_OBJECT.value[0],
     )
@@ -54,7 +54,7 @@ class ObjectGroupForm(forms.ModelForm):
             "dating": _("Start typing to search for a period"),
         }
         widgets = {
-            "materials": widgets.TagsInput(),
+            "materials": TagsInput(),
             "discovery_place_location": widgets.LocationAutoCompleteWidget(),
             "dating": widgets.DatingAutoCompleteWidget(),
         }
@@ -142,7 +142,7 @@ class ObjectGroupImportC2RMFForm(forms.ModelForm):
         fields = ("c2rmf_id", "label", "object_count")
         widgets = {
             "object_count": forms.HiddenInput(),
-            "c2rmf_id": ImportFromInput(
+            "c2rmf_id": widgets.ImportFromInput(
                 "api:objectgroup-c2rmf-fetch", {"label": "id_label"}
             ),
         }

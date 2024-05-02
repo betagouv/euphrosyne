@@ -9,17 +9,18 @@ from django.forms.widgets import HiddenInput, Select
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User, UserInvitation
-from lab import models, widgets
+from lab.models import Institution
+from lab.widgets import CounterTextarea
 
-from .. import models, widgets
 from ..emails import send_project_invitation_email
+from . import models, widgets
 
 
 class BeamTimeRequestForm(forms.ModelForm):
     class Meta:
         model = models.BeamTimeRequest
         fields = ("request_type", "request_id", "form_type", "problem_statement")
-        widgets = {"problem_statement": widgets.CounterTextarea()}
+        widgets = {"problem_statement": CounterTextarea()}
 
 
 class BaseProjectForm(forms.ModelForm):
@@ -93,7 +94,7 @@ class BaseParticipationForm(ModelForm):
             (
                 institution,
                 _,
-            ) = models.Institution.objects.get_or_create(
+            ) = Institution.objects.get_or_create(
                 name=self.data[f"{self.prefix}-institution__name"],
                 country=self.data.get(f"{self.prefix}-institution__country"),
                 ror_id=self.data.get(f"{self.prefix}-institution__ror_id"),
@@ -141,7 +142,7 @@ class LeaderParticipationForm(BaseParticipationForm):
         fields = ("user", "institution")
         widgets = {
             "institution": widgets.InstitutionWidgetWrapper(
-                Select(), models.Institution.participation_set.rel
+                Select(), Institution.participation_set.rel
             ),
         }
 

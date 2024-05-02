@@ -1,10 +1,7 @@
-from typing import Any, Optional, Tuple, Type
+from typing import Any, Optional, Type
 
 from django import forms
-from django.contrib.admin import site
-from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.db import models
-from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.forms.widgets import (
     ChoiceWidget,
     HiddenInput,
@@ -13,37 +10,6 @@ from django.forms.widgets import (
     Textarea,
     Widget,
 )
-from django.urls import reverse
-
-from lab.objects.models import Location, Period
-from lab.participations.models import Institution
-
-
-class UserWidgetWrapper(RelatedFieldWidgetWrapper):
-    # pylint: disable=too-many-arguments
-    def __init__(
-        self,
-        widget: forms.Widget,
-        rel: ForeignObjectRel,
-        can_add_related: Optional[bool] = ...,
-        can_change_related: bool = ...,
-        can_delete_related: bool = ...,
-        can_view_related: bool = ...,
-    ) -> None:
-        super().__init__(
-            widget,
-            rel,
-            site,
-            can_add_related=can_add_related,
-            can_change_related=False,
-            can_delete_related=False,
-            can_view_related=can_view_related,
-        )
-
-    def get_related_url(self, info: Tuple[str, str], action: str, *args: Any) -> str:
-        if action == "add":
-            return reverse("admin:euphro_auth_userinvitation_add")
-        return super().get_related_url(info, action, *args)
 
 
 class AutoCompleteWidget(Widget):
@@ -65,67 +31,6 @@ class AutoCompleteWidget(Widget):
         else:
             context["widget"]["instance"] = None
         return context
-
-
-class InstitutionAutoCompleteWidget(AutoCompleteWidget):
-    template_name = "widgets/institution_autocomplete_widget.html"
-
-    model = Institution
-
-    class Media:
-        js = (
-            "web-components/institution-type-ahead.js",
-            "js/widgets/institution-autocomplete-widget.js",
-        )
-        css = {"all": ("css/widgets/autocomplete-widget.css",)}
-
-
-class LocationAutoCompleteWidget(AutoCompleteWidget):
-    template_name = "widgets/location_autocomplete_widget.html"
-
-    model = Location
-
-    class Media:
-        js = (
-            "web-components/location-type-ahead.js",
-            "js/widgets/location-autocomplete-widget.js",
-        )
-        css = {"all": ("css/widgets/autocomplete-widget.css",)}
-
-
-class DatingAutoCompleteWidget(AutoCompleteWidget):
-    template_name = "widgets/dating_autocomplete_widget.html"
-
-    model = Period
-
-    class Media:
-        js = (
-            "web-components/period-type-ahead.js",
-            "js/widgets/dating-autocomplete-widget.js",
-        )
-        css = {"all": ("css/widgets/autocomplete-widget.css",)}
-
-
-class InstitutionWidgetWrapper(RelatedFieldWidgetWrapper):
-    # pylint: disable=too-many-arguments
-    def __init__(
-        self,
-        widget: forms.Widget,
-        rel: ForeignObjectRel,
-        can_add_related: Optional[bool] = ...,
-        can_change_related: bool = ...,
-        can_delete_related: bool = ...,
-        can_view_related: bool = ...,
-    ) -> None:
-        super().__init__(
-            widget,
-            rel,
-            site,
-            can_add_related=can_add_related,
-            can_change_related=False,
-            can_delete_related=False,
-            can_view_related=can_view_related,
-        )
 
 
 class DisabledSelectWithHidden(Select):
