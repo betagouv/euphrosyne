@@ -12,18 +12,19 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from euphro_tools.hooks import initialize_run_directory, rename_run_directory
+from lab.admin.mixins import LabPermission, LabPermissionMixin
+from lab.permissions import LabRole, is_lab_admin
+from lab.projects.models import Project
 
-from ..forms import (
+from .admin_actions import change_state
+from .forms import (
     RunCreateAdminForm,
     RunCreateForm,
     RunDetailsAdminForm,
     RunDetailsForm,
     RunScheduleForm,
 )
-from ..models import Project, Run
-from ..permissions import LabRole, is_lab_admin
-from .mixins import LabPermission, LabPermissionMixin
-from .run_actions import change_state
+from .models import Run
 
 
 class RunChangeList(ChangeList):

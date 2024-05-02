@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pytest
 from django.db.models import QuerySet
 
-from .... import forms
+from ... import forms
 
 
 @pytest.fixture(scope="module", autouse=True)

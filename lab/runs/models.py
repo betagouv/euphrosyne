@@ -2,10 +2,9 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from lab.methods import MethodModel
+from lab.validators import valid_filename
 from shared.models import TimestampedModel
-
-from ..methods import MethodModel
-from ..validators import valid_filename
 
 
 class RunManager(models.Manager):

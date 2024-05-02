@@ -1,7 +1,7 @@
 from django import template
 
-from ..admin.run_actions import get_change_state_text
 from ..permissions import is_lab_admin
+from ..runs.admin_actions import get_change_state_text
 
 register = template.Library()
 

@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from slugify import slugify
 
 from lab.models.participation import Participation
-from lab.models.run import Run
+from lab.runs.models import Run
 from lab.validators import valid_filename
 from shared.models import TimestampedModel
 

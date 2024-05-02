@@ -10,11 +10,11 @@ from django.urls import reverse
 from django.utils import timezone
 
 from lab.projects.models import Project
+from lab.tests import factories
 
-from ... import forms
-from ...admin import RunAdmin
-from ...models import Run
-from .. import factories
+from .. import forms
+from ..admin import RunAdmin
+from ..models import Run
 
 
 class TestRunAdminPermissions(TestCase):
@@ -171,7 +171,7 @@ class TestRunAdminViewAsLeader(TestCase):
             user=self.project_leader_user, is_leader=True
         )
 
-    @patch("lab.admin.run.initialize_run_directory")
+    @patch("lab.runs.admin.initialize_run_directory")
     def test_add_run_calls_init_directroy_hook(self, init_run_dir_mock):
         request = self.request_factory.post(reverse("admin:lab_run_add"))
         request.user = self.staff_user
@@ -303,7 +303,7 @@ class TestRunAdminViewAsAdmin(TestCase):
         admin = RunAdmin(Run, admin_site=AdminSite())
         assert admin.changelist_view(request)
 
-    @patch("lab.admin.run.rename_run_directory")
+    @patch("lab.runs.admin.rename_run_directory")
     def test_change_run_label_calls_hook(self, rename_run_dir_mock):
         run = factories.RunFactory()
         request = self.request_factory.post(

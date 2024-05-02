@@ -3,9 +3,9 @@ from unittest.mock import patch
 import pytest
 from django.db.models import QuerySet
 
-from ...forms import RunDetailsForm
-from ...models import Run
-from .. import factories
+from lab.runs.forms import RunDetailsForm
+from lab.runs.models import Run
+from lab.tests import factories
 
 
 @pytest.fixture(scope="module", autouse=True)

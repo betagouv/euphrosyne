@@ -4,7 +4,7 @@ import pytest
 from django.db.models import QuerySet
 from django.utils import timezone
 
-from .... import forms, models
+from ... import forms, models
 
 
 @pytest.fixture(scope="module", autouse=True)
