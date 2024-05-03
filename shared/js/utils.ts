@@ -3,5 +3,16 @@ export function getTemplateJSONData<Type>(elementId: string): Type | null {
   if (!element || !element.text) {
     return null;
   }
-  return JSON.parse(element.text);
+  const text = element.text.trim();
+  if (text === "") {
+    return null;
+  }
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    console.error(
+      `Error parsing JSON data for elementId: ${elementId}.\nContent: ${text}`,
+    );
+    return null;
+  }
 }
