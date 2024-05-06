@@ -1,5 +1,5 @@
 -i https://pypi.org/simple
-docutils==0.21.1
+docutils==0.21.2
 dj-database-url==2.1.0
 django-debug-toolbar==4.3.0
 django-filter==24.2
