@@ -673,17 +673,17 @@ msgstr "Cet object a déjà été ajouté à ce run."
 msgid "EROS import"
 msgstr "Import EROS"
 
+msgid "On premises"
+msgstr "Sur place"
+
+msgid "Is the user going to be at the New AGLAE facility?"
+msgstr "L'utilisateur sera-t-il présent sur le site de New AGLAE ?"
+
 msgid "name"
 msgstr "nom"
 
 msgid "country"
 msgstr "pays"
-
-msgid "Project member"
-msgstr "Membre du projet"
-
-msgid "Project members"
-msgstr "Membres du projet"
 
 msgid "Leader"
 msgstr "Chef de projet"
@@ -750,6 +750,27 @@ msgstr "Aucun chef de projet"
 
 msgid "User"
 msgstr "Utilisateur"
+
+msgid "Project member"
+msgstr "Membre du projet"
+
+msgid "Project members"
+msgstr "Membres du projet"
+
+msgid "on premises member"
+msgstr "membre sur place"
+
+msgid "on premises members"
+msgstr "membres sur place"
+
+msgid "remote member"
+msgstr "membre à distance"
+
+msgid "remote members"
+msgstr "membres à distance"
+
+msgid "project leader"
+msgstr "chef de projet"
 
 msgid "Scheduled"
 msgstr "Planifié"
@@ -960,6 +981,9 @@ msgstr "Modification"
 
 msgid "View"
 msgstr "Voir"
+
+msgid "Add another member"
+msgstr "Ajouter un autre membre"
 
 msgid "Popup closing…"
 msgstr "Fenêtre pop-up en cours de fermeture…"

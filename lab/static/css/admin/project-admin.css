@@ -1,3 +1,19 @@
+@media (min-width: 900px) {
+  .inline-group td .autocomplete-input {
+    min-width: 500px;
+  }
+  .inline-group .typeahead-field {
+    width: 60%;
+  }
+  .inline-group .autocomplete-input__country {
+    width: 40%;
+  }
+  .inline-group td.delete input {
+    /* add margin so th delete is in one line */
+    margin: 0 40px;
+  }
+}
+
 body.change-list {
   background-color: var(--background-default-grey);
 }
@@ -10,37 +26,20 @@ body.change-list {
   width: calc(100% - 100px);
 }
 
-#participation_set-group .field-user input {
+.inline-group .field-user input {
   max-width: unset;
   width: 100%;
 }
 
-#participation_set-group td.delete input {
-  /* add margin so th delete is in one line */
-  margin: 0 40px;
-}
-
-#participation_set-group td .autocomplete-input {
-  min-width: 500px;
-}
-
-#participation_set-group .typeahead-field {
-  width: 60%;
-}
-
-#participation_set-group .autocomplete-input__country {
-  width: 40%;
-}
-
-#participation_set-group .delete {
+.inline-group .delete {
   vertical-align: middle;
 }
 
-#participation_set-group.inline-group {
+.inline-group.inline-group {
   overflow: inherit !important; /* for typeahead list to be absolute */
 }
 
-#participation_set-group tbody th {
+.inline-group tbody th {
   text-transform: uppercase;
   font-size: 0.6875rem;
 }
@@ -125,4 +124,16 @@ td.field-status {
 
 #changelist .paginator {
   background-color: transparent;
+}
+
+.field-institution {
+  width: 300px;
+}
+
+#participation_set-group .field-institution div.autocomplete-input {
+  margin-right: 110px;
+}
+
+.inline-group .delete {
+  width: 70px;
 }
