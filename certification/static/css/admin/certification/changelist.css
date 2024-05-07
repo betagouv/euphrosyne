@@ -1,0 +1,24 @@
+#changelist {
+    flex-direction: column-reverse;
+    background: unset;
+}
+@media (max-width: 767px) { /* Override Django responsive styles */
+    #changelist {
+        flex-direction: column-reverse !important;
+    }
+}
+details ul li {
+    display: inline;
+}
+.changelist-form-container {
+    width: 100%;
+}
+nav.changelist-filters {
+    width: 100%;
+}
+.object-tools {
+    display: none;
+}
+#changelist .actions  {
+    padding: 1rem !important;
+}

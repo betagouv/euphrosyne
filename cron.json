@@ -12,6 +12,10 @@
     {
       "command": "5 */6 * * * ./scripts/scalingo_index_and_build_catalog.sh",
       "size": "S"
+    },
+    {
+      "command": "*/10 * * * * python manage.py send_notifications",
+      "size": "S"
     }
   ]
 }
