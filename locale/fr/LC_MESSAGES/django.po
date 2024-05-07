@@ -10,6 +10,215 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
+msgid "Template does not exist"
+msgstr "Le template n'existe pas"
+
+msgid "Quiz certification"
+msgstr "Certification de quiz"
+
+msgid "Score"
+msgstr "Score"
+
+msgid "Quiz URL"
+msgstr "URL du quiz"
+
+msgid "Passing score"
+msgstr "Score pour réussir"
+
+#, python-format
+msgid "%s (quiz)"
+msgstr "%s (quiz)"
+
+msgid "Quiz certifications"
+msgstr "Certifications de quiz"
+
+msgid "Quiz"
+msgstr "Quiz"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Type of certification"
+msgstr "Type de certification"
+
+msgid "Number of days the certification is valid"
+msgstr "Nombre de jours pendant lesquels la certification est valide"
+
+msgid "Invitation to complete email template path"
+msgstr "Template de l'email d'invitation à compléter"
+
+msgid "Success email template path"
+msgstr "Template de l'email de réussite"
+
+msgid "Certification"
+msgstr "Certification"
+
+msgid "Certifications"
+msgstr "Certifications"
+
+#, python-format
+msgid "Certification type %(type)s not implemented."
+msgstr "Le type de certification %(type)s n'est pas implémenté."
+
+msgid "Quiz passed"
+msgstr "Quiz réussi"
+
+msgid "Quiz result"
+msgstr "Résultat du quiz"
+
+msgid "Quiz results"
+msgstr "Résultats des quiz"
+
+#, python-format
+msgid "Result for %(quiz)s - %(user)s - %(score)s - %(created)s"
+msgstr "Résultat pour %(quiz)s - %(user)s - %(score)s - %(created)s"
+
+msgid "Notifications"
+msgstr "Notifications"
+
+msgid "Results"
+msgstr "Résultats"
+
+msgid "Invitation to complete"
+msgstr "Invitation à compléter"
+
+msgid "Retry"
+msgstr "Réessayer"
+
+msgid "Success"
+msgstr "Réussite"
+
+msgid "Certification notification"
+msgstr "Notification des certifications"
+
+msgid "Certification notifications"
+msgstr "Notifications des certifications"
+
+#, python-format
+msgid "[Euphrosyne] Invitation to complete certification %s."
+msgstr "[Euphrosyne] Invitation à compléter la certification %s."
+
+#, python-format
+msgid "[Euphrosyne] Certification %s completed."
+msgstr "[Euphrosyne] Certification %s complétée."
+
+#, python-format
+msgid "[Euphrosyne] Invitation to retry certification %s."
+msgstr "[Euphrosyne] Invitation à retenter la certification %s."
+
+msgid "Add"
+msgstr "Ajouter"
+
+msgid "Filter"
+msgstr "Filtrer"
+
+msgid "Remove from sorting"
+msgstr "Enlever du tri"
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Priorité de tri : %(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "Changer l'ordre de tri"
+
+msgid "Hello"
+msgstr "Bonjour"
+
+msgid "Here is a link to retry the quiz:"
+msgstr "Voici un lien pour retenter le quiz :"
+
+msgid "Access quiz"
+msgstr "Accéder au quiz"
+
+msgid ""
+"We are excited about your interest in conducting experiments using the New "
+"AGLAE particle accelerator at the Louvre."
+msgstr ""
+"Nous sommes ravis de votre intérêt à mener des expériences en utilisant "
+"l'accélérateur de particules New AGLAE au Louvre."
+
+msgid ""
+"However, we noticed that you currently do not have a radiation protection "
+"certificate on file. This certification is a mandatory requirement for all "
+"researchers who wish to use the New AGLAE facilities, ensuring that everyone "
+"understands the necessary safety protocols and procedures."
+msgstr ""
+"Cependant, nous avons remarqué que vous n'avez pas actuellement de "
+"certificat de radioprotection enregistré. Cette certification est une "
+"exigence obligatoire pour tous les chercheurs qui souhaitent utiliser les "
+"installations de New AGLAE, garantissant que tout le monde comprend les "
+"protocoles et procédures de sécurité nécessaires."
+
+msgid ""
+"To assist you in obtaining this certification, we have prepared a "
+"comprehensive tutorial and quiz. By completing these, you will gain the "
+"necessary knowledge about radiation protection and be able to obtain your "
+"certificate."
+msgstr ""
+"Pour vous aider à obtenir cette certification, nous avons préparé un "
+"tutoriel complet et un quiz. En les complétant, vous acquerrez les "
+"connaissances nécessaires sur la radioprotection et pourrez obtenir votre "
+"certificat."
+
+msgid "The PDF course is available by cicking on the following link:"
+msgstr ""
+"Le cours est disponible au format PDF en cliquant sur le lien suivant :"
+
+msgid "In French: "
+msgstr "En français : "
+
+msgid "Access course"
+msgstr "Accéder au cours"
+
+#, fuzzy
+#| msgid "English"
+msgid "In English: "
+msgstr "En anglais : "
+
+msgid ""
+"When you have reviewed the course and are ready to take the the quiz, click "
+"on the following link:"
+msgstr ""
+"Lorsque vous aurez terminé le cours et serez prêt à passer le quiz, cliquez "
+"sur le lien suivant :"
+
+msgid ""
+"Once you have completed the quiz and obtained your certificate, you will be "
+"granted access to the New AGLAE facilities. If you have any questions or "
+"need further assistance, please do not hesitate to contact us."
+msgstr ""
+"Une fois que vous aurez complété le quiz et obtenu votre certificat, vous "
+"aurez accès aux installations de New AGLAE. Si vous avez des questions ou "
+"besoin d'aide supplémentaire, n'hésitez pas à nous contacter."
+
+msgid "Best regards,"
+msgstr "Cordialement,"
+
+msgid "The New AGLAE team"
+msgstr "L'équipe New AGLAE"
+
+msgid ""
+"Congratulations on successfully completing the radiation protection course "
+"and quiz! Your are now certified to use the New AGLAE particle accelerator "
+"at the Louvre."
+msgstr ""
+"Félicitations pour avoir réussi le cours et le quiz de radioprotection ! "
+"Vous êtes maintenant abilité à utiliser l'accélérateur de particules New "
+"AGLAE au Louvre."
+
+msgid ""
+"Please keep this email as a record of your certification. You may be asked "
+"to present proof of your radiation protection certification when accessing "
+"the New AGLAE facilities."
+msgstr ""
+"Gardez cet email comme preuve de votre certification. Vous pourriez être "
+"demandé de présenter une preuve de votre certification de radioprotection "
+"lors de l'accès aux installations de New AGLAE."
+
+msgid "The certification is valid until:"
+msgstr "La certification est valide jusqu'au :"
+
 msgid "Accept request(s) (send download links)"
 msgstr "Accepter les demandes (envoyer les liens de téléchargement)"
 
@@ -66,9 +275,6 @@ msgstr "Nom"
 
 msgid "Institution"
 msgstr "Institution"
-
-msgid "Description"
-msgstr "Description"
 
 msgid "Created"
 msgstr "Créé"
@@ -201,6 +407,9 @@ msgstr "Modifier le mot de passe en utilisant {}."
 msgid "No password. You can set one using {}."
 msgstr "Aucun mot de passe. Vous pouvez en définir un en utilisant {}."
 
+msgid "Radiation protection"
+msgstr "Radioprotection"
+
 msgid "Invite new user"
 msgstr "Inviter un utilisateur"
 
@@ -300,9 +509,6 @@ msgid ""
 "The registration link was invalid, possibly because it has already been used."
 msgstr ""
 "Le lien d'inscription est invalide, peut-être parce qu'il a déjà été utilisé."
-
-msgid "Hello,"
-msgstr "Bonjour,"
 
 msgid "You've been invited to register at Euphrosyne."
 msgstr "Vous avez été invité à vous inscrire sur Euphrosyne."
@@ -997,9 +1203,6 @@ msgstr "Fenêtre pop-up en cours de fermeture…"
 msgid "Delete selected projects"
 msgstr "Supprimer les projets sélectionnés"
 
-msgid "Filter"
-msgstr "Filtrer"
-
 msgid "No project yet"
 msgstr "Aucun projet pour le moment"
 
@@ -1022,16 +1225,6 @@ msgstr ""
 
 msgid "Create my first project"
 msgstr "Créer mon premier projet"
-
-msgid "Remove from sorting"
-msgstr "Enlever du tri"
-
-#, python-format
-msgid "Sorting priority: %(priority_number)s"
-msgstr "Priorité de tri : %(priority_number)s"
-
-msgid "Toggle sorting"
-msgstr "Changer l'ordre de tri"
 
 #, python-format
 msgid " By %(filter_title)s "
@@ -1122,6 +1315,11 @@ msgstr ""
 msgid "Documents"
 msgstr "Documents"
 
+#, fuzzy
+#| msgid "Hello"
+msgid "Hello,"
+msgstr "Bonjour"
+
 #, python-format
 msgid ""
 "We would like to inform you that the end date of the embargo on your data of "
@@ -1152,9 +1350,6 @@ msgstr "Le délai souhaité pour la prolongation."
 msgid "For any questions or specific requests, please feel free to contact us."
 msgstr ""
 "Pour toute question ou demande spécifique, n’hésitez pas à nous contacter."
-
-msgid "Best regards,"
-msgstr "Bien cordialement,"
 
 msgid "The AGLAE Team"
 msgstr "L'équipe AGLAE"
@@ -1188,6 +1383,9 @@ msgstr "Rejoindre le projet"
 msgid "Country"
 msgstr "Pays"
 
+msgid "Missing radiation protection certification"
+msgstr "Certification de radioprotection manquante"
+
 #, python-format
 msgid "Change selected %(model)s"
 msgstr "Modifier l’objet %(model)s sélectionné"
@@ -1195,9 +1393,6 @@ msgstr "Modifier l’objet %(model)s sélectionné"
 #, python-format
 msgid "Add another %(model)s"
 msgstr "Ajouter un autre %(model)s"
-
-msgid "Add"
-msgstr "Ajouter"
 
 msgid "Add a new object or object group"
 msgstr "Créer un objet ou groupe d'objets"
