@@ -27,6 +27,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
+    console.log(document.querySelectorAll(`${baseSelector}`));
     // Add event listeners to institution input elements
     document.querySelectorAll(`${baseSelector}`).forEach((el) => {
       el.querySelector(`${baseSelector}__name`).addEventListener(
@@ -45,29 +46,35 @@
 
     setTimeout(() => {
       // Add event listeners to new institution input elements
-      document
-        .querySelector("#participation_set-group .add-row a")
-        .addEventListener("click", function () {
-          const elements = document.querySelectorAll(
-            ".dynamic-participation_set",
-          );
-          const lastElement = elements[elements.length - 1];
-          lastElement
-            .querySelector(`${baseSelector}__name`)
-            .addEventListener("input", onCountryOrNameInput);
-          lastElement
-            .querySelector(`${baseSelector}__country`)
-            .addEventListener("input", onCountryOrNameInput);
-          lastElement
-            .querySelector("div[is='institution-type-ahead']")
-            .setAttribute(
-              "html-for",
-              lastElement.querySelector(`${baseSelector}__name`).id,
+      const participationFormsets = Array.from(
+        document.querySelectorAll(".inline-group"),
+      ).filter((node) => node.id.startsWith("participation_set"));
+      for (const formset of participationFormsets) {
+        formset
+          .querySelector(".add-row a")
+          .addEventListener("click", function () {
+            const formSetName = formset.id.split("-").slice(0, -1).join("-"); // participation_set-2-group --> participation_set-2
+            const elements = formset.querySelectorAll(
+              `.dynamic-${formSetName}`,
             );
-          lastElement
-            .querySelector("div[is='institution-type-ahead']")
-            .addEventListener("result-click", onResultClicked);
-        });
+            const lastElement = elements[elements.length - 1];
+            lastElement
+              .querySelector(`${baseSelector}__name`)
+              .addEventListener("input", onCountryOrNameInput);
+            lastElement
+              .querySelector(`${baseSelector}__country`)
+              .addEventListener("input", onCountryOrNameInput);
+            lastElement
+              .querySelector("div[is='institution-type-ahead']")
+              .setAttribute(
+                "html-for",
+                lastElement.querySelector(`${baseSelector}__name`).id,
+              );
+            lastElement
+              .querySelector("div[is='institution-type-ahead']")
+              .addEventListener("result-click", onResultClicked);
+          });
+      }
     }, 300);
   });
 })();
