@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-18 09:18+0100\n"
+"POT-Creation-Date: 2024-05-15 15:28+0200\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -28,9 +28,6 @@ msgstr "Déconnexion"
 
 msgid "Admin"
 msgstr "Admin"
-
-msgid "Close"
-msgstr "Fermer"
 
 msgid "Leader"
 msgstr "Chef.fe de projet"
@@ -166,6 +163,9 @@ msgstr "Images"
 
 msgid "No images yet"
 msgstr "Aucune image"
+
+msgid "Close"
+msgstr "Fermer"
 
 msgid "Add files"
 msgstr "Ajouter des fichiers"

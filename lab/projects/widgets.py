@@ -1,5 +1,6 @@
 import typing
 
+from django import forms
 from django.contrib.admin import site
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.db.models.fields.reverse_related import ManyToOneRel
@@ -44,3 +45,10 @@ class InstitutionWidgetWrapper(RelatedFieldWidgetWrapper):
             can_delete_related=False,
             can_view_related=can_view_related,
         )
+
+
+class ParticipationCertificationWidget(forms.Widget):
+    template_name = "widgets/participation_certification_widget.html"
+
+    class Media:
+        css = {"all": ("css/widgets/participation-certification-widget.css",)}
