@@ -3,10 +3,10 @@ from typing import Any
 from django import forms
 from django.contrib.auth import get_user_model
 from django.db.models.fields.reverse_related import ManyToOneRel
+from django.forms import Select
 from django.forms.fields import EmailField
 from django.forms.models import ModelForm
 from django.forms.utils import ErrorList
-from django.forms.widgets import HiddenInput, Select
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User, UserInvitation
@@ -87,6 +87,7 @@ class BaseParticipationForm(ModelForm):
             initial = {**(initial or {}), "user": instance.user.email}
         super().__init__(initial=initial, instance=instance, **kwargs)
         self.fields["user"].widget.attrs["placeholder"] = _("Email")
+        self.fields["user"].label = _("Email")
         if instance:
             self.fields["institution"].widget.instance = instance.institution
 
@@ -138,15 +139,13 @@ class LeaderParticipationForm(BaseParticipationForm):
     `True` when saving the instance.
     """
 
-    is_leader = forms.BooleanField(widget=HiddenInput(), initial=True)
-
     class Meta:
         model = models.Participation
         fields = ("user", "institution")
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.fields["user"].label = _("Leader")
+        self.fields["user"].label = _("Email")
         rel: ManyToOneRel = Institution.participation_set.rel  # type: ignore[attr-defined] # pylint: disable=line-too-long
         self.fields["institution"].widget = widgets.InstitutionWidgetWrapper(
             Select(), rel

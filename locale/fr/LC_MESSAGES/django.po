@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-20 16:41+0100\n"
+"POT-Creation-Date: 2025-03-20 17:00+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -676,17 +676,17 @@ msgstr "Cet object a déjà été ajouté à ce run."
 msgid "EROS import"
 msgstr "Import EROS"
 
+msgid "On premises"
+msgstr "Sur place"
+
+msgid "Is the user going to be at the New AGLAE facility?"
+msgstr "L'utilisateur sera-t-il présent sur le site de New AGLAE ?"
+
 msgid "name"
 msgstr "nom"
 
 msgid "country"
 msgstr "pays"
-
-msgid "Project member"
-msgstr "Membre du projet"
-
-msgid "Project members"
-msgstr "Membres du projet"
 
 msgid "Leader"
 msgstr "Chef de projet"
@@ -753,6 +753,27 @@ msgstr "Aucun chef de projet"
 
 msgid "User"
 msgstr "Utilisateur"
+
+msgid "Project member"
+msgstr "Membre du projet"
+
+msgid "Project members"
+msgstr "Membres du projet"
+
+msgid "on premises member"
+msgstr "membre sur place"
+
+msgid "on premises members"
+msgstr "membres sur place"
+
+msgid "remote member"
+msgstr "membre à distance"
+
+msgid "remote members"
+msgstr "membres à distance"
+
+msgid "project leader"
+msgstr "chef de projet"
 
 msgid "Scheduled"
 msgstr "Planifié"
@@ -960,6 +981,9 @@ msgstr "Modification"
 
 msgid "View"
 msgstr "Voir"
+
+msgid "Add another member"
+msgstr "Ajouter un autre membre"
 
 msgid "Popup closing…"
 msgstr "Fenêtre pop-up en cours de fermeture…"
