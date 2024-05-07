@@ -13,32 +13,69 @@ def test_get_nav_items_for_admin():
     assert get_nav_items(request) == [
         {
             "title": "Tableau de bord",
-            "href": "/",
-            "iconName": "fr-icon-calendar-line",
-            "exactPath": True,
-            "extraPath": [],
+            "item": {
+                "href": "/",
+                "iconName": "fr-icon-calendar-line",
+                "exactPath": True,
+                "extraPath": [],
+            },
         },
         {
             "title": "Projets",
-            "href": "/lab/project/",
-            "iconName": "fr-icon-survey-line",
-            "extraPath": ["/lab/run/"],
-            "exactPath": False,
+            "item": {
+                "href": "/lab/project/",
+                "iconName": "fr-icon-survey-line",
+                "extraPath": ["/lab/run/"],
+                "exactPath": False,
+            },
         },
         {
             "title": "Utilisateurs",
-            "href": "/euphro_auth/user/",
-            "iconName": "fr-icon-user-line",
-            "exactPath": False,
-            "extraPath": ["/euphro_auth/userinvitation/"],
+            "item": {
+                "href": "/euphro_auth/user/",
+                "iconName": "fr-icon-user-line",
+                "exactPath": False,
+                "extraPath": ["/euphro_auth/userinvitation/"],
+            },
         },
         {
             "title": "Demandes de données",
-            "href": "/data_request/datarequest/",
-            "iconName": "fr-icon-download-line",
-            "exactPath": False,
-            "extraPath": None,
-            "badge": 0,
+            "item": {
+                "href": "/data_request/datarequest/",
+                "iconName": "fr-icon-download-line",
+                "exactPath": False,
+                "extraPath": None,
+                "badge": 0,
+            },
+        },
+        {
+            "title": "Certifications",
+            "items": [
+                {
+                    "title": "Certifications",
+                    "item": {
+                        "href": "/certification/certification/",
+                        "exactPath": False,
+                        "extraPath": [],
+                    },
+                },
+                {
+                    "title": "Notifications",
+                    "item": {
+                        "href": "/certification/certificationnotification/",
+                        "exactPath": False,
+                        "extraPath": [],
+                    },
+                },
+                {
+                    "title": "Résultats",
+                    "item": {
+                        "href": "/certification/quizresult/",
+                        "exactPath": False,
+                        "extraPath": [],
+                    },
+                },
+            ],
         },
     ]
 
@@ -50,16 +87,20 @@ def test_get_nav_items_for_staff():
     assert get_nav_items(request) == [
         {
             "title": "Projets",
-            "href": "/lab/project/",
-            "iconName": "fr-icon-survey-line",
-            "extraPath": ["/lab/run/"],
-            "exactPath": False,
+            "item": {
+                "href": "/lab/project/",
+                "iconName": "fr-icon-survey-line",
+                "extraPath": ["/lab/run/"],
+                "exactPath": False,
+            },
         },
         {
             "title": "Compte",
-            "href": f"/euphro_auth/user/{request.user.id}/change/",
-            "iconName": "fr-icon-user-line",
-            "exactPath": False,
-            "extraPath": [],
+            "item": {
+                "href": f"/euphro_auth/user/{request.user.id}/change/",
+                "iconName": "fr-icon-user-line",
+                "exactPath": False,
+                "extraPath": [],
+            },
         },
     ]
