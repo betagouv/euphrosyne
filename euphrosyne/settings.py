@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     "lab",
     "orcid_oauth",
     "static_pages",
+    "certification",
 ] + (["debug_toolbar"] if DEBUG else [])
 
 MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else []) + [
