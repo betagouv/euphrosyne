@@ -1,0 +1,8 @@
+{% load i18n %}
+
+{% if widget.value and widget.value == 'False' %}
+<span class="fr-icon-warning-line participation-certification-warning" aria-hidden="true" aria-describedby="{{widget.attrs.id}}-tooltip" {% include 'django/forms/attrs.html' %}></span>
+<span class="fr-tooltip fr-placement" id="{{widget.attrs.id}}-tooltip" role="tooltip" aria-hidden="true">
+{% translate "Missing radiation protection certification" %}
+</span>
+{% endif %}
