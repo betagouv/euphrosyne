@@ -21,6 +21,12 @@ class Participation(TimestampedModel):
         "lab.Institution", on_delete=models.SET_NULL, null=True
     )
 
+    on_premises = models.BooleanField(
+        verbose_name=_("On premises"),
+        default=False,
+        help_text=_("Is the user going to be at the New AGLAE facility?"),
+    )
+
     def __str__(self):
         return f"{self.user} participation in {self.project}"
 

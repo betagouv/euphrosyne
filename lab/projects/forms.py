@@ -5,7 +5,6 @@ from django.contrib.auth import get_user_model
 from django.forms.fields import EmailField
 from django.forms.models import ModelForm
 from django.forms.utils import ErrorList
-from django.forms.widgets import HiddenInput, Select
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User, UserInvitation
@@ -84,6 +83,7 @@ class BaseParticipationForm(ModelForm):
             initial = {**(initial or {}), "user": instance.user.email}
         super().__init__(initial=initial, instance=instance, **kwargs)
         self.fields["user"].widget.attrs["placeholder"] = _("Email")
+        self.fields["user"].label = _("Email")
         if instance:
             self.fields["institution"].widget.instance = instance.institution
 
@@ -135,23 +135,18 @@ class LeaderParticipationForm(BaseParticipationForm):
     `True` when saving the instance.
     """
 
-    is_leader = forms.BooleanField(widget=HiddenInput(), initial=True)
-
     class Meta:
         model = models.Participation
         fields = ("user", "institution")
-        widgets = {
-            "institution": widgets.InstitutionWidgetWrapper(
-                Select(), Institution.participation_set.rel
-            ),
-        }
+        widgets = {"institution": widgets.InstitutionAutoCompleteWidget()}
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        self.fields["user"].label = _("Leader")
+        self.fields["user"].label = _("Email")
 
     def save(self, commit: bool = ...) -> models.Participation:
         super().save(commit=False)
         self.instance.is_leader = True
         self.instance.save()
         self._save_m2m()
+        return self.instance
