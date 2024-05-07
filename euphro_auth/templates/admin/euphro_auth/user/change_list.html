@@ -9,9 +9,11 @@
 {% block content_title %}
 {% if title %}<div class="fr-container flex-container">
   <h1>{{ title }}</h1>
-  <a class="fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-add-circle-line" href="{% url 'admin:euphro_auth_userinvitation_add' %}">
-    {% trans "Invite user" %}
-  </a>
+  <div>
+    <a class="fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-add-circle-line" href="{% url 'admin:euphro_auth_userinvitation_add' %}">
+      {% trans "Invite user" %}
+    </a>
+  </div>
 </div>{% endif %}
 {% endblock %}
 
