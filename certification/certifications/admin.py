@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from lab.admin.mixins import LabAdminAllowedMixin
 
-from .models import Certification, QuizzCertification, QuizzResult
+from .models import Certification, CertificationType, QuizzCertification, QuizzResult
 
 
 class QuizzCertificationInline(LabAdminAllowedMixin, admin.StackedInline):
@@ -19,6 +19,7 @@ class QuizzCertificationInline(LabAdminAllowedMixin, admin.StackedInline):
 class CertificationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
     list_display = ("name", "created")
     fields = (
+        "type_of",
         "name",
         "description",
         "num_days_valid",
@@ -29,7 +30,7 @@ class CertificationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
     def get_inlines(
         self, request: HttpRequest, obj: Certification | None
     ) -> list[InlineModelAdmin]:
-        if obj:
+        if obj and obj.type_of == CertificationType.QUIZZ:
             return [QuizzCertificationInline]
         return []
 
@@ -37,4 +38,5 @@ class CertificationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
 @admin.register(QuizzResult)
 class QuizzResultAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
     list_display = ("quizz", "user", "score", "is_passed", "created")
-    fields = ("quizz", "user", "score", "is_passed", "created")
+    fields = ("quizz", "user", "score", "is_passed")
+    readonly_fields = ("created",)

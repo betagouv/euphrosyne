@@ -1,11 +1,14 @@
+import functools
 from typing import Any, Mapping, Optional
 
 from django.contrib import admin
+from django.db import transaction
 from django.db.models.query import QuerySet
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
+from certification import radiation_protection
 from lab.admin.mixins import LabPermission, LabPermissionMixin, LabRole
 from lab.models import Participation
 
@@ -64,6 +67,16 @@ class OnPremisesParticipationFormSet(ParticipationFormSet):
         for form in self:
             form.instance.on_premises = True
         return super().save(commit)
+
+    def save_new_objects(self, commit: bool = True) -> Any:
+        saved_forms = super().save_new_objects(commit)
+        for form in saved_forms:
+            transaction.on_commit(
+                functools.partial(
+                    radiation_protection.check_radio_protection_certification, form.user
+                )
+            )
+        return saved_forms
 
 
 class MemberParticipationInline(LabPermissionMixin, admin.TabularInline):

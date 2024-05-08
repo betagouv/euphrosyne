@@ -1,7 +1,11 @@
+import functools
+from unittest import mock
+
 import pytest
 from django.test import RequestFactory
 from django.urls import reverse
 
+from certification import radiation_protection
 from euphrosyne.admin import AdminSite
 from lab.tests import factories
 
@@ -74,16 +78,17 @@ def test_leader_participation_inline_only_accept_one():
 def test_on_premises_participation_inline_save():
     project = factories.ProjectFactory()
     institution = factories.InstitutionFactory()
+    users = [factories.StaffUserFactory(), factories.StaffUserFactory()]
     data = {
         "participation_set-TOTAL_FORMS": 2,
         "participation_set-INITIAL_FORMS": 0,
         "participation_set-0-id": "",
         "participation_set-0-project": project.id,
-        "participation_set-0-user": factories.StaffUserFactory().email,
+        "participation_set-0-user": users[0].email,
         "participation_set-0-institution": institution.id,
         "participation_set-1-id": "",
         "participation_set-1-project": project.id,
-        "participation_set-1-user": factories.StaffUserFactory().email,
+        "participation_set-1-user": users[1].email,
         "participation_set-1-institution": institution.id,
     }
 
@@ -98,9 +103,25 @@ def test_on_premises_participation_inline_save():
     formset = formset_class(data, instance=project)
 
     assert formset.is_valid(), formset.errors
-    formset.save(commit=True)
+    with mock.patch("lab.projects.inlines.transaction") as module_mock:
+        formset.save(commit=True)
 
     assert project.participation_set.filter(on_premises=True).count() == 2
+
+    # Check that the on_commit hook was called for each user
+    assert module_mock.on_commit.call_count == 2
+    assert all(
+        isinstance(c[0][0], functools.partial)
+        for c in module_mock.on_commit.call_args_list
+    )
+    assert all(
+        c[0][0].func is radiation_protection.check_radio_protection_certification
+        for c in module_mock.on_commit.call_args_list
+    )
+    assert all(
+        c[0][0].args == (users[i],)
+        for (i, c) in enumerate(module_mock.on_commit.call_args_list)
+    )
 
 
 @pytest.mark.django_db

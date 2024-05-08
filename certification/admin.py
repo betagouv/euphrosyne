@@ -1,3 +1,4 @@
-from django.contrib import admin
+# pylint: disable=unused-import
 
-# Register your models here.
+from .certifications.admin import CertificationAdmin, QuizzResultAdmin  # noqa: F401
+from .notifications.admin import CertificationNotificationAdmin  # noqa: F401

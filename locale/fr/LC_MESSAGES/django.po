@@ -2,13 +2,127 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-07 10:24+0200\n"
+"POT-Creation-Date: 2024-05-08 19:06+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Quizz certification"
+msgstr "Certification de quizz"
+
+msgid "Quizz URL"
+msgstr "URL du quizz"
+
+msgid "Passing score"
+msgstr "Score pour réussir"
+
+msgid "Quizz"
+msgstr "Quizz"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Type of certification"
+msgstr "Type de certification"
+
+msgid "Number of days the certification is valid"
+msgstr "Nombre de jours pendant lesquels la certification est valide"
+
+msgid "Invitation to complete email template path"
+msgstr "Template de l'email d'invitation à compléter"
+
+msgid "Success email template path"
+msgstr "Template de l'email de réussite"
+
+msgid "Score"
+msgstr "Score"
+
+msgid "Quizz passed"
+msgstr "Quizz réussi"
+
+#, python-brace-format
+msgid "[Euphrosyne] Invitation to complete {certification_name} certification."
+msgstr ""
+"[Euphrosyne] Invitation à compléter la certification {certification_name}"
+
+msgid "Invitation to complete"
+msgstr "Invitation à compléter"
+
+msgid "Success"
+msgstr "Réussite"
+
+msgid "[Euphrosyne] Invitation to complete certification certification."
+msgstr "[Euphrosyne] Invitation à compléter la certification certification."
+
+msgid "Hello,"
+msgstr "Bonjour,"
+
+#, fuzzy
+#| msgid ""
+#| "We are excited about your interest in conducting experiments using the "
+#| "New AGLAE particle accelerator at the Louvres. This cutting-edge facility "
+#| "offers unique opportunities for art research."
+msgid ""
+"We are excited about your interest in conducting experiments using the New "
+"AGLAE particle accelerator at the Louvres."
+msgstr ""
+"Nous sommes ravis de votre intérêt à mener des expériences en utilisant "
+"l'accélérateur de particules New AGLAE au Louvre."
+
+msgid ""
+"However, we noticed that you currently do not have a radioprotection "
+"certificate on file. This certification is a mandatory requirement for all "
+"researchers who wish to use the New AGLAE facilities, ensuring that everyone "
+"understands the necessary safety protocols and procedures."
+msgstr ""
+"Cependant, nous avons remarqué que vous n'avez pas actuellement de "
+"certificat de radioprotection enregistré. Cette certification est une "
+"exigence obligatoire pour tous les chercheurs qui souhaitent utiliser les "
+"installations de New AGLAE, garantissant que tout le monde comprend les "
+"protocoles et procédures de sécurité nécessaires."
+
+msgid ""
+"To assist you in obtaining this certification, we have prepared a "
+"comprehensive tutorial and quiz. By completing these, you will gain the "
+"necessary knowledge about radioprotection and be able to obtain your "
+"certificate."
+msgstr ""
+"Pour vous aider à obtenir cette certification, nous avons préparé un "
+"tutoriel complet et un quiz. En les complétant, vous acquerrez les "
+"connaissances nécessaires sur la radioprotection et pourrez obtenir votre "
+"certificat."
+
+msgid "Please click on the following link to access the tutorial and quiz:"
+msgstr ""
+"Veuillez cliquer sur le lien suivant pour accéder au tutoriel et au quiz :"
+
+msgid "Access quizz"
+msgstr "Accéder au quizz"
+
+msgid ""
+"Once you have completed the quiz and obtained your certificate, you will be "
+"granted access to the New AGLAE facilities. If you have any questions or "
+"need further assistance, please do not hesitate to contact us."
+msgstr ""
+"Une fois que vous aurez complété le quiz et obtenu votre certificat, vous "
+"aurez accès aux installations de New AGLAE. Si vous avez des questions ou "
+"besoin d'aide supplémentaire, n'hésitez pas à nous contacter."
+
+msgid ""
+"Thank you for your attention to this important matter. We look forward to "
+"your participation in the New AGLAE project."
+msgstr ""
+"Merci de votre attention à cette question importante. Nous attendons avec "
+"impatience votre participation au projet New AGLAE."
+
+msgid "Best regards,"
+msgstr "Cordialement,"
+
+msgid "The New AGLAE team"
+msgstr "L'équipe New AGLAE"
 
 msgid "Related project"
 msgstr "Projet apparenté"
@@ -151,9 +265,6 @@ msgid ""
 "The registration link was invalid, possibly because it has already been used."
 msgstr ""
 "Le lien d'inscription est invalide, peut-être parce qu'il a déjà été utilisé."
-
-msgid "Hello,"
-msgstr "Bonjour,"
 
 msgid "You've been invited to register at Euphrosyne."
 msgstr "Vous avez été invité à vous inscrire sur Euphrosyne."
