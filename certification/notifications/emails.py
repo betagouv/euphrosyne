@@ -33,3 +33,4 @@ def send_notification(
             email,
             str(e),
         )
+        raise e

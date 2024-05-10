@@ -55,7 +55,7 @@ class CertificationNotification(models.Model):
             if self.certification.quizz:
                 return {
                     "quizz_link": self.certification.quizz.url,
-                    "passing_score": self.certification.quizz.passing_score,
+                    "passing_score": int(self.certification.quizz.passing_score),
                     "email": self.user.email,  # pylint: disable=no-member
                 }
             return {}

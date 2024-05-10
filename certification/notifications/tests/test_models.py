@@ -52,7 +52,7 @@ def test_get_context_for_invitation_to_complete(certification: Certification):
 
     assert notification.get_context_for_certification() == {
         "quizz_link": certification.quizz.url,
-        "passing_score": certification.quizz.passing_score,
+        "passing_score": int(certification.quizz.passing_score),
         "email": notification.user.email,
     }
 
