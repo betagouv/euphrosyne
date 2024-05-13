@@ -2,8 +2,6 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from certification.db_fields import ModelField
-
 
 class QuizzCertification(models.Model):
     certification = models.OneToOneField(
@@ -16,8 +14,8 @@ class QuizzCertification(models.Model):
     passing_score = models.FloatField(verbose_name=_("Passing score"))
 
 
-class CertificationType(models.Choices):
-    QUIZZ = QuizzCertification, _("Quizz")
+class CertificationType(models.TextChoices):
+    QUIZZ = "QUIZZ", _("Quizz")
 
 
 class Certification(models.Model):
@@ -26,7 +24,7 @@ class Certification(models.Model):
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(_("Description"), blank=True, null=True)
 
-    type_of = ModelField(
+    type_of = models.CharField(
         _("Type of certification"),
         max_length=100,
         choices=CertificationType,
