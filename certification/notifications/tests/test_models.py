@@ -1,7 +1,9 @@
+import datetime
 from unittest import mock
 
 import pytest
 
+from certification.certifications.models import QuizzResult
 from certification.models import Certification, QuizzCertification
 from lab.tests import factories
 
@@ -17,6 +19,7 @@ def certification_fixture():
         name="certification",
         invitation_to_complete_email_template_path=PATH_TO_COMPLETE,
         success_email_template_path=PATH_TO_SUCCESS,
+        num_days_valid=365,
     )
     QuizzCertification.objects.create(
         certification=certification, url="url", passing_score=1
@@ -59,13 +62,21 @@ def test_get_context_for_invitation_to_complete(certification: Certification):
 
 @pytest.mark.django_db
 def test_get_context_for_success(certification: Certification):
+    user = factories.StaffUserFactory()
+    result = QuizzResult.objects.create(
+        quizz=certification.quizz, user=user, score=1, is_passed=False
+    )
     notification = CertificationNotification.objects.create(
         type_of=NotificationType.SUCCESS,
         certification=certification,
-        user=factories.StaffUserFactory(),
+        user=user,
+        quizz_result=result,
     )
 
-    assert notification.get_context_for_certification() == {}
+    context = notification.get_context_for_certification()
+    assert context
+    assert "valid_until" in context
+    assert isinstance(context["valid_until"], datetime.datetime)
 
 
 @pytest.mark.django_db

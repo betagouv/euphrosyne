@@ -3,7 +3,6 @@ import logging
 from django.core.management.base import BaseCommand
 
 from ...models import CertificationNotification
-from ...notifications.emails import send_notification
 
 logger = logging.getLogger(__name__)
 
@@ -14,13 +13,19 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         notifications = CertificationNotification.objects.filter(is_sent=False)
         for notification in notifications:
-            try:
-                send_notification(
-                    notification.user.email,
-                    notification.get_template_for_certification_type(),
-                    notification.certification.name,
-                    notification.get_context_for_certification(),
+            if not notification.get_template_for_certification_type():
+                error_message = (
+                    "No template path found notification type %s"
+                    " of certification %s."
+                    % (
+                        notification.type_of,
+                        notification.certification.name,
+                    )
                 )
+                self.stderr.write(self.style.ERROR(error_message))
+                continue
+            try:
+                notification.send_notification()
             except Exception as e:
                 error_message = (
                     "Error sending notification for certification %s to %s. Reason: %s"

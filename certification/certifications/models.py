@@ -13,6 +13,9 @@ class QuizzCertification(models.Model):
     )
     passing_score = models.FloatField(verbose_name=_("Passing score"))
 
+    def __str__(self) -> str:
+        return _("%s (quizz)") % self.certification.name
+
 
 class CertificationType(models.TextChoices):
     QUIZZ = "QUIZZ", _("Quizz")

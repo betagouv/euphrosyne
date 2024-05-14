@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-08 19:06+0200\n"
+"POT-Creation-Date: 2024-05-14 17:10+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -10,14 +10,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
+msgid "Template does not exist"
+msgstr "Le template n'existe pas"
+
 msgid "Quizz certification"
 msgstr "Certification de quizz"
+
+msgid "Score with passing score"
+msgstr "Score avec score de réussite"
 
 msgid "Quizz URL"
 msgstr "URL du quizz"
 
 msgid "Passing score"
 msgstr "Score pour réussir"
+
+#, python-format
+msgid "%s (quizz)"
+msgstr "%s (quizz)"
 
 msgid "Quizz"
 msgstr "Quizz"
@@ -43,37 +53,32 @@ msgstr "Score"
 msgid "Quizz passed"
 msgstr "Quizz réussi"
 
-#, python-brace-format
-msgid "[Euphrosyne] Invitation to complete {certification_name} certification."
-msgstr ""
-"[Euphrosyne] Invitation à compléter la certification {certification_name}"
-
 msgid "Invitation to complete"
 msgstr "Invitation à compléter"
 
 msgid "Success"
 msgstr "Réussite"
 
-msgid "[Euphrosyne] Invitation to complete certification certification."
-msgstr "[Euphrosyne] Invitation à compléter la certification certification."
+#, python-format
+msgid "[Euphrosyne] Invitation to complete certification %s."
+msgstr "[Euphrosyne] Invitation à compléter la certification %s."
+
+#, python-format
+msgid "[Euphrosyne] Certification %s completed."
+msgstr "[Euphrosyne] Certification %s complétée."
 
 msgid "Hello,"
 msgstr "Bonjour,"
 
-#, fuzzy
-#| msgid ""
-#| "We are excited about your interest in conducting experiments using the "
-#| "New AGLAE particle accelerator at the Louvres. This cutting-edge facility "
-#| "offers unique opportunities for art research."
 msgid ""
 "We are excited about your interest in conducting experiments using the New "
-"AGLAE particle accelerator at the Louvres."
+"AGLAE particle accelerator at the Louvre."
 msgstr ""
 "Nous sommes ravis de votre intérêt à mener des expériences en utilisant "
 "l'accélérateur de particules New AGLAE au Louvre."
 
 msgid ""
-"However, we noticed that you currently do not have a radioprotection "
+"However, we noticed that you currently do not have a radiation protection "
 "certificate on file. This certification is a mandatory requirement for all "
 "researchers who wish to use the New AGLAE facilities, ensuring that everyone "
 "understands the necessary safety protocols and procedures."
@@ -87,7 +92,7 @@ msgstr ""
 msgid ""
 "To assist you in obtaining this certification, we have prepared a "
 "comprehensive tutorial and quiz. By completing these, you will gain the "
-"necessary knowledge about radioprotection and be able to obtain your "
+"necessary knowledge about radiation protection and be able to obtain your "
 "certificate."
 msgstr ""
 "Pour vous aider à obtenir cette certification, nous avons préparé un "
@@ -124,6 +129,27 @@ msgstr "Cordialement,"
 msgid "The New AGLAE team"
 msgstr "L'équipe New AGLAE"
 
+msgid "Hello"
+msgstr "Bonjour"
+
+msgid ""
+"Congratulations on successfully completing the radiation protection course "
+"and quiz! Your are now certified to use the New AGLAE particle accelerator "
+"at the Louvre."
+msgstr ""
+"Félicitations pour avoir réussi le cours et le quiz de radioprotection ! "
+"Vous êtes maintenant abilité à utiliser l'accélérateur de particules New "
+"AGLAE au Louvre."
+
+msgid ""
+"Please keep this email as a record of your certification. You may be asked "
+"to present proof of your radiation protection certification when accessing "
+"the New AGLAE facilities."
+msgstr ""
+
+msgid "The certification is valid until:"
+msgstr "La certification est valide jusqu'à :"
+
 msgid "Related project"
 msgstr "Projet apparenté"
 
@@ -147,6 +173,9 @@ msgstr "Profil"
 
 msgid "Permissions"
 msgstr "Permissions"
+
+msgid "Certifications"
+msgstr "Quizz de certification"
 
 msgid "Superuser"
 msgstr "Superutilisateur"
@@ -184,6 +213,9 @@ msgstr "Modifier le mot de passe en utilisant {}."
 
 msgid "No password. You can set one using {}."
 msgstr "Aucun mot de passe. Vous pouvez en définir un en utilisant {}."
+
+msgid "Radiation protection"
+msgstr "Radioprotection"
 
 msgid "Invite new user"
 msgstr "Inviter un utilisateur"

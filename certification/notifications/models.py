@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from ..certifications.models import Certification, QuizzResult
@@ -25,7 +26,7 @@ class CertificationNotification(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    quizz_result_id = models.ForeignKey(
+    quizz_result = models.OneToOneField(
         QuizzResult, on_delete=models.CASCADE, null=True, blank=True
     )
 
@@ -36,6 +37,7 @@ class CertificationNotification(models.Model):
         context = self.get_context_for_certification()
         send_notification(
             email=self.user.email,  # pylint: disable=no-member
+            subject=self.get_subject_for_certification_type(),
             template_path=template_path,
             certification_name=self.certification.name,
             context=context,
@@ -60,5 +62,21 @@ class CertificationNotification(models.Model):
                 }
             return {}
         if self.type_of == NotificationType.SUCCESS:
-            return {}
+            if self.certification.num_days_valid:
+                return {
+                    "valid_until": self.quizz_result.created
+                    + timezone.timedelta(days=self.certification.num_days_valid)
+                }
         return {}
+
+    def get_subject_for_certification_type(self):
+        if self.type_of == NotificationType.INVITATION_TO_COMPLETE:
+            return (
+                _("[Euphrosyne] Invitation to complete certification %s.")
+                % self.certification.name
+            )
+        if self.type_of == NotificationType.SUCCESS:
+            return (
+                _("[Euphrosyne] Certification %s completed.") % self.certification.name
+            )
+        return ""

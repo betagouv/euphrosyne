@@ -53,7 +53,8 @@ class ClosepollTest(TestCase):
 
         notifications = []
         with mock.patch(
-            "certification.management.commands.send_notifications.send_notification"
+            # pylint: disable=line-too-long
+            "certification.management.commands.send_notifications.CertificationNotification.send_notification"
         ) as mock_fn:
             mock_fn.side_effect = [Exception("Error"), None]
             users = [StaffUserFactory(), StaffUserFactory()]

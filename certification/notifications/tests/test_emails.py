@@ -2,7 +2,6 @@ from unittest import mock
 
 from django.core import mail
 from django.test import SimpleTestCase
-from django.utils.translation import gettext
 
 from ..emails import send_notification
 
@@ -14,15 +13,16 @@ class NotificationsEmailTests(SimpleTestCase):
             "certification.notifications.emails.render_to_string"
         ) as mock_fn:
             mock_fn.return_value = "html_message"
+            subject = "[Euphrosyne] Invitation to complete certification certification."
+
             send_notification(
                 email="email@test.fr",
+                subject=subject,
                 template_path="path/to/template",
                 certification_name="certification",
                 context={},
             )
 
             assert len(mail.outbox) == 1
-            assert mail.outbox[0].subject == gettext(
-                "[Euphrosyne] Invitation to complete certification certification."
-            )
+            assert mail.outbox[0].subject == subject
             assert mail.outbox[0].body == "html_message"
