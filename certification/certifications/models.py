@@ -16,6 +16,10 @@ class QuizzCertification(models.Model):
     def __str__(self) -> str:
         return _("%s (quizz)") % self.certification.name
 
+    class Meta:
+        verbose_name = _("Quizz certification")
+        verbose_name_plural = _("Quizz certifications")
+
 
 class CertificationType(models.TextChoices):
     QUIZZ = "QUIZZ", _("Quizz")
@@ -57,6 +61,10 @@ class Certification(models.Model):
     def __str__(self):
         return str(self.name)
 
+    class Meta:
+        verbose_name = _("Certification")
+        verbose_name_plural = _("Certifications")
+
 
 class QuizzResult(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
@@ -66,3 +74,7 @@ class QuizzResult(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Quizz result")
+        verbose_name_plural = _("Quizz results")

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-15 09:52+0200\n"
+"POT-Creation-Date: 2024-05-15 11:13+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -29,6 +29,9 @@ msgstr "Score pour réussir"
 msgid "%s (quizz)"
 msgstr "%s (quizz)"
 
+msgid "Quizz certifications"
+msgstr "Certifications de quizz"
+
 msgid "Quizz"
 msgstr "Quizz"
 
@@ -47,17 +50,35 @@ msgstr "Template de l'email d'invitation à compléter"
 msgid "Success email template path"
 msgstr "Template de l'email de réussite"
 
+msgid "Certification"
+msgstr "Certification"
+
+msgid "Certifications"
+msgstr "Certifications"
+
 msgid "Score"
 msgstr "Score"
 
 msgid "Quizz passed"
 msgstr "Quizz réussi"
 
+msgid "Quizz result"
+msgstr "Résultat du quizz"
+
+msgid "Quizz results"
+msgstr "Résultats des quizz"
+
 msgid "Invitation to complete"
 msgstr "Invitation à compléter"
 
 msgid "Success"
 msgstr "Réussite"
+
+msgid "Certification notification"
+msgstr "Notification des certifications"
+
+msgid "Certification notifications"
+msgstr "Notifications des certifications"
 
 #, python-format
 msgid "[Euphrosyne] Invitation to complete certification %s."
@@ -66,6 +87,22 @@ msgstr "[Euphrosyne] Invitation à compléter la certification %s."
 #, python-format
 msgid "[Euphrosyne] Certification %s completed."
 msgstr "[Euphrosyne] Certification %s complétée."
+
+msgid "Add"
+msgstr "Ajouter"
+
+msgid "Filter"
+msgstr "Filtrer"
+
+msgid "Remove from sorting"
+msgstr "Enlever du tri"
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Priorité de tri : %(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "Changer l'ordre de tri"
 
 msgid "Hello,"
 msgstr "Bonjour,"
@@ -173,9 +210,6 @@ msgstr "Profil"
 
 msgid "Permissions"
 msgstr "Permissions"
-
-msgid "Certifications"
-msgstr "Certifications"
 
 msgid "Superuser"
 msgstr "Superutilisateur"
@@ -915,9 +949,6 @@ msgstr "Fenêtre pop-up en cours de fermeture…"
 msgid "Delete selected projects"
 msgstr "Supprimer les projets sélectionnés"
 
-msgid "Filter"
-msgstr "Filtrer"
-
 msgid "No project yet"
 msgstr "Aucun projet pour le moment"
 
@@ -940,16 +971,6 @@ msgstr ""
 
 msgid "Create my first project"
 msgstr "Créer mon premier projet"
-
-msgid "Remove from sorting"
-msgstr "Enlever du tri"
-
-#, python-format
-msgid "Sorting priority: %(priority_number)s"
-msgstr "Priorité de tri : %(priority_number)s"
-
-msgid "Toggle sorting"
-msgstr "Changer l'ordre de tri"
 
 #, python-format
 msgid " By %(filter_title)s "
@@ -1064,9 +1085,6 @@ msgstr "Modifier l’objet %(model)s sélectionné"
 #, python-format
 msgid "Add another %(model)s"
 msgstr "Ajouter un autre %(model)s"
-
-msgid "Add"
-msgstr "Ajouter"
 
 msgid "Add a new object or object group"
 msgstr "Créer un objet ou groupe d'objets"

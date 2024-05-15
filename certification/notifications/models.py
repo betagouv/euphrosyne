@@ -13,6 +13,10 @@ class NotificationType(models.TextChoices):
 
 
 class CertificationNotification(models.Model):
+    class Meta:
+        verbose_name = _("Certification notification")
+        verbose_name_plural = _("Certification notifications")
+
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     certification = models.ForeignKey(Certification, on_delete=models.CASCADE)
 
