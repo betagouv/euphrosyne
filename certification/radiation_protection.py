@@ -10,7 +10,9 @@ from .notifications.models import CertificationNotification, NotificationType
 
 @lru_cache
 def _get_radioprotection_certification() -> Certification:
-    return Certification.objects.get(name=settings.RADIOPROTECTION_QUIZZ_NAME)
+    return Certification.objects.get(
+        name=settings.RADIATION_PROTECTION_CERTIFICATION_NAME
+    )
 
 
 @lru_cache
