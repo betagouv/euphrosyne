@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-14 17:10+0200\n"
+"POT-Creation-Date: 2024-05-15 09:52+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -175,7 +175,7 @@ msgid "Permissions"
 msgstr "Permissions"
 
 msgid "Certifications"
-msgstr "Quizz de certification"
+msgstr "Certifications"
 
 msgid "Superuser"
 msgstr "Superutilisateur"
@@ -1109,6 +1109,12 @@ msgstr "Télécharger les données brutes du run %(label)s"
 #, python-format
 msgid "Download processed data of run %(label)s"
 msgstr "Télécharger les données travaillées du run %(label)s"
+
+msgid "Notifications"
+msgstr "Notifications"
+
+msgid "Results"
+msgstr "Résultats"
 
 msgid "Account"
 msgstr "Compte"

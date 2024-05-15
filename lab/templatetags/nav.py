@@ -25,10 +25,12 @@ def nav_items_json(request: HttpRequest):
     items: list[NavItemJson] = [
         {
             "title": str(_("Projects")),
-            "href": reverse("admin:lab_project_changelist"),
-            "iconName": "fr-icon-survey-line",
-            "extraPath": [reverse("admin:lab_run_changelist")],
-            "exactPath": False,
+            "item": {
+                "href": reverse("admin:lab_project_changelist"),
+                "iconName": "fr-icon-survey-line",
+                "extraPath": [reverse("admin:lab_run_changelist")],
+                "exactPath": False,
+            },
         }
     ]
 
@@ -38,20 +40,62 @@ def nav_items_json(request: HttpRequest):
                 0,
                 {
                     "title": str(_("Dashboard")),
-                    "href": reverse("admin:index"),
-                    "iconName": "fr-icon-calendar-line",
-                    "exactPath": True,
-                    "extraPath": [],
+                    "item": {
+                        "href": reverse("admin:index"),
+                        "iconName": "fr-icon-calendar-line",
+                        "exactPath": True,
+                        "extraPath": [],
+                    },
                 },
             )
             items.append(
                 {
                     "title": str(_("Users")),
-                    "href": reverse("admin:euphro_auth_user_changelist"),
-                    "iconName": "fr-icon-user-line",
-                    "exactPath": False,
-                    "extraPath": [
-                        reverse("admin:euphro_auth_userinvitation_changelist")
+                    "item": {
+                        "href": reverse("admin:euphro_auth_user_changelist"),
+                        "iconName": "fr-icon-user-line",
+                        "exactPath": False,
+                        "extraPath": [
+                            reverse("admin:euphro_auth_userinvitation_changelist")
+                        ],
+                    },
+                }
+            )
+            items.append(
+                {
+                    "title": str(_("Certifications")),
+                    "items": [
+                        {
+                            "title": str(_("Certifications")),
+                            "item": {
+                                "href": reverse(
+                                    "admin:certification_certification_changelist"
+                                ),
+                                "exactPath": False,
+                                "extraPath": [],
+                            },
+                        },
+                        {
+                            "title": str(_("Notifications")),
+                            "item": {
+                                "href": reverse(
+                                    # pylint: disable=line-too-long
+                                    "admin:certification_certificationnotification_changelist"
+                                ),
+                                "exactPath": False,
+                                "extraPath": [],
+                            },
+                        },
+                        {
+                            "title": str(_("Results")),
+                            "item": {
+                                "href": reverse(
+                                    "admin:certification_quizzresult_changelist"
+                                ),
+                                "exactPath": False,
+                                "extraPath": [],
+                            },
+                        },
                     ],
                 }
             )
@@ -59,12 +103,14 @@ def nav_items_json(request: HttpRequest):
             items.append(
                 {
                     "title": str(_("Account")),
-                    "href": reverse(
-                        "admin:euphro_auth_user_change", args=[request.user.id]
-                    ),
-                    "iconName": "fr-icon-user-line",
-                    "exactPath": False,
-                    "extraPath": [],
+                    "item": {
+                        "href": reverse(
+                            "admin:euphro_auth_user_change", args=[request.user.id]
+                        ),
+                        "iconName": "fr-icon-user-line",
+                        "exactPath": False,
+                        "extraPath": [],
+                    },
                 }
             )
 
