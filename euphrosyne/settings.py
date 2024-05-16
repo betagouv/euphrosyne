@@ -213,7 +213,7 @@ LOCALE_PATHS = ["locale"]
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "_static")
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STORAGE = {"staticfiles": "whitenoise.storage.CompressedManifestStaticFilesStorage"}
 
 STATICFILES_DIRS = [
     BASE_DIR / "euphrosyne/assets/dist",
