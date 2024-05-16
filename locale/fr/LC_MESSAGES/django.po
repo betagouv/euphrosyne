@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-16 16:55+0200\n"
+"POT-Creation-Date: 2024-05-16 17:05+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -67,6 +67,10 @@ msgstr "Résultat du quizz"
 
 msgid "Quizz results"
 msgstr "Résultats des quizz"
+
+#, python-format
+msgid "Result for %(quizz)s - %(user)s - %(score)s - %(created)s"
+msgstr "Résultat pour %(quizz)s - %(user)s - %(score)s - %(created)s"
 
 msgid "Invitation to complete"
 msgstr "Invitation à compléter"

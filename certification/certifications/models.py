@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 
@@ -78,3 +79,16 @@ class QuizzResult(models.Model):
     class Meta:
         verbose_name = _("Quizz result")
         verbose_name_plural = _("Quizz results")
+
+    def __str__(self):
+        return gettext(
+            "Result for %(quizz)s - %(user)s - %(score)s - %(created)s"
+            % {
+                "quizz": self.quizz,
+                "user": self.user,
+                "score": self.score,
+                "created": self.created.strftime(  # pylint: disable=no-member
+                    "%Y-%m-%d %H:%M:%S"
+                ),
+            }
+        )

@@ -15,6 +15,7 @@ class CertificationNotificationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
         "type_of",
         "created",
         "is_sent",
+        "quizz_result",
     )
     readonly_fields = ("created",)
 
