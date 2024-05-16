@@ -74,6 +74,6 @@ class QuizzResultAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
     list_filter = ("is_passed", "quizz__certification__name")
     search_fields = ("user__email",)
 
-    @admin.display(description=_("Score with passing score"))
+    @admin.display(description=_("Score"))
     def score_with_passing_score(self, obj: QuizzResult) -> str:
         return f"{obj.score} / {obj.quizz.passing_score}"
