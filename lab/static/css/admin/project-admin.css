@@ -137,3 +137,8 @@ td.field-status {
 .inline-group .delete {
   width: 70px;
 }
+
+td.field-has_radiation_protection_certification {
+  vertical-align: inherit;
+  width: 40px;
+}

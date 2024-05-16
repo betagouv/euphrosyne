@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.http import HttpRequest
 
 from lab.admin.mixins import LabAdminAllowedMixin
 
@@ -15,9 +16,9 @@ class CertificationNotificationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
         "created",
         "is_sent",
     )
-    readonly_fields = (
-        "user",
-        "certification",
-        "type_of",
-        "created",
-    )
+    readonly_fields = ("created",)
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: CertificationNotification | None = None
+    ):
+        return False

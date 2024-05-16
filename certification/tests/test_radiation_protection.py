@@ -37,8 +37,6 @@ def test_user_has_active_certification(
         "certification.radiation_protection._get_radioprotection_certification",
         return_value=certification,
     ):
-        user_has_active_certification(user)
-
         # Result with is not passed
         QuizzResult.objects.create(user=user, quizz=quizz, is_passed=False, score=89)
         assert not user_has_active_certification(user)
@@ -64,6 +62,14 @@ def test_user_has_active_certification(
         result.created = timezone.now() - timezone.timedelta(days=4)
         result.save()
         assert user_has_active_certification(user)
+
+
+def test_user_has_active_certification_when_certification_does_not_exist():
+    with mock.patch(
+        "certification.radiation_protection._get_radioprotection_certification",
+        side_effect=Certification.DoesNotExist,
+    ):
+        assert user_has_active_certification(mock.MagicMock()) is False
 
 
 @pytest.mark.django_db

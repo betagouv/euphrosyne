@@ -130,6 +130,20 @@ class BaseParticipationForm(ModelForm):
         labels = {"institution": _("Institution")}
 
 
+class OnPremisesParticipationForm(BaseParticipationForm):
+    has_radiation_protection_certification = forms.BooleanField(
+        required=False,
+        label="",
+        widget=widgets.ParticipationCertificationWidget(),
+    )
+
+    class Meta:
+        model = models.Participation
+        fields = ("user", "institution")
+        widgets = {"institution": widgets.InstitutionAutoCompleteWidget()}
+        labels = {"institution": _("Institution")}
+
+
 class LeaderParticipationForm(BaseParticipationForm):
     """Participation model form that automatically set `is_leader` to
     `True` when saving the instance.

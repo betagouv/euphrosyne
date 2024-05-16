@@ -1,3 +1,4 @@
+import logging
 from functools import lru_cache
 
 from django.conf import settings
@@ -6,6 +7,8 @@ from django.utils import timezone
 
 from .certifications.models import Certification, QuizzCertification, QuizzResult
 from .notifications.models import CertificationNotification, NotificationType
+
+logger = logging.getLogger(__name__)
 
 
 @lru_cache
@@ -29,7 +32,14 @@ def check_radio_protection_certification(user: AbstractBaseUser) -> bool:
 
 
 def user_has_active_certification(user: AbstractBaseUser) -> bool:
-    certification = _get_radioprotection_certification()
+    try:
+        certification = _get_radioprotection_certification()
+    except Certification.DoesNotExist:
+        logger.error(
+            "Radiation protection certification %s does not exist.",
+            settings.RADIATION_PROTECTION_CERTIFICATION_NAME,
+        )
+        return False
     filter_kwargs = {}
     if certification.num_days_valid:
         filter_kwargs["created__gte"] = timezone.now() - timezone.timedelta(

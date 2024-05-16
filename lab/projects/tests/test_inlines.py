@@ -148,6 +148,31 @@ def test_on_premises_participation_inline_queryset():
 
 
 @pytest.mark.django_db
+def test_on_premises_participation_inline_formset():
+    project = factories.ProjectFactory()
+    participation = factories.ParticipationFactory(project=project, on_premises=True)
+
+    with mock.patch(
+        "lab.projects.inlines.radiation_protection.user_has_active_certification",
+        mock.MagicMock(return_value=True),
+    ) as mock_fn:
+        formset = inlines.OnPremisesParticipationInline(
+            Participation, admin_site=AdminSite()
+        ).get_formset(
+            RequestFactory().get(
+                reverse("admin:lab_project_change", args=(project.id,))
+            ),
+            project,
+        )
+        assert any(
+            form.instance.user == participation.user
+            and form.fields["has_radiation_protection_certification"].initial is True
+            for form in formset(instance=project)
+        )
+        mock_fn.assert_called_once_with(participation.user)
+
+
+@pytest.mark.django_db
 def test_remote_participation_inline_save():
     project = factories.ProjectFactory()
     institution = factories.InstitutionFactory()
