@@ -23,7 +23,7 @@ def _validate_signature(request):
     # Get the Tally-Signature header value
     signature_header = request.headers.get("Tally-Signature")
 
-    secret_key = settings.TALLY_SECRET_KEY
+    secret_key = settings.RADIATION_PROTECTION_TALLY_SECRET_KEY
 
     digest = hmac.new(
         secret_key.encode("utf-8"), request.body, digestmod=hashlib.sha256

@@ -14,7 +14,7 @@ env:
   SITE_URL: http://localhost:8000
   PYTHON_VERSION: 3.11.2
   RADIATION_PROTECTION_CERTIFICATION_NAME: quizz
-  TALLY_SECRET_KEY: secret
+  RADIATION_PROTECTION_TALLY_SECRET_KEY: secret
 
 jobs:
   call-worfklow-test:
