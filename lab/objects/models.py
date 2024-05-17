@@ -17,7 +17,10 @@ class Period(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["label"], name="period_unique_label"),
+            models.UniqueConstraint(
+                fields=["label", "theso_joconde_id"],
+                name="period_unique_label_theso_joconde_id",
+            ),
             models.UniqueConstraint(
                 fields=["theso_joconde_id"], name="period_unique_theso_joconde_id"
             ),
@@ -64,7 +67,7 @@ class ObjectGroup(TimestampedModel):
     )
     dating = models.ForeignKey(
         Period,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         verbose_name=_("Dating"),
         blank=True,
         null=True,
@@ -76,7 +79,7 @@ class ObjectGroup(TimestampedModel):
     )
     discovery_place_location = models.ForeignKey(
         Location,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         verbose_name=_("Place of discovery"),
         blank=True,
         null=True,

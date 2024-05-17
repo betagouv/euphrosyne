@@ -5,5 +5,5 @@
   </div>
   
   <input type="hidden" {% if widget.value %}value="{{ widget.value }}"{% endif %} name="{{ widget.name }}" id="{{widget.attrs.id}}" class="fr-input dating-autocomplete-input__id">
-  <input type="hidden" {% if widget.instance %}value="{{ widget.instance.geonames_id }}"{% endif %} name="{{ widget.name }}__geonames_id" id="{{widget.attrs.id}}__geonames_id" class="fr-input dating-autocomplete-input__theso_joconde_id">
+  <input type="hidden" {% if widget.instance and widget.instance.theso_joconde_id %}value="{{ widget.instance.theso_joconde_id }}"{% endif %} name="{{ widget.name }}__theso_joconde_id" id="{{widget.attrs.id}}__theso_joconde_id" class="fr-input dating-autocomplete-input__theso_joconde_id">
 </div>
