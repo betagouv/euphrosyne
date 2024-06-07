@@ -2,13 +2,139 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-27 13:55+0200\n"
+"POT-Creation-Date: 2024-10-23 12:27+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "Accept request(s) (send download links)"
+msgstr "Accepter les demandes (envoyer les liens de téléchargement)"
+
+#, python-format
+msgid "Error sending links to %(email)s for %(data_request)s: %(error)s"
+msgstr ""
+"Une erreur est survenue lors de l'envoi des liens à %(email)s pour "
+"%(data_request)s : %(error)s"
+
+msgid "has been sent"
+msgstr "envoyé"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "No"
+msgstr "Non"
+
+msgid "Data requests"
+msgstr "Demandes de données"
+
+msgid "Is sent"
+msgstr "Envoyé"
+
+msgid "[New AGLAE] Data request received"
+msgstr "[New AGLAE] Demande de données reçue"
+
+msgid "Your New AGLAE data links"
+msgstr "Vos liens de données New AGLAE"
+
+msgid "data request"
+msgstr "demande de données"
+
+msgid "data requests"
+msgstr "demandes de données"
+
+msgid "Viewed"
+msgstr "Vue"
+
+msgid "Has been viewed by an admin"
+msgstr "A été vue par un admin"
+
+msgid "Sent at"
+msgstr "Date d'envoi"
+
+msgid "User email"
+msgstr "Adresse email de l'utilisateur"
+
+msgid "First name"
+msgstr "Prénom"
+
+msgid "Last name"
+msgstr "Nom"
+
+msgid "Institution"
+msgstr "Institution"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Created"
+msgstr "Créé"
+
+msgid "Modified"
+msgstr "Modifié"
+
+msgid "data access event"
+msgstr "événement d'accès aux données"
+
+msgid "data access events"
+msgstr "événements d'accès aux données"
+
+msgid "Path"
+msgstr "Chemin"
+
+msgid "Access time"
+msgstr "Heure d'accès"
+
+msgid "Data Request"
+msgstr "Demande de données"
+
+msgid ""
+"Thank you for your interest in New AGLAE data catalog. We have processed "
+"your request and generated the following links for you to download the data "
+"you have selected:"
+msgstr ""
+"Merci pour votre intérêt pour le catalogue de données de New AGLAE. Nous "
+"avons traité votre demande et généré les liens suivants pour télécharger les "
+"données que vous avez sélectionnées :"
+
+msgid "Raw data"
+msgstr "Données brutes"
+
+msgid "Processed data"
+msgstr "Données travaillées"
+
+msgid ""
+"Please click on the links above to download the data. If you have any "
+"further questions or need assistance, please feel free to contact us."
+msgstr ""
+"Cliquez sur les liens ci-dessus pour télécharger les données. Si vous avez "
+"des questions ou besoin d'aide, n'hésitez pas à nous contacter."
+
+#, python-format
+msgid "Note that the links will be active until %(formatted_exp_date)s."
+msgstr "Les liens sont disponibles jusqu'au %(formatted_exp_date)s."
+
+msgid "Thank you"
+msgstr "Merci"
+
+msgid "The New AGLAE Team"
+msgstr "L'équipe New AGLAE"
+
+msgid "Data request received"
+msgstr "Demande de données reçue"
+
+msgid ""
+"We have received your data request. A member of the New AGLAE team will "
+"review it as soon as posible and get back to you."
+msgstr ""
+"Nous avons bien reçu votre demande de données. Un membre de l'équipe New "
+"AGLAE la traitera dès que possible."
+
+msgid "Have a good day,"
+msgstr "Bonne journée,"
 
 msgid "Related project"
 msgstr "Projet apparenté"
@@ -21,12 +147,6 @@ msgstr "Statut"
 
 msgid "Invitation completed"
 msgstr "Invitation complétée"
-
-msgid "Yes"
-msgstr "Oui"
-
-msgid "No"
-msgstr "Non"
 
 msgid "Profile"
 msgstr "Profil"
@@ -79,12 +199,6 @@ msgstr "[Euphrosyne] Invitation à s'inscrire"
 
 msgid "Email"
 msgstr "Email"
-
-msgid "First name"
-msgstr "Prénom"
-
-msgid "Last name"
-msgstr "Nom"
 
 msgid "An account with this email already exists."
 msgstr "Un compte avec cet email existe déjà."
@@ -362,6 +476,12 @@ msgstr "filtres {}"
 msgid "{} / {} filters choice"
 msgstr "choix de filtres {} / {}"
 
+msgid "Projects"
+msgstr "Projets"
+
+msgid "Account"
+msgstr "Compte"
+
 msgid ""
 "We cannot process the CSV file because it is not valid. Please refer to the "
 "template to fill it properly."
@@ -432,8 +552,11 @@ msgstr "Nombre d'objets"
 msgid "Inventory number"
 msgstr "Inventaire"
 
-msgid "Dating"
-msgstr "Datation"
+msgid "Period"
+msgstr "Période"
+
+msgid "Era"
+msgstr "Époque"
 
 msgid "Materials"
 msgstr "Matériaux"
@@ -510,9 +633,6 @@ msgstr ""
 msgid "Renaming this project is not posible for now : %s"
 msgstr "Renommer ce projet est impossible pour le moment : %s"
 
-msgid "Projects"
-msgstr "Projets"
-
 msgid "To schedule"
 msgstr "A planifier"
 
@@ -543,9 +663,6 @@ msgstr "Aucun chef de projet"
 
 msgid "User"
 msgstr "Utilisateur"
-
-msgid "Institution"
-msgstr "Institution"
 
 msgid "Scheduled"
 msgstr "Planifié"
@@ -683,9 +800,6 @@ msgstr "Embargo permanent"
 
 msgid "The end date must be after the start date"
 msgstr "La date de fin doit être après la date de début"
-
-msgid "Created"
-msgstr "Créé"
 
 msgid "Proton"
 msgstr "Proton"
@@ -961,9 +1075,6 @@ msgstr "Télécharger les données brutes du run %(label)s"
 msgid "Download processed data of run %(label)s"
 msgstr "Télécharger les données travaillées du run %(label)s"
 
-msgid "Account"
-msgstr "Compte"
-
 msgid "Run(s)"
 msgstr "Run(s)"
 
@@ -980,9 +1091,6 @@ msgstr "Vérifiez vos informations"
 
 msgid "Date this entry was first created"
 msgstr "Date de création de cette entrée"
-
-msgid "Modified"
-msgstr "Modifié"
 
 msgid "Date this entry was most recently changed."
 msgstr "Date de la dernière modification de cette entrée"

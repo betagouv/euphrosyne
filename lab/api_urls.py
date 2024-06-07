@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 
 from .api_views.calendar import CalendarView
 from .api_views.objectgroup import get_eros_object
@@ -12,7 +12,7 @@ from .api_views.run_objectgroup import (
 
 urlpatterns = [
     path(
-        "calendar",
+        "calendar/",
         CalendarView.as_view(),
         name="calendar",
     ),
@@ -51,4 +51,5 @@ urlpatterns = [
         get_eros_object,
         name="objectgroup-c2rmf-fetch",
     ),
+    path("catalog/", include("lab.elasticsearch.api_urls"), name="catalog-api"),
 ]

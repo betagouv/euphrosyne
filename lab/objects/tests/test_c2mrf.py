@@ -4,7 +4,7 @@ from ..c2rmf import (
     fetch_full_objectgroup_from_eros,
     fetch_partial_objectgroup_from_eros,
 )
-from ..models import ObjectGroup, Period
+from ..models import Era, ObjectGroup
 
 EROS_RESPONSE = {
     "ctechnique": "majolique lustrée",
@@ -39,7 +39,7 @@ def test_fetch_full_objectgroup_from_eros(_):
     assert og.object_count == 1
     assert og.c2rmf_id == "C2RMF65980"
     assert og.label == "Majolique"
-    assert isinstance(og.dating, Period)
-    assert og.dating.label == "1500"
+    assert isinstance(og.dating_era, Era)
+    assert og.dating_era.label == "1500"
     assert og.inventory == "ODUT 01107"
     assert og.materials == ["terre cuite"]

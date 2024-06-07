@@ -1,0 +1,18 @@
+{% load i18n %}
+
+{% autoescape off %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% trans "Data request received" %}</title>
+</head>
+<body>
+    <h1>{% trans "Data Request" %}</h1>
+    <p>{% trans "We have received your data request. A member of the New AGLAE team will review it as soon as posible and get back to you." %}</p>
+        
+    <p>{% trans "Have a good day," %}</p>
+    <p>{% trans "The New AGLAE Team" %}</p>
+</body>
+</html>
+{% endautoescape %}

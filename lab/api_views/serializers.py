@@ -117,9 +117,14 @@ class RunMethodsSerializer(serializers.ModelSerializer):
 
 
 class _RunObjectGroupObjectGroupSerializer(serializers.ModelSerializer):
+    dating = serializers.SerializerMethodField()
+
     class Meta:
         model = ObjectGroup
         fields = ("label", "id", "object_count", "dating", "materials")
+
+    def get_dating(self, obj: ObjectGroup):
+        return obj.dating_era.label if obj.dating_era else ""
 
 
 class RunObjectGroupSerializer(serializers.ModelSerializer):

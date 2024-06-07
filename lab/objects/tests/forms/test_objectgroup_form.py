@@ -1,6 +1,8 @@
 import pytest
 from django.forms import widgets
 
+from lab.thesauri.models import Era
+
 from ...forms import ObjectGroupAddChoices, ObjectGroupForm
 from ...models import Location, ObjectGroup, Period
 
@@ -120,31 +122,46 @@ def test_try_populate_discovery_place_location_updates_lat_and_long():
 @pytest.mark.django_db
 def test_try_populate_dating_create_period():
     label = "Moyen âge"
-    theso_joconde_id = 1234
+    concept_id = 1234
 
     form = ObjectGroupForm()
 
     form.data = {
-        "dating__label": label,
-        "dating__theso_joconde_id": theso_joconde_id,
+        "dating_period__label": label,
+        "dating_period__concept_id": concept_id,
     }
 
-    form.try_populate_dating()
+    form.try_populate_dating_models()
 
-    dating = Period.objects.get(label=label, theso_joconde_id=theso_joconde_id)
-    assert form.data["dating"] == dating.pk
+    dating_period = Period.objects.get(label=label, concept_id=concept_id)
+    assert form.data["dating_period"] == dating_period.pk
 
 
 @pytest.mark.django_db
-def test_try_populate_dating_find_dating():
-    dating = Period.objects.create(label="Moyen âge", theso_joconde_id=1234)
+def test_try_populate_dating_find_period():
+    dating = Period.objects.create(label="Moyen âge", concept_id=1234)
 
     form = ObjectGroupForm()
     form.data = {
-        "dating__label": "Moyen âge",
-        "dating__theso_joconde_id": 1234,
+        "dating_period__label": "Moyen âge",
+        "dating_period__concept_id": 1234,
     }
 
-    form.try_populate_dating()
+    form.try_populate_dating_models()
 
-    assert form.data["dating"] == dating.pk
+    assert form.data["dating_period"] == dating.pk
+
+
+@pytest.mark.django_db
+def test_try_populate_dating_find_era():
+    dating = Era.objects.create(label="IIe siècle", concept_id=1234)
+
+    form = ObjectGroupForm()
+    form.data = {
+        "dating_era__label": "IIe siècle",
+        "dating_era__concept_id": 1234,
+    }
+
+    form.try_populate_dating_models()
+
+    assert form.data["dating_era"] == dating.pk

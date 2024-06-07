@@ -1,0 +1,2 @@
+class EuphroToolsException(Exception):
+    pass
