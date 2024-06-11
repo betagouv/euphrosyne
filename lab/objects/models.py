@@ -40,6 +40,7 @@ class Location(models.Model):
             models.UniqueConstraint(
                 fields=["latitude", "longitude"], name="unique_lat_long"
             ),
+            models.UniqueConstraint(fields=["geonames_id"], name="unique_geonames_id"),
         ]
 
     def __str__(self) -> str:
