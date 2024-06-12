@@ -7,6 +7,10 @@
     {
       "command": "0 */6 * * * python manage.py check_project_data_availability",
       "size": "S"
+    },
+    {
+      "command": "*/10 * * * * python manage.py send_notifications",
+      "size": "S"
     }
   ]
 }

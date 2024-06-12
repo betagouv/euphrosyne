@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     "lab",
     "orcid_oauth",
     "static_pages",
+    "certification",
 ] + (["debug_toolbar"] if DEBUG else [])
 
 MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else []) + [
@@ -212,7 +213,7 @@ LOCALE_PATHS = ["locale"]
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "_static")
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STORAGE = {"staticfiles": "whitenoise.storage.CompressedManifestStaticFilesStorage"}
 
 STATICFILES_DIRS = [
     BASE_DIR / "euphrosyne/assets/dist",
@@ -315,3 +316,11 @@ REST_FRAMEWORK = {
 GRAPHENE = {"SCHEMA": "lab.schema.schema"}
 
 HDF5_ENABLE = os.getenv("HDF5_ENABLE", "false") == "true"
+
+# CERTIFICATIONS
+RADIATION_PROTECTION_CERTIFICATION_NAME = os.environ[
+    "RADIATION_PROTECTION_CERTIFICATION_NAME"
+]
+RADIATION_PROTECTION_TALLY_SECRET_KEY = os.environ[
+    "RADIATION_PROTECTION_TALLY_SECRET_KEY"
+]

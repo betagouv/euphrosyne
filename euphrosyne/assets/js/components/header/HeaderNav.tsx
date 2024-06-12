@@ -5,20 +5,95 @@ interface HeaderNavProps {
   items: NavItem[];
 }
 
-const isCurrentPath = (currentPath: string, navItem: NavItem) => {
+type AriaCurrent = "page" | "false";
+
+const isCurrentPath = (currentPath: string, navItem: NavItem): boolean => {
   if (!currentPath) {
     return false;
   }
 
-  if (navItem.exactPath) {
-    return navItem.href == currentPath;
-  }
+  if (navItem.item) {
+    if (navItem.item.exactPath) {
+      return navItem.item.href == currentPath;
+    }
 
-  return (
-    currentPath.includes(navItem.href) ||
-    navItem.extraPath?.some((path) => currentPath.includes(path))
-  );
+    return (
+      currentPath.includes(navItem.item.href) ||
+      navItem.item.extraPath?.some((path) => currentPath.includes(path)) ||
+      false
+    );
+  } else {
+    return (
+      navItem.items?.some((item) => isCurrentPath(currentPath, item)) || false
+    );
+  }
 };
+
+function NavigationLink({
+  href,
+  ariaCurrent,
+  title,
+  iconName,
+}: {
+  href: string;
+  ariaCurrent: AriaCurrent;
+  title: string;
+  iconName?: string;
+}) {
+  return (
+    <a
+      className={`fr-nav__link fr-link--icon-left ${iconName}`}
+      href={href}
+      target="_self"
+      aria-current={ariaCurrent}
+    >
+      {title}
+    </a>
+  );
+}
+
+function HeaderMenu({
+  items,
+  label,
+  ariaCurrent,
+}: {
+  items: NavItem[];
+  label: string;
+  ariaCurrent?: AriaCurrent;
+}) {
+  return (
+    <>
+      <button
+        className="fr-nav__btn"
+        aria-expanded="false"
+        aria-controls={`menu-${label}`}
+        aria-current={ariaCurrent}
+      >
+        {label}
+      </button>
+      <div className="fr-collapse fr-menu" id={`menu-${label}`}>
+        <ul className="fr-menu__list">
+          {items.map(
+            (item) =>
+              item.item && (
+                <li
+                  className="fr-menu__item"
+                  key={`menu-${item.item?.href}-${item.title}`}
+                >
+                  <NavigationLink
+                    href={item.item.href}
+                    ariaCurrent="false"
+                    title={item.title}
+                    iconName={item.item?.iconName}
+                  />
+                </li>
+              ),
+          )}
+        </ul>
+      </div>
+    </>
+  );
+}
 
 export default function HeaderNav({ currentPath, items }: HeaderNavProps) {
   const t = {
@@ -42,21 +117,28 @@ export default function HeaderNav({ currentPath, items }: HeaderNavProps) {
         <div className="fr-header__menu-links"></div>
         <nav className="fr-nav" role="navigation" aria-label={"Main menu"}>
           <ul className="fr-nav__list">
-            {items.map((item) => (
-              <li
-                className="fr-nav__item"
-                key={`nav-${item.href}-${item.title}`}
-              >
-                <a
-                  className={`fr-nav__link fr-link--icon-left ${item.iconName}`}
-                  href={item.href}
-                  target="_self"
-                  aria-current={
-                    isCurrentPath(currentPath, item) ? "page" : "false"
-                  }
-                >
-                  {item.title}
-                </a>
+            {items.map((item, index) => (
+              <li className="fr-nav__item" key={`nav-${index}-${item.title}`}>
+                {item.items ? (
+                  <HeaderMenu
+                    items={item.items}
+                    label={item.title}
+                    ariaCurrent={
+                      isCurrentPath(currentPath, item) ? "page" : "false"
+                    }
+                  />
+                ) : (
+                  item.item && (
+                    <NavigationLink
+                      href={item.item.href}
+                      ariaCurrent={
+                        isCurrentPath(currentPath, item) ? "page" : "false"
+                      }
+                      title={item.title}
+                      iconName={item.item.iconName}
+                    />
+                  )
+                )}
               </li>
             ))}
           </ul>

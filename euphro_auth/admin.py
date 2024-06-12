@@ -13,6 +13,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
+from certification import radiation_protection
 from lab.participations.models import Participation
 from lab.permissions import is_lab_admin
 
@@ -120,7 +121,7 @@ class UserAdmin(DjangoUserAdmin):
         "email",
     )
 
-    readonly_fields = ("password_display",)
+    readonly_fields = ("password_display", "has_radiation_certification")
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -170,6 +171,13 @@ class UserAdmin(DjangoUserAdmin):
                     _("Permissions"),
                     {
                         "fields": ("is_staff", "is_lab_admin", "is_active"),
+                        "classes": [*fieldset_classes],
+                    },
+                ),
+                (
+                    _("Certifications"),
+                    {
+                        "fields": ("has_radiation_certification",),
                         "classes": [*fieldset_classes],
                     },
                 ),
@@ -295,6 +303,10 @@ class UserAdmin(DjangoUserAdmin):
             else _("No password. You can set one using {}.")
         ).format(change_pasword_link)
         return format_html('<div class="help">{}</div>', mark_safe(text))
+
+    @admin.display(description=_("Radiation protection"), boolean=True)
+    def has_radiation_certification(self, obj: User) -> bool:
+        return radiation_protection.user_has_active_certification(obj)
 
 
 class UserInvitationAdmin(ModelAdmin):

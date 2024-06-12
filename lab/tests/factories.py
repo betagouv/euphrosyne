@@ -4,7 +4,15 @@ import factory
 import factory.fuzzy
 from django.contrib.auth import get_user_model
 
-from ..models import Object, ObjectGroup, Participation, Period, Project, Run
+from ..models import (
+    Institution,
+    Object,
+    ObjectGroup,
+    Participation,
+    Period,
+    Project,
+    Run,
+)
 
 NOW = datetime.now(tz=timezone.utc)
 
@@ -139,3 +147,11 @@ class ObjectGroupFactory(factory.django.DjangoModelFactory):
     @factory.post_generation
     def objects(self, *args, **kwargs):
         return ObjectFactory.create_batch(3, group_id=self.id)
+
+
+class InstitutionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Institution
+
+    name = factory.Faker("company")
+    country = factory.Faker("country")
