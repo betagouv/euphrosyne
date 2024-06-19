@@ -168,9 +168,11 @@ def build_object_group_catalog_document(
     if object_group.dating:
         dating_label = object_group.dating.label
         dating_theso_huma_num_id = object_group.dating.theso_joconde_id
-        dating_theso_huma_num_parent_ids = fetch_epoques_parent_ids_from_id(
-            object_group.dating.theso_joconde_id
-        )
+        dating_theso_huma_num_parent_ids = None
+        if dating_theso_huma_num_id:
+            dating_theso_huma_num_parent_ids = fetch_epoques_parent_ids_from_id(
+                object_group.dating.theso_joconde_id
+            )
     _id = f"object-{object_group.id}"
     catalog_item = CatalogItem(
         meta={"id": _id},
