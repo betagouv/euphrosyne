@@ -1,7 +1,7 @@
 import enum
 from functools import wraps
-from typing import Optional
 
+from django.contrib.auth.models import AnonymousUser
 from django.http import HttpResponse, JsonResponse
 from django.http.request import HttpRequest
 
@@ -11,21 +11,23 @@ from shared.view_mixins import StaffUserRequiredMixin
 
 
 class LabRole(enum.IntEnum):
-    ANY_STAFF_USER = 0
-    PROJECT_MEMBER = 1
-    PROJECT_LEADER = 2
-    LAB_ADMIN = 3
+    ANONYMOUS = 0
+    ANY_STAFF_USER = 1
+    PROJECT_MEMBER = 2
+    PROJECT_LEADER = 3
+    LAB_ADMIN = 4
 
 
-def get_user_permission_group(
-    request: HttpRequest, project: Project
-) -> Optional[LabRole]:
-    if is_lab_admin(request.user):
+def get_user_permission_group(request: HttpRequest, project: Project) -> LabRole:
+    if request.user.is_anonymous:
+        return LabRole.ANONYMOUS
+    user: User = request.user
+    if is_lab_admin(user):
         return LabRole.LAB_ADMIN
     member_participations = list(
-        project.participation_set.filter(
-            user__is_staff=True, user=request.user
-        ).values_list("is_leader", flat=True)
+        project.participation_set.filter(user__is_staff=True, user=user).values_list(
+            "is_leader", flat=True
+        )
     )
     if member_participations:
         is_leader = member_participations[0]
@@ -35,8 +37,8 @@ def get_user_permission_group(
     return LabRole.ANY_STAFF_USER
 
 
-def is_lab_admin(user: User) -> bool:
-    return user.is_superuser or getattr(user, "is_lab_admin", None)
+def is_lab_admin(user: User | AnonymousUser) -> bool:
+    return bool(user.is_superuser or getattr(user, "is_lab_admin", None))
 
 
 def is_project_leader(user: User, project: Project) -> bool:
@@ -49,11 +51,12 @@ class ProjectMembershipRequiredMixin(StaffUserRequiredMixin):
         self, request: HttpRequest, project_id: int, *args, **kwargs
     ) -> HttpResponse:
         response = super().dispatch(request, *args, **kwargs)
+        if request.user.is_anonymous:
+            return self.handle_no_permission()
+        user: User = request.user
         if (
-            not is_lab_admin(request.user)
-            and not Project.objects.filter(
-                id=project_id, members__id=request.user.id
-            ).exists()
+            not is_lab_admin(user)
+            and not Project.objects.filter(id=project_id, members__id=user.id).exists()
         ):
             return self.handle_no_permission()
         return response

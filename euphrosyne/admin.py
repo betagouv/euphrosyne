@@ -22,26 +22,30 @@ class AdminSite(admin.AdminSite):
     site_header = "Euphrosyne"
     index_title = _("Dashboard")
 
-    def get_urls(self) -> List[URLResolver]:
+    def get_urls(self) -> List[URLResolver]:  # type: ignore[override]
         urls = [
             path(
                 "lab/project/<project_id>/leader/change",
-                self.admin_view(ChangeLeaderView.as_view()),
+                self.admin_view(ChangeLeaderView.as_view()),  # type: ignore[type-var]
                 name="lab_project_leader_participation_change",
             ),
             path(
                 "lab/project/<project_id>/documents",
-                self.admin_view(ProjectDocumentsView.as_view()),
+                self.admin_view(
+                    ProjectDocumentsView.as_view()  # type: ignore[type-var]
+                ),
                 name="lab_project_documents",
             ),
             path(
                 "lab/project/<project_id>/workplace",
-                self.admin_view(WorkplaceView.as_view()),
+                self.admin_view(WorkplaceView.as_view()),  # type: ignore[type-var]
                 name="lab_project_workplace",
             ),
             path(
                 "lab/objectgroup/c2rmf_import",
-                self.admin_view(ObjectImportC2RMFView.as_view()),
+                self.admin_view(
+                    ObjectImportC2RMFView.as_view()  # type: ignore[type-var]
+                ),
                 name="lab_objectgroup_c2rmfimport",
             ),
         ]
@@ -49,11 +53,11 @@ class AdminSite(admin.AdminSite):
             urls.append(
                 path(
                     "lab/project/<project_id>/hdf5-viewer",
-                    self.admin_view(HDF5View.as_view()),
+                    self.admin_view(HDF5View.as_view()),  # type: ignore[type-var]
                     name="lab_project_hdf5_viewer",
                 )
             )
-        return [*urls, *super().get_urls()]
+        return [*urls, *super().get_urls()]  # type: ignore[list-item]
 
     def get_app_list(self, request, app_label=None):
         app_list = super().get_app_list(request, app_label)

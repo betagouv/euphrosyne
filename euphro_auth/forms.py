@@ -23,6 +23,8 @@ class UserChangeForm(DjangoUserChangeForm):
 
 
 class UserInvitationRegistrationForm(DjangoSetPasswordForm):
+    user: User
+
     email = forms.EmailField(
         label=_("Email"),
         max_length=254,

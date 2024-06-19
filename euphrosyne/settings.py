@@ -151,11 +151,11 @@ if _djdb_config:
 elif os.getenv("DB_HOST"):
     DATABASES["default"] = {
         "ENGINE": "django.db.backends.postgresql",
-        "USER": os.getenv("DB_USER"),
+        "USER": os.getenv("DB_USER", ""),
         "NAME": build_development_db_name(os.getenv("DB_NAME")),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT"),
+        "PASSWORD": os.getenv("DB_PASSWORD", ""),
+        "HOST": os.getenv("DB_HOST", ""),
+        "PORT": os.getenv("DB_PORT", ""),
         "CONN_MAX_AGE": 60,
     }
 else:  # Use sqlite by default, for ci

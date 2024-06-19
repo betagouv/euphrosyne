@@ -1,7 +1,8 @@
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Optional
 
 from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
+from django.contrib.admin.options import ShowFacets
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.db.models.query import QuerySet
 from django.forms.models import ModelForm
@@ -101,7 +102,7 @@ class UserAdmin(DjangoUserAdmin):
 
     list_filter = (InvitationCompletedStatusListFilter,)
     list_per_page = 30
-    show_facets = False
+    show_facets = ShowFacets.NEVER
     actions = ("send_invitation_mail_action",)
 
     add_fieldsets = (
@@ -143,9 +144,7 @@ class UserAdmin(DjangoUserAdmin):
             return self.readonly_fields + ("is_superuser",)
         return self.readonly_fields
 
-    def get_fieldsets(
-        self, request: HttpRequest, obj: Optional[User] = None
-    ) -> List[Tuple[Optional[str], Dict[str, Any]]]:
+    def get_fieldsets(self, request: HttpRequest, obj: Optional[User] = None):
         fieldset_classes = [
             "fr-mb-0",
             "fr-pb-1w",
@@ -176,8 +175,8 @@ class UserAdmin(DjangoUserAdmin):
             ]
         if request.user.is_superuser:
             fieldsets += [
-                (
-                    gettext("Superuser"),
+                (  # type: ignore[list-item]
+                    str(gettext("Superuser")),
                     {"fields": ("is_superuser",), "classes": [*fieldset_classes]},
                 ),
             ]
@@ -199,7 +198,7 @@ class UserAdmin(DjangoUserAdmin):
             },
         )
 
-    def changeform_view(
+    def changeform_view(  # type: ignore[override]
         self,
         request: HttpRequest,
         object_id: str,
@@ -305,7 +304,7 @@ class UserInvitationAdmin(ModelAdmin):
         self,
         request: HttpRequest,
         form_url: str = "",
-        extra_context: dict[str, Any] = None,
+        extra_context: dict[str, Any] | None = None,
     ) -> HttpResponse:
         extra_context = {"title": _("Invite new user")}
         return super().add_view(request, form_url, extra_context)
@@ -328,8 +327,7 @@ class UserInvitationAdmin(ModelAdmin):
         if not change:
             obj.save()
             send_invitation_email(obj)
-            return obj
-        return super().save_model(request, obj, form, change)
+        super().save_model(request, obj, form, change)
 
     def has_module_permission(self, request: HttpRequest) -> bool:
         return request.user.is_staff and is_lab_admin(request.user)

@@ -2,6 +2,7 @@ from typing import Any
 
 from django import forms
 from django.contrib.auth import get_user_model
+from django.db.models.fields.reverse_related import ManyToOneRel
 from django.forms.fields import EmailField
 from django.forms.models import ModelForm
 from django.forms.utils import ErrorList
@@ -37,7 +38,7 @@ class MemberProjectForm(BaseProjectForm):
 
 
 class ChangeLeaderForm(forms.Form):
-    leader_participation = forms.ModelChoiceField(
+    leader_participation: forms.ModelChoiceField = forms.ModelChoiceField(
         queryset=None, empty_label=_("No leader"), label=_("Leader")
     )
 
@@ -71,14 +72,16 @@ class ChangeLeaderForm(forms.Form):
             use_required_attribute=use_required_attribute,
             renderer=renderer,
         )
-        self.fields["leader_participation"].queryset = project.participation_set
+        self.fields["leader_participation"].queryset = (  # type: ignore
+            project.participation_set
+        )
 
 
 class BaseParticipationForm(ModelForm):
     user = EmailField(label=_("User"))
 
     def __init__(
-        self, initial=None, instance: models.Participation = None, **kwargs
+        self, initial=None, instance: models.Participation | None = None, **kwargs
     ) -> None:
         if instance:
             initial = {**(initial or {}), "user": instance.user.email}
@@ -103,16 +106,16 @@ class BaseParticipationForm(ModelForm):
 
     def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
-        if "user" in cleaned_data:
+        if cleaned_data and "user" in cleaned_data:
             # Try to find user with email, create it otherwise
             try:
                 user = get_user_model().objects.get(email=cleaned_data["user"])
             except get_user_model().DoesNotExist:
                 user = UserInvitation.create_user(email=cleaned_data["user"])
             return {**cleaned_data, "user": user}
-        return cleaned_data
+        return cleaned_data or {}
 
-    def save(self, commit: bool = ...) -> models.Participation:
+    def save(self, commit: bool = True) -> models.Participation:
         is_new = self.instance.pk is None
         instance = super().save(commit=commit)
         if is_new:
@@ -140,18 +143,18 @@ class LeaderParticipationForm(BaseParticipationForm):
     class Meta:
         model = models.Participation
         fields = ("user", "institution")
-        widgets = {
-            "institution": widgets.InstitutionWidgetWrapper(
-                Select(), Institution.participation_set.rel
-            ),
-        }
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.fields["user"].label = _("Leader")
+        rel: ManyToOneRel = Institution.participation_set.rel  # type: ignore[attr-defined] # pylint: disable=line-too-long
+        self.fields["institution"].widget = widgets.InstitutionWidgetWrapper(
+            Select(), rel
+        )
 
-    def save(self, commit: bool = ...) -> models.Participation:
+    def save(self, commit: bool = True) -> models.Participation:
         super().save(commit=False)
         self.instance.is_leader = True
         self.instance.save()
-        self._save_m2m()
+        self._save_m2m()  # type: ignore[attr-defined]
+        return self.instance

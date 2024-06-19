@@ -1,14 +1,16 @@
+import datetime
 from datetime import time
 from typing import Any, Mapping
 
 from django.core.exceptions import ValidationError
-from django.core.files.base import File
+from django.core.files.uploadedfile import UploadedFile
 from django.db.models.base import Model
 from django.forms.fields import BooleanField, SplitDateTimeField
 from django.forms.models import ModelForm
 from django.forms.utils import ErrorList
 from django.forms.widgets import Select
 from django.utils import timezone
+from django.utils.datastructures import MultiValueDict
 from django.utils.translation import gettext_lazy as _
 
 from lab import widgets
@@ -25,15 +27,15 @@ RECOMMENDED_ENERGY_LEVELS = {
 
 
 def _get_energy_levels_choices(
-    particle_type: str,
-) -> list[tuple[str, str]]:
+    particle_type: models.Run.ParticleType,
+) -> list[tuple[int, int]]:
     return [(level, level) for level in RECOMMENDED_ENERGY_LEVELS[particle_type]]
 
 
 class BaseRunDetailsForm(ModelForm):
     class Meta:
         model = models.Run
-        fields = []
+        fields: list[str] = []
 
         widgets = {
             **{
@@ -98,12 +100,12 @@ class BaseRunDetailsForm(ModelForm):
 )
 class RunDetailsForm(BaseRunDetailsForm):
     class Meta(BaseRunDetailsForm.Meta):
-        fields = (
+        fields = [
             "beamline",
             *[f.name for f in models.Run.get_method_fields()],
             *[f.name for f in models.Run.get_detector_fields()],
             *[f.name for f in models.Run.get_filters_fields()],
-        )
+        ]
 
 
 @controlled_datalist_form(
@@ -116,13 +118,13 @@ class RunDetailsForm(BaseRunDetailsForm):
 )
 class RunDetailsAdminForm(BaseRunDetailsForm):
     class Meta(BaseRunDetailsForm.Meta):
-        fields = fields = (
+        fields = [
             "label",
             "beamline",
             *[f.name for f in models.Run.get_method_fields()],
             *[f.name for f in models.Run.get_detector_fields()],
             *[f.name for f in models.Run.get_filters_fields()],
-        )
+        ]
 
 
 class RunCreateForm(ModelForm):
@@ -131,7 +133,7 @@ class RunCreateForm(ModelForm):
         fields = ("label",)
 
     def save(self, commit: bool = False) -> Any:
-        self.instance.embargo_date = timezone.now() + timezone.timedelta(days=365 * 2)
+        self.instance.embargo_date = timezone.now() + datetime.timedelta(days=365 * 2)
         return super().save(commit)
 
 
@@ -144,11 +146,11 @@ class RunCreateAdminForm(ModelForm):
     def __init__(
         self,
         data: Mapping[str, Any] | None = None,
-        files: Mapping[str, File] | None = None,
+        files: MultiValueDict[str, UploadedFile] | None = None,
         auto_id: bool | str = "id_%s",
         prefix: str | None = None,
         initial: dict[str, Any] | None = None,
-        error_class: ErrorList = ErrorList,
+        error_class: type[ErrorList] = ErrorList,
         label_suffix: str | None = None,
         empty_permitted: bool = False,
         instance: Model | None = None,
@@ -157,7 +159,7 @@ class RunCreateAdminForm(ModelForm):
     ):
         if not initial:
             initial = {}
-        initial["embargo_date"] = timezone.now() + timezone.timedelta(days=365 * 2)
+        initial["embargo_date"] = timezone.now() + datetime.timedelta(days=365 * 2)
         super().__init__(
             data,
             files,
@@ -261,14 +263,14 @@ class RunScheduleForm(ModelForm):
     def __init__(
         self,
         data: Mapping[str, Any] | None = None,
-        files: Mapping[str, File] | None = None,
+        files: MultiValueDict[str, UploadedFile] | None = None,
         auto_id: bool | str = "id_%s",
         prefix: str | None = None,
         initial: dict[str, Any] | None = None,
-        error_class: ErrorList = ErrorList,
+        error_class: type[ErrorList] = ErrorList,
         label_suffix: str | None = None,
         empty_permitted: bool = False,
-        instance: Model | None = None,
+        instance: models.Run | None = None,
         use_required_attribute: bool | None = None,
         renderer: Any = None,
     ) -> None:
@@ -277,7 +279,7 @@ class RunScheduleForm(ModelForm):
         if (
             not instance or not instance.embargo_date
         ) and "embargo_date" not in initial:
-            initial["embargo_date"] = timezone.now() + timezone.timedelta(days=365 * 2)
+            initial["embargo_date"] = timezone.now() + datetime.timedelta(days=365 * 2)
         super().__init__(
             data,
             files,

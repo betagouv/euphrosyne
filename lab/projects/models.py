@@ -146,7 +146,10 @@ class Project(TimestampedModel):
                 for run in runs_with_start_date
             ):
                 return self.Status.FINISHED
-            if any(timezone.now() > run["start_date"] for run in runs_with_start_date):
+            if any(
+                run["start_date"] and timezone.now() > run["start_date"]
+                for run in runs_with_start_date
+            ):
                 return self.Status.ONGOING
             return self.Status.SCHEDULED
         return self.Status.TO_SCHEDULE
@@ -170,15 +173,9 @@ class Project(TimestampedModel):
                 }
             )
 
-    def save(
-        self,
-        force_insert: bool = False,
-        force_update: bool = False,
-        using: Optional[str] = None,
-        update_fields: Optional[list[str]] = None,
-    ) -> None:
+    def save(self, *args, **kwargs) -> None:
         self.slug = self._generate_slug()
-        return super().save(force_insert, force_update, using, update_fields)
+        return super().save(*args, **kwargs)
 
     def _generate_slug(self):
         if not self.name:

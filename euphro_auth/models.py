@@ -14,14 +14,14 @@ class User(AbstractUser):
     email = models.EmailField(_("email address"), unique=True)
     first_name = models.CharField(_("first name"), max_length=150, blank=False)
     last_name = models.CharField(_("last name"), max_length=150, blank=False)
-    username = None
+    username = None  # type: ignore[assignment]
 
     invitation_completed_at = models.DateTimeField(
         _("invitation completed at"), blank=True, null=True
     )
     is_lab_admin = models.BooleanField(_("is Euphrosyne admin"), default=False)
 
-    objects = UserManager()
+    objects = UserManager()  # type: ignore
 
     def __str__(self):
         return (

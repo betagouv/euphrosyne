@@ -9,7 +9,7 @@ from .models import MethodModel
 
 
 def _get_adminfield_name(admin_field: AdminField) -> str:
-    return (
+    return str(
         admin_field.field["name"]
         if isinstance(admin_field.field, dict)
         else admin_field.field.name
@@ -21,8 +21,8 @@ def _get_adminfields(adminform: AdminForm, select: list[str]) -> list[AdminField
 
     `select` must be ordered.
     """
-    all_fields = {
-        _get_adminfield_name(admin_field): admin_field
+    all_fields: dict[str, AdminField] = {
+        _get_adminfield_name(admin_field): admin_field  # type: ignore
         for fieldset in adminform
         for line in fieldset
         for admin_field in line

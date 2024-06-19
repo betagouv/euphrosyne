@@ -1,4 +1,3 @@
-from typing import Optional
 from unittest.mock import patch
 
 from django.contrib.admin import ModelAdmin
@@ -11,7 +10,9 @@ from ....models import Project
 
 
 class DummyModelAdmin(LabPermissionMixin, ModelAdmin):
-    def get_related_project(self, obj: Project = None) -> Optional[Project]:
+    def get_related_project(  # type: ignore[override]
+        self, obj: Project | None = None
+    ) -> Project | None:
         return obj
 
 

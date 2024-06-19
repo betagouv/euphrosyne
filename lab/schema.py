@@ -184,8 +184,7 @@ class LabStatsType(graphene.ObjectType):
     def get_total_projects(period: StatPeriodLiteral):
         qs = Project.objects
         if period == "year":
-            qs = qs.filter(created__gte=THIS_YEAR_START_DT)
-        print(THIS_YEAR_START_DT)
+            return qs.filter(created__gte=THIS_YEAR_START_DT).count()
         return qs.count()
 
     @staticmethod

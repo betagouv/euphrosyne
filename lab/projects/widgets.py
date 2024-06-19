@@ -1,12 +1,14 @@
-from typing import Optional
+import typing
 
-from django import forms
 from django.contrib.admin import site
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
-from django.db.models.fields.reverse_related import ForeignObjectRel
+from django.db.models.fields.reverse_related import ManyToOneRel
 
 from lab.models import Institution
 from lab.widgets import AutoCompleteWidget
+
+if typing.TYPE_CHECKING:
+    from django.forms.widgets import ChoiceWidget
 
 
 class InstitutionAutoCompleteWidget(AutoCompleteWidget):
@@ -26,13 +28,13 @@ class InstitutionWidgetWrapper(RelatedFieldWidgetWrapper):
     # pylint: disable=too-many-arguments
     def __init__(
         self,
-        widget: forms.Widget,
-        rel: ForeignObjectRel,
-        can_add_related: Optional[bool] = ...,
-        can_change_related: bool = ...,
-        can_delete_related: bool = ...,
-        can_view_related: bool = ...,
-    ) -> None:
+        widget: "ChoiceWidget",
+        rel: ManyToOneRel,
+        can_add_related: bool | None = None,
+        can_change_related: bool = False,
+        can_delete_related: bool = False,
+        can_view_related: bool = False,
+    ):
         super().__init__(
             widget,
             rel,
