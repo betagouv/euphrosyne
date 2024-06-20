@@ -1,5 +1,5 @@
 import json
-from typing import TypedDict
+from typing import NotRequired, TypedDict
 
 from django import template
 from django.http import HttpRequest
@@ -17,7 +17,7 @@ class NavItemJson(TypedDict):
     iconName: str
     extraPath: list[str] | None
     exactPath: bool
-    badge: int | None
+    badge: NotRequired[int | None]
 
 
 @register.simple_tag()

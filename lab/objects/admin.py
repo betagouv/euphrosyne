@@ -1,17 +1,19 @@
 import io
 import json
 from dataclasses import asdict
-from typing import Any, Dict, List, Mapping, Optional, Tuple
+from typing import Any, Mapping, Optional
 
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
-from django.contrib.admin.views.main import IS_POPUP_VAR
+from django.contrib.admin.views.main import IS_POPUP_VAR  # type: ignore[attr-defined]
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import QuerySet
 from django.forms import BaseInlineFormSet, ModelForm, ValidationError
 from django.forms.utils import ErrorList
 from django.http import HttpResponse, HttpResponseRedirect, QueryDict
 from django.http.request import HttpRequest
+from django.template.response import TemplateResponse
+from django.utils.datastructures import MultiValueDict
 from django.utils.translation import gettext_lazy as _
 
 from lab.models import Project, Run
@@ -55,13 +57,13 @@ class ObjectFormSet(BaseInlineFormSet):
     # pylint: disable=too-many-arguments
     def __init__(
         self,
-        data: Optional[QueryDict] = None,
-        files: Optional[dict[str, UploadedFile]] = None,
-        instance: Optional[Object] = None,
+        data: QueryDict | None = None,
+        files: MultiValueDict[str, UploadedFile] | None = None,
+        instance: Object | None = None,
         save_as_new: bool = False,
-        prefix: Optional[str] = None,
-        queryset: Optional[QuerySet] = None,
-        **kwargs: Any,
+        prefix: str | None = None,
+        queryset: QuerySet | None = None,
+        **kwargs,
     ) -> None:
         super().__init__(data, files, instance, save_as_new, prefix, queryset, **kwargs)
         if instance and (instance.collection or instance.inventory):
@@ -88,7 +90,9 @@ class ObjectFormSet(BaseInlineFormSet):
             # replace self.data with its content.
             csv_data = {f"{self.prefix}-INITIAL_FORMS": "0"}
             total_forms = 0
-            csv_file = io.TextIOWrapper(self.files["objects-template"])
+            csv_file = io.TextIOWrapper(
+                self.files["objects-template"]  # type: ignore[arg-type]
+            )
             try:
                 for index, object_in_csv in enumerate(parse_csv(csv_file)):
                     csv_data[f"{self.prefix}-{index}-id"] = ""
@@ -108,9 +112,9 @@ class ObjectFormSet(BaseInlineFormSet):
                         )
                     ],
                     error_class="nonform",
-                    renderer=self.renderer,  # pylint: disable=no-member
+                    renderer=self.renderer,  # type: ignore[attr-defined] # pylint: disable=no-member
                 )
-                self._errors = []
+                self._errors = []  # type: ignore[var-annotated]
                 return
             csv_data[f"{self.prefix}-TOTAL_FORMS"] = str(total_forms)
             self.data = csv_data
@@ -224,7 +228,7 @@ class ObjectGroupAdmin(ModelAdmin):
         # We must implement this to use has_change_permission to make
         # page readonly. Otherwise will throw 403 error when viewing the page
         # for non admin users.
-        return is_lab_admin(request.user) or (
+        return is_lab_admin(request.user) or bool(
             obj and obj.runs.filter(project__members=request.user.id).exists()
         )
 
@@ -234,7 +238,7 @@ class ObjectGroupAdmin(ModelAdmin):
         # If obj was imported from Eros, make page readonly
         if obj and obj.c2rmf_id:
             return False
-        return is_lab_admin(request.user) or (
+        return is_lab_admin(request.user) or bool(
             obj and obj.runs.filter(project__members=request.user.id).exists()
         )
 
@@ -251,16 +255,16 @@ class ObjectGroupAdmin(ModelAdmin):
         # Manual creation / edition
         return super().get_form(request, obj, change, **kwargs)
 
-    def get_fieldsets(
-        self, request: HttpRequest, obj: Optional[ObjectGroup] = None
-    ) -> List[Tuple[Optional[str], Dict[str, Any]]]:
+    def get_fieldsets(self, request: HttpRequest, obj: Optional[ObjectGroup] = None):
         description = ""
         if obj and obj.c2rmf_id:
-            description = _("This object was imported from EROS.")
+            description = str(_("This object was imported from EROS."))
         else:
-            description = _(
-                # pylint: disable=line-too-long
-                "Fill up collection and inventory number if you object group is undifferentiated."
+            description = str(
+                _(
+                    # pylint: disable=line-too-long
+                    "Fill up collection and inventory number if you object group is undifferentiated."
+                )
             )
         fieldsets = [
             (
@@ -306,20 +310,19 @@ class ObjectGroupAdmin(ModelAdmin):
     def changeform_view(
         self,
         request: HttpRequest,
-        object_id: Optional[str] = None,
+        object_id: str | None = None,
         form_url: str = "",
-        extra_context: Optional[Dict[str, bool]] = None,
+        extra_context: dict[str, bool] | None = None,
     ) -> Any:
-        obj: ObjectGroup = self.get_object(request, object_id=object_id)
+        obj: ObjectGroup | None = (
+            self.get_object(request, object_id=object_id) if object_id else None
+        )
         are_objects_differentiated = self.get_are_objects_differentiated(request, obj)
 
+        run_id = request.GET.get("run")
         run = (
-            (
-                Run.objects.filter(id=request.GET.get("run"))
-                .values("id", "label")
-                .first()
-            )
-            if request.GET.get("run")
+            Run.objects.filter(id=run_id).values("id", "label").first()
+            if run_id
             else None
         )
 
@@ -342,10 +345,16 @@ class ObjectGroupAdmin(ModelAdmin):
         self,
         request: HttpRequest,
         obj: ObjectGroup,
-        post_url_continue: Optional[str] = None,
-    ) -> HttpResponse:
-        response = super().response_add(request, obj, post_url_continue)
-        if request.method == "POST" and request.POST.get(IS_POPUP_VAR, 0):
+        post_url_continue: str | None = None,
+    ) -> TemplateResponse:
+        response: TemplateResponse = super().response_add(  # type: ignore[assignment]
+            request, obj, post_url_continue
+        )
+        if (
+            response.context_data
+            and request.method == "POST"
+            and request.POST.get(IS_POPUP_VAR, False)
+        ):
             response.context_data["popup_response_data"] = json.dumps(
                 {
                     **json.loads(response.context_data["popup_response_data"]),
@@ -370,7 +379,9 @@ class ObjectGroupAdmin(ModelAdmin):
         return Project.objects.filter(runs__id__in=run_ids).distinct().count()
 
     @staticmethod
-    def get_are_objects_differentiated(request: HttpRequest, obj: ObjectGroup = None):
+    def get_are_objects_differentiated(
+        request: HttpRequest, obj: ObjectGroup | None = None
+    ):
         if obj:
             return obj.object_set.exists()
         if request.method == "POST" and "object_set-TOTAL_FORMS" in request.POST:

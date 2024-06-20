@@ -1,3 +1,5 @@
+import datetime
+
 from django.utils import timezone
 from rest_framework import reverse, serializers
 
@@ -62,7 +64,7 @@ class UpcomingProjectSerializer(serializers.ModelSerializer):
                     lambda r: r.start_date and r.start_date >= timezone.now(),
                     obj.runs.all(),
                 ),
-                key=lambda r: r.start_date,
+                key=lambda r: r.start_date or datetime.datetime.max,
             )
         ]
         if not ordered_start_dates:

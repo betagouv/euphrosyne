@@ -66,7 +66,7 @@ jobs:
 
       - name: Run mypy on selected folders
         run: |
-          python -m mypy
+          python -m mypy .
 
   python-tests:
     runs-on: ubuntu-22.04

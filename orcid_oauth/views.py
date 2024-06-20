@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -27,7 +27,7 @@ class UserCompleteAccountView(UpdateView):
         partial_token = self.kwargs.get("token")
         return strategy.partial_load(partial_token)
 
-    def get_object(self, queryset: Optional[models.query.QuerySet] = ...) -> User:
+    def get_object(self, queryset: models.query.QuerySet | None = None) -> User:
         partial = self.get_partial()
         user = partial.kwargs.get("user")
         return user

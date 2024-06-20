@@ -1,5 +1,3 @@
-from typing import Optional
-
 from django.contrib import admin
 from django.http.request import HttpRequest
 
@@ -40,12 +38,12 @@ class InstitutionAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
     fields = ("name", "country", "ror_id")
     inlines = [ParticipationInline]
 
-    def has_add_permission(
-        self, request: HttpRequest, obj: Optional[Institution] = None
+    def has_add_permission(  # type: ignore[override]
+        self, request: HttpRequest, obj: Institution | None = None
     ) -> bool:
         # Any user can add an institution
         return True
 
     @admin.display
     def members_num(self, obj: Participation) -> int:
-        return obj.participation_set.count()
+        return obj.participation_set.count()  # type: ignore[attr-defined]

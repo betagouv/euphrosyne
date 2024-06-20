@@ -15,4 +15,6 @@ register.filter(method_fields)
 register.filter(detector_fields)
 register.filter(filters_field)
 
-register.inclusion_tag(get_template("run_methods_repr.html"))(run_methods_repr)
+register.inclusion_tag(get_template("run_methods_repr.html"))(  # type: ignore
+    run_methods_repr
+)

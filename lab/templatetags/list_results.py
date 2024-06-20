@@ -1,5 +1,7 @@
+import datetime
+import typing
 from itertools import groupby
-from typing import Any, Callable
+from typing import Any, Callable, TypedDict
 
 from django import template
 from django.contrib.admin.templatetags.admin_list import (
@@ -12,6 +14,7 @@ from django.contrib.admin.views.main import ChangeList
 from django.db.models.functions import TruncMonth
 from django.db.models.query import QuerySet
 from django.utils.html import format_html
+from django_stubs_ext import WithAnnotations
 
 from lab.projects.models import ProjectQuerySet
 
@@ -63,7 +66,8 @@ def project_results(
     project_list_results: list[Project] | ProjectQuerySet | None = None,
 ):
     if not project_list_results:
-        project_list_results = changelist.result_list
+        rl: ProjectQuerySet = changelist.result_list
+        project_list_results = rl
     return [
         update_result(changelist, _project, _result)
         for _project, _result in zip(project_list_results, results)
@@ -82,7 +86,7 @@ def project_result_list_tag(parser, token):
 
 
 def project_result_list(
-    changelist: ChangeList, queryset: QuerySet = None, regroup: bool = False
+    changelist: ChangeList, queryset: QuerySet | None = None, regroup: bool = False
 ):
     """
     Updates the result list of the given ChangeList object
@@ -116,7 +120,7 @@ def project_result_list(
     result_list_dict = result_list(changelist)
     result_list_dict["results"] = project_results(
         changelist=changelist,
-        results=result_list_dict["results"],
+        results=result_list_dict["results"],  # type: ignore[arg-type]
     )
     if regroup:
         result_list_dict["do_regroup"] = regroup
@@ -124,14 +128,28 @@ def project_result_list(
     return result_list_dict
 
 
+class MonthAnnotation(TypedDict):
+    month: datetime.datetime
+
+
+if typing.TYPE_CHECKING:
+    MonthAnnotedProject = WithAnnotations[Project, MonthAnnotation]  # type: ignore
+else:
+    MonthAnnotedProject = WithAnnotations[Project]
+
+
 def group_results_by_month(changelist: ChangeList):
-    changelist.result_list = changelist.result_list.annotate(
-        month=TruncMonth("first_run_date")
+
+    rl: MonthAnnotedProject = changelist.result_list.annotate(
+        month=TruncMonth("first_run_date")  # type: ignore[arg-type]
     )
+    changelist.result_list = rl
     return _group_results(changelist, attr_getter_fn=lambda p: p.month)
 
 
-def _group_results(changelist: ChangeList, attr_getter_fn: Callable[[Project], Any]):
+def _group_results(
+    changelist: ChangeList, attr_getter_fn: Callable[[MonthAnnotedProject], Any]
+):
     """
     Group the results from a ChangeList based on a specific attribute.
 

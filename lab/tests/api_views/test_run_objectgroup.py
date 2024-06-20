@@ -39,7 +39,7 @@ def test_run_objectgroup_mixin_get_queryset_when_member(
     run.project.members.add(user)
 
     view = views.RunObjectGroupMixin()
-    view.request = mock.MagicMock(user=user)
+    view.request = mock.MagicMock(user=user)  # type: ignore
     assert view.get_queryset().count() == 1
 
 

@@ -6,7 +6,7 @@ from shared.models import TimestampedModel
 
 
 class Period(models.Model):
-    label: str = models.CharField(_("Name"), max_length=255)
+    label = models.CharField(_("Name"), max_length=255)
 
     theso_joconde_id = models.CharField(
         "Joconde Thesorus ID", max_length=255, null=True, blank=True
@@ -28,7 +28,7 @@ class Period(models.Model):
 
 
 class Location(models.Model):
-    label: str = models.CharField(_("Name"), max_length=255)
+    label = models.CharField(_("Name"), max_length=255)
     latitude = models.FloatField(_("Latitude"), blank=True, null=True)
     longitude = models.FloatField(_("Longitude"), blank=True, null=True)
 

@@ -27,7 +27,8 @@ class AutoCompleteWidget(Widget):
         elif value:
             if self.model is None:
                 raise ValueError("model is required")
-            context["widget"]["instance"] = self.model.objects.get(pk=value)
+            # pylint: disable=protected-access
+            context["widget"]["instance"] = self.model._default_manager.get(pk=value)
         else:
             context["widget"]["instance"] = None
         return context

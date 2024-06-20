@@ -1,3 +1,5 @@
+import typing
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -24,12 +26,20 @@ class MethodBooleanField(models.BooleanField):
         return name, path, args, kwargs
 
 
+class FieldProtocol(typing.Protocol):
+    method: Method
+    detector: Detector
+
+    # flake8: noqa
+    def __init__(self, *args, **kwargs): ...
+
+
 class DetectorFieldMixin:
     method: Method
     detector: Detector
 
     def __init__(
-        self: models.Field, method: Method, detector: Detector, *args, **kwargs
+        self: FieldProtocol, method: Method, detector: Detector, *args, **kwargs
     ):
         self.method = method
         self.detector = detector

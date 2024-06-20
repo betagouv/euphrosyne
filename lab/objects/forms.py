@@ -59,10 +59,8 @@ class ObjectGroupForm(forms.ModelForm):
             "dating": widgets.DatingAutoCompleteWidget(),
         }
 
-    def __init__(
-        self, *args, instance: ObjectGroup | None = None, **kwargs: dict[str, Any]
-    ):
-        super().__init__(*args, instance=instance, **kwargs)
+    def __init__(self, *args, instance: ObjectGroup | None = None, **kwargs):
+        super().__init__(*args, **kwargs, instance=instance)  # type: ignore[misc]
         # We must check if attribute is in self.fields because it can be removed
         # in admin view when page is readlonly.
         if "dating" in self.fields:
@@ -147,7 +145,7 @@ class ObjectGroupImportC2RMFForm(forms.ModelForm):
             ),
         }
 
-    def __init__(self, *args, **kwargs: dict[str, Any]):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["c2rmf_id"].widget.attrs["placeholder"] = "C2RMF00000"
         self.fields["object_count"].initial = 1

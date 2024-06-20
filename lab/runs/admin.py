@@ -1,4 +1,4 @@
-from typing import Any, Optional, Tuple
+from typing import Any
 
 from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
@@ -61,20 +61,22 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         delete_permission=LabRole.PROJECT_MEMBER,
     )
 
-    def get_related_project(self, obj: Optional[Run] = None) -> Optional[Project]:
+    def get_related_project(  # type: ignore[override]
+        self, obj: Run | None = None
+    ) -> Project | None:
         if obj:
             return obj.project
         return None
 
     def has_change_permission(
-        self, request: HttpRequest, obj: Optional[Run] = None
+        self, request: HttpRequest, obj: Run | None = None  # type: ignore[override]
     ) -> bool:
         return super().has_change_permission(request, obj) and (
             not obj or obj.status == Run.Status.CREATED
         )
 
     def has_delete_permission(
-        self, request: HttpRequest, obj: Optional[Run] = None
+        self, request: HttpRequest, obj: Run | None = None  # type: ignore[override]
     ) -> bool:
         return super().has_delete_permission(request, obj) and (
             not obj or obj.status == Run.Status.CREATED
@@ -98,9 +100,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
             return RunDetailsForm
         return RunCreateForm
 
-    def get_fieldsets(
-        self, request: HttpRequest, obj: Optional[Run] = None
-    ) -> list[Tuple[Optional[str], dict[str, Any]]]:
+    def get_fieldsets(self, request: HttpRequest, obj: Run | None = None):
         fieldset_classes = [
             "fr-mb-0",
             "fr-pb-1w",
@@ -114,7 +114,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         if not obj:
             fieldsets += [
                 (
-                    _("Basic information"),
+                    str(_("Basic information")),
                     {
                         "fields": (
                             admin_basic_info_fields
@@ -128,26 +128,29 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
             if is_lab_admin(request.user):
                 fieldsets += [
                     (
-                        _("Basic information"),
-                        {"fields": ("label",), "classes": [*fieldset_classes]},
+                        str(_("Basic information")),
+                        {
+                            "fields": ["label"],
+                            "classes": [*fieldset_classes],
+                        },
                     )
                 ]
             fieldsets += [
                 (
-                    _("Experimental conditions"),
+                    str(_("Experimental conditions")),
                     {
-                        "fields": ("particle_type", "energy_in_keV", "beamline"),
+                        "fields": ["particle_type", "energy_in_keV", "beamline"],
                         "classes": [*fieldset_classes],
                     },
                 ),
                 (
                     "METHODS",
                     {
-                        "fields": (
+                        "fields": [
                             *[f.name for f in Run.get_method_fields()],
                             *[f.name for f in Run.get_detector_fields()],
                             *[f.name for f in Run.get_filters_fields()],
-                        )
+                        ]
                     },
                 ),
             ]
@@ -164,11 +167,11 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         return runs_queryset.filter(project__members__id=request.user.id).distinct()
 
     def formfield_for_foreignkey(  # pylint: disable=arguments-differ
-        self, db_field, request: HttpRequest, queryset: QuerySet[Run] = None, **kwargs
+        self, db_field, request: HttpRequest, queryset: QuerySet | None = None, **kwargs
     ):
         if not is_lab_admin(request.user) and db_field.name == "project":
             queryset = Project.objects.filter(
-                participation__user_id=request.user.id,
+                participation__user_id=request.user.id,  # type: ignore[misc]
             )
 
         if queryset is not None:
@@ -217,7 +220,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         return super().changeform_view(request, object_id, form_url, extra_context)
 
     def changelist_view(
-        self, request: HttpRequest, extra_context: Optional[dict[str, str]] = None
+        self, request: HttpRequest, extra_context: dict[str, str] | None = None
     ):
         project = self._get_project(request)
         return super().changelist_view(
@@ -240,7 +243,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         elif "label" in form.changed_data:
             rename_run_directory(obj.project.name, form.initial["label"], obj.label)
 
-    def _get_project(self, request, object_id=None) -> Optional[Project]:
+    def _get_project(self, request, object_id=None) -> Project | None:
         if object_id:
             run = self.get_object(request, object_id)
             if not run:
@@ -253,7 +256,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
             return qs.first()
         return None
 
-    def _schedule_action(self, request: HttpRequest, obj: Run) -> None:
+    def _schedule_action(self, request: HttpRequest, obj: Run):
         schedule_form = RunScheduleForm(
             data=request.POST,
             files=request.FILES,

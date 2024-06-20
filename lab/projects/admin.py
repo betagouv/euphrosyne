@@ -1,8 +1,7 @@
-from typing import Any, Dict, List, Mapping, Optional, Tuple, Type
+from typing import Any, Dict, Mapping, Optional, Type
 
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
-from django.contrib.admin.options import InlineModelAdmin
 from django.contrib.admin.views.main import ChangeList
 from django.db.models import Count, DateTimeField, Value
 from django.forms.models import BaseInlineFormSet, ModelForm, inlineformset_factory
@@ -53,9 +52,11 @@ class ProjectChangeList(ChangeList):
         qs = super().get_queryset(request, exclude_parameters)
         if request.method == "POST" and request.POST.get("action") == "delete_selected":
             return qs  # use more general queryset for delete action
-        to_schedule_ids = qs.only_to_schedule().values_list("id", flat=True)
+        to_schedule_ids = qs.only_to_schedule().values_list(  # type: ignore[attr-defined] # pylint:disable=line-too-long
+            "id", flat=True
+        )
         return (
-            qs.exclude(id__in=to_schedule_ids)
+            qs.exclude(id__in=to_schedule_ids)  # type: ignore[attr-defined]
             .distinct()
             .annotate_first_run_date()
             .annotate(number_of_runs=Count("runs"))
@@ -70,11 +71,11 @@ class ParticipationFormSet(BaseInlineFormSet):
         data: Optional[Any] = None,
         files: Optional[Any] = None,
         instance: Optional[Any] = None,
-        save_as_new: bool = None,
+        save_as_new: bool = False,
         prefix: Optional[Any] = None,
         queryset: Optional[Any] = None,
         **kwargs: Any,
-    ) -> None:
+    ):
         super().__init__(
             data=data,
             files=files,
@@ -116,7 +117,9 @@ class ParticipationInline(LabPermissionMixin, admin.TabularInline):
         delete_permission=LabRole.PROJECT_LEADER,
     )
 
-    def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
+    def get_related_project(  # type: ignore[override]
+        self, obj: Project | None = None
+    ) -> Project | None:
         return obj
 
     def get_formset(
@@ -127,10 +130,10 @@ class ParticipationInline(LabPermissionMixin, admin.TabularInline):
     ):
         form = BaseParticipationForm if obj else LeaderParticipationForm
 
-        formset = inlineformset_factory(
+        formset: Type[BaseInlineFormSet] = inlineformset_factory(
             Project,
             Participation,
-            form=form,
+            form=form,  # type: ignore[arg-type]
             extra=0,
             min_num=1,
             # On creation, only leader participation can be added
@@ -152,11 +155,14 @@ class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
         view_permission=LabRole.PROJECT_MEMBER,
     )
 
-    def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
+    def get_related_project(  # type: ignore[override]
+        self,
+        obj: Project | None = None,
+    ) -> Project | None:
         return obj
 
     def has_delete_permission(
-        self, request: HttpRequest, obj: Project | None = None
+        self, request: HttpRequest, obj: Project | None = None  # type: ignore[override]
     ) -> bool:
         # should only add or edit
         return False
@@ -187,13 +193,16 @@ class ProjectDisplayMixin:
 
     @staticmethod
     @admin.display(description=_("First run date"))
-    def first_run_date_with_link(obj: Optional[Project]) -> str:
+    def first_run_date_with_link(obj: Project | None) -> str:
         date = ProjectDisplayMixin.first_run_date(obj)
         if not date:
+            changelist_url = reverse("admin:lab_run_changelist")
+            if obj:
+                changelist_url += f"?project={obj.id}"
             return format_html(
                 '{} <a href="{}" class="{}">{}</a>',
                 _("No scheduled run."),
-                reverse("admin:lab_run_changelist") + f"?project={obj.id}",
+                changelist_url,
                 "fr-link fr-link--sm",
                 _("See runs"),
             )
@@ -236,26 +245,29 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         js = ("pages/project.js",)
         css = {"all": ("css/admin/project-admin.css",)}
 
-    def get_related_project(self, obj: Optional[Project] = None) -> Optional[Project]:
+    def get_related_project(  # type: ignore[override]
+        self,
+        obj: Project | None = None,
+    ) -> Project | None:
         return obj
 
-    def has_delete_permission(
+    def has_delete_permission(  # type: ignore[override]
         self, request: HttpRequest, obj: Project | None = None
     ) -> bool:
         return is_lab_admin(request.user)
 
-    def get_fieldsets(
-        self, request: HttpRequest, obj: Optional[Project] = None
-    ) -> List[Tuple[Optional[str], Dict[str, Any]]]:
+    def get_fieldsets(self, request: HttpRequest, obj: Optional[Project] = None):
         basic_fields = (
-            ("name", "admin", "comments", "first_run_date_with_link")
+            ["name", "admin", "comments", "first_run_date_with_link"]
             if obj
-            else ("name",)
+            else ["name"]
         )
         if is_lab_admin(request.user):
-            basic_fields += ("confidential",)
+            basic_fields += ["confidential"]
 
-        basic_fields_label = _("Basic information") if obj else _("Create new project")
+        basic_fields_label = str(
+            _("Basic information") if obj else _("Create new project")
+        )
         fieldsets = [
             (
                 basic_fields_label,
@@ -264,14 +276,16 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         ]
         if not obj and not is_lab_admin(request.user):
             fieldsets += [
-                (
+                (  # type: ignore[list-item]
                     None,
                     {
-                        "fields": ("has_accepted_cgu",),
-                        "description": "<p><strong>%s</strong></p>"
-                        % _(
-                            # pylint: disable=line-too-long
-                            "To create a project on Euphrosyne, you are required to acknowledge and agree to the platform's general terms of use."
+                        "fields": ["has_accepted_cgu"],
+                        "description": "<p><strong>%s</strong></p>"  # type: ignore
+                        % str(
+                            _(
+                                # pylint: disable=line-too-long
+                                "To create a project on Euphrosyne, you are required to acknowledge and agree to the platform's general terms of use."
+                            )
                         ),
                     },
                 )
@@ -295,7 +309,7 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
     def get_exclude(self, request: HttpRequest, obj: Optional[Project] = None):
         excluded = super().get_exclude(request, obj)
         if not is_lab_admin(request.user):
-            return excluded + ("project",) if excluded else ("project",)
+            return excluded + ("project",) if excluded else ("project",)  # type: ignore
         return excluded
 
     def get_readonly_fields(self, request: HttpRequest, obj: Optional[Project] = None):
@@ -303,10 +317,13 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         readonly_fields = super().get_readonly_fields(request, obj)
         if obj:
             # Prevent changing name after creation (because of data folder sync)
-            readonly_fields += ("name",)
+            readonly_fields = (
+                *readonly_fields,
+                "name",
+            )
         if not is_lab_admin(request.user):
             # Leader
-            readonly_fields = readonly_fields + ("admin", "run_date")
+            readonly_fields = (*readonly_fields, "admin", "run_date")
         return readonly_fields
 
     def get_queryset(self, request: HttpRequest):
@@ -318,14 +335,14 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
     def get_changelist(self, request, **kwargs):
         return ProjectChangeList
 
-    def get_inlines(
-        self, request: HttpRequest, obj: Optional[Project] = ...
-    ) -> List[Type[InlineModelAdmin]]:
+    def get_inlines(self, request: HttpRequest, obj: Project | None = None):
         inlines = []
         if obj:
-            if is_lab_admin(request.user) or is_project_leader(request.user, obj):
-                inlines += [ParticipationInline]
-            inlines += [BeamTimeRequestInline]
+            if is_lab_admin(request.user) or is_project_leader(
+                request.user, obj  # type: ignore[arg-type]
+            ):
+                inlines += [ParticipationInline]  # type: ignore[list-item]
+            inlines += [BeamTimeRequestInline]  # type: ignore[list-item]
         return inlines
 
     def save_model(
@@ -336,10 +353,13 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         change: bool,
     ) -> None:
         if not change and is_lab_admin(request.user):
-            obj.admin_id = request.user.id
+            obj.admin_id = request.user.id  # type: ignore[assignment]
         obj.save()
         if not change and not is_lab_admin(request.user):
-            obj.participation_set.create(user_id=request.user.id, is_leader=True)
+            obj.participation_set.create(
+                user=request.user,  # type: ignore[misc]
+                is_leader=True,
+            )
         if not change:
             initialize_project_directory(obj.name)
 
@@ -404,7 +424,7 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         return changelist_view
 
     def get_field_queryset(
-        self, db: None, db_field, request: Optional[HttpRequest]
+        self, db: str | None, db_field, request: HttpRequest
     ) -> Optional[Any]:
         qs = super().get_field_queryset(db, db_field, request)
         if qs and db_field == Project.admin.field:

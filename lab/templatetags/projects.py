@@ -2,7 +2,7 @@ import json
 
 from django import template
 from django.http import HttpRequest
-from django.urls import reverse
+from django.urls import ResolverMatch, reverse
 from django.utils.translation import gettext_lazy as _
 
 from lab.models import Project
@@ -19,8 +19,9 @@ def project_tabs(project_id: int, request: HttpRequest):
                     "id": "basic-info-tab",
                     "name": _("Basic information"),
                     "url": reverse("admin:lab_project_change", args=[project_id]),
-                    "is_active": request.resolver_match.url_name
-                    == "lab_project_change",
+                    "is_active": _get_is_active(
+                        request.resolver_match, ["lab_project_change"]
+                    ),
                 },
                 {
                     "id": "runs-tab",
@@ -28,26 +29,39 @@ def project_tabs(project_id: int, request: HttpRequest):
                     "url": (
                         reverse("admin:lab_run_changelist") + f"?project={project_id}"
                     ),
-                    "is_active": request.resolver_match.url_name
-                    in ["lab_run_changelist", "lab_run_change", "lab_run_add"],
+                    "is_active": _get_is_active(
+                        request.resolver_match,
+                        ["lab_run_changelist", "lab_run_change", "lab_run_add"],
+                    ),
                 },
                 {
                     "id": "documents-tab",
                     "name": _("Documents"),
                     "url": reverse("admin:lab_project_documents", args=[project_id]),
-                    "is_active": request.resolver_match.url_name
-                    == "lab_project_documents",
+                    "is_active": _get_is_active(
+                        request.resolver_match, ["lab_project_documents"]
+                    ),
                 },
                 {
                     "id": "workplace-tab",
                     "name": _("Workplace"),
                     "url": reverse("admin:lab_project_workplace", args=[project_id]),
-                    "is_active": request.resolver_match.url_name
-                    in ["lab_project_workplace", "lab_project_hdf5_viewer"],
+                    "is_active": _get_is_active(
+                        request.resolver_match,
+                        ["lab_project_workplace", "lab_project_hdf5_viewer"],
+                    ),
                 },
             )
         }
     return None
+
+
+def _get_is_active(
+    resolver_match: ResolverMatch | None, related_url_names: list[str]
+) -> bool:
+    if resolver_match is None or resolver_match.url_name is None:
+        return False
+    return resolver_match.url_name in related_url_names
 
 
 @register.simple_tag

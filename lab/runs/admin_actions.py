@@ -15,7 +15,7 @@ MANDATORY_FIELDS = ("label", "start_date", "end_date", "beamline")
 def validate_mandatory_fields(run: Run):
     missing_fields = [rf for rf in MANDATORY_FIELDS if not getattr(run, rf)]
     missing_fields_verbose = [
-        str(_(Run._meta.get_field(field_name).verbose_name))
+        str(_(Run._meta.get_field(field_name).verbose_name))  # type: ignore[union-attr,arg-type] # pylint: disable=line-too-long
         for field_name in missing_fields
     ]
     if missing_fields:
@@ -82,9 +82,13 @@ def change_state(_modeladmin, request, queryset):
 
 
 def get_change_state_text(labadmin: bool, run: Run) -> Optional[str]:
-    return {
-        Run.Status.CREATED: _("Ask for execution"),
-        Run.Status.ASK_FOR_EXECUTION: _("Start Run") if labadmin else None,
-        Run.Status.ONGOING: _("Finish Run") if labadmin else None,
-        Run.Status.FINISHED: None,
-    }[run.status]
+    return str(
+        {
+            Run.Status.CREATED: _("Ask for execution"),
+            Run.Status.ASK_FOR_EXECUTION: _("Start Run") if labadmin else None,
+            Run.Status.ONGOING: _("Finish Run") if labadmin else None,
+            Run.Status.FINISHED: None,
+        }[
+            run.status  # type: ignore[index]
+        ]
+    )

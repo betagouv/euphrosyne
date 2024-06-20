@@ -11,9 +11,11 @@ class SessionTokenObtainPairView(TokenViewBase):
     token pair to prove the authentication of those credentials.
     """
 
-    authentication_classes = [
+    authentication_classes = (  # type: ignore[assignment]
         authentication.BasicAuthentication,
         authentication.SessionAuthentication,
-    ]
-    permission_classes = [IsAdminUser]  # permission to user with `is_staff`
-    serializer_class = SessionTokenObtainSerializer
+    )
+    permission_classes = (  # type: ignore[assignment]
+        IsAdminUser,
+    )  # permission to user with `is_staff`
+    serializer_class = SessionTokenObtainSerializer  # type: ignore[assignment]

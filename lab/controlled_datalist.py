@@ -73,7 +73,7 @@ class MultiDatalistIntegerField(IntegerField):
 
     widget = ControlledDatalistsWidget
 
-    def to_python(self, value: Optional[List[int]]) -> Optional[int]:
+    def to_python(self, value: list[str] | None):
         # pylint: disable=line-too-long
         # Raincoat: pypi package: django==4.1.2 path: django/forms/fields.py element: IntegerField.to_python
         value = Field.to_python(self, value)
@@ -87,7 +87,7 @@ class MultiDatalistIntegerField(IntegerField):
 def controlled_datalist_form(
     controller_field_name: str,
     controlled_field_name: str,
-    choices: Dict[str, List[Tuple[str, str]]],
+    choices: Dict[str, List[Tuple[int, int]]],
 ):
     """Decorator to wrap a ModelForm class with a controller field and a
     controlled integer field with choices displayed in <datalist> elements

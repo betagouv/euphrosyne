@@ -22,4 +22,4 @@ def test_valid_filename_validator(name_to_validate: str, is_valid: bool):
         with pytest.raises(ValidationError):
             valid_filename(name_to_validate)
     else:
-        assert valid_filename(name_to_validate) is None
+        assert valid_filename(name_to_validate) is None  # type: ignore[func-returns-value] # pylint: disable=line-too-long
