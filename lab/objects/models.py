@@ -4,27 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from shared.models import TimestampedModel
 
-
-class Period(models.Model):
-    label = models.CharField(_("Name"), max_length=255)
-
-    theso_joconde_id = models.CharField(
-        "Joconde Thesorus ID", max_length=255, null=True, blank=True
-    )
-
-    def __str__(self) -> str:
-        return str(self.label)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["label", "theso_joconde_id"],
-                name="period_unique_label_theso_joconde_id",
-            ),
-            models.UniqueConstraint(
-                fields=["theso_joconde_id"], name="period_unique_theso_joconde_id"
-            ),
-        ]
+from ..thesauri.models import Era, Period
 
 
 class Location(models.Model):
@@ -66,10 +46,17 @@ class ObjectGroup(TimestampedModel):
         max_length=255,
         blank=True,
     )
-    dating = models.ForeignKey(
+    dating_period = models.ForeignKey(
         Period,
         on_delete=models.SET_NULL,
-        verbose_name=_("Dating"),
+        verbose_name=_("Period"),
+        blank=True,
+        null=True,
+    )
+    dating_era = models.ForeignKey(
+        Era,
+        on_delete=models.SET_NULL,
+        verbose_name=_("Era"),
         blank=True,
         null=True,
     )
@@ -104,9 +91,10 @@ class ObjectGroup(TimestampedModel):
                 "object_count": self.object_count
             }
             label = "({}) {}".format(count_str, label)
-        materials = ", ".join(self.materials)
-
-        return f"{label} - {self.dating} - {materials}"
+        if self.materials:
+            materials = ", ".join(self.materials)
+            label = f"{label} - {materials}"
+        return label
 
     class Meta:
         verbose_name = _("Object / Sample")

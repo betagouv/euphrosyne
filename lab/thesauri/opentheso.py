@@ -3,9 +3,9 @@ from functools import lru_cache
 
 import requests
 
-logger = logging.getLogger(__name__)
+from .models import Era, Period
 
-THESO_IDS = {"epoques": "th289"}
+logger = logging.getLogger(__name__)
 
 
 @lru_cache
@@ -36,5 +36,9 @@ def fetch_parent_ids_from_id(theso_id: str, concept_id: str) -> list[str]:
     return []
 
 
-def fetch_epoques_parent_ids_from_id(concept_id: str):
-    return fetch_parent_ids_from_id(THESO_IDS["epoques"], concept_id)
+def fetch_era_parent_ids_from_id(concept_id: str):
+    return fetch_parent_ids_from_id(Era.OPENTHESO_THESO_ID, concept_id)
+
+
+def fetch_period_parent_ids_from_id(concept_id: str):
+    return fetch_parent_ids_from_id(Period.OPENTHESO_THESO_ID, concept_id)

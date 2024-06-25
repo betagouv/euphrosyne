@@ -102,8 +102,10 @@ class Query:
                 return _status_query(value)
             case "materials":
                 return _materials_query(value)
-            case "period_ids":
-                return _period_query(value)
+            case "dating_period_ids":
+                return _dating_period_query(value)
+            case "dating_era_ids":
+                return _dating_era_query(value)
             case "category":
                 return _category_filter(value)
             case "c2rmf_id":
@@ -192,8 +194,12 @@ def _materials_query(materials: list[str]):
     return _terms_query("materials", materials)
 
 
-def _period_query(dating_ids: list[str]):
-    return _terms_query("dating_theso_huma_num_parent_ids", dating_ids)
+def _dating_era_query(dating_ids: list[str]):
+    return _terms_query("dating_era_theso_huma_num_parent_ids", dating_ids)
+
+
+def _dating_period_query(dating_ids: list[str]):
+    return _terms_query("dating_period_theso_huma_num_parent_ids", dating_ids)
 
 
 def _category_filter(category: Literal["project", "object"]):

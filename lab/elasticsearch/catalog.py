@@ -5,9 +5,12 @@ from slugify import slugify
 
 from lab.methods.dto import method_model_to_dto
 from lab.models import ObjectGroup, Project
-from lab.opentheso import fetch_epoques_parent_ids_from_id
 from lab.participations.models import Participation
 from lab.runs.models import Run
+from lab.thesauri.opentheso import (
+    fetch_era_parent_ids_from_id,
+    fetch_period_parent_ids_from_id,
+)
 
 from .documents import (
     CatalogItem,
@@ -24,6 +27,15 @@ logger = logging.getLogger(__name__)
 class LocationDict(TypedDict):
     lat: float
     lon: float
+
+
+class DatingDict(TypedDict, total=False):
+    dating_period_label: str | None
+    dating_period_theso_huma_num_id: str | None
+    dating_period_theso_huma_num_parent_ids: list[str] | None
+    dating_era_label: str | None
+    dating_era_theso_huma_num_id: str | None
+    dating_era_theso_huma_num_parent_ids: list[str] | None
 
 
 def _create_leader_doc(leader: Participation):
@@ -55,9 +67,12 @@ def _create_project_page_data(
         )
     for object_group in object_groups:
 
-        dating_label: str | None = None
-        if object_group.dating:
-            dating_label = object_group.dating.label
+        dating_era_label: str | None = None
+        dating_period_label: str | None = None
+        if object_group.dating_period:
+            dating_period_label = object_group.dating_period.label
+        if object_group.dating_era:
+            dating_era_label = object_group.dating_era.label
 
         discovery_place_label: str | None = None
         if object_group.discovery_place_location:
@@ -71,8 +86,9 @@ def _create_project_page_data(
                     "materials": object_group.materials,
                     "discovery_place_label": discovery_place_label,
                     "collection": object_group.collection,
-                    "dating_label": dating_label,
                     "inventory": object_group.inventory,
+                    "dating_period_label": dating_period_label,
+                    "dating_era_label": dating_era_label,
                 }
             ),
             objects=list(
@@ -162,17 +178,25 @@ def build_object_group_catalog_document(
         locations = [location_geopoint]
 
     # Dating
-    dating_label: str | None = None
-    dating_theso_huma_num_id: str | None = None
-    dating_theso_huma_num_parent_ids: list[str] | None = []
-    if object_group.dating:
-        dating_label = object_group.dating.label
-        dating_theso_huma_num_id = object_group.dating.theso_joconde_id
-        dating_theso_huma_num_parent_ids = None
-        if dating_theso_huma_num_id:
-            dating_theso_huma_num_parent_ids = fetch_epoques_parent_ids_from_id(
-                object_group.dating.theso_joconde_id
+    dating_dict = {}
+    for field_name in ["dating_period", "dating_era"]:
+        fetch_parent_ids_fn = (
+            fetch_era_parent_ids_from_id
+            if field_name == "dating_era"
+            else fetch_period_parent_ids_from_id
+        )
+        if getattr(object_group, field_name):
+            theso_huma_num_parent_ids = fetch_parent_ids_fn(
+                getattr(object_group, field_name).concept_id
             )
+            dating_dict = {
+                **dating_dict,
+                f"{field_name}_label": getattr(object_group, field_name).label,
+                f"{field_name}_theso_huma_num_id": getattr(
+                    object_group, field_name
+                ).concept_id,
+                f"{field_name}_theso_huma_num_parent_ids": theso_huma_num_parent_ids,
+            }
     _id = f"object-{object_group.id}"
     catalog_item = CatalogItem(
         meta={"id": _id},
@@ -191,9 +215,7 @@ def build_object_group_catalog_document(
         discovery_place_label=location_label,
         discovery_place_point=location_geopoint,
         discovery_place_points=locations,
-        dating_label=dating_label,
-        dating_theso_huma_num_id=dating_theso_huma_num_id,
-        dating_theso_huma_num_parent_ids=dating_theso_huma_num_parent_ids,
+        **dating_dict,
     )
 
     collections = []

@@ -4,6 +4,8 @@ import factory
 import factory.fuzzy
 from django.contrib.auth import get_user_model
 
+from lab.thesauri.models import Era
+
 from ..models import Object, ObjectGroup, Participation, Period, Project, Run
 from ..objects.models import Location
 
@@ -121,6 +123,13 @@ class PeriodFactory(factory.django.DjangoModelFactory):
     label = factory.Faker("date")
 
 
+class EraFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Era
+
+    label = factory.Faker("date")
+
+
 class ObjectFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Object
@@ -133,7 +142,8 @@ class ObjectGroupFactory(factory.django.DjangoModelFactory):
         model = ObjectGroup
 
     label = factory.Faker("name")
-    dating = factory.SubFactory(PeriodFactory)
+    dating_period = factory.SubFactory(PeriodFactory)
+    dating_era = factory.SubFactory(EraFactory)
     materials = factory.fuzzy.FuzzyChoice(["wood", "stone", "glass", "metal"], list)
     object_count = 3
 

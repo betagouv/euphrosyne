@@ -1,9 +1,9 @@
 from unittest import mock
 
-from ..opentheso import fetch_parent_ids_from_id
+from ..thesauri.opentheso import fetch_parent_ids_from_id
 
 
-@mock.patch("lab.opentheso.requests")
+@mock.patch("lab.thesauri.opentheso.requests")
 def test_fetch_parent_ids_from_id(request_mock: mock.MagicMock):
     response_data = {
         "ELEMENT/IGNORED_ELEMENT": {},

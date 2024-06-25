@@ -54,7 +54,8 @@ def test_build_project_catalog_document():
         {
             "c2rmf_id": objectgroup.c2rmf_id,
             "collection": objectgroup.collection,
-            "dating_label": objectgroup.dating.label,
+            "dating_era_label": objectgroup.dating_era.label,
+            "dating_period_label": objectgroup.dating_period.label,
             "discovery_place_label": (
                 objectgroup.discovery_place.label
                 if objectgroup.discovery_place
@@ -81,10 +82,12 @@ def test_build_project_catalog_document():
 
 @pytest.mark.django_db
 def test_build_object_group_catalog_document():
-    dating = factories.PeriodFactory(theso_joconde_id=123)
+    dating_period = factories.PeriodFactory(concept_id=123)
+    dating_era = factories.EraFactory(concept_id=345)
     discovery_place = factories.LocationFactory()
     object_group = factories.ObjectGroupFactory(
-        dating=dating,
+        dating_period=dating_period,
+        dating_era=dating_era,
         discovery_place_location=discovery_place,
         inventory="123",
     )
@@ -95,17 +98,22 @@ def test_build_object_group_catalog_document():
     run.run_object_groups.add(object_group)
 
     with mock.patch(
-        "lab.elasticsearch.catalog.fetch_epoques_parent_ids_from_id",
+        "lab.elasticsearch.catalog.fetch_period_parent_ids_from_id",
         return_value=[345, 567],
-    ) as fetch_epoques_mock:
-        document = build_object_group_catalog_document(
-            object_group=object_group,
-            runs=[run],
-            projects=[run.project],
-            is_data_available=True,
-        )
+    ) as fetch_period_mock:
+        with mock.patch(
+            "lab.elasticsearch.catalog.fetch_era_parent_ids_from_id",
+            return_value=[890, 445],
+        ) as fetch_era_mock:
+            document = build_object_group_catalog_document(
+                object_group=object_group,
+                runs=[run],
+                projects=[run.project],
+                is_data_available=True,
+            )
 
-    fetch_epoques_mock.assert_called_once_with(123)
+    fetch_period_mock.assert_called_once_with(123)
+    fetch_era_mock.assert_called_once_with(345)
 
     assert document.object_page_data.runs == [
         {
@@ -158,6 +166,10 @@ def test_build_object_group_catalog_document():
         }
     ]
 
-    assert document.dating_label == dating.label
-    assert document.dating_theso_huma_num_id == 123
-    assert document.dating_theso_huma_num_parent_ids == [345, 567]
+    assert document.dating_period_label == dating_period.label
+    assert document.dating_period_theso_huma_num_id == 123
+    assert document.dating_period_theso_huma_num_parent_ids == [345, 567]
+
+    assert document.dating_era_label == dating_era.label
+    assert document.dating_era_theso_huma_num_id == 345
+    assert document.dating_era_theso_huma_num_parent_ids == [890, 445]

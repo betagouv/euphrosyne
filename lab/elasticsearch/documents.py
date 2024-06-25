@@ -24,7 +24,8 @@ class ObjectGroupDoc(os.InnerDoc):
     discovery_place_label = os.Text()
     collection = os.Keyword()
     inventory = os.Keyword()
-    dating_label = os.Text()
+    dating_period_label = os.Text()
+    dating_era_label = os.Text()
     objects = os.Object(ObjectDoc, multi=True)
 
     def add_object(self, label: str, collection: str, inventory: str):
@@ -159,12 +160,16 @@ class CatalogItem(os.Document):
     discovery_place_point = os.GeoPoint()
     collection = os.Text()
     inventory_number = os.Keyword()
-    dating_label = os.Text()
-    dating_theso_huma_num_id = os.Keyword()
-    dating_theso_huma_num_parent_ids = os.Keyword(multi=True)
     objects = os.Object(ObjectDoc, multi=True)
     collections = os.Keyword(multi=True)
     inventory_numbers = os.Keyword(multi=True)
+
+    dating_period_label = os.Text()
+    dating_period_theso_huma_num_id = os.Keyword()
+    dating_period_theso_huma_num_parent_ids = os.Keyword(multi=True)
+    dating_era_label = os.Text()
+    dating_era_theso_huma_num_id = os.Keyword()
+    dating_era_theso_huma_num_parent_ids = os.Keyword(multi=True)
 
     def add_object(
         self,

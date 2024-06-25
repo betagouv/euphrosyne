@@ -6,7 +6,8 @@ BASE_SEARCH_PARAMS = {
     "q": "q",
     "status": "Status.DATA_AVAILABLE",
     "materials": ["material1", "material2"],
-    "period_ids": ["period1", "period2"],
+    "dating_period_ids": ["period1", "period2"],
+    "dating_era_ids": ["era1", "era2"],
     "category": "project",
     "c2rmf_id": "c2rmf_id",
     "created_from": datetime.datetime(2021, 1, 1).strftime("%Y-%m-%d"),
@@ -32,33 +33,36 @@ BASE_SEARCH_PARAMS_RELATED_QUERY = {
                 {
                     "multi_match": {
                         "query": "q",
-                        "fields": [
-                            "name",
-                            "collections",
-                            "collection",
-                            "materials",
-                        ],
+                        "fields": ["name", "collections", "collection", "materials"],
                     }
                 },
                 {"term": {"status": "Status.DATA_AVAILABLE"}},
                 {"terms": {"materials": ["material1", "material2"]}},
-                {"terms": {"dating_theso_huma_num_parent_ids": ["period1", "period2"]}},
+                {
+                    "terms": {
+                        "dating_period_theso_huma_num_parent_ids": [
+                            "period1",
+                            "period2",
+                        ]
+                    }
+                },
+                {"terms": {"dating_era_theso_huma_num_parent_ids": ["era1", "era2"]}},
                 {"term": {"c2rmf_id": "c2rmf_id"}},
                 {
                     "range": {
                         "created": {
                             "gte": "2021-01-01",
-                            "lte": datetime.datetime.max,
-                        },
-                    },
+                            "lte": datetime.datetime(9999, 12, 31, 23, 59, 59, 999999),
+                        }
+                    }
                 },
                 {
                     "range": {
                         "created": {
-                            "gte": datetime.datetime.min,
+                            "gte": datetime.datetime(1, 1, 1, 0, 0),
                             "lte": "2021-12-31",
-                        },
-                    },
+                        }
+                    }
                 },
                 {
                     "geo_bounding_box": {

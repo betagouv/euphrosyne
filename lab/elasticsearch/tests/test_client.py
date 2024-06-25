@@ -70,10 +70,10 @@ def test_aggregate_date(catalog_client: CatalogClient):
 
 @pytest.mark.django_db
 def test_index_from_projects(catalog_client: CatalogClient):
-    dating = lab_factories.PeriodFactory(theso_joconde_id=123)
+    dating_period = lab_factories.PeriodFactory(concept_id=123)
     discovery_place = lab_factories.LocationFactory()
     object_group = lab_factories.ObjectGroupFactory(
-        dating=dating,
+        dating_period=dating_period,
         discovery_place_location=discovery_place,
         inventory="123",
     )

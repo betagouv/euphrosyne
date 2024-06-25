@@ -1,9 +1,34 @@
 <div class="dating-autocomplete-input autocomplete-input flex-container">
   <div class="typeahead-field fr-mr-1w">
-    <input {% if widget.instance %}value="{{ widget.instance.label }}"{% endif %} id="{{widget.attrs.id}}__dating" class="fr-input dating-autocomplete-input__label" name="{{ widget.name }}__label" autocomplete="off"/>
-    <div is="period-type-ahead" class="typeahead-list" html-for="{{ widget.attrs.id }}__dating"></div>
+    <div class="fr-input-wrap fr-icon-search-line">
+      <input 
+        {% if widget.instance %}value="{{ widget.instance.label }}"{% endif %} 
+        id="{{widget.attrs.id}}__dating_{{ widget.field_name }}" 
+        class="fr-input dating-autocomplete-input__label" 
+        name="{{ widget.name }}__label" 
+        autocomplete="off"
+        />
+    </div>
+    <div 
+      is="dating-open-theso-type-ahead" 
+      thesorus-id="{{ widget.opentheso_theso_id }}"
+      class="typeahead-list" 
+      html-for="{{ widget.attrs.id }}__dating_{{ widget.field_name }}">
+    </div>
   </div>
   
-  <input type="hidden" {% if widget.value %}value="{{ widget.value }}"{% endif %} name="{{ widget.name }}" id="{{widget.attrs.id}}" class="fr-input dating-autocomplete-input__id">
-  <input type="hidden" {% if widget.instance and widget.instance.theso_joconde_id %}value="{{ widget.instance.theso_joconde_id }}"{% endif %} name="{{ widget.name }}__theso_joconde_id" id="{{widget.attrs.id}}__theso_joconde_id" class="fr-input dating-autocomplete-input__theso_joconde_id">
+  <input 
+    type="hidden" 
+    {% if widget.value %}value="{{ widget.value }}"{% endif %} 
+    name="{{ widget.name }}"
+    id="{{widget.attrs.id}}" 
+    class="fr-input dating-autocomplete-input__id"
+  />
+  <input 
+    type="hidden" 
+    {% if widget.instance and widget.instance.concept_id %}value="{{ widget.instance.concept_id }}"{% endif %} 
+    name="{{ widget.name }}__concept_id" 
+    id="{{widget.attrs.id}}__concept_id" 
+    class="fr-input dating-autocomplete-input__concept_id"
+  />
 </div>
