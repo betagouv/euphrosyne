@@ -1,5 +1,5 @@
 import logging
-from typing import TypedDict
+from typing import Generic, TypedDict, TypeVar, Unpack
 
 from django.conf import settings
 from opensearchpy import OpenSearch
@@ -9,18 +9,24 @@ from lab.objects.models import ObjectGroup
 from lab.projects.models import Project
 from lab.runs.models import Run
 
-from .catalog import build_object_group_catalog_document, build_project_catalog_document
+from .catalog import (
+    LocationDict,
+    build_object_group_catalog_document,
+    build_project_catalog_document,
+)
 from .documents import CatalogItem
 
 logger = logging.getLogger(__name__)
 
+_T = TypeVar("_T")
 
-class Singleton(type):
-    _instances = {}
+
+class Singleton(type, Generic[_T]):
+    _instances: dict["Singleton[_T]", _T] = {}
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
 
 
@@ -55,7 +61,7 @@ class CatalogClient(metaclass=Singleton):
         )
         CatalogItem.init(using=client)
 
-    def search(self, **kwargs: queries.QueryParams):
+    def search(self, **kwargs: Unpack[queries.QueryParams]):
         query = queries.filter_query(kwargs)
         return self.client.search(index="catalog", body=query)
 
@@ -79,7 +85,7 @@ class CatalogClient(metaclass=Singleton):
                 set(obj for run in runs for obj in run.run_object_groups.all())
             )
             materials = []
-            locations = []
+            locations: list[LocationDict] = []
             for objectgroup in objectgroups:
                 materials.extend(objectgroup.materials)
                 if (

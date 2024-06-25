@@ -5,7 +5,7 @@ from ..thesauri.opentheso import fetch_parent_ids_from_id
 
 @mock.patch("lab.thesauri.opentheso.requests")
 def test_fetch_parent_ids_from_id(request_mock: mock.MagicMock):
-    response_data = {
+    response_data = {  # type: ignore
         "ELEMENT/IGNORED_ELEMENT": {},
         "ELEMENT/FIRST": {},
         "ELEMENT/BLABLA/SECOND": {},

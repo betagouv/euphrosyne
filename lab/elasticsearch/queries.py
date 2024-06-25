@@ -1,6 +1,6 @@
 import dataclasses
 import datetime
-from typing import Literal, NotRequired, TypedDict
+from typing import Literal, NotRequired, TypedDict, cast
 
 from lab.projects.models import Project
 
@@ -19,9 +19,10 @@ class Location(TypedDict):
 
 class QueryParams(TypedDict, total=False):
     q: str
-    status: str
+    status: Project.Status
     materials: list[str]
-    period_ids: list[str]
+    dating_period_ids: list[str]
+    dating_era_ids: list[str]
     category: Literal["project", "object"]
     c2rmf_id: str
     created_from: datetime.datetime
@@ -47,9 +48,9 @@ class Query:
     def build_query(
         self,
         params: QueryParams,
-        size: int = None,
-        _from: int = None,
-        sort: Literal["asc", "desc"] = None,
+        size: int | None = None,
+        _from: int | None = None,
+        sort: Literal["asc", "desc"] | None = None,
     ):
         self._process_params(params)
         if self.must or self.filter:
@@ -79,11 +80,12 @@ class Query:
             # Filter queries -- if we add more filters we could create match fn
             # like _match_param_to_filter
             if key == "category":
+                value = cast(Literal["project", "object"], value)
                 self.filter.append(_category_filter(value))
                 continue
 
             # Must queries
-            query = self._match_param_to_query(key, value)
+            query = self._match_param_to_query(key, params)
             if query:
                 self.must.append(query)
 
@@ -91,37 +93,38 @@ class Query:
     def _match_param_to_query(
         self,
         key: str,
-        value: str | list[str] | datetime.datetime | bool | int | Location,
+        params: QueryParams,
     ):
         match key:
             case "q":
                 return _search_box_query(
-                    value, fields=["name", "collections", "collection", "materials"]
+                    params["q"],
+                    fields=["name", "collections", "collection", "materials"],
                 )
             case "status":
-                return _status_query(value)
+                return _status_query(params["status"])
             case "materials":
-                return _materials_query(value)
+                return _materials_query(params["materials"])
             case "dating_period_ids":
-                return _dating_period_query(value)
+                return _dating_period_query(params["dating_period_ids"])
             case "dating_era_ids":
-                return _dating_era_query(value)
+                return _dating_era_query(params["dating_era_ids"])
             case "category":
-                return _category_filter(value)
+                return _category_filter(params["category"])
             case "c2rmf_id":
-                return _c2rmf_id_query(value)
+                return _c2rmf_id_query(params["c2rmf_id"])
             case "created_from":
-                return _created_query(created_from=value)
+                return _created_query(created_from=params["created_from"])
             case "created_to":
-                return _created_query(created_to=value)
+                return _created_query(created_to=params["created_to"])
             case "location":
-                return _discovery_place_query(value)
+                return _discovery_place_query(params["location"])
             case "collection":
-                return _collection_query(value)
+                return _collection_query(params["collection"])
             case "inventory":
-                return _inventory_query(value)
+                return _inventory_query(params["inventory"])
             case "is_data_available":
-                return _is_data_available_query(value)
+                return _is_data_available_query(params["is_data_available"])
 
 
 def match_all_query():
@@ -169,7 +172,7 @@ def date_historiogram_agg(field: str, interval: str):
     }
 
 
-def _paginate_query(query: dict, size: int = None, _from: int = None):
+def _paginate_query(query: dict, size: int | None = None, _from: int | None = None):
     return {
         **query,
         "from": _from or 0,
@@ -187,7 +190,7 @@ def _search_box_query(q: str, fields: list[str]):
 
 
 def _status_query(status: Project.Status):
-    return _term_query("status", status)
+    return _term_query("status", status)  # type: ignore
 
 
 def _materials_query(materials: list[str]):
@@ -211,7 +214,8 @@ def _c2rmf_id_query(c2rmf_id: str):
 
 
 def _created_query(
-    created_from: datetime.datetime = None, created_to: datetime.datetime = None
+    created_from: datetime.datetime | None = None,
+    created_to: datetime.datetime | None = None,
 ):
     return {
         "range": {
@@ -282,7 +286,7 @@ def _terms_query(field: str, values: list[str]):
     }
 
 
-def _term_query(field: str, value: str):
+def _term_query(field: str, value: str | bool):
     return {
         "term": {
             field: value,

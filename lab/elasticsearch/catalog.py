@@ -44,8 +44,8 @@ def _create_leader_doc(leader: Participation):
         user_last_name=leader.user.last_name,
     )
     if leader.institution:
-        doc.institution_name = leader.institution.name
-        doc.institution_country = leader.institution.country
+        doc.institution_name = leader.institution.name  # type: ignore[assignment]
+        doc.institution_country = leader.institution.country  # type: ignore[assignment]
     return doc
 
 
@@ -116,7 +116,7 @@ def _create_object_group_page_data(projects: list[Project], runs: list[Run]):
         page_data.add_project(
             name=project.name,
             slug=project.slug,
-            leader=_create_leader_doc(project.leader),
+            leader=_create_leader_doc(project.leader) if project.leader else None,
         )
     return page_data
 
@@ -125,7 +125,7 @@ def _create_object_group_page_data(projects: list[Project], runs: list[Run]):
 def build_project_catalog_document(
     project: Project,
     materials: list[str],
-    leader: Participation,
+    leader: Participation | None,
     object_groups: list[ObjectGroup],
     object_group_locations: list[LocationDict],
     runs: list[Run],
@@ -178,7 +178,7 @@ def build_object_group_catalog_document(
         locations = [location_geopoint]
 
     # Dating
-    dating_dict = {}
+    dating_dict: DatingDict = {}
     for field_name in ["dating_period", "dating_era"]:
         fetch_parent_ids_fn = (
             fetch_era_parent_ids_from_id
@@ -191,10 +191,13 @@ def build_object_group_catalog_document(
             )
             dating_dict = {
                 **dating_dict,
-                f"{field_name}_label": getattr(object_group, field_name).label,
-                f"{field_name}_theso_huma_num_id": getattr(
+                f"{field_name}_label": getattr(  # type: ignore
+                    object_group, field_name
+                ).label,
+                f"{field_name}_theso_huma_num_id": getattr(  # type: ignore
                     object_group, field_name
                 ).concept_id,
+                # type: ignore
                 f"{field_name}_theso_huma_num_parent_ids": theso_huma_num_parent_ids,
             }
     _id = f"object-{object_group.id}"
@@ -234,7 +237,10 @@ def build_object_group_catalog_document(
             collections.append(obj.collection)
         if obj.inventory:
             inventory_numbers.append(obj.inventory)
-    catalog_item.collections = list(set(collections))
-    catalog_item.inventory_numbers = list(set(inventory_numbers))
+
+    catalog_item.collections = list(set(collections))  # type: ignore[assignment]
+    catalog_item.inventory_numbers = list(
+        set(inventory_numbers)
+    )  # type: ignore[assignment]
 
     return catalog_item

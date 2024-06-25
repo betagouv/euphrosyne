@@ -23,7 +23,7 @@ def set_es_settings(settings):
 
 
 def test_search(catalog_client: CatalogClient):
-    catalog_client.search(**BASE_SEARCH_PARAMS)
+    catalog_client.search(**BASE_SEARCH_PARAMS)  # type: ignore
     catalog_client.client.search.assert_called_with(
         index="catalog",
         body={

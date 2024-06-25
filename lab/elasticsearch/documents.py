@@ -8,6 +8,7 @@ from lab.methods.dto import DetectorDTO, MethodDTO
 class _ObjectDict(TypedDict):
     label: str
     collection: str
+    inventory: str
 
 
 class ObjectDoc(os.InnerDoc):
@@ -127,7 +128,7 @@ class ObjectPageData(os.InnerDoc):
         self,
         name: str,
         slug: str,
-        leader: LeaderDoc,
+        leader: LeaderDoc | None = None,
     ):
         project = ProjectDoc(name=name, slug=slug, leader=leader)
         self.projects.append(project)

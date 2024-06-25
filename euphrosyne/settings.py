@@ -47,7 +47,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split() or (
 )
 
 CORS_ALLOWED_ORIGINS = (
-    os.getenv("CORS_ALLOWED_ORIGINS").split(",")
+    os.environ["CORS_ALLOWED_ORIGINS"].split(",")
     if os.getenv("CORS_ALLOWED_ORIGINS")
     else []
 )
