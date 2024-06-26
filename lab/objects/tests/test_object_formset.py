@@ -147,7 +147,7 @@ class TestObjectFormsetWithTemplateUpload(TestCase):
         self.inline = ObjectInline(ObjectGroup, admin_site=AdminSite())
         self.objectgroup = ObjectGroup(
             label="Object group",
-            dating=Period.objects.get_or_create(label="XIXe")[0],
+            dating_period=Period.objects.get_or_create(label="XIXe")[0],
             materials=["wood"],
             object_count=0,
         )

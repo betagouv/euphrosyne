@@ -1,7 +1,6 @@
 import datetime
-import typing
 from itertools import groupby
-from typing import Any, Callable, TypedDict
+from typing import Callable, TypedDict
 
 from django import template
 from django.contrib.admin.templatetags.admin_list import (
@@ -14,7 +13,6 @@ from django.contrib.admin.views.main import ChangeList
 from django.db.models.functions import TruncMonth
 from django.db.models.query import QuerySet
 from django.utils.html import format_html
-from django_stubs_ext import WithAnnotations
 
 from lab.projects.models import ProjectQuerySet
 
@@ -132,24 +130,16 @@ class MonthAnnotation(TypedDict):
     month: datetime.datetime
 
 
-if typing.TYPE_CHECKING:
-    MonthAnnotedProject = WithAnnotations[Project, MonthAnnotation]  # type: ignore
-else:
-    MonthAnnotedProject = WithAnnotations[Project]
-
-
 def group_results_by_month(changelist: ChangeList):
 
-    rl: MonthAnnotedProject = changelist.result_list.annotate(
+    rl = changelist.result_list.annotate(
         month=TruncMonth("first_run_date")  # type: ignore[arg-type]
     )
     changelist.result_list = rl
     return _group_results(changelist, attr_getter_fn=lambda p: p.month)
 
 
-def _group_results(
-    changelist: ChangeList, attr_getter_fn: Callable[[MonthAnnotedProject], Any]
-):
+def _group_results(changelist: ChangeList, attr_getter_fn: Callable):
     """
     Group the results from a ChangeList based on a specific attribute.
 

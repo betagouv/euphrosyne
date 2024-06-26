@@ -5,7 +5,7 @@ interface ObjectGroupResponseElement {
   id: number;
   label: string;
   object_count: number;
-  dating: string;
+  dating: string; // this is linked to Django ObjectGroup.dating_era
   materials: string[];
 }
 
@@ -32,6 +32,9 @@ export async function fetchRunObjectGroups(
   }));
 }
 
+/**
+ * Fetches the object groups available to import for a run.
+ */
 export async function fetchAvailableObjectGroups(
   runId: string,
 ): Promise<ObjectGroup[]> {

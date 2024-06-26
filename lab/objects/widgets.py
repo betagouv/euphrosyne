@@ -2,9 +2,10 @@ from typing import Any, Dict
 
 from django.forms import widgets
 
+from lab.thesauri.models import ThesorusConceptModel
 from lab.widgets import AutoCompleteWidget
 
-from .models import Location, Period
+from .models import Era, Location, Period
 
 
 class ImportFromInput(widgets.TextInput):
@@ -68,13 +69,41 @@ class LocationAutoCompleteWidget(AutoCompleteWidget):
 
 
 class DatingAutoCompleteWidget(AutoCompleteWidget):
+    model: type[ThesorusConceptModel] | None = None
+
     template_name = "widgets/dating_autocomplete_widget.html"
 
+    def get_context(
+        self, name: str, value: Any, attrs: dict[str, Any] | None
+    ) -> dict[str, Any]:
+        context = super().get_context(name, value, attrs)
+        if self.model is None:
+            raise ValueError("model is required")
+        context["widget"]["field_name"] = self.model.__name__.lower()
+        # pylint: disable=no-member
+        context["widget"]["opentheso_theso_id"] = self.model.OPENTHESO_THESO_ID
+        return context
+
+
+class PeriodDatingAutoCompleteWidget(DatingAutoCompleteWidget):
     model = Period
+    typeahead_list_webcomponent_name = "period-type-ahead"
 
     class Media:
         js = (
-            "web-components/period-type-ahead.js",
+            "web-components/dating-open-theso-type-ahead.js",
             "js/widgets/dating-autocomplete-widget.js",
+        )
+        css = {"all": ("css/widgets/autocomplete-widget.css",)}
+
+
+class EraDatingAutoCompleteWidget(DatingAutoCompleteWidget):
+    model = Era
+    typeahead_list_webcomponent_name = "era-type-ahead"
+
+    class Media:
+        js = (
+            "web-components/dating-open-theso-type-ahead.js",
+            "js/widgets/era-autocomplete-widget.js",
         )
         css = {"all": ("css/widgets/autocomplete-widget.css",)}
