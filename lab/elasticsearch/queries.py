@@ -139,7 +139,7 @@ def filter_query(
     params: QueryParams,
 ):
     size = params.pop("size", None)
-    _from = params.pop("_from", None)
+    _from = params.pop("from", None)  # type: ignore
     sort = params.pop("sort", None)
     return Query().build_query(
         params,

@@ -1,3 +1,5 @@
+from unittest import mock
+
 from .. import queries
 from ._mock import BASE_SEARCH_PARAMS, BASE_SEARCH_PARAMS_RELATED_QUERY
 
@@ -43,3 +45,9 @@ def test_date_historiogram_agg_query():
             }
         },
     }
+
+
+def test_filter_query():
+    with mock.patch("lab.elasticsearch.queries.Query.build_query") as mock_build_query:
+        queries.filter_query({"size": 50, "from": 40, "sort": "desc"})
+        mock_build_query.assert_called_with({}, size=50, _from=40, sort="desc")
