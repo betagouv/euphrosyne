@@ -4,7 +4,7 @@ black==24.4.2
 django-stubs[compatible-mypy]==5.0.2
 factory-boy==3.3.0
 flake8==7.1.0
-ipython==8.25.0
+ipython==8.26.0
 isort==5.13.2
 mypy==1.10.1
 pylint-django==2.5.5
