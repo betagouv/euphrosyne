@@ -6,7 +6,7 @@ factory-boy==3.3.0
 flake8==7.1.0
 ipython==8.25.0
 isort==5.13.2
-mypy==1.10.0
+mypy==1.10.1
 pylint-django==2.5.5
 pylint==3.2.3
 pytest-django==4.8.0
