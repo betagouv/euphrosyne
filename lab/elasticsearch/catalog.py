@@ -56,6 +56,7 @@ def _create_project_page_data(
     for run in runs:
         page_data.add_run(
             run=RunDoc(
+                id=run.id,
                 label=run.label,
                 start_date=run.start_date,
                 particle_type=run.particle_type,
@@ -103,6 +104,7 @@ def _create_object_group_page_data(projects: list[Project], runs: list[Run]):
     for run in runs:
         page_data.add_run(
             run=RunDoc(
+                id=run.id,
                 label=run.label,
                 start_date=run.start_date,
                 particle_type=run.particle_type,

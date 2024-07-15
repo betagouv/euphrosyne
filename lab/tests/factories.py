@@ -2,31 +2,14 @@ from datetime import datetime, timedelta, timezone
 
 import factory
 import factory.fuzzy
-from django.contrib.auth import get_user_model
 
+from euphro_auth.tests.factories import StaffUserFactory
 from lab.thesauri.models import Era
 
 from ..models import Object, ObjectGroup, Participation, Period, Project, Run
 from ..objects.models import Location
 
 NOW = datetime.now(tz=timezone.utc)
-
-
-class StaffUserFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = get_user_model()
-
-    first_name = factory.Faker("first_name")
-    last_name = factory.Faker("last_name")
-    email = factory.LazyAttribute(
-        lambda u: f"{u.first_name}.{u.last_name}@example.com".lower()
-    )
-    password = factory.Faker("password")
-    is_staff = True
-
-
-class LabAdminUserFactory(StaffUserFactory):
-    is_lab_admin = True
 
 
 class ParticipationFactory(factory.django.DjangoModelFactory):

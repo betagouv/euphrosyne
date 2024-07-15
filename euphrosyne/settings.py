@@ -18,6 +18,7 @@ from pathlib import Path
 import dj_database_url
 import psycopg2
 import sentry_sdk
+from django.http import HttpRequest
 from sentry_sdk.integrations.django import DjangoIntegration
 
 # pylint: disable=abstract-class-instantiated
@@ -75,6 +76,7 @@ INSTALLED_APPS = [
     "graphene_django",
     "django_filters",
     "lab",
+    "data_request",
     "orcid_oauth",
     "static_pages",
 ] + (["debug_toolbar"] if DEBUG else [])
@@ -327,3 +329,12 @@ HDF5_ENABLE = os.getenv("HDF5_ENABLE", "false") == "true"
 ELASTICSEARCH_HOST = os.getenv("ELASTICSEARCH_HOST")
 ELASTICSEARCH_USERNAME = os.getenv("ELASTICSEARCH_USERNAME")
 ELASTICSEARCH_PASSWORD = os.getenv("ELASTICSEARCH_PASSWORD")
+
+
+def _get_nav_items(request: HttpRequest) -> list:
+    from .nav import get_nav_items  # pylint: disable=import-outside-toplevel
+
+    return get_nav_items(request)
+
+
+NAV_GET_NAV_ITEMS = _get_nav_items

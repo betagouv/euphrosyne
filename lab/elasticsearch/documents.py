@@ -56,6 +56,7 @@ class MethodDoc(os.InnerDoc):
 
 
 class RunDoc(os.InnerDoc):
+    id = os.Keyword()
     label = os.Text()
     start_date = os.Date()
     particle_type = os.Keyword()

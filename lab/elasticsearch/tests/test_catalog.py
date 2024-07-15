@@ -42,6 +42,7 @@ def test_build_project_catalog_document():
     }
     assert document.project_page_data.runs == [
         {
+            "id": run.id,
             "beamline": run.beamline,
             "start_date": run.start_date,
             "label": run.label,
@@ -117,6 +118,7 @@ def test_build_object_group_catalog_document():
 
     assert document.object_page_data.runs == [
         {
+            "id": run.id,
             "beamline": run.beamline,
             "start_date": run.start_date,
             "label": run.label,
