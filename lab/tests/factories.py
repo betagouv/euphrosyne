@@ -3,10 +3,7 @@ from datetime import datetime, timedelta, timezone
 import factory
 import factory.fuzzy
 
-# TODO replace all imports from lab.tests.factories.LabAdminUserFactory
-# to euphro_auth.tests.factories...
-# pylint: disable=unused-import
-from euphro_auth.tests.factories import LabAdminUserFactory, StaffUserFactory
+from euphro_auth.tests.factories import StaffUserFactory
 from lab.thesauri.models import Era
 
 from ..models import Object, ObjectGroup, Participation, Period, Project, Run

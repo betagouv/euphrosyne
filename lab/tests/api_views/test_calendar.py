@@ -5,8 +5,9 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from euphro_auth.tests.factories import LabAdminUserFactory, StaffUserFactory
 from lab.api_views.calendar import CalendarSerializer, CalendarView
-from lab.tests.factories import LabAdminUserFactory, RunFactory, StaffUserFactory
+from lab.tests.factories import RunFactory
 
 
 class CalendarViewTestCase(TestCase):

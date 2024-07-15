@@ -5,6 +5,7 @@ from django.contrib.admin.sites import AdminSite
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 
+from euphro_auth.tests import factories as auth_factories
 from lab.tests import factories
 
 from ..admin import ObjectGroupAdmin
@@ -33,7 +34,7 @@ class TesObjectGroupAdminPermissions(TestCase):
         assert self.objectgroup_admin.has_change_permission(request, self.object_group)
 
     def test_change_objectgroup_is_forbidden_for_non_participant(self):
-        user = factories.StaffUserFactory()
+        user = auth_factories.StaffUserFactory()
         request = RequestFactory().get(
             reverse(CHANGE_VIEWNAME, args=[self.object_group.id])
         )

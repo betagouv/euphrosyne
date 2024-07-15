@@ -3,9 +3,8 @@ from unittest import mock
 from django.test import Client, TestCase
 from django.urls import reverse
 
+from euphro_auth.tests import factories as auth_factories
 from lab.objects.c2rmf import ErosHTTPError
-
-from .. import factories
 
 
 class TestProjectListView(TestCase):
@@ -13,7 +12,7 @@ class TestProjectListView(TestCase):
         self.client = client = Client()
         self.api_url = reverse("api:objectgroup-c2rmf-fetch")
 
-        client.force_login(factories.LabAdminUserFactory())
+        client.force_login(auth_factories.LabAdminUserFactory())
 
     def test_route_auth(self):
         client = Client()
