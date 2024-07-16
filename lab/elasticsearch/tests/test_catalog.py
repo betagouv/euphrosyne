@@ -49,6 +49,7 @@ def test_build_project_catalog_document():
             "energy_in_kev": run.energy_in_keV,
             "particle_type": run.particle_type,
             "project_slug": run.project.slug,
+            "is_data_embargoed": run.is_data_embargoed,
         }
     ]
     assert document.project_page_data.object_groups == [
@@ -125,6 +126,7 @@ def test_build_object_group_catalog_document():
             "energy_in_kev": run.energy_in_keV,
             "particle_type": run.particle_type,
             "project_slug": run.project.slug,
+            "is_data_embargoed": run.is_data_embargoed,
         }
     ]
     assert document.object_page_data.projects == [

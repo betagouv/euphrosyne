@@ -64,6 +64,7 @@ class RunDoc(os.InnerDoc):
     beamline = os.Keyword()
     methods = os.Object(MethodDoc, multi=True)
     project_slug = os.Keyword()
+    is_data_embargoed = os.Boolean()
 
     def add_method(
         self,

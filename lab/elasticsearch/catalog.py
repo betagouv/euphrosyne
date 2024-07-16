@@ -63,6 +63,7 @@ def _create_project_page_data(
                 energy_in_kev=run.energy_in_keV,
                 beamline=run.beamline,
                 project_slug=run.project.slug,
+                is_data_embargoed=run.is_data_embargoed,
             ),
             methods=method_model_to_dto(run),
         )
@@ -111,6 +112,7 @@ def _create_object_group_page_data(projects: list[Project], runs: list[Run]):
                 energy_in_kev=run.energy_in_keV,
                 beamline=run.beamline,
                 project_slug=run.project.slug,
+                is_data_embargoed=run.is_data_embargoed,
             ),
             methods=method_model_to_dto(run),
         )
