@@ -86,6 +86,11 @@ class RunInline(admin.TabularInline):
     ) -> bool:
         return False
 
+    def has_view_permission(
+        self, request: HttpRequest, obj: Model | None = None
+    ) -> bool:
+        return is_lab_admin(request.user)
+
 
 @admin.register(DataRequest)
 class DataRequestAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
