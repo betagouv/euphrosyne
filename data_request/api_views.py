@@ -1,6 +1,7 @@
 from rest_framework import generics, serializers
 
 from data_request.emails import send_data_request_created_email
+from lab.runs.models import Run
 
 from .models import DataRequest
 
@@ -8,7 +9,7 @@ from .models import DataRequest
 class DataRequestSerializer(serializers.ModelSerializer):
     runs = serializers.PrimaryKeyRelatedField(
         many=True,
-        queryset=DataRequest.runs.rel.model.objects.all(),  # type: ignore[attr-defined] # pylint: disable=no-member
+        queryset=Run.objects.only_not_embargoed(),
         allow_empty=False,
     )
 

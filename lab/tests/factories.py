@@ -93,6 +93,10 @@ class RunForceNoMethodFactory(RunFactory):
         }
 
 
+class NotEmbargoedRun(RunFactory):
+    embargo_date = NOW.date() - timedelta(days=1)
+
+
 class RunReadyToAskExecFactory(RunFactory):
     # pylint: disable=no-member
     status = Run.Status.CREATED.value
