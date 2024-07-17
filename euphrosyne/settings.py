@@ -18,6 +18,7 @@ from pathlib import Path
 import dj_database_url
 import psycopg2
 import sentry_sdk
+from django.http import HttpRequest
 from sentry_sdk.integrations.django import DjangoIntegration
 
 # pylint: disable=abstract-class-instantiated
@@ -46,6 +47,12 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split() or (
     ["localhost", ".scalingo.io"] if not DEBUG else []
 )
 
+CORS_ALLOWED_ORIGINS = (
+    os.environ["CORS_ALLOWED_ORIGINS"].split(",")
+    if os.getenv("CORS_ALLOWED_ORIGINS")
+    else []
+)
+
 CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split()
 
 SITE_URL = os.environ["SITE_URL"]
@@ -54,6 +61,7 @@ SITE_URL = os.environ["SITE_URL"]
 # Application definition
 
 INSTALLED_APPS = [
+    "corsheaders",
     "euphrosyne.apps.AdminConfig",
     "euphro_auth",
     "django.forms",
@@ -68,11 +76,13 @@ INSTALLED_APPS = [
     "graphene_django",
     "django_filters",
     "lab",
+    "data_request",
     "orcid_oauth",
     "static_pages",
 ] + (["debug_toolbar"] if DEBUG else [])
 
 MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else []) + [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -315,3 +325,16 @@ REST_FRAMEWORK = {
 GRAPHENE = {"SCHEMA": "lab.schema.schema"}
 
 HDF5_ENABLE = os.getenv("HDF5_ENABLE", "false") == "true"
+
+ELASTICSEARCH_HOST = os.getenv("ELASTICSEARCH_HOST")
+ELASTICSEARCH_USERNAME = os.getenv("ELASTICSEARCH_USERNAME")
+ELASTICSEARCH_PASSWORD = os.getenv("ELASTICSEARCH_PASSWORD")
+
+
+def _get_nav_items(request: HttpRequest) -> list:
+    from .nav import get_nav_items  # pylint: disable=import-outside-toplevel
+
+    return get_nav_items(request)
+
+
+NAV_GET_NAV_ITEMS = _get_nav_items

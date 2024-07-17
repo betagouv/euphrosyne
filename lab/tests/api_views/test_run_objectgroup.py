@@ -3,6 +3,8 @@ from unittest import mock
 import pytest
 from rest_framework.permissions import IsAdminUser
 
+from euphro_auth.tests import factories as auth_factories
+
 from ... import models
 from ...api_views import run_objectgroup as views
 from ...api_views import serializers
@@ -23,7 +25,7 @@ def test_run_objectgroup_mixin_permissions():
 @pytest.mark.django_db
 @pytest.mark.usefixtures("run")
 def test_run_objectgroup_mixin_get_queryset_when_user():
-    user = factories.StaffUserFactory()
+    user = auth_factories.StaffUserFactory()
 
     view = views.RunObjectGroupMixin()
     view.request = mock.MagicMock(user=user)
@@ -35,7 +37,7 @@ def test_run_objectgroup_mixin_get_queryset_when_user():
 def test_run_objectgroup_mixin_get_queryset_when_member(
     run: models.Run,
 ):
-    user = factories.StaffUserFactory()
+    user = auth_factories.StaffUserFactory()
     run.project.members.add(user)
 
     view = views.RunObjectGroupMixin()
@@ -46,7 +48,7 @@ def test_run_objectgroup_mixin_get_queryset_when_member(
 @pytest.mark.django_db
 @pytest.mark.usefixtures("run")
 def test_run_objectgroup_mixin_get_queryset_when_admin():
-    user = factories.LabAdminUserFactory()
+    user = auth_factories.LabAdminUserFactory()
 
     view = views.RunObjectGroupMixin()
     view.request = mock.MagicMock(user=user)
@@ -81,7 +83,7 @@ def test_run_object_group_view_get_queryset(run: models.Run):
 def test_run_object_group_view_perform_create_when_admin(run: models.Run):
     view = views.RunObjectGroupView()
     view.kwargs = {"run_id": run.id}
-    view.request = mock.MagicMock(user=factories.LabAdminUserFactory())
+    view.request = mock.MagicMock(user=auth_factories.LabAdminUserFactory())
 
     objectgroup = factories.ObjectGroupFactory()
     serializer = serializers.RunObjectGroupCreateSerializer(
@@ -97,7 +99,7 @@ def test_run_object_group_view_perform_create_when_admin(run: models.Run):
 
 @pytest.mark.django_db
 def test_run_object_group_view_perform_create_when_member(run: models.Run):
-    user = factories.StaffUserFactory()
+    user = auth_factories.StaffUserFactory()
     view = views.RunObjectGroupView()
     view.kwargs = {"run_id": run.id}
     view.request = mock.MagicMock(user=user)
@@ -119,7 +121,7 @@ def test_run_object_group_view_perform_create_when_member(run: models.Run):
 
 @pytest.mark.django_db
 def test_run_object_group_view_perform_create_when_not_member(run: models.Run):
-    user = factories.StaffUserFactory()
+    user = auth_factories.StaffUserFactory()
     view = views.RunObjectGroupView()
     view.kwargs = {"run_id": run.id}
     view.request = mock.MagicMock(user=user)
@@ -142,7 +144,7 @@ def test_run_object_group_available_view_lookup_field():
 def test_run_object_group_available_view_get_queryset_when_admin():
     project = factories.ProjectFactory()
     view = views.RunObjectGroupAvailableListView()
-    view.request = mock.MagicMock(user=factories.LabAdminUserFactory())
+    view.request = mock.MagicMock(user=auth_factories.LabAdminUserFactory())
 
     run_1 = factories.RunFactory(project=project)
     run_2 = factories.RunFactory(project=project)
@@ -157,7 +159,7 @@ def test_run_object_group_available_view_get_queryset_when_admin():
 @pytest.mark.django_db
 def test_run_object_group_available_view_get_queryset_when_member():
     project = factories.ProjectFactory()
-    user = factories.StaffUserFactory()
+    user = auth_factories.StaffUserFactory()
     project.members.add(user)
 
     view = views.RunObjectGroupAvailableListView()
@@ -175,7 +177,7 @@ def test_run_object_group_available_view_get_queryset_when_member():
 
 @pytest.mark.django_db
 def test_run_object_group_available_view_get_queryset_when_not_member():
-    user = factories.StaffUserFactory()
+    user = auth_factories.StaffUserFactory()
 
     view = views.RunObjectGroupAvailableListView()
     view.request = mock.MagicMock(user=user)
@@ -191,7 +193,7 @@ def test_run_object_group_available_view_get_queryset_when_not_member():
 def test_run_object_group_available_view_get_queryset_when_run_has_object():
     project = factories.ProjectFactory()
     view = views.RunObjectGroupAvailableListView()
-    view.request = mock.MagicMock(user=factories.LabAdminUserFactory())
+    view.request = mock.MagicMock(user=auth_factories.LabAdminUserFactory())
 
     run_1 = factories.RunFactory(project=project)
     run_2 = factories.RunFactory(project=project)

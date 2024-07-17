@@ -1,34 +1,21 @@
-import { TypeAheadList, Result } from "../type-ahead-list.component";
-
-interface OpenThesoResult {
-  id: string;
-  arkId: string;
-  label: string;
-}
+import { Result } from "../type-ahead-list.component";
+import {
+  OpenThesoResult,
+  OpenThesoTypeAhead,
+  SearchType,
+} from "./open-theso-type-ahead";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-class MaterialTypeAhead extends TypeAheadList {
+class MaterialTypeAhead extends OpenThesoTypeAhead {
+  thesorusId = "th291";
+  searchType: SearchType = "autocomplete";
+
   async fetchResults(query: string): Promise<Result[]> {
-    const q = encodeURIComponent(query);
-    const response = await fetch(
-      `https://opentheso.huma-num.fr/opentheso/openapi/v1/concept/th291/autocomplete/${q}?lang=fr&exactMatch=false`,
-    );
-
-    if (response && response.status === 404) {
-      return [];
-    }
-    if (!response || !response.ok) {
-      throw new Error("Failed to fetch results");
-    }
-
-    const data = await response.json();
-    if (!data || !data.length) {
-      return [];
-    }
+    const data = await this.doFetch<OpenThesoResult>(query);
     return data.map((item: OpenThesoResult) => ({
       label: item.label,
       id: item.id,
-    }));
+    })) as Result[];
   }
 }
 

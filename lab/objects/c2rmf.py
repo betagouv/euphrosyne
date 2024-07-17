@@ -4,7 +4,9 @@ from typing import Any
 
 import requests
 
-from ..models import ObjectGroup, Period
+from lab.thesauri.models import Era
+
+from ..models import ObjectGroup
 
 
 class ErosHTTPError(requests.RequestException):
@@ -90,7 +92,7 @@ def fetch_full_objectgroup_from_eros(
     updated_og.label = data["title"]
     if data.get("dtfrom") or data.get("period"):
         dating_label = data.get("dtfrom") or data["period"]
-        updated_og.dating = Period(label=dating_label)
+        updated_og.dating_era = Era(label=dating_label)
     updated_og.collection = data.get("collection") or ""
     updated_og.inventory = data.get("inv") or ""
     updated_og.materials = (data.get("support") or "").split(" / ")

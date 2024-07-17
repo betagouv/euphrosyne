@@ -56,6 +56,11 @@ export default function HeaderNav({ currentPath, items }: HeaderNavProps) {
                   }
                 >
                   {item.title}
+                  {!!item.badge && (
+                    <span className="fr-badge fr-badge--new fr-badge--no-icon fr-badge--sm fr-ml-1v">
+                      {item.badge}
+                    </span>
+                  )}
                 </a>
               </li>
             ))}

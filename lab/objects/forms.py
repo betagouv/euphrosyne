@@ -9,7 +9,7 @@ from lab.widgets import ChoiceTag, TagsInput
 
 from . import widgets
 from .c2rmf import ErosHTTPError, fetch_partial_objectgroup_from_eros
-from .models import Location, ObjectGroup, Period
+from .models import Era, Location, ObjectGroup, Period
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,8 @@ class ObjectGroupForm(forms.ModelForm):
             "add_type",
             "label",
             "object_count",
-            "dating",
+            "dating_era",
+            "dating_period",
             "materials",
             "discovery_place_location",
             "inventory",
@@ -51,20 +52,22 @@ class ObjectGroupForm(forms.ModelForm):
                 Click on suggestion or add a comma to add to the list."
             ),
             "discovery_place_location": _("Start typing to search for a location"),
-            "dating": _("Start typing to search for a period"),
+            "dating_period": _("Start typing to search for a period"),
         }
         widgets = {
             "materials": TagsInput(),
             "discovery_place_location": widgets.LocationAutoCompleteWidget(),
-            "dating": widgets.DatingAutoCompleteWidget(),
+            "dating_period": widgets.PeriodDatingAutoCompleteWidget(),
+            "dating_era": widgets.EraDatingAutoCompleteWidget(),
         }
 
     def __init__(self, *args, instance: ObjectGroup | None = None, **kwargs):
         super().__init__(*args, **kwargs, instance=instance)  # type: ignore[misc]
         # We must check if attribute is in self.fields because it can be removed
         # in admin view when page is readlonly.
-        if "dating" in self.fields:
-            self.fields["dating"].required = True
+        for field_name in ["dating_period", "dating_era"]:
+            if field_name in self.fields:
+                self.fields[field_name].required = True
         # Set object count initial value
         if "object_count" in self.fields:
             self.fields["object_count"].initial = 1
@@ -82,11 +85,12 @@ class ObjectGroupForm(forms.ModelForm):
             self.fields["discovery_place_location"].widget.instance = (
                 instance.discovery_place_location
             )
-            self.fields["dating"].widget.instance = instance.dating
+            self.fields["dating_period"].widget.instance = instance.dating_period
+            self.fields["dating_era"].widget.instance = instance.dating_era
 
     def full_clean(self):
         self.try_populate_discovery_place_location()
-        self.try_populate_dating()
+        self.try_populate_dating_models()
         return super().full_clean()
 
     def try_populate_discovery_place_location(self):
@@ -116,16 +120,17 @@ class ObjectGroupForm(forms.ModelForm):
             )  # make a copy of the data because self.data is immutable
             self.data["discovery_place_location"] = location.pk
 
-    def try_populate_dating(self):
-        if not self.data.get("dating") and self.data.get("dating__label"):
-            period, _ = Period.objects.get_or_create(
-                label=self.data["dating__label"],
-                theso_joconde_id=self.data.get("dating__theso_joconde_id"),
-            )
-            self.data = (
-                self.data.copy()
-            )  # make a copy of the data because self.data is immutable
-            self.data["dating"] = period.pk
+    def try_populate_dating_models(self):
+        for field_name, theso_model in [("dating_period", Period), ("dating_era", Era)]:
+            if not self.data.get(field_name) and self.data.get(f"{field_name}__label"):
+                period, _ = theso_model.objects.get_or_create(
+                    label=self.data[f"{field_name}__label"],
+                    concept_id=self.data.get(f"{field_name}__concept_id"),
+                )
+                self.data = (
+                    self.data.copy()
+                )  # make a copy of the data because self.data is immutable
+                self.data[field_name] = period.pk
 
     def is_multipart(self) -> Any:
         if not self.instance.id:
@@ -197,7 +202,8 @@ class ObjectGroupImportC2RMFReadonlyForm(forms.ModelForm):
             "c2rmf_id",
             "label",
             "object_count",
-            "dating",
+            "dating_era",
+            "dating_period",
             "materials",
             "discovery_place_location",
             "inventory",

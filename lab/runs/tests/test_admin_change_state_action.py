@@ -10,6 +10,8 @@ from django.core.exceptions import ValidationError
 from django.test.client import RequestFactory
 from django.urls import reverse
 
+from euphro_auth.tests import factories as auth_factories
+
 from ...tests import factories
 from .. import admin_actions
 from ..admin import RunAdmin
@@ -125,7 +127,7 @@ def test_no_method_selected_does_not_allow_for_ask_exec():
 
 def test_member_can_ask_for_execution():
     run = factories.RunFactory.build(status=Run.Status.CREATED)
-    user = factories.StaffUserFactory.build()
+    user = auth_factories.StaffUserFactory.build()
 
     admin_actions.validate_execute_needs_admin(user, run)
 
@@ -136,7 +138,7 @@ def test_member_can_ask_for_execution():
 )
 def test_admin_can_change_state(status):
     run = factories.RunFactory.build(status=status)
-    user = factories.LabAdminUserFactory.build()
+    user = auth_factories.LabAdminUserFactory.build()
 
     admin_actions.validate_execute_needs_admin(user, run)
 
@@ -147,7 +149,7 @@ def test_admin_can_change_state(status):
 )
 def test_member_cant_do_more_than_ask_for_execution(status):
     run = factories.RunFactory.build(status=status)
-    user = factories.StaffUserFactory.build()
+    user = auth_factories.StaffUserFactory.build()
 
     with pytest.raises(ValidationError):
         admin_actions.validate_execute_needs_admin(user, run)

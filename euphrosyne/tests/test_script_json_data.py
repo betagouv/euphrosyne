@@ -2,7 +2,8 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from lab.tests.factories import ProjectWithLeaderFactory, StaffUserFactory
+from euphro_auth.tests.factories import StaffUserFactory
+from lab.tests.factories import ProjectWithLeaderFactory
 
 
 class TestScriptJsonData(TestCase):
