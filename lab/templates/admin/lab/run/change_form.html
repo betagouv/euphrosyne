@@ -27,18 +27,20 @@
     <div>
         <h1>{{ original.label }}</h1>
 
-        {% if original.start_date %}
+        {% if original.start_date or original.embargo_date %}
         <div class="run-dates">
+            {% if original.start_date %}
             <span class="fr-icon fr-icon-calendar-line" aria-hidden="true"></span>
             <p class="fr-ml-2w">
                 <span class="fr-text--sm">{% translate "Start" %}</span><br>{{ original.start_date|date:"SHORT_DATE_FORMAT" }} {{ original.start_date|time:"H:i" }}
             </p>
+            {% endif %}
             {% if original.end_date %}
             <p class="fr-ml-2w"><span class="fr-text--sm">{% translate "End" %}</span><br>
                     {{ original.end_date|date:"SHORT_DATE_FORMAT" }} {{ original.end_date|time:"H:i" }}{% endif %}
             </p>
             {% if request.user.is_lab_admin %}
-            <span class="fr-icon fr-icon-lock-line fr-ml-3w" aria-hidden="true"></span>
+            <span class="fr-icon fr-icon-lock-line{% if original.start_date %} fr-ml-3w{% endif %}" aria-hidden="true"></span>
             <p class="fr-ml-2w"><span class="fr-text--sm">{% translate "Embargo" %}</span><br>
                 {% if original.embargo_date %}{{ original.embargo_date|date:"SHORT_DATE_FORMAT" }}{% else %}{% translate "No embargo date" %}{% endif %}</p>
             {% endif %}

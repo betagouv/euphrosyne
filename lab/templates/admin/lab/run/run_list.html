@@ -22,7 +22,7 @@
           </h4>
           <div class="fr-card__desc">
 
-            <div class="flex-container fr-text--sm">
+            <div class="flex-container fr-text--sm fr-mb-1w">
               <p class="fr-text--sm fr-mb-0">
                 <span class="fr-text--xs">{% translate "Start" %}</span>
                 <br>{% if run.start_date %}{{ run.start_date|date:"SHORT_DATE_FORMAT" }} {{ run.start_date|time:"H:i" }}{% else %}-{% endif %}
@@ -32,6 +32,11 @@
                 <br>{% if run.end_date %}{{ run.end_date|date:"SHORT_DATE_FORMAT" }} {{ run.end_date|time:"H:i" }}{% else %}-{% endif %}
               </p>
             </div>
+
+            <p class="fr-text--sm">
+              <span class="fr-text--xs">{% translate "Embargo date" %}</span>
+              <br>{% if run.embargo_date %}{{ run.embargo_date|date:"SHORT_DATE_FORMAT" }}{% else %}-{% endif %}
+            </p>
 
             <div class="fr-text--xs mb-0">{% translate "Experimental conditions" %}</div>
             <div class="flex-container fr-text--sm fr-mb-1v">

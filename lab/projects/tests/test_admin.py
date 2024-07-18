@@ -426,3 +426,26 @@ class TestProjectAdminChangelistView(TestCase):
             assert (
                 len(cl_view.context_data["extra_qs"]) == 0
             ), f"Test failed for query {url_query_hiding_qs}"
+
+    def test_scheduled_project_in_to_schedule_qs_when_any_to_schedule_run(self):
+        project_both_scheduled_and_not = ProjectFactory()
+        RunFactory(project=project_both_scheduled_and_not, start_date=timezone.now())
+        RunFactory(project=project_both_scheduled_and_not, start_date=None)
+
+        project_scheduled = ProjectFactory()
+        RunFactory(project=project_scheduled, start_date=timezone.now())
+
+        project_not_scheduled = ProjectFactory()
+        RunFactory(project=project_not_scheduled, start_date=None)
+
+        cl_view: TemplateResponse = self.admin.changelist_view(self.request)
+
+        to_schedule_qs = cl_view.context_data["extra_qs"][0]["qs"]
+        scheduled_qs = cl_view.context_data["cl"].queryset
+
+        assert to_schedule_qs.count() == 2
+        assert project_both_scheduled_and_not in to_schedule_qs.all()
+        assert project_not_scheduled in to_schedule_qs.all()
+        assert scheduled_qs.count() == 2
+        assert project_both_scheduled_and_not in scheduled_qs.all()
+        assert project_scheduled in scheduled_qs.all()

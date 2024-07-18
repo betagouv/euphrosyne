@@ -16,6 +16,9 @@ from shared.models import TimestampedModel
 
 
 class ProjectQuerySet(models.QuerySet):
+    def has_to_schedule_runs(self):
+        return self.filter(runs__start_date__isnull=True)
+
     def only_to_schedule(self):
         to_schedule_runs = Run.objects.filter(start_date__isnull=False)
         return self.exclude(runs__in=to_schedule_runs)
