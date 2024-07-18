@@ -17,6 +17,7 @@ from lab.admin.mixins import LabPermission, LabPermissionMixin, LabRole
 from lab.models import Participation
 from lab.permissions import is_lab_admin, is_project_leader
 
+from . import admin_filters
 from .forms import (
     BaseParticipationForm,
     BaseProjectForm,
@@ -27,36 +28,14 @@ from .forms import (
 from .models import BeamTimeRequest, Project
 
 
-class ProjectStatusListFilter(admin.SimpleListFilter):
-    title = _("status")
-
-    parameter_name = "status"
-    template = "admin/lab/project/filter.html"
-
-    def lookups(self, request, model_admin):
-        return [
-            (enum_member.name, enum_member.value[1])
-            for enum_member in list(Project.Status)
-            if enum_member != Project.Status.TO_SCHEDULE
-            # exclude TO_SCHEDULE from filter as it is displayed in a separate table
-        ]
-
-    def queryset(self, request, queryset):
-        if self.value():
-            return queryset.filter_by_status(Project.Status[self.value()])
-        return queryset
-
-
 class ProjectChangeList(ChangeList):
     def get_queryset(self, request: HttpRequest, exclude_parameters=None):
         qs = super().get_queryset(request, exclude_parameters)
         if request.method == "POST" and request.POST.get("action") == "delete_selected":
             return qs  # use more general queryset for delete action
-        to_schedule_ids = qs.only_to_schedule().values_list(  # type: ignore[attr-defined] # pylint:disable=line-too-long
-            "id", flat=True
-        )
         return (
-            qs.exclude(id__in=to_schedule_ids)  # type: ignore[attr-defined]
+            # qs with projects having at least one scheduled runs
+            qs.filter(runs__start_date__isnull=False)  # type: ignore[attr-defined]
             .distinct()
             .annotate_first_run_date()
             .annotate(number_of_runs=Count("runs"))
@@ -238,7 +217,10 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
 
     search_fields = ("name",)
 
-    list_filter = [ProjectStatusListFilter]
+    list_filter = [
+        admin_filters.ProjectStatusListFilter,
+        admin_filters.ProjectRunActiveEmbargoFilter,
+    ]
     list_per_page = 20
 
     class Media:
@@ -401,7 +383,7 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
             # add scheduled projects on basic page (no search or pagination)
             to_schedule_projects = (
                 self.get_queryset(request)
-                .only_to_schedule()
+                .has_to_schedule_runs()
                 .annotate(
                     first_run_date=Value(
                         None,

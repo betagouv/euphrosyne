@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-02 12:14+0200\n"
+"POT-Creation-Date: 2024-07-18 16:55+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -468,9 +468,6 @@ msgstr "nom"
 msgid "country"
 msgstr "pays"
 
-msgid "status"
-msgstr "statut"
-
 msgid "Project member"
 msgstr "Membre du projet"
 
@@ -513,6 +510,21 @@ msgstr "Projets"
 
 msgid "To schedule"
 msgstr "A planifier"
+
+msgid "status"
+msgstr "statut"
+
+msgid "embargo status"
+msgstr "statut de l'embargo"
+
+msgid "Active"
+msgstr "Actif"
+
+msgid "Over"
+msgstr "Terminé"
+
+msgid "Not set"
+msgstr "Non défini"
 
 msgid "I have read and accepted the general conditions of Euphrosyne."
 msgstr "J'ai lu et accepté les conditions générales d'Euphrosyne."
