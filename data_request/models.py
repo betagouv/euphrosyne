@@ -25,3 +25,19 @@ class DataRequest(models.Model):
 
     created = models.DateTimeField(_("Created"), auto_now_add=True)
     modified = models.DateTimeField(_("Modified"), auto_now=True)
+
+
+class DataAccessEvent(models.Model):
+
+    class Meta:
+        verbose_name = _("data access event")
+        verbose_name_plural = _("data access events")
+
+    data_request = models.ForeignKey(
+        DataRequest, on_delete=models.CASCADE, related_name="data_access_events"
+    )
+
+    path = models.CharField(_("Path"), max_length=255)
+
+    access_time = models.DateTimeField(_("Access time"), auto_now_add=True)
+    modified = models.DateTimeField(_("Modified"), auto_now=True)

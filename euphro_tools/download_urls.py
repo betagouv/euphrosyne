@@ -6,7 +6,7 @@ from typing import Literal
 
 import requests
 
-from euphro_auth.jwt.tokens import EuphroRefreshToken
+from euphro_auth.jwt.tokens import EuphroToolsAPIToken
 
 from .exceptions import EuphroToolsException
 from .utils import get_run_data_path
@@ -31,6 +31,7 @@ def fetch_token_for_run_data(
     run_label: str,
     data_type: DataType,
     expiration: datetime | None = None,
+    data_request_id: str | None = None,
 ) -> str:
     query_params = f"?path={get_run_data_path(project_slug, run_label, data_type)}"
     if expiration:
@@ -40,7 +41,9 @@ def fetch_token_for_run_data(
         + f"/data/{project_slug}/token"
         + f"?path={get_run_data_path(project_slug, run_label, data_type)}"
     )
-    bearer_token = EuphroRefreshToken.for_euphrosyne_admin_user().access_token
+    if data_request_id:
+        token_url += f"&data_request={data_request_id}"
+    bearer_token = EuphroToolsAPIToken.for_euphrosyne().access_token
     try:
         request = requests.get(
             token_url,

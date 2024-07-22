@@ -8,4 +8,9 @@ urlpatterns = (
         api_views.DataRequestCreateAPIView.as_view(),
         name="create",
     ),
+    path(
+        "access-event",
+        api_views.DataAccessEventCreateAPIView.as_view(),
+        name="create-access-event",
+    ),
 )

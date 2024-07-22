@@ -14,11 +14,6 @@ class EuphroRefreshToken(RefreshToken):
         token["is_admin"] = is_lab_admin(user)
         return token
 
-    @classmethod
-    def for_euphrosyne_admin_user(cls):
-        user, _ = User.objects.get_or_create(email="euphrosyne", is_lab_admin=True)
-        return cls.for_user(user)
-
 
 class EuphroToolsAPIToken(RefreshToken):
     """Token used for direct communication between Euphrosyne & Euphrosyne Tools."""
@@ -27,4 +22,6 @@ class EuphroToolsAPIToken(RefreshToken):
     def for_euphrosyne(cls):
         token = cls()
         token[rf_simplejwt_api_settings.USER_ID_CLAIM] = "euphrosyne"
+        token["projects"] = []
+        token["is_admin"] = True
         return token

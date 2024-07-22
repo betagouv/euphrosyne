@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-09 11:58+0200\n"
+"POT-Creation-Date: 2024-07-22 15:28+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -75,6 +75,18 @@ msgstr "Créé"
 
 msgid "Modified"
 msgstr "Modifié"
+
+msgid "data access event"
+msgstr "événement d'accès aux données"
+
+msgid "data access events"
+msgstr "événements d'accès aux données"
+
+msgid "Path"
+msgstr "Chemin"
+
+msgid "Access time"
+msgstr "Heure d'accès"
 
 msgid "Data Request"
 msgstr "Demande de données"

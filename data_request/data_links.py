@@ -24,6 +24,7 @@ def send_links(data_request: DataRequest):
                 run.label,
                 data_type,
                 expiration=expiration,
+                data_request_id=str(data_request.id),
             )
             links.append(
                 {

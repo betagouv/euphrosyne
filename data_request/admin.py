@@ -12,7 +12,38 @@ from lab.admin.mixins import LabAdminAllowedMixin
 from lab.permissions import is_lab_admin
 
 from .data_links import send_links
-from .models import DataRequest
+from .models import DataAccessEvent, DataRequest
+
+
+class ReadonlyInlineMixin:
+
+    def has_change_permission(
+        self,
+        request: HttpRequest,
+        obj: Model | None = None,  # pylint: disable=unused-argument
+    ) -> bool:
+        return False
+
+    def has_delete_permission(
+        self,
+        request: HttpRequest,
+        obj: Model | None = None,  # pylint: disable=unused-argument
+    ) -> bool:
+        return is_lab_admin(request.user)
+
+    def has_add_permission(
+        self,
+        request: HttpRequest,
+        obj: Model | None = None,  # pylint: disable=unused-argument
+    ) -> bool:
+        return False
+
+    def has_view_permission(
+        self,
+        request: HttpRequest,
+        obj: Model | None = None,  # pylint: disable=unused-argument
+    ) -> bool:
+        return is_lab_admin(request.user)
 
 
 @admin.action(description=_("Accept request(s) (send download links)"))
@@ -63,33 +94,21 @@ class BeenSeenListFilter(admin.SimpleListFilter):
         return queryset.filter(sent_at__isnull=self.value() == "0")
 
 
-class RunInline(admin.TabularInline):
+class DataAccessEventInline(ReadonlyInlineMixin, admin.TabularInline):
+    model = DataAccessEvent
+    extra = 0
+
+    fields = ("path", "access_time")
+    readonly_fields = ("path", "access_time")
+
+
+class RunInline(ReadonlyInlineMixin, admin.TabularInline):
     model = DataRequest.runs.through
     verbose_name = "Run"
     verbose_name_plural = "Runs"
     extra = 0
 
     fields = ("run",)
-
-    def has_change_permission(
-        self, request: HttpRequest, obj: Model | None = None
-    ) -> bool:
-        return False
-
-    def has_delete_permission(
-        self, request: HttpRequest, obj: Model | None = None
-    ) -> bool:
-        return is_lab_admin(request.user)
-
-    def has_add_permission(
-        self, request: HttpRequest, obj: Model | None = None
-    ) -> bool:
-        return False
-
-    def has_view_permission(
-        self, request: HttpRequest, obj: Model | None = None
-    ) -> bool:
-        return is_lab_admin(request.user)
 
 
 @admin.register(DataRequest)
@@ -124,7 +143,7 @@ class DataRequestAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
         "description",
     )
 
-    inlines = [RunInline]
+    inlines = [RunInline, DataAccessEventInline]
 
     def has_change_permission(self, request: HttpRequest, obj: Model | None = None):
         return False

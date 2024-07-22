@@ -17,7 +17,7 @@ class TestDownloaldUrls(TestCase):
         self.addCleanup(patcher.stop)
 
         patcher = mock.patch(
-            "euphro_tools.download_urls.EuphroRefreshToken.for_euphrosyne_admin_user"
+            "euphro_tools.download_urls.EuphroToolsAPIToken.for_euphrosyne"
         )
         self.token_mock = patcher.start()
         self.addCleanup(patcher.stop)
@@ -57,6 +57,13 @@ class TestDownloaldUrls(TestCase):
         assert self.requests_get_mock.call_args[1]["headers"] == {
             "Authorization": "Bearer access"
         }
+
+    def test_fetch_token_for_run_data_with_data_request_id(self):
+        self.requests_get_mock.return_value.json.return_value = {"token": "token"}
+        fetch_token_for_run_data(
+            "project_slug", "run_label", "raw_data", data_request_id="1"
+        )
+        assert "data_request=1" in self.requests_get_mock.call_args[0][0]
 
     def test_fetch_token_for_run_data_raise_euphro_tools_exception(
         self,
