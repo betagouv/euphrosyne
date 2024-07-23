@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-18 16:55+0200\n"
+"POT-Creation-Date: 2024-07-23 11:55+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -216,8 +216,6 @@ msgstr "Enregistrer"
 msgid "Save as new"
 msgstr "Sauvegarder comme nouveau"
 
-#, fuzzy
-#| msgid "Save and view"
 msgid "Save and add another"
 msgstr "Sauvegarder et ajouter un autre"
 
@@ -511,20 +509,24 @@ msgstr "Projets"
 msgid "To schedule"
 msgstr "A planifier"
 
-msgid "status"
-msgstr "statut"
+msgid "run status"
+msgstr "statut du run"
 
-msgid "embargo status"
-msgstr "statut de l'embargo"
+msgid "data status"
+msgstr "statut des données"
 
-msgid "Active"
-msgstr "Actif"
+msgid "Available (DIGILAB)"
+msgstr "Accessibles (DIGILAB)"
 
-msgid "Over"
-msgstr "Terminé"
+msgid "Available (FIXLAB)"
+msgstr "Accessibles (FIXLAB)"
 
-msgid "Not set"
-msgstr "Non défini"
+msgid "Hidden (DIGILAB)"
+msgstr "Cachées (DIGILAB)"
+
+msgctxt "for data"
+msgid "Confidential"
+msgstr "Confidentielles"
 
 msgid "I have read and accepted the general conditions of Euphrosyne."
 msgstr "J'ai lu et accepté les conditions générales d'Euphrosyne."
@@ -547,8 +549,8 @@ msgstr "En cours"
 msgid "Finished"
 msgstr "Terminé"
 
-msgid "Data available"
-msgstr "Données disponibles"
+msgid "Data uploaded"
+msgstr "Données versées"
 
 msgid "Project name"
 msgstr "Nom du projet"
@@ -574,6 +576,9 @@ msgstr "Administrateur"
 
 msgid "Comments"
 msgstr "Commentaires"
+
+msgid "Data available"
+msgstr "Données disponibles"
 
 msgid "Has at least one run with data available."
 msgstr "A au moins un run avec des données disponibles."

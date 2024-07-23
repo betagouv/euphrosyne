@@ -81,7 +81,7 @@ class Project(TimestampedModel):
         SCHEDULED = 11, _("Scheduled")
         ONGOING = 21, _("Ongoing")
         FINISHED = 31, _("Finished")
-        DATA_AVAILABLE = 41, _("Data available")
+        DATA_AVAILABLE = 41, _("Data uploaded")
 
     class Meta:
         verbose_name = _("Project")
@@ -156,6 +156,8 @@ class Project(TimestampedModel):
                 return self.Status.ONGOING
             return self.Status.SCHEDULED
         return self.Status.TO_SCHEDULE
+
+    status.fget.short_description = _("Status")  # type: ignore
 
     def clean(self):
         super().clean()
