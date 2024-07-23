@@ -25,6 +25,7 @@ from ..admin import (
     ProjectAdmin,
     ProjectChangeList,
 )
+from ..admin_filters import ProjectStatusListFilter
 from ..models import Project
 
 
@@ -396,6 +397,7 @@ class TestProjectAdminChangelistView(TestCase):
         self.admin = ProjectAdmin(model=Project, admin_site=AdminSite())
         self.request = RequestFactory().get(reverse("admin:lab_project_changelist"))
         self.request.user = self.admin_user
+        self.status_filter_param = ProjectStatusListFilter.parameter_name
 
     def test_has_to_schedule_projects_in_ctx(self):
         pids = [r.project_id for r in RunFactory.create_batch(3, start_date=None)]
@@ -416,7 +418,11 @@ class TestProjectAdminChangelistView(TestCase):
         assert hasattr(first_project, "first_run_date")
 
     def test_no_to_schedule_projects_in_ctx_when_paginated_results(self):
-        for url_query_hiding_qs in ("?q=test", "?p=2", "?status=SCHEDULED"):
+        for url_query_hiding_qs in (
+            "?q=test",
+            "?p=2",
+            f"?{self.status_filter_param}=SCHEDULED",
+        ):
             request = RequestFactory().get(
                 reverse("admin:lab_project_changelist") + url_query_hiding_qs
             )
