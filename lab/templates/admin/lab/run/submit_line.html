@@ -3,7 +3,7 @@
 {% block submit-row %}
 {% if original %}
     {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
-    <p class="deletelink-box"><a href="{% add_preserved_filters delete_url %}{% if is_popup %}?_popup=1{% endif %}" class="fr-btn fr-btn--secondary delete-btn">{% translate "Delete" %}</a></p>
+    <p class="deletelink-box"><a href="{% add_preserved_filters delete_url %}{% if is_popup %}?_popup=1&{% else %}?{% endif %}_changelist_filters=project%3D{{ original.project_id }}" class="fr-btn fr-btn--secondary delete-btn">{% translate "Delete" %}</a></p>
 {% endif %}
 {% if show_save or show_save_and_continue %}<input type="submit" value="{% translate 'Save' %}" class="fr-btn" name="{% if show_save_and_continue %}_continue{% else %}_save{% endif %}">{% endif %}
 {% endblock %}
