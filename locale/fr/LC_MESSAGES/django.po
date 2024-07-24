@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-23 11:55+0200\n"
+"POT-Creation-Date: 2024-07-24 12:10+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -671,6 +671,9 @@ msgstr "Choix de filtre invalide"
 msgid "Only Admin users might rewind runs."
 msgstr "Seuls les utilisateurs Admin peuvent remettre un run en arrière."
 
+msgid "Permanent embargo"
+msgstr "Embargo permanent"
+
 msgid "The end date must be after the start date"
 msgstr "La date de fin doit être après la date de début"
 
@@ -840,9 +843,6 @@ msgstr "Fin"
 
 msgid "Embargo"
 msgstr "Embargo"
-
-msgid "No embargo date"
-msgstr "Pas de date d'embargo"
 
 msgid "Object(s) / Sample(s)"
 msgstr "Objet(s) / Échantillon(s)"

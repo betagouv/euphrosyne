@@ -42,7 +42,7 @@
             {% if request.user.is_lab_admin %}
             <span class="fr-icon fr-icon-lock-line{% if original.start_date %} fr-ml-3w{% endif %}" aria-hidden="true"></span>
             <p class="fr-ml-2w"><span class="fr-text--sm">{% translate "Embargo" %}</span><br>
-                {% if original.embargo_date %}{{ original.embargo_date|date:"SHORT_DATE_FORMAT" }}{% else %}{% translate "No embargo date" %}{% endif %}</p>
+                {% if original.embargo_date %}{{ original.embargo_date|date:"SHORT_DATE_FORMAT" }}{% else %}{% translate "Permanent embargo" %}{% endif %}</p>
             {% endif %}
         </div>
         {% endif %}

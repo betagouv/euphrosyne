@@ -255,6 +255,10 @@ class RunScheduleForm(ModelForm):
         widget=widgets.SplitDateTimeWithDefaultTime(default_time_value=time(18)),
     )
 
+    permanent_embargo = BooleanField(
+        label=_("Permanent embargo"), required=False, label_suffix=""
+    )
+
     class Meta:
         model = models.Run
         fields = ("start_date", "end_date", "embargo_date")
@@ -274,12 +278,6 @@ class RunScheduleForm(ModelForm):
         use_required_attribute: bool | None = None,
         renderer: Any = None,
     ) -> None:
-        if not initial:
-            initial = {}
-        if (
-            not instance or not instance.embargo_date
-        ) and "embargo_date" not in initial:
-            initial["embargo_date"] = timezone.now() + datetime.timedelta(days=365 * 2)
         super().__init__(
             data,
             files,
@@ -293,6 +291,17 @@ class RunScheduleForm(ModelForm):
             use_required_attribute,
             renderer,
         )
+        if (
+            instance
+            and instance.embargo_date is None
+            and "embargo_date" not in (data or {})
+        ):
+            self.fields["permanent_embargo"].initial = True
+        # on POST, if embargo_date is not set, set it to None
+        # as it means permanent embargo is checked
+        if data and "embargo_date" not in data:
+            self.instance.embargo_date = None
+
         self.fields["embargo_date"].widget.format = "%Y-%m-%d"
         self.fields["embargo_date"].widget.input_type = "date"
 

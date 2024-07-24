@@ -1,0 +1,26 @@
+{% if field.widget_type == "checkbox" %}
+  {% comment %}In DSFR label tag holds the checkbox and must be placed after input element{% endcomment %}
+  {% if field.use_fieldset %}<fieldset>{% endif %}
+      <div class="fr-checkbox-group">
+        {% if field.help_text %}<div class="helptext"{% if field.auto_id %} id="{{ field.auto_id }}_helptext"{% endif %}>{{ field.help_text|safe }}</div>{% endif %}
+        {{ field.errors }}
+        {{ field }}
+        {% if field.label %}
+          {% if field.use_fieldset %}{{ field.legend_tag }}{% else %}{{ field.label_tag }}{% endif %}
+        {% endif %}
+      </div>
+  {% if field.use_fieldset %}</fieldset>{% endif %}
+
+{% else %}
+  {% if field.use_fieldset %}
+    <fieldset>
+    {% if field.label %}{{ field.legend_tag }}{% endif %}
+  {% else %}
+    {% if field.label %}{{ field.label_tag }}{% endif %}
+  {% endif %}
+  {% if field.help_text %}<div class="helptext"{% if field.auto_id %} id="{{ field.auto_id }}_helptext"{% endif %}>{{ field.help_text|safe }}</div>{% endif %}
+  {{ field.errors }}
+  {{ field }}
+  {% if field.use_fieldset %}</fieldset>{% endif %}
+
+{% endif %}
