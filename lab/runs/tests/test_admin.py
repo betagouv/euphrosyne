@@ -21,6 +21,7 @@ class TestRunAdminPermissions(TestCase):
     def setUp(self):
         self.run_admin = RunAdmin(model=Run, admin_site=AdminSite())
         self.project = factories.ProjectWithLeaderFactory()
+        self.lab_admin = factories.LabAdminUserFactory()
         self.member = get_user_model().objects.get(participation__project=self.project)
         self.new_run = factories.RunFactory(
             status=Run.Status.CREATED, project=self.project
@@ -36,12 +37,19 @@ class TestRunAdminPermissions(TestCase):
         request.user = self.member
         assert self.run_admin.has_change_permission(request, self.new_run)
 
-    def test_delete_is_allowed_if_new(self):
+    def test_delete_is_allowed_if_and_admin(self):
+        request = RequestFactory().get(
+            reverse("admin:lab_run_delete", args=[self.ask_run.id])
+        )
+        request.user = self.lab_admin
+        assert self.run_admin.has_delete_permission(request, self.ask_run)
+
+    def test_delete_is_disallowed_if_member(self):
         request = RequestFactory().get(
             reverse("admin:lab_run_delete", args=[self.new_run.id])
         )
         request.user = self.member
-        assert self.run_admin.has_delete_permission(request, self.new_run)
+        assert not self.run_admin.has_delete_permission(request, self.new_run)
 
     def test_change_is_disallowed_if_ask(self):
         request = RequestFactory().get(
@@ -49,13 +57,6 @@ class TestRunAdminPermissions(TestCase):
         )
         request.user = self.member
         assert not self.run_admin.has_change_permission(request, self.ask_run)
-
-    def test_delete_is_disallowed_if_ask(self):
-        request = RequestFactory().get(
-            reverse("admin:lab_run_delete", args=[self.new_run.id])
-        )
-        request.user = self.member
-        assert not self.run_admin.has_delete_permission(request, self.ask_run)
 
     def test_module_is_disallowed(self):
         request = RequestFactory().get("/admin")

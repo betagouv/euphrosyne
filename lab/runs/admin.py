@@ -58,7 +58,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         add_permission=LabRole.ANY_STAFF_USER,
         view_permission=LabRole.PROJECT_MEMBER,
         change_permission=LabRole.PROJECT_MEMBER,
-        delete_permission=LabRole.PROJECT_MEMBER,
+        delete_permission=LabRole.LAB_ADMIN,
     )
 
     def get_related_project(  # type: ignore[override]
@@ -72,13 +72,6 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         self, request: HttpRequest, obj: Run | None = None  # type: ignore[override]
     ) -> bool:
         return super().has_change_permission(request, obj) and (
-            not obj or obj.status == Run.Status.CREATED
-        )
-
-    def has_delete_permission(
-        self, request: HttpRequest, obj: Run | None = None  # type: ignore[override]
-    ) -> bool:
-        return super().has_delete_permission(request, obj) and (
             not obj or obj.status == Run.Status.CREATED
         )
 
