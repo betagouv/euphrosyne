@@ -107,3 +107,7 @@ body {
   padding-left: 0;
   padding-right: 0;
 }
+
+.run-schedule-modal .fr-checkbox-group {
+  margin-top: .5rem;
+}

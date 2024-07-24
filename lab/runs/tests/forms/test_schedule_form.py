@@ -25,19 +25,45 @@ def test_run_dates_are_coherent():
     assert form.has_error("end_date", code="start_date_after_end_date")
 
 
-def test_initial_embargo_in_two_years():
-    form = forms.RunScheduleForm()
-    assert form.initial["embargo_date"]
-    assert form.initial["embargo_date"] > (
-        timezone.now() + timezone.timedelta(days=(365 * 2) - 1)
+def test_set_permanent_embargo_when_embargo_not_in_data():
+    run = models.Run(embargo_date=None)
+    form = forms.RunScheduleForm(
+        data={
+            "start_date_0": "2021-01-01",
+            "start_date_1": "00:00:00",
+            "end_date_0": "2021-01-01",
+            "end_date_1": "00:00:00",
+        },
+        instance=run,
     )
+    assert form.fields["permanent_embargo"].initial is True
 
 
-def test_no_initial_embargo_when_instance():
-    now = timezone.now()
-    run = models.Run(embargo_date=now)
-    form = forms.RunScheduleForm(instance=run)
-    assert not form.fields["embargo_date"].initial
+def test_absent_permanent_embargo_when_embargo_in_data():
+    form = forms.RunScheduleForm(
+        data={
+            "start_date_0": "2021-01-01",
+            "start_date_1": "00:00:00",
+            "end_date_0": "2021-01-01",
+            "end_date_1": "00:00:00",
+            "embargo_date": "2021-01-01",
+        }
+    )
+    assert not form.fields["permanent_embargo"].initial
+
+
+def test_set_embargo_date_when_embargo_not_in_data():
+    run = models.Run(embargo_date=timezone.now().date())
+    form = forms.RunScheduleForm(
+        data={
+            "start_date_0": "2021-01-01",
+            "start_date_1": "00:00:00",
+            "end_date_0": "2021-01-01",
+            "end_date_1": "00:00:00",
+        },
+        instance=run,
+    )
+    assert form.instance.embargo_date is None
 
 
 def test_embargo_widget():

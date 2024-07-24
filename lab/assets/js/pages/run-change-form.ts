@@ -5,6 +5,7 @@ import { renderComponent } from "../../../../euphrosyne/assets/js/react";
 import { getTemplateJSONData } from "../../../../shared/js/utils";
 
 import RunObjectGroupForm from "../../../objects/assets/js/components/RunObjectGroupForm";
+import { initRunScheduleForm } from "../run/schedule-form";
 
 interface RunChangeFormData {
   run: {
@@ -14,6 +15,7 @@ interface RunChangeFormData {
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
+  initRunScheduleForm();
   const popupObjectGroupEventTarget = new EventTarget();
 
   window.dismissAddRelatedObjectGroupPopup = (win: Window) => {
