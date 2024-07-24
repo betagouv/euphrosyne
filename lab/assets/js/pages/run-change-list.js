@@ -1,6 +1,4 @@
 import {
-  getDeleteRunButtons,
-  handleDelete,
   getCards,
   toggleRunSelection,
   getRunChangeStateActionButton,
@@ -8,15 +6,6 @@ import {
 } from "../run/changelist.js";
 
 document.addEventListener("DOMContentLoaded", function () {
-  getDeleteRunButtons().forEach((el) => {
-    const runid = el.dataset.runid;
-    el.addEventListener("click", (e) => {
-      handleDelete(runid);
-      // Stop the propagation to avoid triggering the card selection event
-      e.stopPropagation();
-    });
-  });
-
   getCards().forEach((el) => {
     el.addEventListener("click", () => toggleRunSelection(el));
 

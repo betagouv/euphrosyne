@@ -9,15 +9,15 @@
           <h4 class="fr-card__title flex-container">
             {{ run.label }}
             <input type="checkbox" name="_selected_action" value="{{ run.id }}" class="action-select">
-            <div class="align-right">
+            <div class="align-right run-list-card-actions">
               <a href="{% url "admin:lab_run_change" run.id %}" title="{% translate "Change" %}" class="fr-link">
                 <span class="fr-icon-edit-line" aria-hidden="true"></span>
                 <span class="fr-sr-only" rel="noopener noreferrer">{% translate "Change" %}</span>
               </a>
-              <button class="fr-link" aria-controls="delete-run" data-runid="{{ run.id }}">
+              <a href="{% url "admin:lab_run_delete" run.id  %}" title="{% translate "Delete" %}" class="fr-link">
                 <span class="fr-icon-delete-line" aria-hidden="true"></span>
                 <span class="fr-sr-only" rel="noopener noreferrer">{% translate "Delete" %}</span>
-              </button>
+              </a>
             </div>
           </h4>
           <div class="fr-card__desc">
