@@ -111,3 +111,7 @@ body {
 .run-schedule-modal .fr-checkbox-group {
   margin-top: .5rem;
 }
+
+.run-list-card-actions {
+  min-width: 3.3rem;
+}
