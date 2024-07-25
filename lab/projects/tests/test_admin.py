@@ -103,11 +103,6 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         )
         assert ParticipationInline in inlines
 
-    def test_name_is_readonly_when_change(self):
-        assert "name" in self.project_admin.get_readonly_fields(
-            self.change_request, self.change_project
-        )
-
     def test_add_project_form_has_confidential_checkbox(self):
         response = self.client.get(self.add_view_url)
         assert '<input type="checkbox" name="confidential"' in response.content.decode()
@@ -127,6 +122,7 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         another_member = get_user_model().objects.create(email="aneweuser@mail.com")
 
         participation_data = {
+            "name": project.name,
             "participation_set-TOTAL_FORMS": "2",
             "participation_set-INITIAL_FORMS": "0",
             "participation_set-MIN_NUM_FORMS": "1",
@@ -161,6 +157,25 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         assert response.status_code == 302
         project.refresh_from_db()
         assert project.leader.user == self.project_participant_user
+
+    @patch("lab.projects.admin.rename_project_directory")
+    def test_change_project_name_calls_hook(self, rename_project_dir_mock):
+        project = ProjectFactory(name="project a")
+        request = self.request_factory.post(
+            reverse("admin:lab_project_change", args=[project.id]),
+            data={
+                "name": "project b",
+            },
+        )
+        request.user = self.admin_user
+        with patch.object(project, "save"):
+            project_admin = ProjectAdmin(Project, admin_site=AdminSite())
+            form_class = project_admin.get_form(request, obj=project, change=True)
+            form = form_class(request.POST, request.FILES, instance=project)
+            # Clean form to populate run instance
+            assert form.is_valid()
+            project_admin.save_model(request, project, form=form, change=True)
+        rename_project_dir_mock.assert_called_once_with("project a", "project b")
 
 
 class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
@@ -212,6 +227,11 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
 
         assert "change-leader-link" not in response.content.decode()
 
+    def test_name_is_readonly_when_change(self):
+        assert "name" in self.project_admin.get_readonly_fields(
+            self.change_request, self.change_project
+        )
+
     def test_add_project_form_has_not_confidential_checkbox(self):
         response = self.client.get(self.add_view_url)
         assert (
@@ -228,6 +248,28 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
     def test_add_project_has_cgu_checkbox(self):
         fieldsets = self.project_admin.get_fieldsets(self.add_request)
         assert "has_accepted_cgu" in fieldsets[1][1]["fields"]
+
+    @patch("lab.projects.admin.rename_project_directory")
+    def test_change_project_name_not_call_hook(self, rename_project_dir_mock):
+        request = self.request_factory.post(
+            reverse("admin:lab_project_change", args=[self.change_project.id]),
+            data={
+                "name": "project b",
+            },
+        )
+        request.user = self.project_leader
+        with patch.object(self.change_project, "save"):
+            project_admin = ProjectAdmin(Project, admin_site=AdminSite())
+            form_class = project_admin.get_form(
+                request, obj=self.change_project, change=True
+            )
+            form = form_class(request.POST, request.FILES, instance=self.change_project)
+            # Clean form to populate run instance
+            assert form.is_valid()
+            project_admin.save_model(
+                request, self.change_project, form=form, change=True
+            )
+        rename_project_dir_mock.assert_not_called()
 
 
 class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
