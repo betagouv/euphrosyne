@@ -1,5 +1,6 @@
 import os
 import typing
+from functools import lru_cache
 from typing import Any
 
 import requests
@@ -52,6 +53,7 @@ class ErosData(typing.TypedDict):
     images: typing.NotRequired[list[ErosImage]]
 
 
+@lru_cache
 def _fetch_object_group_from_eros(c2rmf_id: str) -> ErosData | None:
     """Fetch object group from EROS."""
     token = os.environ["EROS_HTTP_TOKEN"]
