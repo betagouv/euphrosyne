@@ -3,9 +3,12 @@ from unittest import mock
 import pytest
 from slugify import slugify
 
+from lab.objects.c2rmf import ErosHTTPError
 from lab.tests import factories
 
 from ..catalog import (
+    _create_project_page_data,
+    _fetch_object_group_from_eros,
     build_object_group_catalog_document,
     build_project_catalog_document,
 )
@@ -177,3 +180,52 @@ def test_build_object_group_catalog_document():
     assert document.dating_era_label == dating_era.label
     assert document.dating_era_theso_huma_num_id == 345
     assert document.dating_era_theso_huma_num_parent_ids == [890, 445]
+
+
+@pytest.mark.django_db
+@mock.patch("lab.elasticsearch.catalog.fetch_full_objectgroup_from_eros")
+def test_build_object_group_calls_eros_if_c2rmf_id(eros_mock: mock.MagicMock):
+    object_group = factories.ObjectGroupFactory(
+        c2rmf_id="abc",
+    )
+    eros_mock.return_value = object_group
+    build_object_group_catalog_document(
+        object_group=object_group,
+        runs=[],
+        projects=[],
+        is_data_available=True,
+    )
+
+    eros_mock.assert_called_once_with(c2rmf_id="abc", object_group=object_group)
+
+
+@pytest.mark.django_db
+@mock.patch("lab.elasticsearch.catalog.fetch_full_objectgroup_from_eros")
+def test_create_project_page_data_calls_eros_if_c2rmf_id(eros_mock: mock.MagicMock):
+    object_group = factories.ObjectGroupFactory(
+        c2rmf_id="abc",
+    )
+    eros_mock.return_value = object_group
+    _create_project_page_data(
+        runs=[factories.RunFactory()], object_groups=[object_group], leader=None
+    )
+
+    eros_mock.assert_called_once_with(c2rmf_id="abc", object_group=object_group)
+
+
+@pytest.mark.django_db
+@mock.patch("lab.elasticsearch.catalog.fetch_full_objectgroup_from_eros")
+def test_fetch_object_group_from_eros_if_eros_fails_returns_og(
+    eros_mock: mock.MagicMock,
+):
+    object_group = factories.ObjectGroupFactory(
+        c2rmf_id="abc",
+    )
+    eros_mock.side_effect = ErosHTTPError
+    assert (
+        _fetch_object_group_from_eros(
+            c2rmf_id="abc",
+            object_group=object_group,
+        )
+        == object_group
+    )

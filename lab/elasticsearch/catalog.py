@@ -5,6 +5,7 @@ from slugify import slugify
 
 from lab.methods.dto import method_model_to_dto
 from lab.models import ObjectGroup, Project
+from lab.objects.c2rmf import ErosHTTPError, fetch_full_objectgroup_from_eros
 from lab.participations.models import Participation
 from lab.runs.models import Run
 from lab.thesauri.opentheso import (
@@ -68,17 +69,23 @@ def _create_project_page_data(
             methods=method_model_to_dto(run),
         )
     for object_group in object_groups:
-
+        discovery_place_label: str | None = None
         dating_era_label: str | None = None
         dating_period_label: str | None = None
-        if object_group.dating_period:
-            dating_period_label = object_group.dating_period.label
-        if object_group.dating_era:
-            dating_era_label = object_group.dating_era.label
+        if object_group.c2rmf_id:
+            # Fetch object group from EROS
+            object_group = fetch_full_objectgroup_from_eros(
+                c2rmf_id=object_group.c2rmf_id, object_group=object_group
+            )
+        else:
+            # Fetch thesauri information for non-EROS object groups
+            if object_group.dating_period:
+                dating_period_label = object_group.dating_period.label
+            if object_group.dating_era:
+                dating_era_label = object_group.dating_era.label
 
-        discovery_place_label: str | None = None
-        if object_group.discovery_place_location:
-            discovery_place_label = object_group.discovery_place_location.label
+            if object_group.discovery_place_location:
+                discovery_place_label = object_group.discovery_place_location.label
         page_data.add_object_group(
             object_group=ObjectGroupDoc(
                 **{
@@ -169,6 +176,13 @@ def build_object_group_catalog_document(
     location_geopoint: LocationDict | None = None
     location_label: str | None = None
     locations = []
+
+    if object_group.c2rmf_id:
+        # Fetch object group from EROS
+        object_group = _fetch_object_group_from_eros(
+            c2rmf_id=object_group.c2rmf_id, object_group=object_group
+        )
+
     if (
         object_group.discovery_place_location
         and object_group.discovery_place_location.latitude
@@ -248,3 +262,17 @@ def build_object_group_catalog_document(
     )  # type: ignore[assignment]
 
     return catalog_item
+
+
+def _fetch_object_group_from_eros(
+    c2rmf_id: str, object_group: ObjectGroup
+) -> ObjectGroup:
+    try:
+        object_group: ObjectGroup = fetch_full_objectgroup_from_eros(
+            c2rmf_id=c2rmf_id,
+            object_group=object_group,
+        )
+    except ErosHTTPError as error:
+        logger.error("Failed to fetch object group from EROS: %s", error, exc_info=True)
+        return object_group
+    return object_group
