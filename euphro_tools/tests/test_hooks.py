@@ -7,6 +7,7 @@ from ..hooks import (
     _make_request,
     initialize_project_directory,
     initialize_run_directory,
+    rename_project_directory,
     rename_run_directory,
 )
 
@@ -41,6 +42,17 @@ def test_rename_run_directory(requests_mock: MagicMock, monkeypatch: MonkeyPatch
     requests_mock.post.assert_called_once()
     assert requests_mock.post.call_args[0] == (
         "http://euphro.tools/data/project/runs/run/rename/newname",
+    )
+
+
+@patch("euphro_tools.hooks.requests")
+def test_rename_project_directory(requests_mock: MagicMock, monkeypatch: MonkeyPatch):
+    monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "http://euphro.tools")
+    rename_project_directory("project", "newname")
+
+    requests_mock.post.assert_called_once()
+    assert requests_mock.post.call_args[0] == (
+        "http://euphro.tools/data/project/rename/newname",
     )
 
 

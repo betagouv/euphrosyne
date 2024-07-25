@@ -12,7 +12,7 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
-from euphro_tools.hooks import initialize_project_directory
+from euphro_tools.hooks import initialize_project_directory, rename_project_directory
 from lab.admin.mixins import LabPermission, LabPermissionMixin, LabRole
 from lab.models import Participation
 from lab.permissions import is_lab_admin, is_project_leader
@@ -297,15 +297,9 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
     def get_readonly_fields(self, request: HttpRequest, obj: Optional[Project] = None):
         """Set edit permission based on user role."""
         readonly_fields = super().get_readonly_fields(request, obj)
-        if obj:
-            # Prevent changing name after creation (because of data folder sync)
-            readonly_fields = (
-                *readonly_fields,
-                "name",
-            )
         if not is_lab_admin(request.user):
             # Leader
-            readonly_fields = (*readonly_fields, "admin", "run_date")
+            readonly_fields = (*readonly_fields, "name", "admin", "run_date")
         return readonly_fields
 
     def get_queryset(self, request: HttpRequest):
@@ -333,17 +327,19 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         obj: Project,
         form: ModelForm,
         change: bool,
-    ) -> None:
+    ):
         if not change and is_lab_admin(request.user):
             obj.admin_id = request.user.id  # type: ignore[assignment]
         obj.save()
-        if not change and not is_lab_admin(request.user):
-            obj.participation_set.create(
-                user=request.user,  # type: ignore[misc]
-                is_leader=True,
-            )
         if not change:
+            if not is_lab_admin(request.user):
+                obj.participation_set.create(
+                    user=request.user,  # type: ignore[misc]
+                    is_leader=True,
+                )
             initialize_project_directory(obj.name)
+        if change and "name" in form.changed_data:
+            rename_project_directory(form.initial["name"], obj.name)
 
     def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
         return super().changeform_view(

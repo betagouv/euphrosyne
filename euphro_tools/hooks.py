@@ -66,3 +66,18 @@ def rename_run_directory(project_name: str, run_name: str, new_run_name: str):
             response.status_code,
             response.text,
         )
+
+
+def rename_project_directory(project_name: str, new_project_name: str):
+    base_url = os.environ["EUPHROSYNE_TOOLS_API_URL"]
+    response = _make_request(
+        f"{base_url}/data/{project_name}/rename/{new_project_name}"
+    )
+    if response is not None and not response.ok:
+        logger.error(
+            "Could not update project directory name from %s to %s. %s: %s",
+            project_name,
+            new_project_name,
+            response.status_code,
+            response.text,
+        )
