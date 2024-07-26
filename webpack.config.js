@@ -81,7 +81,7 @@ export default {
   module: {
     rules: [
       {
-        test: /\.js$/i,
+        test: /\.m?js$/i,
         enforce: "pre",
         use: ["source-map-loader"],
       },
@@ -102,7 +102,7 @@ export default {
         },
       },
       {
-        test: /\.js$/,
+        test: /\.m?js$/,
         enforce: "pre",
         use: ["source-map-loader"],
       },
