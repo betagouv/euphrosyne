@@ -38,7 +38,7 @@
     "vitest": "^1.6.0"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.4",
+    "@emotion/react": "^11.13.0",
     "@fullcalendar/core": "^6.1.8",
     "@fullcalendar/daygrid": "^6.1.14",
     "@fullcalendar/list": "^6.1.14",
