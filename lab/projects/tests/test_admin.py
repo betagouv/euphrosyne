@@ -232,6 +232,9 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
             self.change_request, self.change_project
         )
 
+    def test_name_is_not_readonly_when_add(self):
+        assert "name" not in self.project_admin.get_readonly_fields(self.add_request)
+
     def test_add_project_form_has_not_confidential_checkbox(self):
         response = self.client.get(self.add_view_url)
         assert (
