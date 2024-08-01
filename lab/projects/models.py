@@ -172,8 +172,9 @@ class Project(TimestampedModel):
                         _(
                             "A project with a similar name already exists. "
                             "The slug corresponding to the name you enter is '%s' "
-                            "and another project with this slug exists." % slug
+                            "and another project with this slug exists."
                         )
+                        % slug
                     )
                 }
             )
