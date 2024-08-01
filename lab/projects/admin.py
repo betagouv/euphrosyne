@@ -299,7 +299,9 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         readonly_fields = super().get_readonly_fields(request, obj)
         if not is_lab_admin(request.user):
             # Leader
-            readonly_fields = (*readonly_fields, "name", "admin", "run_date")
+            readonly_fields = (*readonly_fields, "admin", "run_date")
+            if obj:
+                readonly_fields = (*readonly_fields, "name")
         return readonly_fields
 
     def get_queryset(self, request: HttpRequest):
