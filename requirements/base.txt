@@ -9,7 +9,7 @@ djangorestframework-simplejwt==5.3.1
 django-stubs[compatible-mypy]==5.0.2 # not dev because used in code (WithAnnotations)
 graphene-django==3.2.2
 gunicorn==22.0.0
-markdown==3.6
+markdown==3.7
 psycopg2==2.9.9
 python-dotenv==1.0.1
 python3-openid==3.2.0
