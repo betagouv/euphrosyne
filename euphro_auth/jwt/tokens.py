@@ -10,7 +10,9 @@ class EuphroRefreshToken(RefreshToken):
     @classmethod
     def for_user(cls, user: User):  # type: ignore[override]
         token = super().for_user(user)
-        token["projects"] = list(user.project_set.values("id", "name", "slug"))
+        token["projects"] = list(
+            user.project_set.values("id", "name", "slug")  # type: ignore[misc]
+        )
         token["is_admin"] = is_lab_admin(user)
         return token
 
