@@ -51,6 +51,7 @@ class MethodModel(models.Model):
         Filter("13 µm Cr + 50 µm Al"),
         Filter("50 µm Cu"),
         Filter("75 µm Cu"),
+        Filter("25µm Co"),
         Filter(OTHER_VALUE),
     ]
     filters_for_detector_LE0 = FiltersCharField(
