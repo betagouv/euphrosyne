@@ -3,7 +3,7 @@ var _paq = (window._paq = window._paq || []);
 _paq.push(["trackPageView"]);
 _paq.push(["enableLinkTracking"]);
 (function () {
-  var u = "https://stats.data.gouv.fr/";
+  var u = "https://stats.beta.gouv.fr/";
   _paq.push(["setTrackerUrl", u + "piwik.php"]);
   _paq.push(["setSiteId", process.env.MATOMO_SITE_ID]);
   var d = document,
