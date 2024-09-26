@@ -3,13 +3,20 @@ import os
 from typing import Optional
 
 import requests
+from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.jwt.tokens import EuphroToolsAPIToken
 
 logger = logging.getLogger(__name__)
 
 
-def _make_request(url: str) -> Optional[requests.Response]:
+class RenameFailedError(Exception):
+    pass
+
+
+def _make_request(
+    url: str, raise_on_error: bool = False
+) -> Optional[requests.Response]:
     """Make an authorized request to Euphrosyne tools API."""
     token = EuphroToolsAPIToken.for_euphrosyne().access_token
     try:
@@ -19,6 +26,8 @@ def _make_request(url: str) -> Optional[requests.Response]:
             timeout=5,
         )
     except (requests.Timeout, requests.ConnectionError) as error:
+        if raise_on_error:
+            raise error
         logger.error(
             "Error making call to Euphrosyne Tools API.\nURL: %s\nReason: %s",
             url,
@@ -70,14 +79,27 @@ def rename_run_directory(project_name: str, run_name: str, new_run_name: str):
 
 def rename_project_directory(project_name: str, new_project_name: str):
     base_url = os.environ["EUPHROSYNE_TOOLS_API_URL"]
-    response = _make_request(
-        f"{base_url}/data/{project_name}/rename/{new_project_name}"
-    )
-    if response is not None and not response.ok:
+    base_error_message = "Could not update project directory name from %s to %s. %s"
+    error = ""
+    try:
+        response = _make_request(
+            f"{base_url}/data/{project_name}/rename/{new_project_name}",
+            raise_on_error=True,
+        )
+    except (requests.Timeout, requests.ConnectionError) as e:
         logger.error(
-            "Could not update project directory name from %s to %s. %s: %s",
+            base_error_message,
             project_name,
             new_project_name,
-            response.status_code,
-            response.text,
+            str(error),
         )
+        raise RenameFailedError(_("Euphro tools is not available.")) from e
+    if response is not None and not response.ok:
+        error = f"{response.status_code}: {response.text}"
+        logger.error(
+            base_error_message,
+            project_name,
+            new_project_name,
+            str(error),
+        )
+        raise RenameFailedError(response.text)
