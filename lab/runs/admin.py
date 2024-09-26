@@ -71,6 +71,8 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
     def has_change_permission(
         self, request: HttpRequest, obj: Run | None = None  # type: ignore[override]
     ) -> bool:
+        if is_lab_admin(request.user):
+            return True
         return super().has_change_permission(request, obj) and (
             not obj or obj.status == Run.Status.CREATED
         )
