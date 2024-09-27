@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-24 12:10+0200\n"
+"POT-Creation-Date: 2024-09-27 13:55+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -169,6 +169,9 @@ msgstr "L'équipe Euphrosyne"
 
 msgid "Enter your information"
 msgstr "Entrez vos informations"
+
+msgid "Euphro tools is not available."
+msgstr "Euphro tools n'est pas disponible."
 
 msgid "Dashboard"
 msgstr "Tableau de bord"
@@ -502,6 +505,10 @@ msgid ""
 msgstr ""
 "Pour créer un projet sur Euphrosyne, vous devez lire et accepter les "
 "conditions générales d'utilisation de la plateforme."
+
+#, python-format
+msgid "Renaming this project is not posible for now : %s"
+msgstr "Renommer ce projet est impossible pour le moment : %s"
 
 msgid "Projects"
 msgstr "Projets"

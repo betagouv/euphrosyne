@@ -1,6 +1,6 @@
 from typing import Any, Dict, Mapping, Optional, Type
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
 from django.db.models import Count, DateTimeField, Value
@@ -12,7 +12,11 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
-from euphro_tools.hooks import initialize_project_directory, rename_project_directory
+from euphro_tools.hooks import (
+    RenameFailedError,
+    initialize_project_directory,
+    rename_project_directory,
+)
 from lab.admin.mixins import LabPermission, LabPermissionMixin, LabRole
 from lab.models import Participation
 from lab.permissions import is_lab_admin, is_project_leader
@@ -332,6 +336,20 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
     ):
         if not change and is_lab_admin(request.user):
             obj.admin_id = request.user.id  # type: ignore[assignment]
+
+        if change and "name" in form.changed_data:
+            try:
+                rename_project_directory(form.initial["name"], obj.name)
+            except RenameFailedError as error:
+                # Prevent changing name
+                obj.name = form.initial["name"]
+                self.message_user(
+                    request,
+                    message=_("Renaming this project is not posible for now : %s")
+                    % str(error),
+                    level=messages.ERROR,
+                )
+
         obj.save()
         if not change:
             if not is_lab_admin(request.user):
@@ -340,8 +358,6 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                     is_leader=True,
                 )
             initialize_project_directory(obj.name)
-        if change and "name" in form.changed_data:
-            rename_project_directory(form.initial["name"], obj.name)
 
     def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
         return super().changeform_view(
