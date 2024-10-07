@@ -13,4 +13,4 @@ pytest==8.3.3
 pytest-dotenv==0.5.2
 raincoat==1.2.4
 types-Markdown==3.7.0.20240822
-types-requests<2.32.0.20240908 # See note in https://pypi.org/project/types-requests/ as opensearch-py 2.5.0 requires urllib3<2,>=1.26.18
+types-requests<2.32.0.20240915 # See note in https://pypi.org/project/types-requests/ as opensearch-py 2.5.0 requires urllib3<2,>=1.26.18
