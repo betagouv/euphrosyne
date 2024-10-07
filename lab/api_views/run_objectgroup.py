@@ -79,3 +79,16 @@ class RunObjectGroupAvailableListView(RunObjectGroupMixin, generics.ListAPIView)
             .exclude(id__in=run_object_groups.values_list("objectgroup_id", flat=True))
             .distinct()
         )
+
+
+class RunObjectGroupImagesView(generics.ListCreateAPIView):
+    serializer_class = serializers.RunObjectGroupImageSerializer
+
+    def get_queryset(self):
+        run_object_group_id = self.kwargs["run_object_group_id"]
+        return models.RunObjetGroupImage.objects.filter(
+            run_object_group_id=run_object_group_id
+        )
+
+    def perform_create(self, serializer):
+        serializer.save(run_object_group_id=self.kwargs["run_object_group_id"])

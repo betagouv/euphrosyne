@@ -20,15 +20,6 @@ interface ListDataResponseItem {
   type?: FileType;
 }
 
-class FileUploadError extends Error {
-  file: File;
-
-  constructor(message: string, file: File) {
-    super(message);
-    this.file = file;
-  }
-}
-
 // Service to manage files on an Azure Fileshare
 export class FileService {
   listFileURL: string;
@@ -89,37 +80,5 @@ export class FileService {
     );
     if (!response?.ok) throw new Error("Failed to fetch presigned URL");
     return (await response.json()).url;
-  }
-
-  async createEmptyFile(presignedURL: string, file: File) {
-    const response = await fetch(presignedURL, {
-      method: "PUT",
-      headers: {
-        "Content-Length": "0",
-        "x-ms-type": "file",
-        "x-ms-content-length": file.size.toString(),
-        "x-ms-version": "2021-08-06",
-      },
-    });
-    if (!response.ok) {
-      throw new FileUploadError(response.statusText, file);
-    }
-  }
-
-  uploadBytesToFile(
-    presignedURL: string,
-    blob: BodyInit,
-    fileByteStart: number,
-    fileByteEnd: number,
-  ) {
-    return fetch(presignedURL + "&comp=range", {
-      method: "PUT",
-      body: blob,
-      headers: {
-        "x-ms-range": `bytes=${fileByteStart}-${fileByteEnd}`,
-        "x-ms-write": "update",
-        "x-ms-version": "2021-08-06",
-      },
-    });
   }
 }
