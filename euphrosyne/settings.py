@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     "graphene_django",
     "django_filters",
     "lab",
+    "lab_notebook",
     "orcid_oauth",
     "static_pages",
 ] + (["debug_toolbar"] if DEBUG else [])

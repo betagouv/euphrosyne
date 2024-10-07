@@ -125,3 +125,19 @@ class Object(models.Model):
         max_length=255,
         blank=True,
     )
+
+
+class RunObjectGroup(TimestampedModel):
+    """Many to many ObjectGroup - Run JOIN model"""
+
+    objectgroup = models.ForeignKey(ObjectGroup, on_delete=models.CASCADE)
+    run = models.ForeignKey("lab.Run", on_delete=models.CASCADE)
+
+
+class RunObjetGroupImage(TimestampedModel):
+    run_object_group = models.ForeignKey(
+        RunObjectGroup, on_delete=models.CASCADE, related_name="images"
+    )
+
+    path = models.CharField(max_length=256, verbose_name=_("Path"))
+    transform = models.JSONField(verbose_name=_("Image transformation"), null=True)

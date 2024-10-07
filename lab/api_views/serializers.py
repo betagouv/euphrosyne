@@ -4,7 +4,7 @@ from django.utils import timezone
 from rest_framework import reverse, serializers
 
 from ..models import Project, Run
-from ..objects.models import ObjectGroup
+from ..objects.models import ObjectGroup, RunObjetGroupImage
 
 
 class ProjectRunObjectGroupSerializer(serializers.ModelSerializer):
@@ -140,3 +140,21 @@ class RunObjectGroupCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Run.run_object_groups.through
         fields = ("objectgroup",)
+
+
+class ObjectGroupCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ObjectGroup
+        fields = (
+            "id",
+            "label",
+        )
+        read_only_fields = ("id",)
+
+
+class RunObjectGroupImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RunObjetGroupImage
+        fields = ("id", "path", "transform")
+
+        read_only_fields = ("id",)

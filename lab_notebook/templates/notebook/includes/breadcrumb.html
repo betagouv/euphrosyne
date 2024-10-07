@@ -1,0 +1,23 @@
+{% load i18n %}
+<nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+    <button class="fr-breadcrumb__button" aria-expanded="false" aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
+    <div class="fr-collapse" id="breadcrumb-1">
+        <ol class="fr-breadcrumb__list">
+            <li>
+                <a class="fr-breadcrumb__link" href="{% url 'admin:lab_project_changelist' %}">{% translate "Projects" %}</a>
+            </li>
+            <li>
+                <a class="fr-breadcrumb__link" href="{% url 'admin:lab_project_change' project.id %}">{{ project.name }}</a>
+            </li>
+            <li>
+                <a class="fr-breadcrumb__link" href="{% url 'admin:lab_run_changelist' %}?project={{project.id}}">{% translate "Runs" %}</a>
+            </li>
+            <li>
+                <a class="fr-breadcrumb__link" href="{% url 'admin:lab_run_change' run.id %}">{{ run.label }}</a>
+            </li>
+            <li>
+                <a class="fr-breadcrumb__link" aria-current="page">{% translate "Notebook" %}</a>
+            </li>
+        </ol>
+    </div>
+</nav>

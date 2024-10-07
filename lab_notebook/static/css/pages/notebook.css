@@ -1,0 +1,11 @@
+body {
+    background-color: var(--body-bg) !important;
+}
+
+h2 {
+    font-size: 2rem !important;
+}
+
+.card-condition-experimental  {
+    width: 450px;
+}
