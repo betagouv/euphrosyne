@@ -1,5 +1,6 @@
 "use strict";
 
+import { uploadFile } from "../../../assets/js/fileshare-service";
 import { FileService } from "../../../assets/js/file-service";
 import { jwtFetch } from "../../../assets/js/jwt";
 
@@ -23,41 +24,8 @@ export class DocumentFileService extends FileService {
     );
   }
 
-  async uploadFile(file: File, url: string) {
-    // File upload in an Azure Fileshare is divided in two steps :
-
-    // 1. Creation of an empty file
-    await this.createEmptyFile(url, file);
-
-    // 2. Upload file content. If the file size is greater than 4 Mb, it must be
-    // uploaded in several batches.
-    const batchNum = file.size / 4000000;
-    const promises = [...Array(Math.ceil(batchNum)).keys()].map(
-      (currentBatchNum) => {
-        const batchStart = 4000000 * currentBatchNum,
-          batchEnd =
-            Math.ceil(batchNum) === currentBatchNum + 1
-              ? file.size
-              : (currentBatchNum + 1) * 4000000;
-        return this.uploadBytesToFile(
-          url,
-          file.slice(batchStart, batchEnd),
-          batchStart,
-          batchEnd - 1,
-        );
-      },
-    );
-
-    const allSettledPromises = await Promise.allSettled(promises);
-
-    // Throw error if any upload fail
-    for (const promise of allSettledPromises) {
-      if (promise.status === "rejected") {
-        throw { file, value: promise.reason };
-      }
-    }
-
-    return { file };
+  uploadFile(file: File, url: string) {
+    return uploadFile(file, url);
   }
 
   async fetchUploadPresignedURL(fileName: string) {

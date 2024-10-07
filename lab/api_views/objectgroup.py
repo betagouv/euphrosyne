@@ -1,6 +1,6 @@
 import logging
 
-from rest_framework import authentication
+from rest_framework import authentication, generics
 from rest_framework.decorators import (
     api_view,
     authentication_classes,
@@ -11,6 +11,8 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
 from ..objects.c2rmf import ErosHTTPError, fetch_partial_objectgroup_from_eros
+from ..objects.models import ObjectGroup
+from . import serializers
 
 logger = logging.getLogger(__name__)
 
@@ -33,3 +35,11 @@ def get_eros_object(request):
     if not obj:
         raise NotFound("Object with this C2RMF ID was not found.")
     return Response({"c2rmf_id": obj["c2rmf_id"], "label": obj["label"]})
+
+
+class ObjectGroupCreateView(IsAdminUser, generics.CreateAPIView):
+    serializer_class = serializers.ObjectGroupCreateSerializer
+    queryset = ObjectGroup.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(object_count=1)
