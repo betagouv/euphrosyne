@@ -72,7 +72,10 @@ class Run(TimestampedModel, MethodModel):
     )
 
     run_object_groups = models.ManyToManyField(
-        "lab.ObjectGroup", verbose_name=_("Object groups"), related_name="runs"
+        "lab.ObjectGroup",
+        verbose_name=_("Object groups"),
+        related_name="runs",
+        through="lab.RunObjectGroup",
     )
 
     def __str__(self):

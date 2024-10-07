@@ -1,1 +1,7 @@
-from .models import Location, Object, ObjectGroup, Period  # noqa: F401
+from .models import (  # noqa: F401
+    Location,
+    Object,
+    ObjectGroup,
+    Period,
+    RunObjetGroupImage,
+)

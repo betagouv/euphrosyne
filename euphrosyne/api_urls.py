@@ -14,4 +14,5 @@ urlpatterns = [
     ),
     path("auth/", include("euphro_auth.api_urls")),
     path("lab/", include("lab.api_urls")),
+    path("notebook/", include("lab_notebook.api.urls")),
 ]
