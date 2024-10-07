@@ -7,7 +7,6 @@ from django.http.request import HttpRequest
 from ..models import Project
 from ..permissions import LabRole, get_user_permission_group, is_lab_admin
 
-# pylint: disable=invalid-name ; should be fixed with https://github.com/PyCQA/pylint/pull/5221
 T = TypeVar("T", bound=models.Model)
 
 
