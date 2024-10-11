@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   createMeasuringPoint,
   listMeasuringPoints,
 } from "../../../../lab/assets/js/measuring-point.service";
-import { IMeasuringPoint } from "../IMeasuringPoint";
 import MeasuringPoints from "./MeasuringPoints";
-import { NotebookContext } from "../Notebook.context";
+import { NotebookContext, useNotebookContext } from "../Notebook.context";
+import { StorageImageServices } from "../notebook-image.services";
 
 interface NotebookProps {
   runId: string;
@@ -20,7 +20,9 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
     "Add point": window.gettext("Add point"),
   };
 
-  const [measuringPoints, setMeasuringPoints] = useState<IMeasuringPoint[]>([]);
+  const notebookContext = useNotebookContext(projectSlug, runId);
+  const { setImageStorage, measuringPoints, setMeasuringPoints } =
+    notebookContext;
 
   const getNextMeasuringPointName = () => {
     const n = measuringPoints.length + 1;
@@ -38,10 +40,13 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
 
   useEffect(() => {
     listMeasuringPoints(runId).then(setMeasuringPoints);
+    new StorageImageServices(notebookContext.projectSlug)
+      .getImagesUrlAndToken()
+      .then(setImageStorage);
   }, []);
 
   return (
-    <NotebookContext.Provider value={{ projectSlug, runId }}>
+    <NotebookContext.Provider value={notebookContext}>
       <div>
         <div className="flex-container fr-mt-3w">
           <h4>{t["Image gallery"]}</h4>

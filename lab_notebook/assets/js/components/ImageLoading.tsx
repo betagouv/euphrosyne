@@ -1,4 +1,11 @@
-export default function ImageLoading(props: React.SVGProps<SVGSVGElement>) {
+interface IImageLoadingProps {
+  spinningRadius?: number;
+}
+
+export default function ImageLoading({
+  spinningRadius = 40,
+  ...props
+}: React.SVGProps<SVGSVGElement> & IImageLoadingProps) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" {...props}>
       <radialGradient
@@ -25,7 +32,7 @@ export default function ImageLoading(props: React.SVGProps<SVGSVGElement>) {
         strokeDashoffset="0"
         cx="100"
         cy="100"
-        r="40"
+        r={`${spinningRadius}`}
       >
         <animateTransform
           type="rotate"
@@ -47,7 +54,7 @@ export default function ImageLoading(props: React.SVGProps<SVGSVGElement>) {
         strokeLinecap="round"
         cx="100"
         cy="100"
-        r="40"
+        r={`${spinningRadius}`}
       ></circle>
     </svg>
   );

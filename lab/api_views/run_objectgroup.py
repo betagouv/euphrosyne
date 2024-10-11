@@ -6,7 +6,6 @@ from rest_framework.permissions import IsAdminUser
 from .. import models
 from ..permissions import is_lab_admin
 from . import serializers
-from .permissions import ProjectMembershipRequiredMixin
 
 
 class RunObjectGroupMixin:

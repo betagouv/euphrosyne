@@ -28,8 +28,6 @@ export default function ImageCropper({
         dragMode: readonly ? "none" : "move",
         aspectRatio: 1 / 1,
         guides: !readonly,
-        crop: onCrop,
-        ready: onReady,
         rotatable: !readonly,
         scalable: !readonly,
         zoomable: readonly,
@@ -39,6 +37,8 @@ export default function ImageCropper({
         cropBoxResizable: !readonly,
         minContainerWidth: 140,
         minContainerHeight: 140,
+        crop: onCrop,
+        ready: onReady,
       });
     }
   }, []);

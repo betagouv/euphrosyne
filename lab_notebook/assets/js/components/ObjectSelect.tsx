@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext, useEffect, useId, useState } from "react";
+import { ChangeEvent, useContext, useId } from "react";
 import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 import { updateMeasuringPointObjectId } from "../../../../lab/assets/js/measuring-point.service";
 import { IMeasuringPoint } from "../IMeasuringPoint";
@@ -16,27 +16,15 @@ export default function ObjectSelect({
     emptyObject: window.gettext("No object group / object selected"),
   };
 
-  const { runId } = useContext(NotebookContext);
+  const { runId, addObjectToMeasuringPoint } = useContext(NotebookContext);
 
   const selectId = useId();
-
-  const objectGroup = runObjectGroups.find(
-    (rog) => rog.objectGroup.id === measuringPoint.objectGroupId,
-  )?.objectGroup;
-
-  const [selectedObjectGroupId, setSelectedObjectGroupId] = useState<string>(
-    objectGroup?.id || "",
-  );
 
   const changeObjectGroup = async (event: ChangeEvent<HTMLSelectElement>) => {
     const objectGroupId = event.target.value;
     await updateMeasuringPointObjectId(runId, measuringPoint.id, objectGroupId);
-    setSelectedObjectGroupId(objectGroupId);
+    addObjectToMeasuringPoint(measuringPoint.id, objectGroupId);
   };
-
-  useEffect(() => {
-    setSelectedObjectGroupId(objectGroup?.id || "");
-  }, [objectGroup]);
 
   return (
     <div className="fr-select-group">
@@ -48,7 +36,7 @@ export default function ObjectSelect({
         id={selectId}
         name="select"
         onChange={changeObjectGroup}
-        value={selectedObjectGroupId}
+        value={measuringPoint.objectGroupId || undefined}
       >
         <option value="">{t.emptyObject}</option>
         {runObjectGroups.map((og) => (

@@ -1,20 +1,30 @@
-import { IImageTransform, IImagewithUrl, IRunObjectImage } from "../IImageTransform";
-import ImageCropper from "./ImageCropper";
+import { IPointLocation } from "../IImagePointLocation";
+import type { IRunObjectImageWithUrl } from "../IImageTransform";
+import { IMeasuringPoint } from "../IMeasuringPoint";
+import ImageMeasuringPointer from "./ImageMeasuringPointer";
 
 export default function AddMeasuringPointToImage({
-  storedImage,
   runObjectImage,
-  onTransform,
+  onLocate,
+  measuringPoint,
 }: {
-  storedImage: IImagewithUrl;
-  runObjectImage: IRunObjectImage,
-  onTransform?: (data: IImageTransform) => void;
+  runObjectImage: IRunObjectImageWithUrl;
+  measuringPoint?: IMeasuringPoint;
+  onLocate?: (data: IPointLocation) => void;
 }) {
+  const t = {
+    helpText:
+      "Move and zoom the image to select the measurement point or zone. Switch between point and area selection using the buttons located at the top left of the image. ",
+  };
   return (
     <div>
-      <ImageCropper
-        src={storedImage.url}
-        onCrop={(e) => onTransform && onTransform(e.detail)}
+      <p className="fr-text--sm">{t.helpText}</p>
+      <ImageMeasuringPointer
+        src={runObjectImage.url}
+        transform={runObjectImage.transform}
+        onLocate={onLocate}
+        initialLocation={measuringPoint?.image?.pointLocation}
+        maxHeight="400px"
       />
     </div>
   );

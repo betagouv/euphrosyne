@@ -74,4 +74,9 @@ urlpatterns = [
         measuring_points_views.MeasuringPointView.as_view(),
         name="run_measuring_point",
     ),
+    path(
+        "measuring-points/<int:measuring_point_id>/image",
+        measuring_points_views.MeasuringPointImageCreateView.as_view(),
+        name="run_measuring_point",
+    ),
 ]

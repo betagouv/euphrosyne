@@ -7,19 +7,19 @@ const selectedImageStyle = css({
   outline: "solid var(--background-action-high-blue-france) 3px",
 });
 
-interface IImageGridProps {
-  images: IImagewithUrl[];
-  selectedImage?: IImagewithUrl | null;
-  onImageSelect?: (image: IImagewithUrl) => void;
+interface IImageGridProps<T extends IImagewithUrl> {
+  images: T[];
+  selectedImage?: T | null;
   hideFrom?: number;
+  onImageSelect?: (image: T) => void;
 }
 
-export default function ImageGrid({
+export default function ImageGrid<T extends IImagewithUrl>({
   images,
   selectedImage,
-  onImageSelect,
   hideFrom,
-}: IImageGridProps) {
+  onImageSelect,
+}: IImageGridProps<T>) {
   const t = {
     showMore: "Show more",
     showLess: "Show less",
@@ -28,7 +28,7 @@ export default function ImageGrid({
 
   const visibleImages = showMore ? images : images.slice(0, hideFrom);
 
-  const isSelectedImage = (image: IImagewithUrl) => {
+  const isSelectedImage = (image: T) => {
     return (
       selectedImage &&
       image.url === selectedImage.url &&
