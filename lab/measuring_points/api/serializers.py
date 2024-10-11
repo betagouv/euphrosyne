@@ -1,16 +1,36 @@
 from rest_framework import serializers
 
-from ..models import MeasuringPoint
+from .. import models
+from ...api_views.serializers import RunObjectGroupImageSerializer
+from ...objects.models import RunObjetGroupImage
+
+
+class MeasuringPointImageSerializer(serializers.ModelSerializer):
+    run_object_group_image = serializers.PrimaryKeyRelatedField(
+        queryset=RunObjetGroupImage.objects.all()
+    )
+
+    class Meta:
+        model = models.MeasuringPointImage
+        fields = ("id", "point_location", "run_object_group_image")
+
+        read_only_fields = ("id",)
+
+
+class MeasuringPointImageReadonlySerializer(serializers.ModelSerializer):
+    run_object_group_image = RunObjectGroupImageSerializer()
+
+    class Meta:
+        model = models.MeasuringPointImage
+        fields = ("id", "point_location", "run_object_group_image")
+
+        read_only_fields = ("id", "point_location", "run_object_group_image")
 
 
 class MeasuringPointsSerializer(serializers.ModelSerializer):
+    image = MeasuringPointImageReadonlySerializer()
+
     class Meta:
-        model = MeasuringPoint
-        fields = (
-            "id",
-            "name",
-            "run",
-            "object_group",
-            "comments",
-        )
-        read_only_fields = ("run",)
+        model = models.MeasuringPoint
+        fields = ("id", "name", "run", "object_group", "comments", "image")
+        read_only_fields = ("run", "image")

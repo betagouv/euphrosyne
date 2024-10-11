@@ -1,4 +1,10 @@
-import { MouseEventHandler, useEffect, useState } from "react";
+import {
+  MouseEventHandler,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import ObjectSelect from "./ObjectSelect";
 import type { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 import type { IMeasuringPoint } from "../IMeasuringPoint";
@@ -7,10 +13,14 @@ import AddImageToObjectTransform from "./AddImageToObjectTransform";
 import {
   IImageTransform,
   IImagewithUrl,
-  IRunObjectImage,
+  IRunObjectImageWithUrl,
 } from "../IImageTransform";
 import { RunObjectGroupImageServices } from "../notebook-image.services";
 import AddMeasuringPointToImage from "./AddMeasuringPointToImage";
+import { IPointLocation } from "../IImagePointLocation";
+import { addMeasuringPointImage } from "../../../../lab/assets/js/measuring-point.service";
+import { NotebookContext } from "../Notebook.context";
+import { constructImageStorageUrl } from "../utils";
 
 type StepNumber = 1 | 11 | 12 | 21;
 
@@ -45,8 +55,8 @@ export default function AddImageToMeasuringModal({
     objectChoice: window.gettext("Object group / object choice"),
     imageChoice: window.gettext("Image choice"),
     imageChoiceWithAdjustment: window.gettext("Image choice (edit)"),
-    continueAdjustImage: window.gettext("Edit image"),
-    continueNoAdjustImage: window.gettext("Continue without editing"),
+    continueAdjustImage: window.gettext("Resize image"),
+    continueNoAdjustImage: window.gettext("Continue"),
     pointSelection: window.gettext("Point selection on image"),
     next: window.gettext("Next"),
     back: window.gettext("Back"),
@@ -62,28 +72,90 @@ export default function AddImageToMeasuringModal({
   );
   const objectGroup = runObjectGroup?.objectGroup;
 
-  // Can be either local path or blob path
-  const [selectedObjectImageURL, setSelectedObjectImageURL] =
-    useState<IImagewithUrl | null>();
+  const { imageStorage, updateMeasuringPointImage } =
+    useContext(NotebookContext);
 
+  const [isAddingRunObjectImage, setIsAddingRunObjectImage] = useState(false);
+
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  const resetModal = () => {
+    if (pointLocation) {
+      setPointLocation(undefined);
+    }
+    if (selectedObjectImage) {
+      setSelectedObjectImage(null);
+    }
+    if (selectedImageTransform) {
+      setSelectedImageTransform(undefined);
+    }
+    if (selectedRunObjectImage) {
+      setSelectedRunObjectImage(null);
+    }
+  };
+
+  // Represents an image accessible somewhere with its `url` property.
+  // This image will be saved as a Run-Object image in the database,
+  // where data about measurement points will be linked to it.
+  const [selectedObjectImage, setSelectedObjectImage] =
+    useState<IImagewithUrl | null>(null);
+
+  // Represents the transformation properties (e.g., zoom, rotation, etc.)
+  // related to the selectedObjectImage. Can be object, null (i.e no transform)
+  // or undefined (unknown / not specified).
   const [selectedImageTransform, setSelectedImageTransform] =
     useState<IImageTransform | null>();
 
-  const [selectedObjectRunImage, setSelectedObjectRunImage] =
-    useState<IRunObjectImage | null>();
+  // Represents the final state of the image that will be saved in the database.
+  // It links the web url accessible image and its transformation information.
+  const [selectedRunObjectImage, setSelectedRunObjectImage] =
+    useState<IRunObjectImageWithUrl | null>(null);
+
+  // Image selection
+  const onImageSelect = (image: IImagewithUrl) => {
+    setSelectedObjectImage(image);
+    setSelectedRunObjectImage(null);
+  };
+  const onRunObjectImageSelect = (image: IRunObjectImageWithUrl) => {
+    setSelectedObjectImage(null);
+    setSelectedRunObjectImage(image);
+  };
+
+  // Adding image & transformation to DB
 
   const addImageToRunObjectGroup = async () => {
-    if (runObjectGroup && selectedObjectImageURL) {
-      const path = new URL(selectedObjectImageURL.url).pathname;
+    if (runObjectGroup && selectedObjectImage) {
+      const path = new URL(selectedObjectImage.url).pathname;
       const savedImage = await new RunObjectGroupImageServices(
         runObjectGroup?.id,
       ).addRunObjectGroupImage({
         path,
         transform: selectedImageTransform || null,
       });
-      setSelectedObjectRunImage(savedImage);
+      onRunObjectImageSelect({
+        ...savedImage,
+        url: selectedObjectImage.url,
+      });
     }
   };
+
+  // Adding measuring point on image info to DB
+
+  const [pointLocation, setPointLocation] = useState<IPointLocation>();
+
+  const addImageToPoint = async () => {
+    if (!measuringPoint || !selectedRunObjectImage?.id || !pointLocation) {
+      return;
+    }
+    return addMeasuringPointImage(
+      measuringPoint?.id,
+      selectedRunObjectImage?.id,
+      pointLocation,
+      !measuringPoint.image,
+    );
+  };
+
+  // Steps
 
   const steps: ISteps = {
     1: {
@@ -94,6 +166,7 @@ export default function AddImageToMeasuringModal({
           title: t.next,
           onClick: () => setCurrentStep(11),
           frType: "primary",
+          disabled: !measuringPoint?.objectGroupId,
         },
       ],
       content: () =>
@@ -111,8 +184,10 @@ export default function AddImageToMeasuringModal({
         objectGroup && (
           <AddImageToObject
             runObjectGroup={runObjectGroup}
-            onImageSelect={setSelectedObjectImageURL}
-            onRunObjectImageSelect={setSelectedObjectRunImage}
+            selectedObjectImage={selectedObjectImage}
+            selectedRunObjectImage={selectedRunObjectImage}
+            onImageSelect={onImageSelect}
+            onRunObjectImageSelect={onRunObjectImageSelect}
           />
         ),
       buttons: [
@@ -120,13 +195,13 @@ export default function AddImageToMeasuringModal({
           title: t.continueNoAdjustImage,
           onClick: () => setCurrentStep(21),
           frType: "primary",
-          disabled: !selectedObjectImageURL || !selectedObjectRunImage,
+          disabled: !selectedObjectImage && !selectedRunObjectImage,
         },
         {
           title: t.continueAdjustImage,
           onClick: () => setCurrentStep(12),
-          frType: "primary",
-          disabled: !selectedObjectImageURL || !!selectedObjectRunImage,
+          frType: "secondary",
+          disabled: !selectedObjectImage,
         },
         {
           title: t.back,
@@ -139,9 +214,9 @@ export default function AddImageToMeasuringModal({
       // Adjust selected image
       title: t.imageChoiceWithAdjustment,
       content: () =>
-        selectedObjectImageURL && (
+        selectedObjectImage && (
           <AddImageToObjectTransform
-            image={selectedObjectImageURL}
+            image={selectedObjectImage}
             onTransform={setSelectedImageTransform}
           />
         ),
@@ -149,16 +224,21 @@ export default function AddImageToMeasuringModal({
         {
           title: t.next,
           onClick: () => {
-            addImageToRunObjectGroup().then(() => setCurrentStep(21));
+            setIsAddingRunObjectImage(true);
+            addImageToRunObjectGroup()
+              .then(() => {
+                setCurrentStep(21);
+              })
+              .finally(() => setIsAddingRunObjectImage(false));
           },
           frType: "primary",
-          disabled: !selectedImageTransform,
+          disabled: !selectedImageTransform || isAddingRunObjectImage,
         },
         {
           title: t.back,
           onClick: () => {
             setCurrentStep(11);
-            setSelectedObjectImageURL(null);
+            setSelectedObjectImage(null);
             setSelectedImageTransform(null);
           },
           frType: "secondary",
@@ -168,31 +248,40 @@ export default function AddImageToMeasuringModal({
     21: {
       // Select measuring point on image
       title: t.pointSelection,
-      content: () => (
-        <AddMeasuringPointToImage image={selectedObjectImageURL} />
-      ),
+      content: () =>
+        selectedRunObjectImage && (
+          <AddMeasuringPointToImage
+            runObjectImage={selectedRunObjectImage}
+            onLocate={setPointLocation}
+            measuringPoint={measuringPoint}
+          />
+        ),
       buttons: [
+        {
+          title: t.save,
+          onClick: () =>
+            addImageToPoint().then((image) => {
+              if (image && measuringPoint?.image)
+                updateMeasuringPointImage(measuringPoint.id, {
+                  ...image,
+                  runObjectGroupImage:
+                    measuringPoint.image?.runObjectGroupImage,
+                });
+              closeButtonRef.current?.click();
+            }),
+          frType: "primary",
+          disabled: !pointLocation,
+        },
         {
           title: t.changeImage,
           onClick: () => setCurrentStep(11),
           frType: "secondary",
-        },
-        {
-          title: t.backToEdit,
-          onClick: () => setCurrentStep(12),
-          frType: "secondary",
-        },
-        {
-          title: t.save,
-          onClick: () => null,
-          frType: "primary",
         },
       ],
     },
   };
 
   const initialStep = measuringPoint?.objectGroupId ? 11 : 1;
-
   const [currentStep, setCurrentStep] = useState<StepNumber>(initialStep);
 
   const getNextStepTitle = () => {
@@ -211,11 +300,30 @@ export default function AddImageToMeasuringModal({
   const modalId = `add-measuring-point-image-modal`;
 
   useEffect(() => {
-    // Go to second step if object group is set
-    if (objectGroup && currentStep === 1) {
-      setCurrentStep(11);
+    // Go to 3rd step if has measuring point location
+    if (objectGroup) {
+      if (currentStep !== 21 && measuringPoint?.image && imageStorage) {
+        const { runObjectGroupImage } = measuringPoint.image;
+        setPointLocation(measuringPoint.image.pointLocation);
+        setSelectedRunObjectImage({
+          ...runObjectGroupImage,
+          url: constructImageStorageUrl(
+            runObjectGroupImage.path,
+            imageStorage.baseUrl,
+            imageStorage.token,
+          ),
+        });
+        setCurrentStep(21);
+      }
+      // Go to second step if object group is set
+      else if (currentStep !== 11) {
+        setCurrentStep(11);
+      }
+    } else if (currentStep !== 1) {
+      resetModal();
+      setCurrentStep(1);
     }
-  }, [objectGroup]);
+  }, [objectGroup, imageStorage, measuringPoint]);
 
   return (
     <dialog
@@ -233,6 +341,7 @@ export default function AddImageToMeasuringModal({
                   className="fr-btn--close fr-btn"
                   title={t.close}
                   aria-controls={modalId}
+                  ref={closeButtonRef}
                 >
                   {t.close}
                 </button>

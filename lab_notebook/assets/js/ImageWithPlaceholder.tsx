@@ -1,7 +1,7 @@
 import { Fragment, useState } from "react";
 import ImageLoading from "./components/ImageLoading";
 import { css } from "@emotion/react";
-import { IImageTransform, IImagewithUrl } from "./IImageTransform";
+import { IImageTransform } from "./IImageTransform";
 import ImageCropper from "./components/ImageCropper";
 
 const visiblePlaceholderStyle = css({
@@ -10,7 +10,7 @@ const visiblePlaceholderStyle = css({
   left: 0,
 });
 
-const hiddentPlaceholderStyle = css({
+const hiddenPlaceholderStyle = css({
   display: "none",
 });
 
@@ -42,7 +42,7 @@ export default function ImageWithPlaceholder(
         <img {...otherProps} onLoad={onImageLoad} />
       )}
       <ImageLoading
-        css={isLoaded ? hiddentPlaceholderStyle : visiblePlaceholderStyle}
+        css={isLoaded ? hiddenPlaceholderStyle : visiblePlaceholderStyle}
       />
     </Fragment>
   );

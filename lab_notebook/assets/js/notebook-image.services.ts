@@ -1,10 +1,38 @@
 import { jwtFetch } from "../../../lab/assets/js/jwt.js";
 import { getCSRFToken } from "../../../lab/assets/js/utils.js";
-import {
-  IRunObjectImage,
-  IImageTransform,
-  IImagewithUrl,
-} from "./IImageTransform.js";
+import { IRunObjectImage, IImagewithUrl } from "./IImageTransform.js";
+
+export class StorageImageServices {
+  protected projectSlug: string;
+
+  constructor(projectSlug: string) {
+    this.projectSlug = projectSlug;
+  }
+
+  async getImagesUrlAndToken() {
+    const url =
+      process.env.EUPHROSYNE_TOOLS_API_URL +
+      `/images/projects/${this.projectSlug}/signed-url`;
+
+    const response = await jwtFetch(url);
+
+    if (!response?.ok) {
+      console.error(response);
+      throw new Error(
+        window.gettext("An error occured while requesting upload URL."),
+      );
+    }
+
+    const { base_url, token } = (await response.json()) as {
+      base_url: string;
+      token: string;
+    };
+    return {
+      baseUrl: base_url,
+      token: token,
+    };
+  }
+}
 
 export class ObjectGroupImageServices {
   protected projectSlug: string;
@@ -50,9 +78,7 @@ export class ObjectGroupImageServices {
       `/images/upload/signed-url` +
       `?project_name=${this.projectSlug}&object_group_id=${this.objectGroupId}&file_name=${fileName}`;
 
-    let response: Response | undefined;
-
-    response = await jwtFetch(url);
+    const response = await jwtFetch(url);
 
     if (!response) {
       throw new Error(
@@ -83,25 +109,6 @@ export class ObjectGroupImageServices {
     throw new Error(
       window.gettext("Didn't receive upload URL from euphrosyne tools."),
     );
-  }
-
-  async getImagesUrlAndToken() {
-    const url =
-      process.env.EUPHROSYNE_TOOLS_API_URL +
-      `images/projects/${this.projectSlug}/signed-url`;
-
-    let response: Response | undefined;
-
-    response = await jwtFetch(url);
-
-    if (!response?.ok) {
-      console.error(response);
-      throw new Error(
-        window.gettext("An error occured while requesting upload URL."),
-      );
-    }
-
-    return (await response.json()) as { url: string; token: string };
   }
 }
 
