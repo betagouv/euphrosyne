@@ -13,6 +13,7 @@ import {
 import ImageGrid from "./ImageGrid";
 import UploadObjectImage from "./UploadObjectImage";
 import ImageLoading from "./ImageLoading";
+import ImageWithPlaceholder from "../ImageWithPlaceholder";
 
 export default function AddImageToObject({
   runObjectGroup,
@@ -154,7 +155,6 @@ interface IObjectImageGalleryProps<T extends IImagewithUrl> {
 
 function ObjectImageGallery<T extends IImagewithUrl>({
   title,
-  selectedImage,
   images,
   loading = false,
   noImageText,
@@ -166,11 +166,18 @@ function ObjectImageGallery<T extends IImagewithUrl>({
       {loading && <LoadingIndicator />}
       {!loading && images.length === 0 && noImageText && <p>{noImageText}</p>}
       <ImageGrid
-        images={images}
-        selectedImage={selectedImage}
-        onImageSelect={onImageSelect}
+        onImageSelect={(index) => onImageSelect(images[index])}
         hideFrom={6}
-      />
+      >
+        {images.map((i) => (
+          <ImageWithPlaceholder
+            src={i.url}
+            transform={i.transform}
+            alt=""
+            key={i.url + "-" + JSON.stringify(i.transform)}
+          />
+        ))}
+      </ImageGrid>
     </div>
   );
 }
