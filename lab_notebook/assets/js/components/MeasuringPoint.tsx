@@ -3,10 +3,10 @@ import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 import type { IMeasuringPoint, IMeasuringPointImage } from "../IMeasuringPoint";
 import MeasuringPointComments from "./MeasuringPointComments";
 import ObjectSelect from "./ObjectSelect";
-import ImageMeasuringPointer from "./ImageMeasuringPointer";
 import { NotebookContext } from "../Notebook.context";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { constructImageStorageUrl } from "../utils";
+import CroppedImageDisplay from "./CroppedImageDisplay";
 
 const buttonContainerStyle = css({
   border: "dashed var(--background-action-high-blue-france) 1px",
@@ -52,6 +52,7 @@ export default function MeasuringPoint({
       <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-12 fr-col-md-5">
           <MeasuringPointImageTile
+            point={point}
             image={point.image}
             onLocalizeImageClicked={onLocalizeImageClicked}
           />
@@ -83,10 +84,12 @@ export default function MeasuringPoint({
 }
 
 interface IMeasuringPointImageTileProps {
+  point: IMeasuringPoint;
   image?: IMeasuringPointImage;
   onLocalizeImageClicked: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 function MeasuringPointImageTile({
+  point,
   image,
   onLocalizeImageClicked,
 }: IMeasuringPointImageTileProps) {
@@ -97,15 +100,20 @@ function MeasuringPointImageTile({
 
   const { imageStorage } = useContext(NotebookContext);
 
-  let imageUrl: string | null = null;
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  if (image && imageStorage) {
-    imageUrl = constructImageStorageUrl(
-      image.runObjectGroupImage.path,
-      imageStorage.baseUrl,
-      imageStorage.token,
-    );
-  }
+  useEffect(() => {
+    if (image && imageStorage) {
+      setImageUrl(
+        constructImageStorageUrl(
+          image.runObjectGroupImage.path,
+          imageStorage.baseUrl,
+          imageStorage.token,
+        ),
+      );
+    }
+  }, [image, imageStorage, point.id]);
+
   return (
     <div css={imageContainerStyle}>
       {imageUrl ? (
@@ -119,11 +127,12 @@ function MeasuringPointImageTile({
           >
             {t.changeLocation}
           </button>
-          <ImageMeasuringPointer
+          <CroppedImageDisplay
+            css={{ maxWidth: "100%" }}
             src={imageUrl}
             transform={image?.runObjectGroupImage.transform}
-            initialLocation={image?.pointLocation}
-            isReadonly={true}
+            measuringPoints={[point]}
+            showNames={false}
           />
         </div>
       ) : (

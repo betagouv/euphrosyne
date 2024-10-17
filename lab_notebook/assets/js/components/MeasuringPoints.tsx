@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { IMeasuringPoint } from "../IMeasuringPoint";
 import MeasuringPoint from "./MeasuringPoint";
 import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
@@ -25,17 +25,14 @@ export default function MeasuringPoints({
 
   const [objectGroups, setObjectGroups] = useState<RunObjectGroup[]>([]);
 
+  // Selected measuring point for object group modal
   const [addObjectModalPointId, setAddObjectModalPointId] = useState<
     string | null
   >(null);
 
-  const [addImageToMeasuringPointId, setAddImageToMeasuringPointId] = useState<
-    string | null
-  >(null);
-
-  const addImageToMeasuringPoint = points.find(
-    (p) => p.id === addImageToMeasuringPointId,
-  );
+  // Selected measuring point for image localization modal
+  const [addImageToMeasuringPoint, setAddImageToMeasuringPoint] =
+    useState<IMeasuringPoint>();
 
   useEffect(() => {
     // Init object group selection & image location modal
@@ -45,11 +42,19 @@ export default function MeasuringPoints({
     }
   }, []);
 
-  const onAddObjectSuccess = () => {
+  useEffect(() => {
+    // Reset if point changes
+    if (addImageToMeasuringPoint)
+      setAddImageToMeasuringPoint(
+        points.find((p) => p.id === addImageToMeasuringPoint.id),
+      );
+  }, [points]);
+
+  const onAddObjectSuccess = useCallback(() => {
     setAddObjectModalPointId(null);
     fetchRunObjectGroups(runId).then(setObjectGroups);
     onAddObjectToPoint();
-  };
+  }, [runId]);
 
   // Accordion buttons management
 
@@ -91,14 +96,16 @@ export default function MeasuringPoints({
         runObjectGroups={objectGroups}
         measuringPoint={addImageToMeasuringPoint}
       />
-      <div className="fr-my-1w">
-        <button
-          className={`fr-btn fr-btn--tertiary-no-outline fr-btn--icon-left fr-icon-arrow-${allExpanded ? "up" : "down"}-s-line`}
-          onClick={() => toggleButtons(allExpanded ? "close" : "open")}
-        >
-          {allExpanded ? t.closeAll : t.unfoldAll}
-        </button>
-      </div>
+      {points.length > 1 && (
+        <div className="fr-my-1w">
+          <button
+            className={`fr-btn fr-btn--tertiary-no-outline fr-btn--icon-left fr-icon-arrow-${allExpanded ? "up" : "down"}-s-line`}
+            onClick={() => toggleButtons(allExpanded ? "close" : "open")}
+          >
+            {allExpanded ? t.closeAll : t.unfoldAll}
+          </button>
+        </div>
+      )}
       {points.length === 0 && <p>{t["noPoint"]}</p>}
       {points.map((point, index) => (
         <div
@@ -124,7 +131,7 @@ export default function MeasuringPoints({
                 runId={runId}
                 onAddObjectClicked={() => setAddObjectModalPointId(point.id)}
                 onLocalizeImageClicked={() =>
-                  setAddImageToMeasuringPointId(point.id)
+                  setAddImageToMeasuringPoint(point)
                 }
               />
             </div>

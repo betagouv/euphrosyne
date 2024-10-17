@@ -95,13 +95,13 @@ export default function ImageMeasuringPointer({
         ready: () => {
           if (transform) {
             _cropper.setData(transform);
-            setCroppedDataUrl(_cropper.getCroppedCanvas().toDataURL());
           }
+          setCroppedDataUrl(_cropper.getCroppedCanvas().toDataURL());
         },
       });
       _cropper.disable();
     }
-  }, []);
+  }, [props.src, JSON.stringify(transform)]);
 
   // INIT CROPPED
   useEffect(() => {
