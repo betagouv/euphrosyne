@@ -22,4 +22,4 @@ def create_favorites(
     sender, instance, created, **kwargs
 ):  # pylint: disable=unused-argument
     if created:
-        RunNotebook.objects.create(run_notebook=instance)
+        RunNotebook.objects.create(run=instance)

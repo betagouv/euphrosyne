@@ -193,7 +193,11 @@ export default function AddImageToMeasuringModal({
       buttons: [
         {
           title: t.continueNoAdjustImage,
-          onClick: () => setCurrentStep(21),
+          onClick: () => {
+            if (!selectedRunObjectImage)
+              addImageToRunObjectGroup().then(() => setCurrentStep(21));
+            else setCurrentStep(21);
+          },
           frType: "primary",
           disabled: !selectedObjectImage && !selectedRunObjectImage,
         },
@@ -265,6 +269,7 @@ export default function AddImageToMeasuringModal({
                 updateMeasuringPointImage(measuringPoint.id, {
                   ...image,
                   runObjectGroupImage:
+                    selectedRunObjectImage ||
                     measuringPoint.image?.runObjectGroupImage,
                 });
               closeButtonRef.current?.click();

@@ -141,3 +141,11 @@ class RunObjetGroupImage(TimestampedModel):
 
     path = models.CharField(max_length=256, verbose_name=_("Path"))
     transform = models.JSONField(verbose_name=_("Image transformation"), null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["path", "transform", "run_object_group"],
+                name="run_object_group_image_unique_path_transform_perrun_object_group",
+            ),
+        ]

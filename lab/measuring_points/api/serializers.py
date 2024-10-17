@@ -28,7 +28,7 @@ class MeasuringPointImageReadonlySerializer(serializers.ModelSerializer):
 
 
 class MeasuringPointsSerializer(serializers.ModelSerializer):
-    image = MeasuringPointImageReadonlySerializer()
+    image = MeasuringPointImageReadonlySerializer(read_only=True)
 
     class Meta:
         model = models.MeasuringPoint
