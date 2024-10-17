@@ -3,7 +3,7 @@ import {
   createObjectGroup,
   addObjectGroupToRun,
 } from "../../../../lab/objects/assets/js/services";
-import { updateMeasuringPointObjectId } from "../../../../lab/assets/js/measuring-point.service";
+import { updateMeasuringPointObjectId } from "../../../../lab/assets/js/measuring-point.services";
 
 export default function AddObjectGroupModal({
   runId,

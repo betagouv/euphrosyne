@@ -1,4 +1,5 @@
 import { css } from "@emotion/react";
+import { updateMeasuringPointComments } from "../../../../lab/assets/js/measuring-point.services";
 
 const textAreaStyle = css({
   width: "100%",
