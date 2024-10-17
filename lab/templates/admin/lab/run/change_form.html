@@ -24,7 +24,6 @@
 
 <div class="fr-container">
     {% project_tabs project.id request %}
-    <div>
         <h1>{{ original.label }}</h1>
 
         {% if original.start_date or original.embargo_date %}
@@ -46,6 +45,12 @@
             {% endif %}
         </div>
         {% endif %}
+
+
+        {% if original and original.run_notebook %}
+        <a class="fr-link" href="{% url "admin:lab_run_notebook" original.id %}" target="_blank">{% translate "Go to notebook" %}</a>
+        {% endif %}
+
 
     </div>
 </div>
