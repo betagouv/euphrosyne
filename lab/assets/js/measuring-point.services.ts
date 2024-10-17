@@ -156,6 +156,6 @@ export async function addMeasuringPointImage(
   return {
     id: image.id.toString(),
     pointLocation: image.point_location,
-    run_object_group_image: image.run_object_group_image.toString(),
+    runObjectImageId: image.run_object_group_image.toString(),
   };
 }

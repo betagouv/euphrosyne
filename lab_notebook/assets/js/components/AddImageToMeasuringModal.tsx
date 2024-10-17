@@ -18,7 +18,7 @@ import {
 import { RunObjectGroupImageServices } from "../notebook-image.services";
 import AddMeasuringPointToImage from "./AddMeasuringPointToImage";
 import { IPointLocation } from "../IImagePointLocation";
-import { addMeasuringPointImage } from "../../../../lab/assets/js/measuring-point.service";
+import { addMeasuringPointImage } from "../../../../lab/assets/js/measuring-point.services";
 import { NotebookContext } from "../Notebook.context";
 import { constructImageStorageUrl } from "../utils";
 
