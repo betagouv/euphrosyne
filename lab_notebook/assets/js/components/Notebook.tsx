@@ -2,10 +2,11 @@ import { useEffect } from "react";
 import {
   createMeasuringPoint,
   listMeasuringPoints,
-} from "../../../../lab/assets/js/measuring-point.service";
+} from "../../../../lab/assets/js/measuring-point.services";
 import MeasuringPoints from "./MeasuringPoints";
 import { NotebookContext, useNotebookContext } from "../Notebook.context";
 import { StorageImageServices } from "../notebook-image.services";
+import MeasuringPointImageGallery from "./MeasuringPointImageGallery";
 
 interface NotebookProps {
   runId: string;
@@ -14,7 +15,7 @@ interface NotebookProps {
 
 export default function Notebook({ runId, projectSlug }: NotebookProps) {
   const t = {
-    "Image gallery": window.gettext("Image gallery"),
+    gallery: window.gettext("Run images with point locations"),
     "Add image": window.gettext("Add image"),
     "Measuring points": window.gettext("Measuring points"),
     "Add point": window.gettext("Add point"),
@@ -49,14 +50,9 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
     <NotebookContext.Provider value={notebookContext}>
       <div>
         <div className="flex-container fr-mt-3w">
-          <h4>{t["Image gallery"]}</h4>
-          <div>
-            <button className="fr-btn fr-btn--secondary" disabled>
-              {t["Add image"]}
-            </button>
-          </div>
+          <h4>{t.gallery}</h4>
         </div>
-        <p>TODO</p>
+        <MeasuringPointImageGallery />
 
         <div className="fr-mt-4w">
           <div className="flex-container">

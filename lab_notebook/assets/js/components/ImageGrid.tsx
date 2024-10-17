@@ -1,70 +1,76 @@
-import { useState } from "react";
-import { IImagewithUrl } from "../IImageTransform";
-import ImageWithPlaceholder from "../ImageWithPlaceholder";
+import {
+  PropsWithChildren,
+  useState,
+  Children,
+  cloneElement,
+  isValidElement,
+  ReactElement,
+} from "react";
 import { css } from "@emotion/react";
 
 const selectedImageStyle = css({
   outline: "solid var(--background-action-high-blue-france) 3px",
 });
 
-interface IImageGridProps<T extends IImagewithUrl> {
-  images: T[];
-  selectedImage?: T | null;
+interface IImageGridProps {
   hideFrom?: number;
-  onImageSelect?: (image: T) => void;
+  onImageSelect?: (index: number) => void;
 }
 
-export default function ImageGrid<T extends IImagewithUrl>({
-  images,
-  selectedImage,
+export default function ImageGrid({
   hideFrom,
   onImageSelect,
-}: IImageGridProps<T>) {
+  children,
+}: PropsWithChildren<IImageGridProps>) {
   const t = {
     showMore: "Show more",
     showLess: "Show less",
   };
   const [showMore, setShowMore] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState<number>();
 
-  const visibleImages = showMore ? images : images.slice(0, hideFrom);
+  const visibleImages = Children.map(children, (child) =>
+    isValidElement(child) ? (
+      cloneElement(child as ReactElement, {
+        className: "fr-responsive-img fr-ratio-1x1",
+      })
+    ) : (
+      <></>
+    ),
+  )?.slice(0, showMore ? undefined : hideFrom);
 
-  const isSelectedImage = (image: T) => {
-    return (
-      selectedImage &&
-      image.url === selectedImage.url &&
-      JSON.stringify(image.transform) ===
-        JSON.stringify(selectedImage.transform)
-    );
+  const isSelectedImage = (index: number) => {
+    return selectedIndex && selectedIndex === index;
   };
   return (
     <div>
       <div className="fr-grid-row fr-grid-row--gutters">
-        {visibleImages.map((i) => (
+        {Children.map(visibleImages, (node, index) => (
           <div
-            className="fr-col-6 fr-col-md-4"
-            key={i.url + "-" + JSON.stringify(i.transform)}
+            className="fr-col-12 fr-col-sm-6 fr-col-md-4"
+            key={node?.toString() + `_${index}`}
           >
             <figure className="fr-content-media fr-my-0" role="group">
               <div
                 className="fr-content-media__img"
                 css={{
-                  ...(isSelectedImage(i) ? selectedImageStyle : {}),
+                  ...(isSelectedImage(index) ? selectedImageStyle : {}),
                   position: "relative",
                 }}
-                onClick={() => onImageSelect && onImageSelect(i)}
+                onClick={() => {
+                  if (onImageSelect) {
+                    setSelectedIndex(index);
+                    onImageSelect && onImageSelect(index);
+                  }
+                }}
               >
-                <ImageWithPlaceholder
-                  className={`fr-responsive-img fr-ratio-1x1`}
-                  src={i.url}
-                  transform={i.transform}
-                  alt=""
-                />
+                {node}
               </div>
             </figure>
           </div>
         ))}
       </div>
-      {hideFrom && images.length > hideFrom && (
+      {hideFrom && Children.toArray(children).length > hideFrom && (
         <div className="fr-mt-1w" css={{ textAlign: "center" }}>
           <button
             className={`fr-btn fr-btn--tertiary-no-outline fr-btn--lg  ${showMore ? "fr-icon-arrow-up-s-line" : "fr-icon-arrow-down-s-line"}`}
