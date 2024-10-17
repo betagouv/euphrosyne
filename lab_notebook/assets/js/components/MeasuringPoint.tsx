@@ -75,7 +75,7 @@ export default function MeasuringPoint({
               {t.addObjectGroup}
             </button>
           </div>
-          <MeasuringPointComments pointId={point.id} />
+          <MeasuringPointComments pointId={point.id} value={point.comments} />
         </div>
       </div>
     </div>

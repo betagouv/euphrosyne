@@ -11,7 +11,8 @@
     "downlevelIteration": true,
     /* Type Checking */
     "strict": true /* Enable all strict type-checking options. */,
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals"],
+    "allowSyntheticDefaultImports": true
   },
 
   "include": ["**/*.ts", "**/*.tsx", "**/**/*.ts", "**/**/*.tsx"],
