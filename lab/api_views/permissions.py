@@ -1,4 +1,4 @@
-from typing import Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 
 from django.db import models
 from rest_framework.permissions import IsAdminUser
@@ -15,7 +15,7 @@ class IsLabAdminUser(IsAdminUser):
         return super().has_permission(request, view) and is_lab_admin(request.user)
 
 
-class ProjectMembershipRequiredMixin(IsAdminUser):
+class ProjectMembershipRequiredMixin(Generic[T], IsAdminUser):
     def get_related_project(self, obj: T | None = None) -> Optional[Project]:
         raise NotImplementedError()
 

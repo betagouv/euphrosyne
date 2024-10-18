@@ -8,14 +8,16 @@ from . import serializers
 
 class MeasuringPointViewMixin(ProjectMembershipRequiredMixin):
     def get_related_project(self, obj: MeasuringPoint | None = None) -> Project | None:
-        return obj and obj.run.project
+        return obj.run.project if obj else None
 
     def get_queryset(self):
         run_id = self.kwargs["run_id"]
         return MeasuringPoint.objects.filter(run_id=run_id).order_by("created")
 
 
-class MeasuringPointsView(MeasuringPointViewMixin, generics.ListCreateAPIView):
+class MeasuringPointsView(
+    MeasuringPointViewMixin, generics.ListCreateAPIView
+):  # pylint: disable=too-many-ancestors
     serializer_class = serializers.MeasuringPointsSerializer
 
     def perform_create(self, serializer):
@@ -28,15 +30,15 @@ class MeasuringPointView(MeasuringPointViewMixin, generics.UpdateAPIView):
     def get_related_project(self, obj: MeasuringPoint | None = None) -> Project | None:
         if not obj:
             return None
-        return obj and obj.run.project
+        return obj.run.project if obj else None
 
     def get_queryset(self):
         run_id = self.kwargs["run_id"]
         return MeasuringPoint.objects.filter(run_id=run_id)
 
 
-class MeasuringPointImageCreateView(
-    MeasuringPointViewMixin, generics.CreateAPIView, generics.UpdateAPIView
+class MeasuringPointImageCreateView(  # pylint: disable=too-many-ancestors
+    ProjectMembershipRequiredMixin, generics.CreateAPIView, generics.UpdateAPIView
 ):
     serializer_class = serializers.MeasuringPointImageSerializer
 
@@ -45,8 +47,9 @@ class MeasuringPointImageCreateView(
     ) -> Project | None:
         if not obj:
             point_id = self.kwargs["measuring_point_id"]
-            return MeasuringPoint.objects.get(id=point_id).run.project
-        return obj and obj.measuring_point.run.project
+            # pylint: disable=protected-access
+            return MeasuringPoint._base_manager.get(id=point_id).run.project
+        return obj.measuring_point.run.project if obj else None
 
     def get_queryset(self):
         return MeasuringPointImage.objects.filter(
