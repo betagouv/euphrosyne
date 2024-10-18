@@ -16,7 +16,7 @@ class NotebookView(ProjectMembershipRequiredMixin, TemplateView):
     run: lab_models.Run
 
     # pylint: disable=arguments-differ
-    def dispatch(
+    def dispatch(  # type: ignore[override]
         self, request: HttpRequest, run_id: int, *args, **kwargs
     ) -> HttpResponse:
         self.run = get_object_or_404(lab_models.Run, pk=run_id)

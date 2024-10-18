@@ -9,7 +9,7 @@ from . import serializers
 
 
 class RunNotebookView(ProjectMembershipRequiredMixin, generics.UpdateAPIView):
-    queryset = RunNotebook.objects.all()
+    queryset = RunNotebook._default_manager.all()  # pylint: disable=protected-access
     serializer_class = serializers.RunNotebookSerializer
 
     lookup_url_kwarg = "run_id"
@@ -17,7 +17,7 @@ class RunNotebookView(ProjectMembershipRequiredMixin, generics.UpdateAPIView):
     def get_related_project(self, obj: RunNotebook | None = None) -> Project | None:
         if not obj:
             return None
-        return obj and obj.run.project
+        return obj.run.project if obj else None
 
     def get_object(self):
         """Same as generics.GenericAPIView.get_object
