@@ -1,6 +1,6 @@
 import { css } from "@emotion/react";
 import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
-import type { IMeasuringPoint, IMeasuringPointImage } from "../IMeasuringPoint";
+import type { IMeasuringPoint } from "../IMeasuringPoint";
 import MeasuringPointComments from "./MeasuringPointComments";
 import ObjectSelect from "./ObjectSelect";
 import { NotebookContext } from "../Notebook.context";
@@ -53,7 +53,6 @@ export default function MeasuringPoint({
         <div className="fr-col-12 fr-col-md-5">
           <MeasuringPointImageTile
             point={point}
-            image={point.image}
             onLocalizeImageClicked={onLocalizeImageClicked}
           />
         </div>
@@ -85,18 +84,18 @@ export default function MeasuringPoint({
 
 interface IMeasuringPointImageTileProps {
   point: IMeasuringPoint;
-  image?: IMeasuringPointImage;
   onLocalizeImageClicked: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 function MeasuringPointImageTile({
   point,
-  image,
   onLocalizeImageClicked,
 }: IMeasuringPointImageTileProps) {
   const t = {
     localizeOnObject: window.gettext("Locate point on image"),
     changeLocation: window.gettext("Edit point location on image"),
   };
+
+  const image = point.image;
 
   const { imageStorage } = useContext(NotebookContext);
 
@@ -112,7 +111,7 @@ function MeasuringPointImageTile({
         ),
       );
     }
-  }, [image, imageStorage, point.id]);
+  }, [imageStorage, point.id, point.image]);
 
   return (
     <div css={imageContainerStyle}>

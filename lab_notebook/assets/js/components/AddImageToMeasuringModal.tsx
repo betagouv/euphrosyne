@@ -13,6 +13,7 @@ import AddImageToObjectTransform from "./AddImageToObjectTransform";
 import {
   IImageTransform,
   IImagewithUrl,
+  IRunObjectImage,
   IRunObjectImageWithUrl,
 } from "../IImageTransform";
 import { RunObjectGroupImageServices } from "../notebook-image.services";
@@ -265,12 +266,18 @@ export default function AddImageToMeasuringModal({
           title: t.save,
           onClick: () =>
             addImageToPoint().then((image) => {
-              if (image && measuringPoint?.image)
+              if (
+                image &&
+                measuringPoint &&
+                (selectedRunObjectImage ||
+                  measuringPoint?.image?.runObjectGroupImage)
+              )
                 updateMeasuringPointImage(measuringPoint.id, {
                   ...image,
                   runObjectGroupImage:
                     selectedRunObjectImage ||
-                    measuringPoint.image?.runObjectGroupImage,
+                    (measuringPoint.image
+                      ?.runObjectGroupImage as IRunObjectImage),
                 });
               closeButtonRef.current?.click();
             }),
