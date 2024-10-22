@@ -15,6 +15,10 @@ import UploadObjectImage from "./UploadObjectImage";
 import ImageLoading from "./ImageLoading";
 import ImageWithPlaceholder from "../ImageWithPlaceholder";
 
+const selectedImageStyle = {
+  outline: "3px solid var(--border-active-blue-france)",
+};
+
 export default function AddImageToObject({
   runObjectGroup,
   selectedObjectImage,
@@ -158,6 +162,7 @@ function ObjectImageGallery<T extends IImagewithUrl>({
   images,
   loading = false,
   noImageText,
+  selectedImage,
   onImageSelect,
 }: IObjectImageGalleryProps<T>) {
   return (
@@ -175,6 +180,7 @@ function ObjectImageGallery<T extends IImagewithUrl>({
             transform={i.transform}
             alt=""
             key={i.url + "-" + JSON.stringify(i.transform)}
+            css={selectedImage === i ? selectedImageStyle : undefined}
           />
         ))}
       </ImageGrid>
