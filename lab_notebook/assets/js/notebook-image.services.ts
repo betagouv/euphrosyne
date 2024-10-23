@@ -1,6 +1,7 @@
 import { jwtFetch } from "../../../lab/assets/js/jwt.js";
+import { UploadSasUrlMixin } from "../../../lab/assets/js/upload-sas-url-mixin";
 import { getCSRFToken } from "../../../lab/assets/js/utils.js";
-import { IRunObjectImage, IImagewithUrl } from "./IImageTransform.js";
+import { IRunObjectImage } from "./IImageTransform.js";
 
 export class StorageImageServices {
   protected projectSlug: string;
@@ -34,80 +35,24 @@ export class StorageImageServices {
   }
 }
 
-export class ObjectGroupImageServices {
+export class ObjectGroupImageServices extends UploadSasUrlMixin {
   protected projectSlug: string;
   protected objectGroupId: string;
+  protected uploadSasUrl: string;
 
   constructor(projectSlug: string, objectGroupId: string) {
+    super();
     this.projectSlug = projectSlug;
     this.objectGroupId = objectGroupId;
-  }
-
-  async listObjectGroupImages(): Promise<IImagewithUrl[]> {
-    const url =
+    this.uploadSasUrl =
       process.env.EUPHROSYNE_TOOLS_API_URL +
-      `/images/projects/${this.projectSlug}/object-groups/${this.objectGroupId}`;
-
-    const requestInit: RequestInit = {
-      method: "GET",
-    };
-
-    let response: Response | undefined;
-
-    try {
-      response = await jwtFetch(url, requestInit);
-    } catch (error) {
-      console.error(error);
-      return [];
-    }
-
-    const images = (await response?.json()) as { images: string[] } | undefined;
-
-    if (images) {
-      return images.images.map((image) => ({
-        url: image,
-        transform: undefined,
-      }));
-    }
-    return [];
+      `/images/upload/signed-url` +
+      `?project_name=${projectSlug}&object_group_id=${objectGroupId}`;
   }
 
   async getUploadSASUrl(fileName: string) {
-    const url =
-      process.env.EUPHROSYNE_TOOLS_API_URL +
-      `/images/upload/signed-url` +
-      `?project_name=${this.projectSlug}&object_group_id=${this.objectGroupId}&file_name=${fileName}`;
-
-    const response = await jwtFetch(url);
-
-    if (!response) {
-      throw new Error(
-        window.gettext("An error occured while requesting upload URL."),
-      );
-    }
-
-    if (!response.ok) {
-      const body = (await response.json()) as {
-        detail: { error_code?: string; message: string } | string;
-      };
-      if (typeof body.detail !== "string") {
-        if (body.detail.error_code === "extension-not-supported") {
-          throw new Error("File extension not supported.");
-        } else {
-          throw new Error(body.detail.message);
-        }
-      } else {
-        throw new Error(body.detail);
-      }
-    }
-
-    const data = (await response?.json()) as { url: string } | undefined;
-
-    if (data) {
-      return data.url;
-    }
-    throw new Error(
-      window.gettext("Didn't receive upload URL from euphrosyne tools."),
+    return this._getUploadSASUrl(
+      `${this.uploadSasUrl}&object_group_id=${this.objectGroupId}&file_name=${fileName}`,
     );
   }
 }

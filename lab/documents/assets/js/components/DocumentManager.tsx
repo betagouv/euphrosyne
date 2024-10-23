@@ -8,6 +8,11 @@ import { DocumentFileService } from "../document-file-service";
 import FileTable, { Col } from "../../../../assets/js/components/FileTable";
 import DocumentUploadModal from "./DocumentUploadModal";
 import BaseFileActionCell from "../../../../assets/js/components/BaseFileActionCell";
+import { IImagewithUrl } from "../../../../../lab_notebook/assets/js/IImageTransform";
+import { ProjectImageServices } from "../project-image-service";
+import ImageGrid from "../../../../../lab_notebook/assets/js/components/ImageGrid";
+import ImageWithPlaceholder from "../../../../../lab_notebook/assets/js/ImageWithPlaceholder";
+import { uploadFile } from "../../../../assets/js/blob-service";
 
 interface DocumentManagerProps {
   project: {
@@ -51,17 +56,35 @@ export default function DocumentManager({
 }: DocumentManagerProps) {
   const t = {
     "Add a document": window.gettext("Add a document"),
+    Images: window.gettext("Images"),
   };
 
   const [isLoading, setIsLoading] = useState(true);
   const [files, setFiles] = useState<EuphrosyneFile[]>([]);
 
+  const [images, setImages] = useState<IImagewithUrl[]>([]);
+
   const fileService = new DocumentFileService(project.name, project.slug);
+  const imageService = new ProjectImageServices(project.slug);
+
+  const uploadFiles = async (files: File[]) => {
+    const images = files.filter((file) => file.type.startsWith("image/"));
+    const documents = files.filter((file) => !file.type.startsWith("image/"));
+    const documentPromises = fileService.uploadFiles(documents);
+    const imagePromises = images.map(async (i) => {
+      const url = await imageService.getUploadSASUrl(i.name);
+      return uploadFile(i, url);
+    });
+    return Promise.allSettled([...documentPromises, ...imagePromises]);
+  };
 
   const fetchFiles = async () => {
     setIsLoading(true);
-    const files = await fileService.listData();
-    setFiles(files);
+    const promises = [
+      fileService.listData().then(setFiles),
+      imageService.listProjectImages().then(setImages),
+    ];
+    await Promise.allSettled(promises);
     setIsLoading(false);
   };
 
@@ -95,9 +118,20 @@ export default function DocumentManager({
         }
       />
 
+      <h2>{t["Images"]}</h2>
+      <ImageGrid hideFrom={10}>
+        {images.map((image) => (
+          <ImageWithPlaceholder
+            key={image.url.split("?")[0]}
+            src={image.url}
+            alt=""
+          />
+        ))}
+      </ImageGrid>
+
       <DocumentUploadModal
         id={uploadModalId}
-        onUploadFile={(files: File[]) => fileService.uploadFiles(files)}
+        onUploadFile={(files: File[]) => uploadFiles(files)}
         onUploadError={(fileName: string) => fileService.deleteFile(fileName)}
         onAnyUploadSucccess={fetchFiles}
         hintText={form.hintText}

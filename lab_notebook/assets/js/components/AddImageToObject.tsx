@@ -14,6 +14,7 @@ import ImageGrid from "./ImageGrid";
 import UploadObjectImage from "./UploadObjectImage";
 import ImageLoading from "./ImageLoading";
 import ImageWithPlaceholder from "../ImageWithPlaceholder";
+import { ProjectImageServices } from "../../../../lab/documents/assets/js/project-image-service";
 
 const selectedImageStyle = {
   outline: "3px solid var(--border-active-blue-france)",
@@ -39,10 +40,7 @@ export default function AddImageToObject({
       window.gettext("Images of object %s used in this run"),
       [objectGroup.label],
     ),
-    otherObjectImages: window.interpolate(
-      window.gettext("Other images of object %s"),
-      [objectGroup.label],
-    ),
+    otherObjectImages: window.gettext("Other images of this project"),
     noObjectImage: window.gettext(
       "No image has been upload for this object group / object. You can upload one or import one from the project documents.",
     ),
@@ -57,6 +55,7 @@ export default function AddImageToObject({
     projectSlug,
     objectGroup.id,
   );
+  const projectImageService = new ProjectImageServices(projectSlug);
   const runObjectGroupImageService = new RunObjectGroupImageServices(
     runObjectGroup.id,
   );
@@ -71,16 +70,16 @@ export default function AddImageToObject({
 
   const fetchImagesFn = async () => {
     const promises = [
-      objectGroupImageService.listObjectGroupImages(),
+      projectImageService.listProjectImages(),
       runObjectGroupImageService.listRunObjectGroupImages(),
     ];
 
-    const [_objectImagesPromise, _runObjectImagesPromise] =
+    const [_projectImagesPromise, _runObjectImagesPromise] =
       await Promise.allSettled(promises);
 
     let _objectImages: IImagewithUrl[] = [];
-    if (_objectImagesPromise.status === "fulfilled") {
-      _objectImages = _objectImagesPromise.value as IImagewithUrl[];
+    if (_projectImagesPromise.status === "fulfilled") {
+      _objectImages = _projectImagesPromise.value as IImagewithUrl[];
     }
 
     setFetchingObjectImages(false);
@@ -106,7 +105,7 @@ export default function AddImageToObject({
 
   const onUpload = (url: string) => {
     // Refetch images
-    objectGroupImageService.listObjectGroupImages().then((images) => {
+    projectImageService.listProjectImages().then((images) => {
       setObjectImages(images);
       // Select uploaded image
       const _image = images.find(
