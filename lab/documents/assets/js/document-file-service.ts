@@ -15,13 +15,11 @@ export class DocumentFileService extends FileService {
     this.uploadPresignURL = `${process.env.EUPHROSYNE_TOOLS_API_URL}/data/${projectName}/documents/upload/shared_access_signature`;
   }
 
-  async uploadFiles(files: File[]) {
-    return await Promise.allSettled(
-      files.map(async (file) => {
-        const url = await this.fetchUploadPresignedURL(file.name);
-        return this.uploadFile(file, url);
-      }),
-    );
+  uploadFiles(files: File[]) {
+    return files.map(async (file) => {
+      const url = await this.fetchUploadPresignedURL(file.name);
+      return this.uploadFile(file, url);
+    });
   }
 
   uploadFile(file: File, url: string) {
