@@ -1,6 +1,8 @@
 from django.test import Client, TestCase
 from django.urls import reverse
 
+from euphro_auth.tests import factories as auth_factories
+
 from .. import factories
 
 
@@ -10,7 +12,7 @@ class TestRunView(TestCase):
         self.client = client = Client()
         self.api_url = reverse("api:run-detail-methods", args=[run.id])
 
-        client.force_login(factories.LabAdminUserFactory())
+        client.force_login(auth_factories.LabAdminUserFactory())
 
         self.june_project = factories.RunFactory(
             start_date="2023-06-01 10:00:00", end_date="2023-06-30 10:00:00"

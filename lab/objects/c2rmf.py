@@ -1,10 +1,13 @@
 import os
 import typing
+from functools import lru_cache
 from typing import Any
 
 import requests
 
-from ..models import ObjectGroup, Period
+from lab.thesauri.models import Era
+
+from ..models import ObjectGroup
 
 
 class ErosHTTPError(requests.RequestException):
@@ -50,6 +53,7 @@ class ErosData(typing.TypedDict):
     images: typing.NotRequired[list[ErosImage]]
 
 
+@lru_cache
 def _fetch_object_group_from_eros(c2rmf_id: str) -> ErosData | None:
     """Fetch object group from EROS."""
     token = os.environ["EROS_HTTP_TOKEN"]
@@ -90,7 +94,7 @@ def fetch_full_objectgroup_from_eros(
     updated_og.label = data["title"]
     if data.get("dtfrom") or data.get("period"):
         dating_label = data.get("dtfrom") or data["period"]
-        updated_og.dating = Period(label=dating_label)
+        updated_og.dating_era = Era(label=dating_label)
     updated_og.collection = data.get("collection") or ""
     updated_og.inventory = data.get("inv") or ""
     updated_og.materials = (data.get("support") or "").split(" / ")

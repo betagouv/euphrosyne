@@ -11,6 +11,9 @@ class RunManager(models.Manager):
     def only_finished(self):
         return super().get_queryset().filter(end_date__lt=timezone.now())
 
+    def only_not_embargoed(self):
+        return super().get_queryset().filter(embargo_date__lte=timezone.now())
+
 
 class Run(TimestampedModel, MethodModel):
     class Meta:
@@ -87,3 +90,7 @@ class Run(TimestampedModel, MethodModel):
         except IndexError as exception:
             raise AttributeError("Run has no next status") from exception
         return next_status
+
+    @property
+    def is_data_embargoed(self):
+        return self.embargo_date is None or self.embargo_date > timezone.now().date()

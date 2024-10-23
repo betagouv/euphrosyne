@@ -2,28 +2,14 @@ from datetime import datetime, timedelta, timezone
 
 import factory
 import factory.fuzzy
-from django.contrib.auth import get_user_model
+
+from euphro_auth.tests.factories import StaffUserFactory
+from lab.thesauri.models import Era
 
 from ..models import Object, ObjectGroup, Participation, Period, Project, Run
+from ..objects.models import Location
 
 NOW = datetime.now(tz=timezone.utc)
-
-
-class StaffUserFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = get_user_model()
-
-    first_name = factory.Faker("first_name")
-    last_name = factory.Faker("last_name")
-    email = factory.LazyAttribute(
-        lambda u: f"{u.first_name}.{u.last_name}@example.com".lower()
-    )
-    password = factory.Faker("password")
-    is_staff = True
-
-
-class LabAdminUserFactory(StaffUserFactory):
-    is_lab_admin = True
 
 
 class ParticipationFactory(factory.django.DjangoModelFactory):
@@ -107,6 +93,10 @@ class RunForceNoMethodFactory(RunFactory):
         }
 
 
+class NotEmbargoedRun(RunFactory):
+    embargo_date = NOW.date() - timedelta(days=1)
+
+
 class RunReadyToAskExecFactory(RunFactory):
     # pylint: disable=no-member
     status = Run.Status.CREATED.value
@@ -116,6 +106,13 @@ class RunReadyToAskExecFactory(RunFactory):
 class PeriodFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Period
+
+    label = factory.Faker("date")
+
+
+class EraFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Era
 
     label = factory.Faker("date")
 
@@ -132,10 +129,20 @@ class ObjectGroupFactory(factory.django.DjangoModelFactory):
         model = ObjectGroup
 
     label = factory.Faker("name")
-    dating = factory.SubFactory(PeriodFactory)
+    dating_period = factory.SubFactory(PeriodFactory)
+    dating_era = factory.SubFactory(EraFactory)
     materials = factory.fuzzy.FuzzyChoice(["wood", "stone", "glass", "metal"], list)
     object_count = 3
 
     @factory.post_generation
     def objects(self, *args, **kwargs):
         return ObjectFactory.create_batch(3, group_id=self.id)
+
+
+class LocationFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Location
+
+    label = factory.Faker("name")
+    latitude = factory.Faker("latitude")
+    longitude = factory.Faker("longitude")

@@ -2,6 +2,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from euphro_auth.tests import factories as auth_factories
 from lab.api_views.project import (
     IsLabAdminUser,
     ProjectList,
@@ -18,7 +19,7 @@ class TestProjectListView(TestCase):
         self.client = client = Client()
         self.api_url = reverse("api:project-list")
 
-        client.force_login(factories.LabAdminUserFactory())
+        client.force_login(auth_factories.LabAdminUserFactory())
 
         self.june_project = factories.RunFactory(
             start_date="2023-06-01 10:00:00", end_date="2023-06-30 10:00:00"
@@ -113,7 +114,7 @@ class TestUpcomingProjectListView(TestCase):
         self.client = client = Client()
         self.api_url = reverse("api:project-upcoming-list")
 
-        client.force_login(factories.LabAdminUserFactory())
+        client.force_login(auth_factories.LabAdminUserFactory())
 
         self.last_month_project = factories.RunFactory(
             start_date=timezone.now() - timezone.timedelta(days=30),

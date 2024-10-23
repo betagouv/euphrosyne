@@ -1,0 +1,31 @@
+{% load i18n %}
+
+{% autoescape off %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% trans "Data Request" %}</title>
+</head>
+<body>
+    <h1>{% trans "Data Request" %}</h1>
+    <p>{% trans "Thank you for your interest in New AGLAE data catalog. We have processed your request and generated the following links for you to download the data you have selected:" %}</p>
+    
+    <ul>
+        {% for link in links %}
+        <li>
+            <a href="{{ link.url }}">{{ link.name }}</a>
+             - {% if link.data_type == "raw_data" %}{% trans "Raw data" %}{% else %}{% trans "Processed data" %}{% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    
+    <p>{% trans "Please click on the links above to download the data. If you have any further questions or need assistance, please feel free to contact us." %}</p>
+    <p>{% blocktranslate with formatted_exp_date=expiration_date|date:"DATETIME_FORMAT"%}Note that the links will be active until {{ formatted_exp_date  }}.{% endblocktranslate %}</p>
+
+    
+    <p>{% trans "Thank you" %},</p>
+    <p>{% trans "The New AGLAE Team" %}</p>
+</body>
+</html>
+{% endautoescape %}

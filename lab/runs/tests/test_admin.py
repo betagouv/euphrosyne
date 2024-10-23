@@ -9,6 +9,7 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 
+from euphro_auth.tests import factories as auth_factories
 from lab.projects.models import Project
 from lab.tests import factories
 
@@ -21,7 +22,7 @@ class TestRunAdminPermissions(TestCase):
     def setUp(self):
         self.run_admin = RunAdmin(model=Run, admin_site=AdminSite())
         self.project = factories.ProjectWithLeaderFactory()
-        self.lab_admin = factories.LabAdminUserFactory()
+        self.lab_admin = auth_factories.LabAdminUserFactory()
         self.member = get_user_model().objects.get(participation__project=self.project)
         self.new_run = factories.RunFactory(
             status=Run.Status.CREATED, project=self.project
@@ -70,9 +71,9 @@ class TestRunAdminParams(TestCase):
         self.run_admin = RunAdmin(model=Run, admin_site=AdminSite())
         self.project = factories.ProjectWithLeaderFactory()
         self.leader_user = self.project.leader.user
-        self.member_user = factories.StaffUserFactory()
+        self.member_user = auth_factories.StaffUserFactory()
         self.project.members.add(self.member_user)
-        self.lab_admin_user = factories.LabAdminUserFactory()
+        self.lab_admin_user = auth_factories.LabAdminUserFactory()
         self.run = factories.RunFactory(project=self.project)
 
     def test_project_is_readonly_when_change(self):
@@ -136,28 +137,28 @@ class TestRunAdminParams(TestCase):
     def test_project_when_adding_from_project(self):
         project = factories.ProjectFactory()
         request = RequestFactory().get(f"{self.add_url}?project={project.id}")
-        user = request.user = factories.StaffUserFactory()
+        user = request.user = auth_factories.LabAdminUserFactory()
         project.members.add(user)
         # pylint: disable=protected-access
         assert self.run_admin._get_project(request) == project
 
     def test_project_is_none_when_adding(self):
         request = RequestFactory().get(reverse("admin:lab_run_add"))
-        request.user = factories.StaffUserFactory()
+        request.user = auth_factories.LabAdminUserFactory()
         # pylint: disable=protected-access
         assert self.run_admin._get_project(request) is None
 
     def test_project_is_none_when_not_a_member(self):
         project = factories.ProjectFactory()
         request = RequestFactory().get(f"{self.add_url}?project={project.id}")
-        request.user = factories.StaffUserFactory()
+        request.user = auth_factories.StaffUserFactory()
         # pylint: disable=protected-access
         assert self.run_admin._get_project(request) is None
 
     def test_project_when_admin(self):
         project = factories.ProjectFactory()
         request = RequestFactory().get(f"{self.add_url}?project={project.id}")
-        request.user = factories.LabAdminUserFactory()
+        request.user = auth_factories.LabAdminUserFactory()
         # pylint: disable=protected-access
         assert self.run_admin._get_project(request) == project
 
@@ -165,8 +166,8 @@ class TestRunAdminParams(TestCase):
 class TestRunAdminViewAsLeader(TestCase):
     def setUp(self):
         self.request_factory = RequestFactory()
-        self.staff_user = factories.StaffUserFactory()
-        self.project_leader_user = factories.StaffUserFactory()
+        self.staff_user = auth_factories.StaffUserFactory()
+        self.project_leader_user = auth_factories.StaffUserFactory()
         self.project = factories.ProjectFactory()
         self.project.participation_set.create(
             user=self.project_leader_user, is_leader=True
@@ -262,7 +263,7 @@ class TestRunAdminViewAsLeader(TestCase):
 class TestRunAdminViewAsAdmin(TestCase):
     def setUp(self):
         self.request_factory = RequestFactory()
-        self.admin_user = factories.LabAdminUserFactory()
+        self.admin_user = auth_factories.LabAdminUserFactory()
         self.admin_project_1 = factories.ProjectFactory()
         self.admin_project_1.participation_set.create(
             user=self.admin_user, is_leader=True
@@ -356,7 +357,7 @@ class TestRunAdminMethodFieldset(TestCase):
             )
             + f"?project={self.project.id}"
         )
-        self.admin_user = factories.LabAdminUserFactory()
+        self.admin_user = auth_factories.LabAdminUserFactory()
         self.request.user = self.admin_user
         self.request.resolver_match = MagicMock()
         self.run_admin = RunAdmin(Run, admin_site=AdminSite())
@@ -381,7 +382,7 @@ class TestRunAdminScheduleAction(TestCase):
     def setUp(self):
         self.run = factories.RunFactory()
         self.project = self.run.project
-        self.admin_user = factories.LabAdminUserFactory()
+        self.admin_user = auth_factories.LabAdminUserFactory()
         self.run_admin = RunAdmin(Run, admin_site=AdminSite())
 
         now = timezone.now()
@@ -452,7 +453,7 @@ class TestRunAdminScheduleAction(TestCase):
             ),
             data=self.correct_data,
         )
-        request.user = factories.StaffUserFactory()
+        request.user = auth_factories.StaffUserFactory()
         self.run.project.members.add(request.user)
 
         with pytest.raises(PermissionDenied):

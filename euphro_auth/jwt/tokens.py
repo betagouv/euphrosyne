@@ -24,4 +24,6 @@ class EuphroToolsAPIToken(RefreshToken):
     def for_euphrosyne(cls):
         token = cls()
         token[rf_simplejwt_api_settings.USER_ID_CLAIM] = "euphrosyne"
+        token["projects"] = []
+        token["is_admin"] = True
         return token

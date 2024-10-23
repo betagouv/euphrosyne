@@ -8,7 +8,7 @@
 
     const parentField = event.target.closest(baseSelector);
     parentField.querySelector(`${baseSelector}__label`).value = label;
-    parentField.querySelector(`${baseSelector}__theso_joconde_id`).value = id;
+    parentField.querySelector(`${baseSelector}__concept_id`).value = id;
 
     parentField.querySelector(".typeahead-list").classList.add("hidden");
   }
@@ -19,21 +19,20 @@
     const idInput = datingField.querySelector(`${baseSelector}__id`);
     if (idInput.value && idInput.value !== "") {
       idInput.value = "";
-      datingField.querySelector(`${baseSelector}__theso_joconde_id`).value = "";
+      datingField.querySelector(`${baseSelector}__concept_id`).value = "";
     }
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    // Add event listeners to institution input elements
+    // Add event listeners to dating input elements
     document.querySelectorAll(`${baseSelector}`).forEach((el) => {
       el.querySelector(`${baseSelector}__label`).addEventListener(
         "input",
         onInput,
       );
-      el.querySelector("div[is='period-type-ahead']").addEventListener(
-        "result-click",
-        onResultClicked,
-      );
+      el.querySelector(
+        "div[is='dating-open-theso-type-ahead']",
+      ).addEventListener("result-click", onResultClicked);
     });
   });
 })();

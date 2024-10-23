@@ -11,13 +11,9 @@ from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 
+from euphro_auth.tests.factories import LabAdminUserFactory
 from lab.models import Institution
-from lab.tests.factories import (
-    LabAdminUserFactory,
-    ProjectFactory,
-    ProjectWithLeaderFactory,
-    RunFactory,
-)
+from lab.tests.factories import ProjectFactory, ProjectWithLeaderFactory, RunFactory
 
 from ..admin import (
     BeamTimeRequestInline,

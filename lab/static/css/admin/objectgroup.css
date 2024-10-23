@@ -34,7 +34,7 @@ input[type="submit"][disabled].default {
   margin-bottom: 1rem;
 }
 
-.field-discovery_place_location, .field-dating, .field-materials {
+.field-discovery_place_location, .field-dating_period, .field-dating_era, .field-materials {
   overflow: initial;
 }
 
