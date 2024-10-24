@@ -37,6 +37,7 @@ export default {
       "@gouvfr/dsfr/dist/utility/icons/icons-user/icons-user.min.css",
       "@gouvfr/dsfr/dist/utility/icons/icons-map/icons-map.min.css",
       "@gouvfr/dsfr/dist/utility/icons/icons-media/icons-media.min.css",
+      "@gouvfr/dsfr/dist/utility/icons/icons-development/icons-development.min.css",
       "@gouvfr/dsfr/dist/utility/colors/colors.min.css",
       "remixicon/fonts/remixicon.css",
     ],

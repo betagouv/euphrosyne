@@ -38,23 +38,7 @@
               <br>{% if run.embargo_date %}{{ run.embargo_date|date:"SHORT_DATE_FORMAT" }}{% else %}-{% endif %}
             </p>
 
-            <div class="fr-text--xs mb-0">{% translate "Experimental conditions" %}</div>
-            <div class="flex-container fr-text--sm fr-mb-1v">
-              <p>
-                <span class="fr-text--xs">{% translate "Particle type" %}</span>
-                <br>{{ run.particle_type|default:"-" }}
-              </p>
-              <p>
-                <span class="fr-text--xs">{% translate "Energy" %}</span>
-                <br>{{ run.energy_in_keV|default:"-" }}
-              </p>
-              <p>
-                <span class="fr-text--xs">{% translate "Beamline" %}</span>
-                <br>{{ run.beamline|default:"-" }}
-              </p>
-            </div>
-            
-            {% run_methods_repr run %}
+            {% include "admin/lab/run/includes/run_experimental_conditions.html" %}
             
           </div>
         </div>

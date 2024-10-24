@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     "django_filters",
     "lab",
     "data_request",
+    "lab_notebook",
     "orcid_oauth",
     "static_pages",
 ] + (["debug_toolbar"] if DEBUG else [])
