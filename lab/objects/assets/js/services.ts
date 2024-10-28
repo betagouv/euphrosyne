@@ -7,6 +7,7 @@ interface ObjectGroupResponseElement {
   object_count: number;
   dating: string; // this is linked to Django ObjectGroup.dating_era
   materials: string[];
+  c2rmf_id: string;
 }
 
 interface RunObjectGroupsResponseElement {
@@ -56,6 +57,7 @@ export async function fetchRunObjectGroups(
       objectCount: ro.objectgroup.object_count,
       dating: ro.objectgroup.dating,
       materials: ro.objectgroup.materials,
+      c2rmfId: ro.objectgroup.c2rmf_id,
     },
   }));
 }
@@ -75,6 +77,7 @@ export async function fetchAvailableObjectGroups(
     objectCount: objectgroup.object_count,
     dating: objectgroup.dating,
     materials: objectgroup.materials,
+    c2rmfId: objectgroup.c2rmf_id,
   }));
 }
 

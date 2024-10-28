@@ -21,7 +21,8 @@ import AddMeasuringPointToImage from "./AddMeasuringPointToImage";
 import { IPointLocation } from "../IImagePointLocation";
 import { addMeasuringPointImage } from "../../../../lab/assets/js/measuring-point.services";
 import { NotebookContext } from "../Notebook.context";
-import { constructImageStorageUrl } from "../utils";
+import { constructImageStorageUrl, extractPath } from "../utils";
+import { getToken } from "../../../../shared/js/jwt";
 
 type StepNumber = 1 | 11 | 12 | 21;
 
@@ -123,10 +124,9 @@ export default function AddImageToMeasuringModal({
   };
 
   // Adding image & transformation to DB
-
   const addImageToRunObjectGroup = async () => {
     if (runObjectGroup && selectedObjectImage) {
-      const path = new URL(selectedObjectImage.url).pathname;
+      const path = extractPath(new URL(selectedObjectImage.url).pathname);
       const savedImage = await new RunObjectGroupImageServices(
         runObjectGroup?.id,
       ).addRunObjectGroupImage({
@@ -206,7 +206,9 @@ export default function AddImageToMeasuringModal({
           title: t.continueAdjustImage,
           onClick: () => setCurrentStep(12),
           frType: "secondary",
-          disabled: !selectedObjectImage,
+          disabled:
+            !selectedObjectImage ||
+            selectedObjectImage.url.includes("eros/iiif"), // Hack to prevent resizing eros images while it is not implemented
         },
         {
           title: t.back,
@@ -317,15 +319,18 @@ export default function AddImageToMeasuringModal({
       if (currentStep !== 21 && measuringPoint?.image && imageStorage) {
         const { runObjectGroupImage } = measuringPoint.image;
         setPointLocation(measuringPoint.image.pointLocation);
-        setSelectedRunObjectImage({
-          ...runObjectGroupImage,
-          url: constructImageStorageUrl(
-            runObjectGroupImage.path,
-            imageStorage.baseUrl,
-            imageStorage.token,
-          ),
+        getToken(true).then((token) => {
+          setSelectedRunObjectImage({
+            ...runObjectGroupImage,
+            url: constructImageStorageUrl(
+              runObjectGroupImage.path,
+              imageStorage.baseUrl,
+              imageStorage.token,
+              token,
+            ),
+          });
+          setCurrentStep(21);
         });
-        setCurrentStep(21);
       }
       // Go to second step if object group is set
       else if (currentStep !== 11) {

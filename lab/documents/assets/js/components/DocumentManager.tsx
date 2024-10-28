@@ -13,6 +13,7 @@ import { ProjectImageServices } from "../project-image-service";
 import ImageGrid from "../../../../../lab_notebook/assets/js/components/ImageGrid";
 import ImageWithPlaceholder from "../../../../../lab_notebook/assets/js/ImageWithPlaceholder";
 import { uploadFile } from "../../../../assets/js/blob-service";
+import { useClientContext } from "../../../../../shared/js/EuphrosyneToolsClient.context";
 
 interface DocumentManagerProps {
   project: {
@@ -64,8 +65,17 @@ export default function DocumentManager({
 
   const [images, setImages] = useState<IImagewithUrl[]>([]);
 
-  const fileService = new DocumentFileService(project.name, project.slug);
-  const imageService = new ProjectImageServices(project.slug);
+  const toolsClient = useClientContext();
+
+  const fileService = new DocumentFileService(
+    project.name,
+    project.slug,
+    toolsClient.fetchFn,
+  );
+  const imageService = new ProjectImageServices(
+    project.slug,
+    toolsClient.fetchFn,
+  );
 
   const uploadFiles = async (files: File[]) => {
     const images = files.filter((file) => file.type.startsWith("image/"));

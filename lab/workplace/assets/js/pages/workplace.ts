@@ -16,6 +16,7 @@ import WorkplaceRunTabs, {
 } from "../components/WorkplaceRunTabs";
 import { RawDataFileService } from "../raw-data/raw-data-file-service";
 import { ProcessedDataFileService } from "../processed-data/processed-data-file-service";
+import toolsFetch from "../../../../../shared/js/euphrosyne-tools-client";
 
 export type WorkplacePageData = Omit<
   WorkplaceRunTabsProps,
@@ -42,10 +43,15 @@ document.addEventListener("DOMContentLoaded", () => {
       project,
       runs: runs.map((run) => ({
         ...run,
-        rawDataFileService: new RawDataFileService(project.slug, run.label),
+        rawDataFileService: new RawDataFileService(
+          project.slug,
+          run.label,
+          toolsFetch,
+        ),
         processedDataFileService: new ProcessedDataFileService(
           project.slug,
           run.label,
+          toolsFetch,
         ),
       })),
     }),
@@ -53,7 +59,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderComponent(
     "project-config-image-definitions",
-    createElement(ProjectImageDefinitionSelect, { projectSlug: project.slug }),
+    createElement(ProjectImageDefinitionSelect, {
+      projectSlug: project.slug,
+      fetchFn: toolsFetch,
+    }),
   );
 
   document.querySelectorAll(".run-data-download-btn").forEach((btn) => {
@@ -67,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
         project.slug,
         target.dataset.runName,
         target.dataset.runDataType,
+        toolsFetch,
       );
     });
   });

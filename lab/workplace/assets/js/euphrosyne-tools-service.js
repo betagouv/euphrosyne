@@ -1,12 +1,9 @@
-import { jwtFetch } from "../../../assets/js/jwt.js";
+import { jwtFetch } from "../../../../shared/js/jwt.js";
 
-async function fetchVMConnectionLink(projectSlug) {
-  const response = await jwtFetch(
-    `${process.env.EUPHROSYNE_TOOLS_API_URL}/connect/${projectSlug}`,
-    {
-      method: "GET",
-    },
-  );
+async function fetchVMConnectionLink(projectSlug, fetchFn = jwtFetch) {
+  const response = await fetchFn(`/connect/${projectSlug}`, {
+    method: "GET",
+  });
   if (response.ok) {
     return (await response.json())["url"];
   } else if (response.status === 404) {
@@ -15,13 +12,10 @@ async function fetchVMConnectionLink(projectSlug) {
   throw new Error(`An error occured while fetching project ${projectSlug} VM`);
 }
 
-async function fetchDeploymentStatus(projectSlug) {
-  const response = await jwtFetch(
-    `${process.env.EUPHROSYNE_TOOLS_API_URL}/deployments/${projectSlug}`,
-    {
-      method: "GET",
-    },
-  );
+async function fetchDeploymentStatus(projectSlug, fetchFn = jwtFetch) {
+  const response = await fetchFn(`/deployments/${projectSlug}`, {
+    method: "GET",
+  });
   if (response.ok) {
     return (await response.json())["status"];
   } else if (response.status === 404) {
@@ -32,44 +26,32 @@ async function fetchDeploymentStatus(projectSlug) {
   );
 }
 
-function deployVM(projectSlug) {
-  return jwtFetch(
-    `${process.env.EUPHROSYNE_TOOLS_API_URL}/deployments/${projectSlug}`,
-    {
-      method: "POST",
-    },
-  );
+function deployVM(projectSlug, fetchFn = jwtFetch) {
+  return fetchFn(`/deployments/${projectSlug}`, {
+    method: "POST",
+  });
 }
 
-function deleteVM(projectSlug) {
-  return jwtFetch(
-    `${process.env.EUPHROSYNE_TOOLS_API_URL}/vms/${projectSlug}`,
-    {
-      method: "DELETE",
-    },
-  );
+function deleteVM(projectSlug, fetchFn = jwtFetch) {
+  return fetchFn(`/vms/${projectSlug}`, {
+    method: "DELETE",
+  });
 }
 
-async function fetchProjectVmSize(projectSlug) {
-  const response = await jwtFetch(
-    `${process.env.EUPHROSYNE_TOOLS_API_URL}/config/${projectSlug}/vm-size`,
-    {
-      method: "GET",
-    },
-  );
+async function fetchProjectVmSize(projectSlug, fetchFn = jwtFetch) {
+  const response = await fetchFn(`/config/${projectSlug}/vm-size`, {
+    method: "GET",
+  });
   if (response.ok) {
     return (await response.json())["vm_size"];
   }
 }
 
-async function setProjectVmSize(projectSlug, vmSize) {
-  return jwtFetch(
-    `${process.env.EUPHROSYNE_TOOLS_API_URL}/config/${projectSlug}/vm-size`,
-    {
-      method: "POST",
-      body: JSON.stringify({ vm_size: vmSize }),
-    },
-  );
+async function setProjectVmSize(projectSlug, vmSize, fetchFn = jwtFetch) {
+  return fetchFn(`/config/${projectSlug}/vm-size`, {
+    method: "POST",
+    body: JSON.stringify({ vm_size: vmSize }),
+  });
 }
 
 const exports = {

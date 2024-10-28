@@ -7,6 +7,10 @@ import MeasuringPoints from "./MeasuringPoints";
 import { NotebookContext, useNotebookContext } from "../Notebook.context";
 import { StorageImageServices } from "../notebook-image.services";
 import MeasuringPointImageGallery from "./MeasuringPointImageGallery";
+import {
+  EuphrosyneToolsClientContext,
+  useClientContext,
+} from "../../../../shared/js/EuphrosyneToolsClient.context";
 
 interface NotebookProps {
   runId: string;
@@ -25,6 +29,8 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
   const { setImageStorage, measuringPoints, setMeasuringPoints } =
     notebookContext;
 
+  const toolsClient = useClientContext();
+
   const getNextMeasuringPointName = () => {
     const n = measuringPoints.length + 1;
     return n > 9 ? "0" + n : "00" + n;
@@ -41,40 +47,42 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
 
   useEffect(() => {
     listMeasuringPoints(runId).then(setMeasuringPoints);
-    new StorageImageServices(notebookContext.projectSlug)
+    new StorageImageServices(notebookContext.projectSlug, toolsClient.fetchFn)
       .getImagesUrlAndToken()
       .then(setImageStorage);
   }, []);
 
   return (
-    <NotebookContext.Provider value={notebookContext}>
-      <div>
-        <div className="flex-container fr-mt-3w">
-          <h4>{t.gallery}</h4>
-        </div>
-        <MeasuringPointImageGallery />
-
-        <div className="fr-mt-4w">
-          <div className="flex-container">
-            <h4>{t["Measuring points"]}</h4>
-            <div>
-              <button
-                className="fr-btn fr-btn--secondary"
-                onClick={onAddPointClick}
-              >
-                {t["Add point"]}
-              </button>
-            </div>
+    <EuphrosyneToolsClientContext.Provider value={toolsClient}>
+      <NotebookContext.Provider value={notebookContext}>
+        <div>
+          <div className="flex-container fr-mt-3w">
+            <h4>{t.gallery}</h4>
           </div>
-          <MeasuringPoints
-            points={measuringPoints}
-            runId={runId}
-            onAddObjectToPoint={() =>
-              listMeasuringPoints(runId).then(setMeasuringPoints)
-            }
-          />
+          <MeasuringPointImageGallery />
+
+          <div className="fr-mt-4w">
+            <div className="flex-container">
+              <h4>{t["Measuring points"]}</h4>
+              <div>
+                <button
+                  className="fr-btn fr-btn--secondary"
+                  onClick={onAddPointClick}
+                >
+                  {t["Add point"]}
+                </button>
+              </div>
+            </div>
+            <MeasuringPoints
+              points={measuringPoints}
+              runId={runId}
+              onAddObjectToPoint={() =>
+                listMeasuringPoints(runId).then(setMeasuringPoints)
+              }
+            />
+          </div>
         </div>
-      </div>
-    </NotebookContext.Provider>
+      </NotebookContext.Provider>
+    </EuphrosyneToolsClientContext.Provider>
   );
 }

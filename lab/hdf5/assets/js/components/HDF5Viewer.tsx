@@ -1,5 +1,5 @@
 import { App, H5GroveProvider } from "@h5web/app";
-import { getToken } from "../../../../assets/js/jwt";
+import { getToken } from "../../../../../shared/js/jwt";
 import { useEffect, useState } from "react";
 import { Axios } from "axios";
 

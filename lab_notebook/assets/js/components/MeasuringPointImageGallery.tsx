@@ -5,6 +5,7 @@ import { IRunObjectImage } from "../IImageTransform";
 import { css } from "@emotion/react";
 import ImageGrid from "./ImageGrid";
 import CroppedImageDisplay from "./CroppedImageDisplay";
+import { getToken } from "../../../../shared/js/jwt";
 
 const modalStyle = css({
   position: "fixed",
@@ -24,6 +25,8 @@ export default function MeasuringPointImageGallery() {
 
   const { measuringPoints, imageStorage } = useContext(NotebookContext);
 
+  const [euphrosyneToken, setEuphrosyneToken] = useState<string | null>(null);
+
   const pointImages = measuringPoints
     .map((point) => point.image)
     .filter((i) => !!i);
@@ -42,6 +45,10 @@ export default function MeasuringPointImageGallery() {
       ).values(),
     ]);
   }, [pointImages.map((i) => i.runObjectGroupImage.path).join(",")]);
+
+  useEffect(() => {
+    getToken().then(setEuphrosyneToken);
+  });
 
   const getPointsForImage = useCallback(
     (image: IRunObjectImage) => {
@@ -71,7 +78,7 @@ export default function MeasuringPointImageGallery() {
       ) : (
         <p>{t.helpText}</p>
       )}
-      {imageStorage && (
+      {imageStorage && euphrosyneToken && (
         <ImageGrid>
           {usedRunObjectImages.map((image, idx) => (
             <div
@@ -87,6 +94,7 @@ export default function MeasuringPointImageGallery() {
                   image.path,
                   imageStorage.baseUrl,
                   imageStorage.token,
+                  euphrosyneToken,
                 )}
                 transform={image.transform}
                 measuringPoints={getPointsForImage(image)}

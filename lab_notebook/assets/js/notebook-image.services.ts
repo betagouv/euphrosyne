@@ -1,21 +1,20 @@
-import { jwtFetch } from "../../../lab/assets/js/jwt.js";
 import { UploadSasUrlMixin } from "../../../lab/assets/js/upload-sas-url-mixin";
 import { getCSRFToken } from "../../../lab/assets/js/utils.js";
 import { IRunObjectImage } from "./IImageTransform.js";
 
 export class StorageImageServices {
+  protected fetchFn: typeof fetch;
   protected projectSlug: string;
 
-  constructor(projectSlug: string) {
+  constructor(projectSlug: string, fetchFn?: typeof fetch) {
     this.projectSlug = projectSlug;
+    this.fetchFn = fetchFn || fetch;
   }
 
   async getImagesUrlAndToken() {
-    const url =
-      process.env.EUPHROSYNE_TOOLS_API_URL +
-      `/images/projects/${this.projectSlug}/signed-url`;
+    const url = `/images/projects/${this.projectSlug}/signed-url`;
 
-    const response = await jwtFetch(url);
+    const response = await this.fetchFn(url);
 
     if (!response?.ok) {
       console.error(response);
@@ -40,12 +39,15 @@ export class ObjectGroupImageServices extends UploadSasUrlMixin {
   protected objectGroupId: string;
   protected uploadSasUrl: string;
 
-  constructor(projectSlug: string, objectGroupId: string) {
-    super();
+  constructor(
+    projectSlug: string,
+    objectGroupId: string,
+    fetchFn?: typeof fetch,
+  ) {
+    super(fetchFn);
     this.projectSlug = projectSlug;
     this.objectGroupId = objectGroupId;
     this.uploadSasUrl =
-      process.env.EUPHROSYNE_TOOLS_API_URL +
       `/images/upload/signed-url` +
       `?project_name=${projectSlug}&object_group_id=${objectGroupId}`;
   }

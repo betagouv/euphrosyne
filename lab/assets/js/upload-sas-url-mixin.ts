@@ -1,10 +1,12 @@
-import { jwtFetch } from "./jwt";
-
 export class UploadSasUrlMixin {
-  async _getUploadSASUrl(url: string) {
-    // TODO merge with notebook-image.services.ts
+  fetchFn: typeof fetch;
 
-    const response = await jwtFetch(url);
+  constructor(fetchFn?: typeof fetch) {
+    this.fetchFn = fetchFn || fetch;
+  }
+
+  async _getUploadSASUrl(url: string) {
+    const response = await this.fetchFn(url);
 
     if (!response) {
       throw new Error(

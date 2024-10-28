@@ -7,6 +7,7 @@ import { NotebookContext } from "../Notebook.context";
 import { useContext, useEffect, useState } from "react";
 import { constructImageStorageUrl } from "../utils";
 import CroppedImageDisplay from "./CroppedImageDisplay";
+import { getToken } from "../../../../shared/js/jwt";
 
 const buttonContainerStyle = css({
   border: "dashed var(--background-action-high-blue-france) 1px",
@@ -103,13 +104,16 @@ function MeasuringPointImageTile({
 
   useEffect(() => {
     if (image && imageStorage) {
-      setImageUrl(
-        constructImageStorageUrl(
-          image.runObjectGroupImage.path,
-          imageStorage.baseUrl,
-          imageStorage.token,
-        ),
-      );
+      getToken(true).then((token) => {
+        setImageUrl(
+          constructImageStorageUrl(
+            image.runObjectGroupImage.path,
+            imageStorage.baseUrl,
+            imageStorage.token,
+            token,
+          ),
+        );
+      });
     }
   }, [imageStorage, point.id, point.image]);
 

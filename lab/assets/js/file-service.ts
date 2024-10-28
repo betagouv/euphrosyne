@@ -1,6 +1,6 @@
 "use strict";
 
-import { jwtFetch } from "./jwt.js";
+import { EuphroToolsService } from "../../../shared/js/euphrosyne-tools-client";
 
 type FileType = "file" | "directory";
 
@@ -21,13 +21,18 @@ interface ListDataResponseItem {
 }
 
 // Service to manage files on an Azure Fileshare
-export class FileService {
+export class FileService extends EuphroToolsService {
   listFileURL: string;
   presignURL: string;
 
-  constructor(listFileURL: string, fetchPresignedURL: string) {
-    this.listFileURL = `${process.env.EUPHROSYNE_TOOLS_API_URL}${listFileURL}`;
-    this.presignURL = `${process.env.EUPHROSYNE_TOOLS_API_URL}${fetchPresignedURL}`;
+  constructor(
+    listFileURL: string,
+    fetchPresignedURL: string,
+    fetchFn?: typeof fetch,
+  ) {
+    super(fetchFn);
+    this.listFileURL = listFileURL;
+    this.presignURL = fetchPresignedURL;
   }
 
   async listData(folder?: string): Promise<EuphrosyneFile[]> {
@@ -38,7 +43,7 @@ export class FileService {
     const fetchRequestInit: RequestInit = {
       method: "GET",
     };
-    const response = await jwtFetch(url, fetchRequestInit);
+    const response = await this.fetchFn(url, fetchRequestInit);
     if (response?.ok) {
       const files = (await response.json()) as ListDataResponseItem[];
       return files.map(({ name, path, last_modified, size, type }) => ({
@@ -72,7 +77,7 @@ export class FileService {
   }
 
   async fetchPresignedURL(path: string) {
-    const response = await jwtFetch(
+    const response = await this.fetchFn(
       `${this.presignURL}?path=${encodeURIComponent(path)}`,
       {
         method: "GET",

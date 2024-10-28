@@ -9,6 +9,7 @@ export interface ObjectGroup {
   objectCount: number;
   dating: string;
   materials: string[];
+  c2rmfId: string | null;
 }
 
 export interface RunObjectGroup {
