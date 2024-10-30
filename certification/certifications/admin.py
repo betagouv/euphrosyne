@@ -1,3 +1,5 @@
+from typing import Any
+
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.options import InlineModelAdmin
@@ -8,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 
 from lab.admin.mixins import LabAdminAllowedMixin
 
-from .models import Certification, CertificationType, QuizzCertification, QuizzResult
+from .models import Certification, CertificationType, QuizCertification, QuizResult
 
 
 class CertificationAdminForm(forms.ModelForm):
@@ -37,11 +39,18 @@ class CertificationAdminForm(forms.ModelForm):
         return True
 
 
-class QuizzCertificationInline(LabAdminAllowedMixin, admin.StackedInline):
-    model = QuizzCertification
-    verbose_name = _("Quizz certification")
+class QuizCertificationInline(LabAdminAllowedMixin, admin.StackedInline):
+    model = QuizCertification
+    verbose_name = _("Quiz certification")
 
     fields = ("url", "passing_score")
+
+    extra = 1
+
+    def get_extra(
+        self, request: HttpRequest, obj: Certification | None = None, **kwargs: Any
+    ) -> int:
+        return 1 if not obj.quizzes.count() else 0
 
 
 @admin.register(Certification)
@@ -61,19 +70,19 @@ class CertificationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
     def get_inlines(
         self, request: HttpRequest, obj: Certification | None
     ) -> list[InlineModelAdmin]:
-        if obj and obj.type_of == CertificationType.QUIZZ:
-            return [QuizzCertificationInline]
+        if obj and obj.type_of == CertificationType.QUIZ:
+            return [QuizCertificationInline]
         return []
 
 
-@admin.register(QuizzResult)
-class QuizzResultAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
-    list_display = ("quizz", "user", "score_with_passing_score", "is_passed", "created")
-    fields = ("quizz", "user", "score", "is_passed")
+@admin.register(QuizResult)
+class QuizResultAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
+    list_display = ("quiz", "user", "score_with_passing_score", "is_passed", "created")
+    fields = ("quiz", "user", "score", "is_passed")
     readonly_fields = ("created",)
-    list_filter = ("is_passed", "quizz__certification__name")
+    list_filter = ("is_passed", "quiz__certification__name")
     search_fields = ("user__email",)
 
     @admin.display(description=_("Score"))
-    def score_with_passing_score(self, obj: QuizzResult) -> str:
-        return f"{obj.score} / {obj.quizz.passing_score}"
+    def score_with_passing_score(self, obj: QuizResult) -> str:
+        return f"{obj.score} / {obj.quiz.passing_score}"

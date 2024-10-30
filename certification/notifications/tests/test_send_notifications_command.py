@@ -5,7 +5,7 @@ from django.core import mail
 from django.core.management import call_command
 from django.test import TestCase
 
-from certification.certifications.models import Certification, QuizzCertification
+from certification.certifications.models import Certification, QuizCertification
 from lab.tests.factories import StaffUserFactory
 
 from ..models import CertificationNotification, NotificationType
@@ -24,7 +24,7 @@ class ClosepollTest(TestCase):
             ),
             type_of=NotificationType.INVITATION_TO_COMPLETE,
         )
-        QuizzCertification.objects.create(
+        QuizCertification.objects.create(
             certification=notification.certification, url="url", passing_score=1
         )
 
@@ -47,7 +47,7 @@ class ClosepollTest(TestCase):
             name="certification",
             invitation_to_complete_email_template_path=TEMPLATE,
         )
-        QuizzCertification.objects.create(
+        QuizCertification.objects.create(
             certification=certification, url="url", passing_score=1
         )
 

@@ -1,29 +1,76 @@
+import random
+
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models import Count
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
+from euphro_auth.models import User
 
-class QuizzCertification(models.Model):
-    certification = models.OneToOneField(
-        "Certification", on_delete=models.CASCADE, related_name="quizz"
+
+class QuizCertificationQuerySet(models.QuerySet):
+    def _get_next_quizzes_for_user(self, certification: "Certification", user: User):
+        quizzes = self.filter(certification=certification)
+        results = (
+            QuizResult.objects.filter(user=user, quiz__certification=certification)
+            .values("quiz")
+            .annotate(total=Count("quiz"))
+            .values_list("quiz", "total")
+        )
+        quizzes_to_exclude = []
+        if results:
+            max_count = max(results, key=lambda x: x[1])[1]
+            this_round_quizzes = [
+                quiz_id for quiz_id, count in results if count == max_count
+            ]
+            if len(this_round_quizzes) != quizzes.count():
+                quizzes_to_exclude = this_round_quizzes
+        return self.filter(certification=certification).exclude(
+            id__in=quizzes_to_exclude
+        )
+
+    def get_random_next_quizz_for_user(
+        self, certification: "Certification", user: User
+    ):
+        quizzes = self._get_next_quizzes_for_user(certification, user)
+        return quizzes[random.randint(0, len(quizzes) - 1)] if quizzes else None
+
+
+class QuizCertificationManager(models.Manager):
+    def get_queryset(self):
+        return QuizCertificationQuerySet(self.model, using=self._db)
+
+    def get_random_next_quizz_for_user(
+        self, certification: "Certification", user: User
+    ):
+        return self.get_queryset().get_random_next_quizz_for_user(
+            certification=certification, user=user
+        )
+
+
+class QuizCertification(models.Model):
+    certification = models.ForeignKey(
+        "Certification", on_delete=models.CASCADE, related_name="quizzes"
     )
 
     url = models.URLField(
-        verbose_name=_("Quizz URL"), help_text="https://tally.so/r/3jyvJ6"
+        verbose_name=_("Quiz URL"), help_text="https://tally.so/r/3jyvJ6"
     )
     passing_score = models.FloatField(verbose_name=_("Passing score"))
 
+    objects = QuizCertificationManager()
+
     def __str__(self) -> str:
-        return _("%s (quizz)") % self.certification.name
+        return _("%s (quiz)") % self.certification.name
 
     class Meta:
-        verbose_name = _("Quizz certification")
-        verbose_name_plural = _("Quizz certifications")
+        verbose_name = _("Quiz certification")
+        verbose_name_plural = _("Quiz certifications")
 
 
 class CertificationType(models.TextChoices):
-    QUIZZ = "QUIZZ", _("Quizz")
+    QUIZ = "QUIZ", _("Quiz")
 
 
 class Certification(models.Model):
@@ -36,7 +83,7 @@ class Certification(models.Model):
         _("Type of certification"),
         max_length=100,
         choices=CertificationType,
-        default=CertificationType.QUIZZ,
+        default=CertificationType.QUIZ,
     )
 
     num_days_valid = models.IntegerField(
@@ -54,7 +101,7 @@ class Certification(models.Model):
         _("Success email template path"), max_length=250, blank=True, null=True
     )
 
-    quizz: "QuizzCertification"  # hack so pylint doesn't complain
+    quizzes: "QuizCertification"
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -67,24 +114,24 @@ class Certification(models.Model):
         verbose_name_plural = _("Certifications")
 
 
-class QuizzResult(models.Model):
+class QuizResult(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    quizz = models.ForeignKey(QuizzCertification, on_delete=models.CASCADE)
+    quiz = models.ForeignKey(QuizCertification, on_delete=models.CASCADE)
     score = models.FloatField(_("Score"))
-    is_passed = models.BooleanField(_("Quizz passed"))
+    is_passed = models.BooleanField(_("Quiz passed"))
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = _("Quizz result")
-        verbose_name_plural = _("Quizz results")
+        verbose_name = _("Quiz result")
+        verbose_name_plural = _("Quiz results")
 
     def __str__(self):
         return gettext(
-            "Result for %(quizz)s - %(user)s - %(score)s - %(created)s"
+            "Result for %(quiz)s - %(user)s - %(score)s - %(created)s"
             % {
-                "quizz": self.quizz,
+                "quiz": self.quiz,
                 "user": self.user,
                 "score": self.score,
                 "created": self.created.strftime(  # pylint: disable=no-member

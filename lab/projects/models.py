@@ -170,6 +170,7 @@ class Project(TimestampedModel):
                 }
             )
 
+    # pylint: disable=arguments-differ
     def save(
         self,
         force_insert: bool = False,

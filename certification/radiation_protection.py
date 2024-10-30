@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils import timezone
 
-from .certifications.models import Certification, QuizzCertification, QuizzResult
+from .certifications.models import Certification, QuizCertification, QuizResult
 from .notifications.models import CertificationNotification, NotificationType
 
 logger = logging.getLogger(__name__)
@@ -19,8 +19,8 @@ def _get_radioprotection_certification() -> Certification:
 
 
 @lru_cache
-def _get_radioprotection_quizz() -> QuizzCertification:
-    return QuizzCertification.objects.get(
+def _get_radioprotection_quizzes() -> QuizCertification:
+    return QuizCertification.objects.filter(
         certification=_get_radioprotection_certification()
     )
 
@@ -45,8 +45,8 @@ def user_has_active_certification(user: AbstractBaseUser) -> bool:
         filter_kwargs["created__gte"] = timezone.now() - timezone.timedelta(
             days=certification.num_days_valid
         )
-    return QuizzResult.objects.filter(
-        quizz=_get_radioprotection_quizz(),
+    return QuizResult.objects.filter(
+        quiz__in=_get_radioprotection_quizzes(),
         user=user,
         is_passed=True,
         **filter_kwargs,

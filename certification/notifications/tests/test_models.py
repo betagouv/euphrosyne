@@ -3,8 +3,8 @@ from unittest import mock
 
 import pytest
 
-from certification.certifications.models import QuizzResult
-from certification.models import Certification, QuizzCertification
+from certification.certifications.tests import factories as certification_factories
+from certification.models import Certification
 from lab.tests import factories
 
 from ..models import CertificationNotification, NotificationType
@@ -15,13 +15,13 @@ PATH_TO_SUCCESS = "path/to/success"
 
 @pytest.fixture(name="certification")
 def certification_fixture():
-    certification = Certification.objects.create(
+    certification = certification_factories.CertificationOfTypeQuizFactory(
         name="certification",
         invitation_to_complete_email_template_path=PATH_TO_COMPLETE,
         success_email_template_path=PATH_TO_SUCCESS,
         num_days_valid=365,
     )
-    QuizzCertification.objects.create(
+    certification_factories.QuizCertificationFactory(
         certification=certification, url="url", passing_score=1
     )
     return certification
@@ -53,24 +53,35 @@ def test_get_context_for_invitation_to_complete(certification: Certification):
         user=factories.StaffUserFactory(),
     )
 
-    assert notification.get_context_for_certification() == {
-        "quizz_link": certification.quizz.url,
-        "passing_score": int(certification.quizz.passing_score),
-        "email": notification.user.email,
-    }
+    with mock.patch(
+        # pylint: disable=line-too-long
+        "certification.certifications.models.QuizCertificationQuerySet.get_random_next_quizz_for_user"
+    ) as mock_fn:
+        mock_fn.return_value = certification_factories.QuizCertificationFactory(
+            certification=certification, url="url123", passing_score=3232
+        )
+        context = notification.get_context_for_certification()
+
+        mock_fn.assert_called_once()
+        assert context["quiz_link"] == "url123"
+        assert context["passing_score"] == 3232
+        assert context["email"] == notification.user.email
 
 
 @pytest.mark.django_db
 def test_get_context_for_success(certification: Certification):
     user = factories.StaffUserFactory()
-    result = QuizzResult.objects.create(
-        quizz=certification.quizz, user=user, score=1, is_passed=False
+    quiz = certification_factories.QuizCertificationFactory(
+        certification=certification, url="url", passing_score=1
+    )
+    result = certification_factories.QuizResultFactory(
+        quiz=quiz, user=user, score=1, is_passed=False
     )
     notification = CertificationNotification.objects.create(
         type_of=NotificationType.SUCCESS,
         certification=certification,
         user=user,
-        quizz_result=result,
+        quiz_result=result,
     )
 
     context = notification.get_context_for_certification()

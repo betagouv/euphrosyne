@@ -5,18 +5,18 @@ from certification.notifications.models import (
     NotificationType,
 )
 
-from .models import Certification, CertificationType, QuizzCertification, QuizzResult
+from .models import Certification, CertificationType, QuizCertification, QuizResult
 
 
 def create_result(certification_name: str, email: str, score: float):
     user = get_user_model().objects.get(email=email)
     certification = Certification.objects.get(name=certification_name)
 
-    if certification.type_of == CertificationType.QUIZZ:
-        quizz = QuizzCertification.objects.get(certification=certification)
-        is_passed = score >= quizz.passing_score
-        result = QuizzResult.objects.create(
-            user=user, quizz=quizz, score=score, is_passed=is_passed
+    if certification.type_of == CertificationType.QUIZ:
+        quiz = QuizCertification.objects.get(certification=certification)
+        is_passed = score >= quiz.passing_score
+        result = QuizResult.objects.create(
+            user=user, quiz=quiz, score=score, is_passed=is_passed
         )
         if is_passed:
             # Create a success notification for the user
@@ -24,5 +24,5 @@ def create_result(certification_name: str, email: str, score: float):
                 user=user,
                 certification=certification,
                 type_of=NotificationType.SUCCESS,
-                quizz_result=result,
+                quiz_result=result,
             )

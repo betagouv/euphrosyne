@@ -1,4 +1,4 @@
 # pylint: disable=unused-import
 
-from .certifications.admin import CertificationAdmin, QuizzResultAdmin  # noqa: F401
+from .certifications.admin import CertificationAdmin, QuizResultAdmin  # noqa: F401
 from .notifications.admin import CertificationNotificationAdmin  # noqa: F401

@@ -90,7 +90,7 @@ def nav_items_json(request: HttpRequest):
                             "title": str(_("Results")),
                             "item": {
                                 "href": reverse(
-                                    "admin:certification_quizzresult_changelist"
+                                    "admin:certification_quizresult_changelist"
                                 ),
                                 "exactPath": False,
                                 "extraPath": [],

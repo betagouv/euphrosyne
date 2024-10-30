@@ -13,27 +13,27 @@ msgstr ""
 msgid "Template does not exist"
 msgstr "Le template n'existe pas"
 
-msgid "Quizz certification"
-msgstr "Certification de quizz"
+msgid "Quiz certification"
+msgstr "Certification de quiz"
 
 msgid "Score"
 msgstr "Score"
 
-msgid "Quizz URL"
-msgstr "URL du quizz"
+msgid "Quiz URL"
+msgstr "URL du quiz"
 
 msgid "Passing score"
 msgstr "Score pour réussir"
 
 #, python-format
-msgid "%s (quizz)"
-msgstr "%s (quizz)"
+msgid "%s (quiz)"
+msgstr "%s (quiz)"
 
-msgid "Quizz certifications"
-msgstr "Certifications de quizz"
+msgid "Quiz certifications"
+msgstr "Certifications de quiz"
 
-msgid "Quizz"
-msgstr "Quizz"
+msgid "Quiz"
+msgstr "Quiz"
 
 msgid "Description"
 msgstr "Description"
@@ -56,18 +56,18 @@ msgstr "Certification"
 msgid "Certifications"
 msgstr "Certifications"
 
-msgid "Quizz passed"
-msgstr "Quizz réussi"
+msgid "Quiz passed"
+msgstr "Quiz réussi"
 
-msgid "Quizz result"
-msgstr "Résultat du quizz"
+msgid "Quiz result"
+msgstr "Résultat du quiz"
 
-msgid "Quizz results"
-msgstr "Résultats des quizz"
+msgid "Quiz results"
+msgstr "Résultats des quiz"
 
 #, python-format
-msgid "Result for %(quizz)s - %(user)s - %(score)s - %(created)s"
-msgstr "Résultat pour %(quizz)s - %(user)s - %(score)s - %(created)s"
+msgid "Result for %(quiz)s - %(user)s - %(score)s - %(created)s"
+msgstr "Résultat pour %(quiz)s - %(user)s - %(score)s - %(created)s"
 
 msgid "Invitation to complete"
 msgstr "Invitation à compléter"
@@ -146,14 +146,14 @@ msgid "Access course"
 msgstr "Accéder au cours"
 
 msgid ""
-"When you have reviewed the course and are ready to take the the quizz, click "
+"When you have reviewed the course and are ready to take the the quiz, click "
 "on the following link:"
 msgstr ""
-"Lorsque vous aurez terminé le cours et serez prêt à passer le quizz, cliquez "
+"Lorsque vous aurez terminé le cours et serez prêt à passer le quiz, cliquez "
 "sur le lien suivant :"
 
-msgid "Access quizz"
-msgstr "Accéder au quizz"
+msgid "Access quiz"
+msgstr "Accéder au quiz"
 
 msgid ""
 "Once you have completed the quiz and obtained your certificate, you will be "

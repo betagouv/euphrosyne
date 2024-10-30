@@ -9,8 +9,8 @@ from django.test import TestCase, override_settings
 from certification.certifications.models import (
     Certification,
     CertificationType,
-    QuizzCertification,
-    QuizzResult,
+    QuizCertification,
+    QuizResult,
 )
 from certification.notifications.models import (
     CertificationNotification,
@@ -27,9 +27,9 @@ PASSING_SCORE = 10
 class TestTallyHook(TestCase):
     def setUp(self):
         self.certification = Certification.objects.create(
-            name="test", type_of=CertificationType.QUIZZ
+            name="test", type_of=CertificationType.QUIZ
         )
-        QuizzCertification.objects.create(
+        QuizCertification.objects.create(
             certification=self.certification, passing_score=PASSING_SCORE
         )
 
@@ -134,15 +134,15 @@ class TestTallyHook(TestCase):
 
         assert response.status_code == 200
 
-        quizz_result_qs = QuizzResult.objects.filter(
+        quiz_result_qs = QuizResult.objects.filter(
             user=user, score=success_score, is_passed=True
         )
-        assert quizz_result_qs.exists()
+        assert quiz_result_qs.exists()
         assert CertificationNotification.objects.filter(
             user=user,
             certification=self.certification,
             type_of=NotificationType.SUCCESS,
-            quizz_result=quizz_result_qs.first(),
+            quiz_result=quiz_result_qs.first(),
         ).exists()
 
     @mock.patch(
@@ -160,13 +160,13 @@ class TestTallyHook(TestCase):
 
         assert response.status_code == 200
 
-        quizz_result_qs = QuizzResult.objects.filter(
+        quiz_result_qs = QuizResult.objects.filter(
             user=user, score=failed_score, is_passed=False
         )
-        assert quizz_result_qs.exists()
+        assert quiz_result_qs.exists()
         assert not CertificationNotification.objects.filter(
             user=user,
             certification=self.certification,
             type_of=NotificationType.SUCCESS,
-            quizz_result=quizz_result_qs.first(),
+            quiz_result=quiz_result_qs.first(),
         ).exists()

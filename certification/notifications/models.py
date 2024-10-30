@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from ..certifications.models import Certification, QuizzResult
+from ..certifications.models import Certification, QuizResult
 from .emails import send_notification
 
 
@@ -30,8 +30,8 @@ class CertificationNotification(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-    quizz_result = models.OneToOneField(
-        QuizzResult, on_delete=models.CASCADE, null=True, blank=True
+    quiz_result = models.OneToOneField(
+        QuizResult, on_delete=models.CASCADE, null=True, blank=True
     )
 
     def send_notification(self):
@@ -58,17 +58,20 @@ class CertificationNotification(models.Model):
 
     def get_context_for_certification(self):
         if self.type_of == NotificationType.INVITATION_TO_COMPLETE:
-            if self.certification.quizz:
+            if self.certification.quizzes.exists():
+                next_quizz = self.certification.quizzes.get_random_next_quizz_for_user(
+                    certification=self.certification, user=self.user
+                )
                 return {
-                    "quizz_link": self.certification.quizz.url,
-                    "passing_score": int(self.certification.quizz.passing_score),
+                    "quiz_link": next_quizz.url,
+                    "passing_score": int(next_quizz.passing_score),
                     "email": self.user.email,  # pylint: disable=no-member
                 }
             return {}
         if self.type_of == NotificationType.SUCCESS:
             if self.certification.num_days_valid:
                 return {
-                    "valid_until": self.quizz_result.created
+                    "valid_until": self.quiz_result.created
                     + timezone.timedelta(days=self.certification.num_days_valid)
                 }
         return {}

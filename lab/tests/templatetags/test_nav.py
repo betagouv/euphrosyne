@@ -111,7 +111,7 @@ def test_nav_items_json_when_admin():
     _check_nav_item(
         results,
         _("Results"),
-        reverse("admin:certification_quizzresult_changelist"),
+        reverse("admin:certification_quizresult_changelist"),
         [],
         False,
     )

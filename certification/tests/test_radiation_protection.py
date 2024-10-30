@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from lab.tests.factories import StaffUserFactory
 
-from ..certifications.models import Certification, QuizzCertification, QuizzResult
+from ..certifications.models import Certification, QuizCertification, QuizResult
 from ..notifications.models import CertificationNotification, NotificationType
 from ..radiation_protection import (
     check_radio_protection_certification,
@@ -19,9 +19,9 @@ def certification_fixture():
     return Certification.objects.create(name="radiation", num_days_valid=5)
 
 
-@pytest.fixture(name="quizz")
-def quizz_fixture(certification):
-    return QuizzCertification.objects.create(
+@pytest.fixture(name="quiz")
+def quiz_fixture(certification):
+    return QuizCertification.objects.create(
         certification=certification,
         url="url",
         passing_score=90,
@@ -30,7 +30,7 @@ def quizz_fixture(certification):
 
 @pytest.mark.django_db
 def test_user_has_active_certification(
-    certification: Certification, quizz: QuizzCertification
+    certification: Certification, quiz: QuizCertification
 ):
     user = StaffUserFactory()
     with mock.patch(
@@ -38,13 +38,13 @@ def test_user_has_active_certification(
         return_value=certification,
     ):
         # Result with is not passed
-        QuizzResult.objects.create(user=user, quizz=quizz, is_passed=False, score=89)
+        QuizResult.objects.create(user=user, quiz=quiz, is_passed=False, score=89)
         assert not user_has_active_certification(user)
 
         # Result is passed but too old
-        result = QuizzResult.objects.create(
+        result = QuizResult.objects.create(
             user=user,
-            quizz=quizz,
+            quiz=quiz,
             is_passed=True,
             score=95,
         )
@@ -53,9 +53,9 @@ def test_user_has_active_certification(
         assert not user_has_active_certification(user)
 
         # Result is passed and recent
-        result = QuizzResult.objects.create(
+        result = QuizResult.objects.create(
             user=user,
-            quizz=quizz,
+            quiz=quiz,
             is_passed=True,
             score=95,
         )
