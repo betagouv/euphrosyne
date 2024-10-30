@@ -26,3 +26,9 @@ def create_result(certification_name: str, email: str, score: float):
                 type_of=NotificationType.SUCCESS,
                 quiz_result=result,
             )
+        else:  # Create an invitation to retake the quiz
+            CertificationNotification.objects.create(
+                user=user,
+                certification=certification,
+                type_of=NotificationType.INVITATION_TO_COMPLETE,
+            )
