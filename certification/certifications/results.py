@@ -30,5 +30,5 @@ def create_result(certification_name: str, email: str, score: float):
             CertificationNotification.objects.create(
                 user=user,
                 certification=certification,
-                type_of=NotificationType.INVITATION_TO_COMPLETE,
+                type_of=NotificationType.RETRY,
             )

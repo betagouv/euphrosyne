@@ -67,6 +67,34 @@ def test_get_context_for_invitation_to_complete(certification: Certification):
         assert context["passing_score"] == 3232
         assert context["email"] == notification.user.email
         assert context["notification_id"] == notification.id
+        assert context["invitation_type"] == str(
+            NotificationType.INVITATION_TO_COMPLETE
+        )
+
+
+@pytest.mark.django_db
+def test_get_context_for_retry(certification: Certification):
+    notification = CertificationNotification.objects.create(
+        type_of=NotificationType.RETRY,
+        certification=certification,
+        user=factories.StaffUserFactory(),
+    )
+
+    with mock.patch(
+        # pylint: disable=line-too-long
+        "certification.certifications.models.QuizCertificationQuerySet.get_random_next_quizz_for_user"
+    ) as mock_fn:
+        mock_fn.return_value = certification_factories.QuizCertificationFactory(
+            certification=certification, url="url123", passing_score=3232
+        )
+        context = notification.get_context_for_certification()
+
+        mock_fn.assert_called_once()
+        assert context["quiz_link"] == "url123"
+        assert context["passing_score"] == 3232
+        assert context["email"] == notification.user.email
+        assert context["notification_id"] == notification.id
+        assert context["invitation_type"] == str(NotificationType.RETRY)
 
 
 @pytest.mark.django_db

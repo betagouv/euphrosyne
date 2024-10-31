@@ -9,6 +9,7 @@ from .emails import send_notification
 
 class NotificationType(models.TextChoices):
     INVITATION_TO_COMPLETE = "INVITATION_TO_COMPLETE", _("Invitation to complete")
+    RETRY = "RETRY", _("Retry")
     SUCCESS = "SUCCESS", _("Success")
 
 
@@ -50,14 +51,20 @@ class CertificationNotification(models.Model):
         self.save()
 
     def get_template_for_certification_type(self):
-        if self.type_of == NotificationType.INVITATION_TO_COMPLETE:
+        if self.type_of in [
+            NotificationType.INVITATION_TO_COMPLETE,
+            NotificationType.RETRY,
+        ]:
             return self.certification.invitation_to_complete_email_template_path
         if self.type_of == NotificationType.SUCCESS:
             return self.certification.success_email_template_path
         return None
 
     def get_context_for_certification(self):
-        if self.type_of == NotificationType.INVITATION_TO_COMPLETE:
+        if self.type_of in [
+            NotificationType.INVITATION_TO_COMPLETE,
+            NotificationType.RETRY,
+        ]:
             if self.certification.quizzes.exists():
                 next_quizz = self.certification.quizzes.get_random_next_quizz_for_user(
                     certification=self.certification, user=self.user
@@ -67,6 +74,7 @@ class CertificationNotification(models.Model):
                     "passing_score": int(next_quizz.passing_score),
                     "email": self.user.email,  # pylint: disable=no-member
                     "notification_id": self.id,
+                    "invitation_type": str(self.type_of),
                 }
             return {}
         if self.type_of == NotificationType.SUCCESS:
@@ -86,5 +94,10 @@ class CertificationNotification(models.Model):
         if self.type_of == NotificationType.SUCCESS:
             return (
                 _("[Euphrosyne] Certification %s completed.") % self.certification.name
+            )
+        if self.type_of == NotificationType.RETRY:
+            return (
+                _("[Euphrosyne] Invitation to retry certification %s.")
+                % self.certification.name
             )
         return ""

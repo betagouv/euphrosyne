@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-16 17:15+0200\n"
+"POT-Creation-Date: 2024-10-31 09:49+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -72,6 +72,9 @@ msgstr "Résultat pour %(quiz)s - %(user)s - %(score)s - %(created)s"
 msgid "Invitation to complete"
 msgstr "Invitation à compléter"
 
+msgid "Retry"
+msgstr "Réessayer"
+
 msgid "Success"
 msgstr "Réussite"
 
@@ -88,6 +91,10 @@ msgstr "[Euphrosyne] Invitation à compléter la certification %s."
 #, python-format
 msgid "[Euphrosyne] Certification %s completed."
 msgstr "[Euphrosyne] Certification %s complétée."
+
+#| msgid "[Euphrosyne] Invitation to complete certification %s."
+msgid "[Euphrosyne] Invitation to retry certification %s."
+msgstr "[Euphrosyne] Invitation à retenter la certification %s."
 
 msgid "Add"
 msgstr "Ajouter"
@@ -107,6 +114,12 @@ msgstr "Changer l'ordre de tri"
 
 msgid "Hello"
 msgstr "Bonjour"
+
+msgid "Here is a link to retry the quiz:"
+msgstr "Voici un lien pour retenter le quiz :"
+
+msgid "Access quiz"
+msgstr "Accéder au quiz"
 
 msgid ""
 "We are excited about your interest in conducting experiments using the New "
@@ -152,9 +165,6 @@ msgstr ""
 "Lorsque vous aurez terminé le cours et serez prêt à passer le quiz, cliquez "
 "sur le lien suivant :"
 
-msgid "Access quiz"
-msgstr "Accéder au quiz"
-
 msgid ""
 "Once you have completed the quiz and obtained your certificate, you will be "
 "granted access to the New AGLAE facilities. If you have any questions or "
@@ -163,13 +173,6 @@ msgstr ""
 "Une fois que vous aurez complété le quiz et obtenu votre certificat, vous "
 "aurez accès aux installations de New AGLAE. Si vous avez des questions ou "
 "besoin d'aide supplémentaire, n'hésitez pas à nous contacter."
-
-msgid ""
-"Thank you for your attention to this important matter. We look forward to "
-"your participation in the New AGLAE project."
-msgstr ""
-"Merci de votre attention à cette question importante. Nous attendons avec "
-"impatience votre participation au projet New AGLAE."
 
 msgid "Best regards,"
 msgstr "Cordialement,"
@@ -404,8 +407,6 @@ msgstr "Enregistrer"
 msgid "Save as new"
 msgstr "Sauvegarder comme nouveau"
 
-#, fuzzy
-#| msgid "Save and view"
 msgid "Save and add another"
 msgstr "Sauvegarder et ajouter un autre"
 

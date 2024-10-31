@@ -2,6 +2,11 @@
 
 <p>{% trans "Hello" %},</p>
 
+{% if invitation_type == "RETRY" %}
+<p>{% blocktranslate %}Here is a link to retry the quiz:{% endblocktranslate %} <a href="{{ quiz_link }}?email={{email}}&passing_score={{passing_score}}&nid={{notification}}">{% trans "Access quiz" %}</a></p>
+
+
+{% else %}
 <p>{% blocktranslate %}We are excited about your interest in conducting experiments using the New AGLAE particle accelerator at the Louvre.{% endblocktranslate %}</p>
 
 <p>{% blocktranslate %}However, we noticed that you currently do not have a radiation protection certificate on file. This certification is a mandatory requirement for all researchers who wish to use the New AGLAE facilities, ensuring that everyone understands the necessary safety protocols and procedures.{% endblocktranslate %}</p>
@@ -11,6 +16,9 @@
 <p>{% blocktranslate %}The PDF course is available by cicking on the following link:{% endblocktranslate %} <a href="https://euphroprodsa.blob.core.windows.net/static/AGLAE-radioprotection.pdf">{% trans "Access course" %}</a></p>
 
 <p>{% blocktranslate %}When you have reviewed the course and are ready to take the the quiz, click on the following link:{% endblocktranslate %} <a href="{{ quiz_link }}?email={{email}}&passing_score={{passing_score}}&nid={{notification_id}}">{% trans "Access quiz" %}</a></p>
+
+{% endif %}
+
 
 <p>{% blocktranslate %}Once you have completed the quiz and obtained your certificate, you will be granted access to the New AGLAE facilities. If you have any questions or need further assistance, please do not hesitate to contact us.{% endblocktranslate %}</p>
 
