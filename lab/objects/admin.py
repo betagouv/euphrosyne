@@ -90,7 +90,7 @@ class ObjectFormSet(BaseInlineFormSet):
             # replace self.data with its content.
             csv_data = {f"{self.prefix}-INITIAL_FORMS": "0"}
             total_forms = 0
-            csv_file = io.TextIOWrapper(
+            csv_file = io.TextIOWrapper(  # type: ignore[type-var]
                 self.files["objects-template"]  # type: ignore[arg-type]
             )
             try:
