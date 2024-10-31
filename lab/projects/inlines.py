@@ -58,15 +58,6 @@ class ParticipationFormSet(BaseInlineFormSet):
         return super().full_clean()
 
 
-class LeaderParticipationFormSet(ParticipationFormSet):
-    def save(self, commit: bool = True):
-        # Set first participation as leader
-        if len(self) > 0:
-            self[0].instance.is_leader = True
-            self[0].instance.on_premises = True
-        return super().save(commit)
-
-
 class OnPremisesParticipationFormSet(ParticipationFormSet):
     # pylint: disable=too-many-arguments
     def __init__(
@@ -103,6 +94,14 @@ class OnPremisesParticipationFormSet(ParticipationFormSet):
                 )
             )
         return saved_forms
+
+
+class LeaderParticipationFormSet(OnPremisesParticipationFormSet):
+    def save(self, commit: bool = True):
+        # Set first participation as leader
+        if len(self) > 0:
+            self[0].instance.is_leader = True
+        return super().save(commit)
 
 
 class MemberParticipationInline(LabPermissionMixin, admin.TabularInline):

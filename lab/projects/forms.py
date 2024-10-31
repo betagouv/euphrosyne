@@ -149,6 +149,12 @@ class LeaderParticipationForm(BaseParticipationForm):
     `True` when saving the instance.
     """
 
+    has_radiation_protection_certification = forms.BooleanField(
+        required=False,
+        label="",
+        widget=widgets.ParticipationCertificationWidget(),
+    )
+
     class Meta:
         model = models.Participation
         fields = ("user", "institution")
