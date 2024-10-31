@@ -100,6 +100,21 @@ class TestTallyHook(TestCase):
     @mock.patch(
         "certification.providers.tally.hooks._validate_signature", lambda _: True
     )
+    @mock.patch("certification.providers.tally.hooks.TallyWebhookData.from_tally_data")
+    def test_hook_when_score_is_zero(self, mock_from_tally_data: mock.MagicMock):
+        mock_from_tally_data.return_value.user_email = StaffUserFactory().email
+        mock_from_tally_data.return_value.score = 0
+        response = self.client.post(
+            "/certification/hooks/tally",
+            data=b'{"data": {"user_email": null, "score": 0}}',
+            content_type="application/json",
+            HTTP_EUPHROSYNE_CERTIFICATION=self.certification.name,
+        )
+        assert response.status_code == 200
+
+    @mock.patch(
+        "certification.providers.tally.hooks._validate_signature", lambda _: True
+    )
     @mock.patch(
         "certification.providers.tally.hooks.create_result",
         mock.MagicMock(side_effect=Certification.DoesNotExist),

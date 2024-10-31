@@ -53,7 +53,7 @@ def tally_webhook(request: HttpRequest):
         logger.error("Tally webhook : email is required for %s", certificate_name)
         return JsonResponse({"error": "Email is required"}, status=400)
     score = data.score
-    if not score:
+    if score is None:
         logger.error("Tally webhook : score is required for %s", certificate_name)
         return JsonResponse({"error": "Score is required"}, status=400)
 
