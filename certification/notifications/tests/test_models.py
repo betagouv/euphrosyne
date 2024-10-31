@@ -66,6 +66,7 @@ def test_get_context_for_invitation_to_complete(certification: Certification):
         assert context["quiz_link"] == "url123"
         assert context["passing_score"] == 3232
         assert context["email"] == notification.user.email
+        assert context["notification_id"] == notification.id
 
 
 @pytest.mark.django_db

@@ -66,6 +66,7 @@ class CertificationNotification(models.Model):
                     "quiz_link": next_quizz.url,
                     "passing_score": int(next_quizz.passing_score),
                     "email": self.user.email,  # pylint: disable=no-member
+                    "notification_id": self.id,
                 }
             return {}
         if self.type_of == NotificationType.SUCCESS:
