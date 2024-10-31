@@ -13,7 +13,7 @@ from django.views.decorators.http import require_POST
 
 from certification.providers.tally.dataclasses import TallyWebhookData
 
-from ...certifications.results import create_result
+from ...certifications.results import create_quiz_result
 from ...models import Certification
 
 logger = logging.getLogger(__name__)
@@ -46,6 +46,11 @@ def tally_webhook(request: HttpRequest):
         logger.error("Tally webhook : certificate name is required")
         return JsonResponse({"error": "Certificate name is required"}, status=400)
 
+    quiz_url = request.headers.get("Euphrosyne-QuizUrl")
+    if not quiz_url:
+        logger.error("Tally webhook : quiz url is required")
+        return JsonResponse({"error": "quiz url is required"}, status=400)
+
     data = TallyWebhookData.from_tally_data(json.loads(request.body))
 
     email = data.user_email
@@ -58,7 +63,12 @@ def tally_webhook(request: HttpRequest):
         return JsonResponse({"error": "Score is required"}, status=400)
 
     try:
-        create_result(certification_name=certificate_name, email=email, score=score)
+        create_quiz_result(
+            certification_name=certificate_name,
+            quiz_url=quiz_url,
+            email=email,
+            score=score,
+        )
     except Certification.DoesNotExist:
         logger.error(
             "Tally webhook : certification %s not found in DB", certificate_name

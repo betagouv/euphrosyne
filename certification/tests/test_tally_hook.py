@@ -116,7 +116,7 @@ class TestTallyHook(TestCase):
         "certification.providers.tally.hooks._validate_signature", lambda _: True
     )
     @mock.patch(
-        "certification.providers.tally.hooks.create_result",
+        "certification.providers.tally.hooks.create_quiz_result",
         mock.MagicMock(side_effect=Certification.DoesNotExist),
     )
     @mock.patch("certification.providers.tally.hooks.TallyWebhookData.from_tally_data")
