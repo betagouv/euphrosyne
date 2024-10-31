@@ -44,7 +44,7 @@ export default function ProjectImageDefinitionSelect({
     setImageDefinition(value);
     try {
       await setProjectImageDefinition(projectSlug, value);
-    } catch (error) {
+    } catch {
       setHasError(true);
     }
   };

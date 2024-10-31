@@ -34,7 +34,7 @@ export default function ObjectGroupTable({
     setDeleting(true);
     try {
       onRowDelete?.(runObjectGroupId);
-    } catch (e) {
+    } catch {
       setDeleting(false);
     }
     setDeleting(false);

@@ -44,18 +44,18 @@ export default function BaseFileActionCell({
     ) {
       return;
     }
-    setIsLoading && setIsLoading(true);
+    if (setIsLoading) setIsLoading(true);
     try {
       await fileService.deleteFile(path);
-    } catch (error) {
+    } catch {
       displayMessage(
         window.interpolate(t["File %s could not be removed."], [name]),
         "error",
       );
-      setIsLoading && setIsLoading(false);
+      if (setIsLoading) setIsLoading(false);
     }
     if (onDeleteSuccess) onDeleteSuccess(name);
-    setIsLoading && setIsLoading(false);
+    if (setIsLoading) setIsLoading(false);
     displayMessage(
       window.interpolate(t["File %s has been removed."], [name]),
       "success",
