@@ -149,7 +149,7 @@ describe("Test VirtualOfficeButton", () => {
       let hadError = false;
       try {
         await voButton.onButtonClick();
-      } catch (_) {
+      } catch {
         hadError = true;
       }
 

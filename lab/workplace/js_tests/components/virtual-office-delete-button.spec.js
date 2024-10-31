@@ -42,7 +42,7 @@ describe("Test VirtualOfficeDeleteButton", () => {
     let hadError = false;
     try {
       await voDeleteButton.onButtonClick();
-    } catch (_) {
+    } catch {
       hadError = true;
     }
 

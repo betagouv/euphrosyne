@@ -17,11 +17,10 @@ import WorkplaceRunTabs, {
 import { RawDataFileService } from "../raw-data/raw-data-file-service";
 import { ProcessedDataFileService } from "../processed-data/processed-data-file-service";
 
-export interface WorkplacePageData
-  extends Omit<
-    WorkplaceRunTabsProps,
-    "rawDataFileService" | "processedDataFileService"
-  > {}
+export type WorkplacePageData = Omit<
+  WorkplaceRunTabsProps,
+  "rawDataFileService" | "processedDataFileService"
+>;
 
 VirtualOfficeButton.init();
 VirtualOfficeDeleteButton.init();
