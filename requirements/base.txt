@@ -1,6 +1,6 @@
 -i https://pypi.org/simple
 docutils==0.21.2
-django-cors-headers==4.3.1
+django-cors-headers==4.6.0
 dj-database-url==2.3.0
 django-debug-toolbar==4.4.6
 django-filter==24.3
