@@ -51,7 +51,7 @@
     "css-minimizer-webpack-plugin": "^7.0.0",
     "dotenv": "^16.4.5",
     "glob": "^11.0.0",
-    "mini-css-extract-plugin": "^2.9.1",
+    "mini-css-extract-plugin": "^2.9.2",
     "promise-polyfill": "8.3.0",
     "purgecss-webpack-plugin": "^6.0.0",
     "react": "^18.2.0",
