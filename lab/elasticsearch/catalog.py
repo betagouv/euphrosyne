@@ -166,7 +166,7 @@ def build_project_catalog_document(
 
 
 # pylint: disable=too-many-arguments, too-many-locals
-def build_object_group_catalog_document(
+def build_object_group_catalog_document(  # noqa: C901
     object_group: ObjectGroup,
     projects: list[Project],
     runs: list[Run],
@@ -207,9 +207,11 @@ def build_object_group_catalog_document(
             else fetch_period_parent_ids_from_id
         )
         if getattr(object_group, field_name):
-            theso_huma_num_parent_ids = fetch_parent_ids_fn(
-                getattr(object_group, field_name).concept_id
-            )
+            theso_huma_num_parent_ids = None
+            if getattr(getattr(object_group, field_name), "concept_id"):
+                theso_huma_num_parent_ids = fetch_parent_ids_fn(
+                    getattr(object_group, field_name).concept_id
+                )
             dating_dict = {
                 **dating_dict,
                 f"{field_name}_label": getattr(  # type: ignore
