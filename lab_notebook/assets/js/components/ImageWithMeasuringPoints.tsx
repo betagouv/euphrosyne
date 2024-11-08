@@ -22,6 +22,7 @@ export default function ImageWithMeasuringPoints({
 }: IImageWithMeasuringPoints & React.HTMLProps<HTMLElement>) {
   const [height, setHeight] = useState(imageTransform?.height || 100);
   const [width, setWidth] = useState(imageTransform?.width || 100);
+  const aspectRatio = width / height;
 
   useEffect(() => {
     if (!imageTransform) {
@@ -44,7 +45,7 @@ export default function ImageWithMeasuringPoints({
     height,
   }: IPointLocation) => ({
     rlvX: x / widthRatio,
-    rlvY: y / heightRatio,
+    rlvY: y / heightRatio / aspectRatio,
     rlvWidth: width / widthRatio,
     rlvHeight: height / heightRatio,
   });
@@ -55,13 +56,15 @@ export default function ImageWithMeasuringPoints({
     stroke: "red",
   };
 
+  const circleRadius = 0.7;
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox={`0 0 100 100`}
       className={className}
     >
-      <image href={src} width={100} height={100} />
+      <image href={src} width={100} />
       {measuringPoints.map(({ pointLocation, name }) => {
         const id = `${pointLocation?.x}-${pointLocation?.y}`;
         const relativeLocation = pointLocation
@@ -94,14 +97,14 @@ export default function ImageWithMeasuringPoints({
                   x={relativeLocation.rlvX}
                   y={relativeLocation.rlvY}
                   width={relativeLocation.rlvWidth}
-                  height={relativeLocation.rlvHeight}
+                  height={relativeLocation.rlvHeight / aspectRatio}
                   {...rectProps}
                 />
               ) : (
                 <circle
-                  cx={relativeLocation.rlvX}
-                  cy={relativeLocation.rlvY}
-                  r="0.7px"
+                  cx={relativeLocation.rlvX - circleRadius / 2}
+                  cy={relativeLocation.rlvY - circleRadius / 2}
+                  r={`${circleRadius}px`}
                   fill="red"
                 />
               )}

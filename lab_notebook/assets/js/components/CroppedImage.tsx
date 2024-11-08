@@ -20,10 +20,15 @@ export default function CroppedImage({
       const _cropper = new Cropper(originalImageRef.current, {
         viewMode: 1,
         ready: () => {
+          if (!props.src) {
+            throw new Error("src is not defined");
+          }
           if (transform) {
             _cropper.setData(transform);
+            onReady(_cropper.getCroppedCanvas().toDataURL());
+          } else {
+            onReady(props.src);
           }
-          onReady(_cropper.getCroppedCanvas().toDataURL());
         },
       });
       _cropper.disable();
@@ -33,5 +38,5 @@ export default function CroppedImage({
     }
   }, [props.src]);
 
-  return <img ref={originalImageRef} {...props} />;
+  return <img ref={originalImageRef} {...props} css={{ maxWidth: "100%" }} />;
 }

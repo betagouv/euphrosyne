@@ -95,8 +95,10 @@ export default function ImageMeasuringPointer({
         ready: () => {
           if (transform) {
             _cropper.setData(transform);
+            setCroppedDataUrl(_cropper.getCroppedCanvas().toDataURL());
+          } else {
+            setCroppedDataUrl(props.src);
           }
-          setCroppedDataUrl(_cropper.getCroppedCanvas().toDataURL());
         },
       });
       _cropper.disable();

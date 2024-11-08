@@ -24,9 +24,8 @@ export default function ImageCropper({
     if (croppedImageRef.current) {
       new Cropper(croppedImageRef.current, {
         data: transform || undefined,
-        viewMode: readonly ? 3 : 2,
+        viewMode: 1,
         dragMode: readonly ? "none" : "move",
-        aspectRatio: 1 / 1,
         guides: !readonly,
         rotatable: !readonly,
         scalable: !readonly,
