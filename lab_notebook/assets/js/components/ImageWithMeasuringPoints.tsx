@@ -1,25 +1,29 @@
 import { useEffect, useState } from "react";
 import { IImageTransform } from "../IImageTransform";
 import { IPointLocation } from "../IImagePointLocation";
+import { Interpolation, Theme } from "@emotion/react";
 
 interface IMeasuringPoint {
   name: string;
   pointLocation?: IPointLocation;
 }
 
-interface IImageWithMeasuringPoints {
+interface IImageWithMeasuringPointsProps {
   src: string;
   imageTransform?: IImageTransform | null;
   measuringPoints: IMeasuringPoint[];
   showNames?: boolean;
+  css?: Interpolation<Theme>;
 }
+
 export default function ImageWithMeasuringPoints({
   src,
   imageTransform,
   className,
   measuringPoints,
   showNames = true,
-}: IImageWithMeasuringPoints & React.HTMLProps<HTMLElement>) {
+  css,
+}: IImageWithMeasuringPointsProps & React.HTMLProps<HTMLElement>) {
   const [height, setHeight] = useState(imageTransform?.height || 100);
   const [width, setWidth] = useState(imageTransform?.width || 100);
   const aspectRatio = width / height;
@@ -63,6 +67,7 @@ export default function ImageWithMeasuringPoints({
       xmlns="http://www.w3.org/2000/svg"
       viewBox={`0 0 100 100`}
       className={className}
+      css={css}
     >
       <image href={src} width={100} />
       {measuringPoints.map(({ pointLocation, name }) => {

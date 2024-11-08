@@ -159,3 +159,13 @@ export async function addMeasuringPointImage(
     runObjectImageId: image.run_object_group_image.toString(),
   };
 }
+
+export async function deleteMeasuringPointImage(pointId: string) {
+  const headers: HeadersInit = new Headers();
+  headers.set("X-CSRFToken", getCSRFToken() || "");
+
+  await fetch(`/api/lab/measuring-points/${pointId}/image`, {
+    method: "DELETE",
+    headers,
+  });
+}

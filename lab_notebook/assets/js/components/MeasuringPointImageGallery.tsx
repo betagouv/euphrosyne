@@ -72,6 +72,22 @@ export default function MeasuringPointImageGallery() {
     setOpenedImageIndex(null);
   };
 
+  const getCroppedImageStyle = useCallback(
+    (idx: number) => {
+      return css({
+        maxWidth: "100%",
+        ...(idx === openedImageIndex
+          ? {
+              maxHeight: "80vh",
+              margin: "0 auto",
+              display: "block",
+            }
+          : {}),
+      });
+    },
+    [openedImageIndex],
+  );
+
   return (
     <div>
       {usedRunObjectImages.length === 0 ? (
@@ -90,7 +106,7 @@ export default function MeasuringPointImageGallery() {
               css={openedImageIndex === idx && modalStyle}
             >
               <CroppedImageDisplay
-                css={{ maxWidth: "100%" }}
+                css={getCroppedImageStyle(idx)}
                 src={constructImageStorageUrl(
                   image.path,
                   imageStorage.baseUrl,

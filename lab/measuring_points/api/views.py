@@ -38,7 +38,10 @@ class MeasuringPointView(MeasuringPointViewMixin, generics.UpdateAPIView):
 
 
 class MeasuringPointImageCreateView(  # pylint: disable=too-many-ancestors
-    ProjectMembershipRequiredMixin, generics.CreateAPIView, generics.UpdateAPIView
+    ProjectMembershipRequiredMixin,
+    generics.CreateAPIView,
+    generics.UpdateAPIView,
+    generics.DestroyAPIView,
 ):
     serializer_class = serializers.MeasuringPointImageSerializer
 

@@ -19,7 +19,10 @@ import {
 import { RunObjectGroupImageServices } from "../notebook-image.services";
 import AddMeasuringPointToImage from "./AddMeasuringPointToImage";
 import { IPointLocation } from "../IImagePointLocation";
-import { addMeasuringPointImage } from "../../../../lab/assets/js/measuring-point.services";
+import {
+  addMeasuringPointImage,
+  deleteMeasuringPointImage,
+} from "../../../../lab/assets/js/measuring-point.services";
 import { NotebookContext } from "../Notebook.context";
 import { constructImageStorageUrl, extractPath } from "../utils";
 import { getToken } from "../../../../shared/js/jwt";
@@ -67,6 +70,7 @@ export default function AddImageToMeasuringModal({
     backToEdit: window.gettext("Back to edit"),
     stepCount: window.gettext("Step %s of %s"),
     nextStep: window.gettext("Next step: "),
+    delete: window.gettext("Delete"),
   };
 
   const runObjectGroup = runObjectGroups.find(
@@ -78,6 +82,8 @@ export default function AddImageToMeasuringModal({
     useContext(NotebookContext);
 
   const [isAddingRunObjectImage, setIsAddingRunObjectImage] = useState(false);
+  const [isDeletingMeasuringPointImage, setIsDeletingMeasuringPointImage] =
+    useState(false);
 
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -264,33 +270,55 @@ export default function AddImageToMeasuringModal({
           />
         ),
       buttons: [
-        {
-          title: t.save,
-          onClick: () =>
-            addImageToPoint().then((image) => {
-              if (
-                image &&
-                measuringPoint &&
-                (selectedRunObjectImage ||
-                  measuringPoint?.image?.runObjectGroupImage)
-              )
-                updateMeasuringPointImage(measuringPoint.id, {
-                  ...image,
-                  runObjectGroupImage:
-                    selectedRunObjectImage ||
-                    (measuringPoint.image
-                      ?.runObjectGroupImage as IRunObjectImage),
-                });
-              closeButtonRef.current?.click();
-            }),
-          frType: "primary",
-          disabled: !pointLocation,
-        },
-        {
-          title: t.changeImage,
-          onClick: () => setCurrentStep(11),
-          frType: "secondary",
-        },
+        ...([
+          {
+            title: t.save,
+            onClick: () =>
+              addImageToPoint().then((image) => {
+                if (
+                  image &&
+                  measuringPoint &&
+                  (selectedRunObjectImage ||
+                    measuringPoint?.image?.runObjectGroupImage)
+                )
+                  updateMeasuringPointImage(measuringPoint.id, {
+                    ...image,
+                    runObjectGroupImage:
+                      selectedRunObjectImage ||
+                      (measuringPoint.image
+                        ?.runObjectGroupImage as IRunObjectImage),
+                  });
+                closeButtonRef.current?.click();
+              }),
+            frType: "primary",
+            disabled: !pointLocation,
+          },
+          {
+            title: t.changeImage,
+            onClick: () => setCurrentStep(11),
+            frType: "secondary",
+          },
+        ] as IFooterButton[]),
+        ...((measuringPoint?.image
+          ? [
+              {
+                title: t.delete,
+                onClick: async () => {
+                  setIsDeletingMeasuringPointImage(true);
+                  deleteMeasuringPointImage(measuringPoint.id)
+                    .then(() => {
+                      updateMeasuringPointImage(measuringPoint.id, undefined);
+                      closeButtonRef.current?.click();
+                    })
+                    .finally(() => {
+                      setIsDeletingMeasuringPointImage(false);
+                    });
+                },
+                frType: "secondary",
+                disabled: isDeletingMeasuringPointImage,
+              },
+            ]
+          : []) as IFooterButton[]),
       ],
     },
   };
@@ -351,7 +379,7 @@ export default function AddImageToMeasuringModal({
     >
       <div className="fr-container fr-container--fluid fr-container-md">
         <div className="fr-grid-row fr-grid-row--center">
-          <div className="fr-col-12 fr-col-md-8">
+          <div>
             <div className="fr-modal__body">
               <div className="fr-modal__header">
                 <button

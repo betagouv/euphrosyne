@@ -18,7 +18,7 @@ export interface INotebookContext {
   ) => void;
   updateMeasuringPointImage: (
     measuringPointId: string,
-    image: IMeasuringPointImage,
+    image?: IMeasuringPointImage,
   ) => void;
   setImageStorage: Dispatch<SetStateAction<ImageStorage | undefined>>;
 }
@@ -53,7 +53,7 @@ export function useNotebookContext(
 
   const updateMeasuringPointImage = (
     measuringPointId: string,
-    image: IMeasuringPointImage,
+    image?: IMeasuringPointImage,
   ) => {
     setMeasuringPoints(
       measuringPoints.map((p) =>

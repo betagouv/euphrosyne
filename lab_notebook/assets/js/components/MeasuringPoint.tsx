@@ -114,6 +114,8 @@ function MeasuringPointImageTile({
           ),
         );
       });
+    } else if (imageUrl) {
+      setImageUrl(null);
     }
   }, [imageStorage, point.id, point.image]);
 
