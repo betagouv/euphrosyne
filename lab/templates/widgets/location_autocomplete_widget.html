@@ -1,6 +1,6 @@
 <div class="location-autocomplete-input autocomplete-input flex-container">
-  <div class="typeahead-field fr-mr-1w">
-    <input {% if widget.instance %}value="{{ widget.instance.label }}"{% endif %} id="{{widget.attrs.id}}__location" class="fr-input location-autocomplete-input__label" name="{{ widget.name }}__label" autocomplete="off">
+  <div class="typeahead-field fr-mr-1w fr-input-wrap fr-icon-search-line">
+    <input {% if widget.instance %}value="{{ widget.instance.label }}"{% endif %} id="{{widget.attrs.id}}__location" class="fr-input location-autocomplete-input__label" name="{{ widget.name }}__label" autocomplete="off" type="text">
     <div is="location-type-ahead" class="typeahead-list" html-for="{{ widget.attrs.id }}__location"></div>
   </div>
   

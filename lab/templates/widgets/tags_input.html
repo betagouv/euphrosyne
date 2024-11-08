@@ -1,4 +1,4 @@
-<div class="tags-input typeahead-field">
+<div class="tags-input typeahead-field fr-input-wrap fr-icon-search-line">
     <input type="text" class="tags-input__input fr-input" size="1" autocomplete="off" {% include "django/forms/widgets/attrs.html" %}>
     <div is="material-type-ahead" class="typeahead-list" html-for="{{ widget.attrs.id }}"></div>
     <input type="hidden" name="{{ widget.name }}" {% if widget.value != None %} value="{{ widget.value }}"{% endif %}>

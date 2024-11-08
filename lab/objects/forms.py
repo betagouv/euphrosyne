@@ -63,11 +63,8 @@ class ObjectGroupForm(forms.ModelForm):
 
     def __init__(self, *args, instance: ObjectGroup | None = None, **kwargs):
         super().__init__(*args, **kwargs, instance=instance)  # type: ignore[misc]
-        # We must check if attribute is in self.fields because it can be removed
-        # in admin view when page is readlonly.
-        for field_name in ["dating_period", "dating_era"]:
-            if field_name in self.fields:
-                self.fields[field_name].required = True
+        if "materials" in self.fields:
+            self.fields["materials"].required = False
         # Set object count initial value
         if "object_count" in self.fields:
             self.fields["object_count"].initial = 1
