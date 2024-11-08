@@ -18,9 +18,10 @@ const modalStyle = css({
 
 export default function MeasuringPointImageGallery() {
   const t = {
-    noImage:
+    noImage: window.gettext(
       "There is no image for this run yet. You can add images to the measurement points below, and they will appear here with their corresponding point locations.",
-    helpText: "Click on an image to expand it.",
+    ),
+    helpText: window.gettext("Click on an image to expand it."),
   };
 
   const { measuringPoints, imageStorage } = useContext(NotebookContext);
