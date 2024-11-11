@@ -19,5 +19,5 @@ python-slugify==8.0.4
 pyyaml==6.0.2
 sentry-sdk==2.18.0
 social-auth-app-django==5.4.2
-wheel==0.44.0
+wheel==0.45.0
 whitenoise==6.8.2
