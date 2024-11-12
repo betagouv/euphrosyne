@@ -43,7 +43,7 @@
 
             <div class="fr-col-12 fr-col-md-8">
               {% block filters %}
-              {% if cl.has_filters %}
+              {% if cl.has_filters and request.user.is_lab_admin %}
               <nav aria-labelledby="changelist-filter-header" class="changelist-filters">
                 <h4 id="changelist-filter-header" class="fr-mb-1v">{% translate 'Filter' %}</h4>
                 {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
