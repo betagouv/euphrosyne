@@ -5,6 +5,7 @@ import { workplaceTableCols } from "../../../../assets/js/components/FileTableCo
 import { HDF5FileService } from "../hdf5-file.service";
 import FileTable from "../../../../assets/js/components/FileTable";
 import BaseDirectoryActionCell from "../../../../assets/js/components/BaseDirectoryActionCell";
+import toolsFetch from "../../../../../shared/js/euphrosyne-tools-client";
 
 interface HDF5FileTableProps {
   projectId: string;
@@ -64,7 +65,7 @@ export default function HDF5FileTable({
   };
 
   useEffect(() => {
-    const fileService = new HDF5FileService(projectSlug, runName);
+    const fileService = new HDF5FileService(projectSlug, runName, toolsFetch);
     setIsLoading(true);
     fileService
       .listData(folder.join("/"))
