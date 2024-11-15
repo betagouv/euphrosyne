@@ -11,6 +11,7 @@ import {
   EuphrosyneToolsClientContext,
   useClientContext,
 } from "../../../../shared/js/EuphrosyneToolsClient.context";
+import { listStandards } from "../../../../standard/assets/js/standard-services";
 
 interface NotebookProps {
   runId: string;
@@ -26,7 +27,7 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
   };
 
   const notebookContext = useNotebookContext(projectSlug, runId);
-  const { setImageStorage, measuringPoints, setMeasuringPoints } =
+  const { setImageStorage, measuringPoints, setMeasuringPoints, setStandards } =
     notebookContext;
 
   const toolsClient = useClientContext();
@@ -50,6 +51,10 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
     new StorageImageServices(notebookContext.projectSlug, toolsClient.fetchFn)
       .getImagesUrlAndToken()
       .then(setImageStorage);
+  }, []);
+
+  useEffect(() => {
+    listStandards().then(setStandards);
   }, []);
 
   return (

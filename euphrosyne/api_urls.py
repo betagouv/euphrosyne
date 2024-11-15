@@ -16,4 +16,5 @@ urlpatterns = [
     path("lab/", include("lab.api_urls")),
     path("data-request/", include("data_request.api_urls")),
     path("notebook/", include("lab_notebook.api.urls")),
+    path("standard/", include("standard.api.urls")),
 ]

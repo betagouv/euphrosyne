@@ -2,12 +2,22 @@ import { css } from "@emotion/react";
 import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 import type { IMeasuringPoint } from "../IMeasuringPoint";
 import MeasuringPointComments from "./MeasuringPointComments";
-import ObjectSelect from "./ObjectSelect";
 import { NotebookContext } from "../Notebook.context";
 import { useContext, useEffect, useState } from "react";
 import { constructImageStorageUrl } from "../utils";
 import CroppedImageDisplay from "./CroppedImageDisplay";
 import { getToken } from "../../../../shared/js/jwt";
+import MeasuringPointObjectGroup from "./MeasuringPointObjectGroup";
+import MeasuringPointSegmentedControl, {
+  MeasuringPointType,
+} from "./MeasuringPointSegmentedControl";
+import MeasuringPointStandard from "./MeasuringPointStandard";
+import {
+  addOrUpdateStandardToMeasuringPoint,
+  deleteMeasuringPointStandard,
+  retrieveMeasuringPointStandard,
+} from "../../../../standard/assets/js/standard-services";
+import { IMeasuringPointStandard } from "../../../../standard/assets/js/IStandard";
 
 const buttonContainerStyle = css({
   border: "dashed var(--background-action-high-blue-france) 1px",
@@ -16,15 +26,7 @@ const buttonContainerStyle = css({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-});
-
-const containerStyle = css({
-  display: "flex",
-  alignItems: "center",
-});
-
-const addButtonStyle = css({
-  marginTop: "8px",
+  padding: "1rem",
 });
 
 const imageContainerStyle = css({
@@ -46,36 +48,82 @@ export default function MeasuringPoint({
   onLocalizeImageClicked: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }) {
   const t = {
-    addObjectGroup: window.gettext("Add a new object group"),
+    disabledTooltip: window.gettext(
+      "Unset the object group or standard to change the analysis type",
+    ),
   };
+  const [selectedMeasuringPointType, setSelectedMeasuringPointType] =
+    useState<MeasuringPointType>("objectGroup");
+
+  const [pointStandard, setPointStandard] =
+    useState<IMeasuringPointStandard | null>(null);
+
+  useEffect(() => {
+    if (!point.objectGroupId) {
+      retrieveMeasuringPointStandard(point.id).then((standard) => {
+        setPointStandard(standard);
+        if (standard) setSelectedMeasuringPointType("standard");
+      });
+    }
+  }, [point.objectGroupId]);
+
+  const onStandardChange = (selectedStandard: string | null) => {
+    let promise: Promise<void | IMeasuringPointStandard> | null = null;
+    if (selectedStandard) {
+      promise = addOrUpdateStandardToMeasuringPoint(
+        selectedStandard,
+        point.id,
+        !pointStandard,
+      );
+    } else if (pointStandard) {
+      promise = deleteMeasuringPointStandard(point.id);
+    }
+    if (promise) {
+      promise.then((result) => setPointStandard(result || null));
+    }
+  };
+
   return (
     <div className="fr-container--fluid">
+      <MeasuringPointSegmentedControl
+        selectedType={selectedMeasuringPointType}
+        onTypeSelect={(type) => setSelectedMeasuringPointType(type)}
+        className="fr-mb-2w"
+        disabled={!!point.objectGroupId || !!pointStandard}
+        aria-describedby="tooltip-2989"
+      />
+      {(!!point.objectGroupId || !!pointStandard) && (
+        <span
+          className="fr-tooltip fr-placement"
+          id="tooltip-2989"
+          role="tooltip"
+          aria-hidden="true"
+        >
+          {t.disabledTooltip}
+        </span>
+      )}
       <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-12 fr-col-md-5">
-          <MeasuringPointImageTile
-            point={point}
-            onLocalizeImageClicked={onLocalizeImageClicked}
-          />
+          {selectedMeasuringPointType === "objectGroup" && (
+            <MeasuringPointImageTile
+              point={point}
+              onLocalizeImageClicked={onLocalizeImageClicked}
+            />
+          )}
         </div>
         <div className="fr-col-12 fr-col-md-7">
-          <div css={containerStyle}>
-            <ObjectSelect
-              runObjectGroups={runObjectGroups}
-              measuringPoint={point}
+          {selectedMeasuringPointType === "standard" ? (
+            <MeasuringPointStandard
+              standard={pointStandard?.standard.label || null}
+              onStandardChange={onStandardChange}
             />
-
-            <button
-              type="button"
-              className="fr-btn fr-icon-add-line fr-btn--tertiary-no-outline fr-ml-2v"
-              title={t.addObjectGroup}
-              css={addButtonStyle}
-              aria-controls="add-object-group-modal"
-              data-fr-opened={false}
-              onClick={onAddObjectClicked}
-            >
-              {t.addObjectGroup}
-            </button>
-          </div>
+          ) : (
+            <MeasuringPointObjectGroup
+              runObjectGroups={runObjectGroups}
+              point={point}
+              onAddObjectClicked={onAddObjectClicked}
+            />
+          )}
           <MeasuringPointComments pointId={point.id} value={point.comments} />
         </div>
       </div>

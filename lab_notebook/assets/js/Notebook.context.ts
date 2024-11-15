@@ -1,5 +1,6 @@
 import { createContext, Dispatch, SetStateAction, useState } from "react";
 import { IMeasuringPoint, IMeasuringPointImage } from "./IMeasuringPoint";
+import { IStandard } from "../../../standard/assets/js/IStandard";
 
 interface ImageStorage {
   baseUrl: string;
@@ -10,6 +11,7 @@ export interface INotebookContext {
   projectSlug: string;
   runId: string;
   imageStorage?: ImageStorage;
+  setImageStorage: Dispatch<SetStateAction<ImageStorage | undefined>>;
   measuringPoints: IMeasuringPoint[];
   setMeasuringPoints: Dispatch<SetStateAction<IMeasuringPoint[]>>;
   addObjectToMeasuringPoint: (
@@ -20,17 +22,20 @@ export interface INotebookContext {
     measuringPointId: string,
     image?: IMeasuringPointImage,
   ) => void;
-  setImageStorage: Dispatch<SetStateAction<ImageStorage | undefined>>;
+  standards: IStandard[];
+  setStandards: Dispatch<SetStateAction<IStandard[]>>;
 }
 
 export const NotebookContext = createContext<INotebookContext>({
   projectSlug: "",
   runId: "",
   measuringPoints: [],
+  standards: [],
   addObjectToMeasuringPoint: () => {},
   setMeasuringPoints: () => {},
   setImageStorage: () => {},
   updateMeasuringPointImage: () => {},
+  setStandards: () => {},
 });
 
 export function useNotebookContext(
@@ -39,6 +44,7 @@ export function useNotebookContext(
 ): INotebookContext {
   const [imageStorage, setImageStorage] = useState<ImageStorage>();
   const [measuringPoints, setMeasuringPoints] = useState<IMeasuringPoint[]>([]);
+  const [standards, setStandards] = useState<IStandard[]>([]);
 
   const addObjectToMeasuringPoint = (
     measuringPointId: string,
@@ -71,5 +77,7 @@ export function useNotebookContext(
     setMeasuringPoints,
     addObjectToMeasuringPoint,
     updateMeasuringPointImage,
+    standards,
+    setStandards,
   };
 }

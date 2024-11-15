@@ -1,6 +1,7 @@
 from typing import Generic, Optional, TypeVar
 
 from django.db import models
+from django.core.exceptions import PermissionDenied
 from rest_framework.permissions import IsAdminUser
 
 from lab.projects.models import Project
@@ -25,3 +26,7 @@ class ProjectMembershipRequiredMixin(Generic[T], IsAdminUser):
             is_lab_admin(request.user)
             or project.participation_set.filter(user=request.user).exists()
         )
+
+    def check_object_permissions(self, request, obj):
+        if not self.has_object_permission(request, self, obj):
+            raise PermissionDenied()
