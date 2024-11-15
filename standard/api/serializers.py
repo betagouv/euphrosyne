@@ -13,6 +13,12 @@ class MeasuringPointStandardSerializer(serializers.ModelSerializer):
     class MeasuringPointStandardStandardSerializer(serializers.Serializer):
         label = serializers.CharField()
 
+        def create(self, validated_data):
+            raise NotImplementedError
+
+        def update(self, instance, validated_data):
+            raise NotImplementedError
+
     standard = MeasuringPointStandardStandardSerializer()
 
     class Meta:

@@ -1,7 +1,7 @@
 from typing import Generic, Optional, TypeVar
 
-from django.db import models
 from django.core.exceptions import PermissionDenied
+from django.db import models
 from rest_framework.permissions import IsAdminUser
 
 from lab.projects.models import Project

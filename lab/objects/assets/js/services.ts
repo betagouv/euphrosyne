@@ -36,7 +36,12 @@ export async function createObjectGroup(
       throw new Error(await response.json());
     } catch (e) {
       throw new Error(
-        window.gettext("An error occured while creating the object group."),
+        window.interpolate(
+          window.gettext(
+            "An error occured while creating the object group. %s",
+          ),
+          [(e as Error).toString()],
+        ),
       );
     }
   }

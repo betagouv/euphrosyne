@@ -60,7 +60,7 @@ export default function ImageGrid({
                 onClick={() => {
                   if (onImageSelect) {
                     setSelectedIndex(index);
-                    onImageSelect && onImageSelect(index);
+                    if (onImageSelect) onImageSelect(index);
                   }
                 }}
               >

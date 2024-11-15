@@ -1,8 +1,10 @@
-from django.forms import ValidationError
 import pytest
-from ..models import Standard, MeasuringPointStandard
+from django.forms import ValidationError
+
 from lab.measuring_points.models import MeasuringPoint
 from lab.tests import factories as lab_factories
+
+from ..models import MeasuringPointStandard, Standard
 
 
 @pytest.mark.django_db

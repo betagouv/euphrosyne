@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-08 10:51+0100\n"
+"POT-Creation-Date: 2024-11-15 18:17+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -183,8 +183,10 @@ msgstr ""
 "Lancez la recherche sur un numéro C2RMF valide avant de soumettre le "
 "formulaire. "
 
-msgid "An error occured while creating the object group."
-msgstr "Une erreur s'est produite lors de la création du lot d'objet."
+#, fuzzy, javascript-format
+#| msgid "An error occured while creating the object group. %s"
+msgid "An error occured while creating the object group. %s"
+msgstr "Une erreur s'est produite lors de la création du lot d'objet. %S"
 
 #, javascript-format
 msgid "Characters left: %s"
@@ -319,6 +321,9 @@ msgstr "Étape %s sur %s"
 msgid "Next step: "
 msgstr "Étape suivante :"
 
+msgid "Delete"
+msgstr "Supprimer"
+
 #, javascript-format
 msgid "Images of object %s used in this run"
 msgstr "Images de l'objet %s utilisées dans ce run"
@@ -382,8 +387,9 @@ msgstr "Zone"
 msgid "Selection mode"
 msgstr "Mode de sélection"
 
-msgid "Add a new object group"
-msgstr "Ajouter un groupe d'objets ou un objet"
+msgid "Unset the object group or standard to change the analysis type"
+msgstr ""
+"Supprimer le groupe d'objets ou le standard pour changer le type d'analyse"
 
 msgid "Locate point on image"
 msgstr "Localiser le point sur l'image"
@@ -405,6 +411,24 @@ msgstr ""
 
 msgid "Click on an image to expand it."
 msgstr "Cliquer sur une image pour l'agrandir."
+
+msgid "Add a new object group"
+msgstr "Ajouter un groupe d'objets ou un objet"
+
+msgid "Object"
+msgstr "Objet"
+
+msgid "Standard"
+msgstr "Standard"
+
+msgid "Analysis type"
+msgstr "Type d'analyse"
+
+msgid "Standard reference"
+msgstr "Référence du standard"
+
+msgid "No standard"
+msgstr "Auncun standard"
 
 msgid ""
 "There are no notes in this notebook yet. Click the button to add the first "

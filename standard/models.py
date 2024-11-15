@@ -1,6 +1,7 @@
 from django.db import models
 from django.forms import ValidationError
 from django.utils.translation import gettext_lazy as _
+
 from lab.measuring_points.models import MeasuringPoint
 
 

@@ -23,7 +23,6 @@ export default function ImageLoading({
         <stop offset="1" stopColor="#000091" stopOpacity="0"></stop>
       </radialGradient>
       <circle
-        transform-origin="center"
         fill="none"
         stroke="url(#a11)"
         strokeWidth="2"
@@ -46,7 +45,6 @@ export default function ImageLoading({
         ></animateTransform>
       </circle>
       <circle
-        transform-origin="center"
         fill="none"
         opacity=".2"
         stroke="#000091"

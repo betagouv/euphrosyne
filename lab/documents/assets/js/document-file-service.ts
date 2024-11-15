@@ -41,6 +41,6 @@ export class DocumentFileService extends FileService {
       },
     );
     if (!response?.ok) throw new Error("Failed to fetch upload presigned URL");
-    return (await response.json()).url;
+    return (await response.json()).url as string;
   }
 }

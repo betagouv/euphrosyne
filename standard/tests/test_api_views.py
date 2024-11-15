@@ -1,10 +1,12 @@
-from django.test import TestCase
-from euphro_auth.tests import factories as auth_factories
-from lab.tests import factories as lab_factories
-from ..models import Standard, MeasuringPointStandard
-from lab.measuring_points.models import MeasuringPoint
-
 import json
+
+from django.test import TestCase
+
+from euphro_auth.tests import factories as auth_factories
+from lab.measuring_points.models import MeasuringPoint
+from lab.tests import factories as lab_factories
+
+from ..models import MeasuringPointStandard, Standard
 
 
 class TestStandardAPIView(TestCase):

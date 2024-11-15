@@ -1,15 +1,13 @@
 from rest_framework import generics
-from rest_framework.permissions import IsAdminUser
-from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.exceptions import NotFound
+from rest_framework.permissions import IsAdminUser
 
 from lab.api_views.permissions import ProjectMembershipRequiredMixin
 from lab.measuring_points.models import MeasuringPoint
 from lab.projects.models import Project
 
-from . import serializers
 from .. import models
+from . import serializers
 
 
 class StandardListView(generics.ListAPIView):
@@ -20,7 +18,7 @@ class StandardListView(generics.ListAPIView):
         return models.Standard.objects.all()
 
 
-class MeasuringPointStandardView(
+class MeasuringPointStandardView(  # pylint: disable=too-many-ancestors
     ProjectMembershipRequiredMixin,
     generics.RetrieveAPIView,
     generics.CreateAPIView,
@@ -63,7 +61,7 @@ class MeasuringPointStandardView(
             obj = models.MeasuringPointStandard.objects.get(measuring_point_id=point_id)
             self.check_object_permissions(self.request, obj)
             return obj
-        except models.MeasuringPointStandard.DoesNotExist:
+        except models.MeasuringPointStandard.DoesNotExist as exc:
             raise NotFound(
                 detail="No standard linked to this measuring point",
-            )
+            ) from exc

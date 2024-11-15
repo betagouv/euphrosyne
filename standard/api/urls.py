@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import StandardListView, MeasuringPointStandardView
+
+from .views import MeasuringPointStandardView, StandardListView
 
 urlpatterns = [
     path(

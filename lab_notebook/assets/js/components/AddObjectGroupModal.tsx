@@ -52,13 +52,13 @@ export default function AddObjectGroupModal({
       objectGroup = await createObjectGroup({
         label: objectGroupLabel,
       });
-    } catch (e) {
+    } catch {
       setError(t.createObjectError);
       return;
     }
     try {
       await addObjectGroupToRun(runId, objectGroup.id.toString());
-    } catch (e) {
+    } catch {
       setError(t.addObjectErrorToRun);
       return;
     }
@@ -68,7 +68,7 @@ export default function AddObjectGroupModal({
         measuringPointId,
         objectGroup.id.toString(),
       );
-    } catch (e) {
+    } catch {
       setError(t.addObjectErrorToPoint);
       return;
     }

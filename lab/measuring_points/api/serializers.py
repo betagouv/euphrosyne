@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
-from .. import models
 from ...api_views.serializers import RunObjectGroupImageSerializer
 from ...objects.models import RunObjetGroupImage
+from .. import models
 
 
 class MeasuringPointImageSerializer(serializers.ModelSerializer):

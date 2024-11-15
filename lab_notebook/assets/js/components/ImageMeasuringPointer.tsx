@@ -118,15 +118,15 @@ export default function ImageMeasuringPointer({
         toggleDragModeOnDblclick: false,
         crop: (event: Cropper.CropEvent<HTMLImageElement>) => {
           const { width, height, x, y } = event.detail;
-          onLocate && onLocate({ width, height, x, y });
+          if (onLocate) onLocate({ width, height, x, y });
         },
         ready: (event: Cropper.ReadyEvent<HTMLImageElement>) => {
-          initialLocation
-            ? initWithInitialLocation(_cropper, initialLocation)
-            : setCropperData(_cropper, selectionMode);
+          if (initialLocation)
+            initWithInitialLocation(_cropper, initialLocation);
+          else setCropperData(_cropper, selectionMode);
           if (isReadonly) _cropper.disable();
           setIsReady(true);
-          onReady && onReady(event);
+          if (onReady) onReady(event);
         },
       });
       setCropper(_cropper);

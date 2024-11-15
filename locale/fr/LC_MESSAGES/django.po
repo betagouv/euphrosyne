@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-28 16:13+0100\n"
+"POT-Creation-Date: 2024-11-15 18:14+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -1122,6 +1122,26 @@ msgstr "Date de création de cette entrée"
 
 msgid "Date this entry was most recently changed."
 msgstr "Date de la dernière modification de cette entrée"
+
+msgid "standard"
+msgstr "standard"
+
+msgid "standards"
+msgstr "standards"
+
+msgid "measuring point standard"
+msgstr "standard du point de mesure"
+
+msgid "measuring point standards"
+msgstr "standards du point de messure"
+
+msgid "Standard measuring point must not belong to an object group."
+msgstr ""
+"Les de points de mesure ne peuvent pas être lié à un groupe d'objets et à un "
+"standard."
+
+msgid "Create new standard"
+msgstr "Créer un nouveau standard"
 
 msgid "Accessibility declaration"
 msgstr "Déclaration d'accessibilité"
