@@ -1,4 +1,4 @@
-import { getToken } from "../assets/js/jwt";
+import { getToken } from "../jwt";
 
 describe("Test getToken", () => {
   describe("local storage usage", () => {
@@ -29,10 +29,13 @@ describe("Test getToken", () => {
         ok: true,
         json: vi.fn().mockResolvedValue({ access: "remote token" }),
       });
+
       const token = await getToken(false);
 
       expect(token).toBe("remote token");
-      expect(getItemMock).not.toHaveBeenCalled();
+      console.log(getItemMock.mock.calls);
+      expect(getItemMock).toHaveBeenCalledTimes(2);
+      expect(getItemMock).toHaveBeenCalledWith("euphrosyne-jwt-refresh");
       expect(fetchTokenMock).toHaveBeenCalled();
       expect(setItemMock).toHaveBeenCalledWith(
         "euphrosyne-jwt-access",

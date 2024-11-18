@@ -3,7 +3,7 @@ from typing import List
 from django.conf import settings
 from django.contrib import admin
 from django.shortcuts import redirect
-from django.urls import path, reverse
+from django.urls import include, path, reverse
 from django.urls.resolvers import URLResolver
 from django.utils.translation import gettext_lazy as _
 
@@ -48,6 +48,7 @@ class AdminSite(admin.AdminSite):
                 ),
                 name="lab_objectgroup_c2rmfimport",
             ),
+            path("", include("lab_notebook.urls")),
         ]
         if settings.HDF5_ENABLE:
             urls.append(

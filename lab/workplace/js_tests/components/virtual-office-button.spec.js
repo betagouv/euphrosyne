@@ -3,6 +3,7 @@ import euphrosyneToolsService from "../../assets/js/euphrosyne-tools-service";
 import VirtualOfficeButton from "../../assets/js/components/virtual-office-button";
 
 import utils from "../../../assets/js/utils";
+import euphrosyneToolsFetch from "../../../../shared/js/euphrosyne-tools-client";
 
 describe("Test VirtualOfficeButton", () => {
   let voButton, fetchVMMock, fetchDeploymentMock;
@@ -122,7 +123,10 @@ describe("Test VirtualOfficeButton", () => {
       voButton.setAttribute("project-slug", "projet-tango");
       await voButton.onButtonClick();
 
-      expect(deployMock).toHaveBeenCalledWith("projet-tango");
+      expect(deployMock).toHaveBeenCalledWith(
+        "projet-tango",
+        euphrosyneToolsFetch,
+      );
       expect(voButton.disabled).toBe(true);
     });
 

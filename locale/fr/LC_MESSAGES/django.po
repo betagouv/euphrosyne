@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-23 12:27+0200\n"
+"POT-Creation-Date: 2024-11-15 18:14+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -461,6 +461,18 @@ msgstr "[Euphrosyne] Invitation à rejoindre le projet {project.name}"
 msgid "HDF5 Viewer"
 msgstr "Visionneur HDF5"
 
+msgid "Run"
+msgstr "Run"
+
+msgid "Object group"
+msgstr "Lot d'objets"
+
+msgid "Comments"
+msgstr "Commentaires"
+
+msgid "Point location of image"
+msgstr "Localisation du point sur l'image"
+
 msgid "{} analysis technique"
 msgstr "technique d'analyse {}"
 
@@ -580,6 +592,9 @@ msgstr "Objet(s) / Échantillon(s)"
 msgid "Inventory"
 msgstr "Inventaire"
 
+msgid "Image transformation"
+msgstr "Redimensionnement de l'image"
+
 msgid "This object has already been added to the run."
 msgstr "Cet object a déjà été ajouté à ce run."
 
@@ -697,9 +712,6 @@ msgstr "Membres"
 
 msgid "Administrator"
 msgstr "Administrateur"
-
-msgid "Comments"
-msgstr "Commentaires"
 
 msgid "Data available"
 msgstr "Données disponibles"
@@ -965,6 +977,9 @@ msgstr "Fin"
 msgid "Embargo"
 msgstr "Embargo"
 
+msgid "Go to notebook"
+msgstr "Aller au cahier de laboratoire"
+
 msgid "Object(s) / Sample(s)"
 msgstr "Objet(s) / Échantillon(s)"
 
@@ -1086,6 +1101,19 @@ msgstr ""
 "Seuls les lettres, chiffres, tirets bas, traits d'union et espaces sont des "
 "caractères valides"
 
+msgid "Notebook"
+msgstr "Cahier de laboratoire"
+
+msgid "Export"
+msgstr "Export"
+
+msgid "Timestamp request"
+msgstr "Requête d'horodatage"
+
+#, python-format
+msgid "Notebook: %s"
+msgstr "Cahier de labo: %s"
+
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"
 
@@ -1094,6 +1122,26 @@ msgstr "Date de création de cette entrée"
 
 msgid "Date this entry was most recently changed."
 msgstr "Date de la dernière modification de cette entrée"
+
+msgid "standard"
+msgstr "standard"
+
+msgid "standards"
+msgstr "standards"
+
+msgid "measuring point standard"
+msgstr "standard du point de mesure"
+
+msgid "measuring point standards"
+msgstr "standards du point de messure"
+
+msgid "Standard measuring point must not belong to an object group."
+msgstr ""
+"Les de points de mesure ne peuvent pas être lié à un groupe d'objets et à un "
+"standard."
+
+msgid "Create new standard"
+msgstr "Créer un nouveau standard"
 
 msgid "Accessibility declaration"
 msgstr "Déclaration d'accessibilité"

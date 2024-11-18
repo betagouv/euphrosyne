@@ -1,0 +1,14 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="align-right fr-mb-1w">
+    <a class="fr-btn fr-btn--icon-left fr-icon-add-line" href={% url "admin:standard_standard_add" %}>
+      {% trans "Create new standard" %}
+    </a>
+  </div>
+{{ block.super }}
+{% endblock %}
+
+{% block object-tools %}
+{% endblock %}

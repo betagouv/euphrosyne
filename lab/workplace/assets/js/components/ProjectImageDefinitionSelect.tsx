@@ -8,10 +8,12 @@ import {
 
 interface ProjectImageDefinitionSelectProps {
   projectSlug: string;
+  fetchFn?: typeof fetch;
 }
 
 export default function ProjectImageDefinitionSelect({
   projectSlug,
+  fetchFn,
 }: ProjectImageDefinitionSelectProps) {
   const t = {
     "Image definition": window.gettext("Image definition"),
@@ -31,8 +33,8 @@ export default function ProjectImageDefinitionSelect({
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    fetchImageDefinitions().then(setImageDefinitions);
-    fetchProjectImageDefinition(projectSlug).then(setImageDefinition);
+    fetchImageDefinitions(fetchFn).then(setImageDefinitions);
+    fetchProjectImageDefinition(projectSlug, fetchFn).then(setImageDefinition);
     setIsLoading(false);
   }, []);
 
@@ -43,7 +45,7 @@ export default function ProjectImageDefinitionSelect({
     const { value } = event.target;
     setImageDefinition(value);
     try {
-      await setProjectImageDefinition(projectSlug, value);
+      await setProjectImageDefinition(projectSlug, value, fetchFn);
     } catch {
       setHasError(true);
     }

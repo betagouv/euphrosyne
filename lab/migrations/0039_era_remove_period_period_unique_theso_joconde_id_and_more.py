@@ -37,7 +37,7 @@ def reverse_move_period_to_era(apps, _):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("lab", "0038_location_unique_geonames_id"),
+        ("lab", "0039_measuringpoint_measuringpoint_unique_name_per_run"),
     ]
 
     operations = [

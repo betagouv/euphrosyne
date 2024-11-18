@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-01 15:14+0200\n"
+"POT-Creation-Date: 2024-11-15 18:17+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -113,11 +113,20 @@ msgstr "Le fichier %s a été téléversé."
 msgid "File %s could not be uploaded."
 msgstr "Le fichier %s n'a pas pu être sauvegardé."
 
+msgid "An error occured while requesting upload URL."
+msgstr "Une erreur s'est produite lors de la demande d'URL de téléversement."
+
+msgid "Didn't receive upload URL from euphrosyne tools."
+msgstr "N'a pas reçu l'URL de téléversement de la part d'Euphrosyne Tools."
+
 msgid "Last modified"
 msgstr "Modifié le"
 
 msgid "Add a document"
 msgstr "Ajouter un document"
+
+msgid "Images"
+msgstr "Images"
 
 msgid "Add files"
 msgstr "Ajouter des fichiers"
@@ -173,6 +182,11 @@ msgid "Search for a valid C2RMF ID before submitting the form."
 msgstr ""
 "Lancez la recherche sur un numéro C2RMF valide avant de soumettre le "
 "formulaire. "
+
+#, fuzzy, javascript-format
+#| msgid "An error occured while creating the object group. %s"
+msgid "An error occured while creating the object group. %s"
+msgstr "Une erreur s'est produite lors de la création du lot d'objet. %S"
 
 #, javascript-format
 msgid "Characters left: %s"
@@ -266,3 +280,183 @@ msgstr "Une erreur s'est produite lors de la suppression du bureau distant."
 
 msgid "The virtual office has been deleted."
 msgstr "Le bureau virtuel a bien été supprimé."
+
+msgid "Object group / object choice"
+msgstr "Choix du groupe d'objets / objet"
+
+msgid "Image choice"
+msgstr "Choix de l'image"
+
+msgid "Image choice (edit)"
+msgstr "Choix de l'image (modifier)"
+
+msgid "Resize image"
+msgstr "Redimensionner l'image"
+
+msgid "Continue"
+msgstr "Continuer"
+
+msgid "Point selection on image"
+msgstr "Sélection de point sur l'image"
+
+msgid "Next"
+msgstr "Suivant"
+
+msgid "Back"
+msgstr "Retour"
+
+msgid "Save"
+msgstr "Sauvegarder"
+
+msgid "Change image"
+msgstr "Changer l'image"
+
+msgid "Back to edit"
+msgstr "Retour à l'édition"
+
+#, javascript-format
+msgid "Step %s of %s"
+msgstr "Étape %s sur %s"
+
+msgid "Next step: "
+msgstr "Étape suivante :"
+
+msgid "Delete"
+msgstr "Supprimer"
+
+#, javascript-format
+msgid "Images of object %s used in this run"
+msgstr "Images de l'objet %s utilisées dans ce run"
+
+#, fuzzy
+#| msgid "Other images of object %s"
+msgid "Other images of this project"
+msgstr "Autres images de l'objet %s"
+
+msgid ""
+"No image has been upload for this object group / object. You can upload one "
+"or import one from the project documents."
+msgstr ""
+"Aucune image n'a été téléversée pour ce groupe d'objets / objet. Vous pouvez "
+"en téléverser une ou en importer une à partir des documents du projet."
+
+msgid ""
+"No image has been linked to this object yet. Select an image below or upload "
+"one to add one."
+msgstr ""
+"Aucune image n'a encore été liée à cet objet. Sélectionnez une image ci-"
+"dessous ou téléversez-en une pour l'ajouter."
+
+msgid "Images from EROS"
+msgstr "Images d'EROS"
+
+msgid "No images found in EROS for this object."
+msgstr "Pas d'image trouvée dans EROS pour cet objet."
+
+msgid "Add a new object group / object"
+msgstr "Ajouter un nouveau groupe d'objets ou un objet"
+
+msgid "Object name / reference"
+msgstr "Nom / référence de l'objet"
+
+msgid "An error occured while creating the object group / object."
+msgstr ""
+"Une erreur s'est produite lors de la création du lot d'objets / de l'objet."
+
+msgid "An error occured while adding the object group / object to the run."
+msgstr ""
+"Une erreur s'est produite lors de l'ajout du groupe d'objets / objet au run."
+
+msgid "An object group / object with this label already exists in this run."
+msgstr ""
+"Un groupe d'objets / objet avec cette étiquette existe déjà dans ce run."
+
+msgid ""
+"An error occured while adding the object group / object to the measuring "
+"point."
+msgstr ""
+"Une erreur s'est produite lors de l'ajout du groupe d'objets / objet au "
+"point de mesure."
+
+msgid "Point"
+msgstr "Point"
+
+msgid "Area"
+msgstr "Zone"
+
+msgid "Selection mode"
+msgstr "Mode de sélection"
+
+msgid "Unset the object group or standard to change the analysis type"
+msgstr ""
+"Supprimer le groupe d'objets ou le standard pour changer le type d'analyse"
+
+msgid "Locate point on image"
+msgstr "Localiser le point sur l'image"
+
+msgid "Edit point location on image"
+msgstr "Modifier l'emplacement du point sur l'image"
+
+msgid "Comments"
+msgstr "Commentaires"
+
+msgid ""
+"There is no image for this run yet. You can add images to the measurement "
+"points below, and they will appear here with their corresponding point "
+"locations."
+msgstr ""
+"Aucune image n'a encore été ajoutée à ce run. Vous pouvez ajouter des images "
+"aux points de mesure ci-dessous, elles apparaîtront ici avec leurs "
+"emplacements de points correspondants."
+
+msgid "Click on an image to expand it."
+msgstr "Cliquer sur une image pour l'agrandir."
+
+msgid "Add a new object group"
+msgstr "Ajouter un groupe d'objets ou un objet"
+
+msgid "Object"
+msgstr "Objet"
+
+msgid "Standard"
+msgstr "Standard"
+
+msgid "Analysis type"
+msgstr "Type d'analyse"
+
+msgid "Standard reference"
+msgstr "Référence du standard"
+
+msgid "No standard"
+msgstr "Auncun standard"
+
+msgid ""
+"There are no notes in this notebook yet. Click the button to add the first "
+"one."
+msgstr ""
+"Il n'y a encore aucune note dans ce carnet. Cliquez sur le bouton pour "
+"ajouter la première."
+
+msgid "Unfold all"
+msgstr "Tout déplier"
+
+msgid "Close all"
+msgstr "Tout fermer"
+
+msgid "Run images with point locations"
+msgstr "Images avec les emplacements des points de mesure"
+
+msgid "Add image"
+msgstr "Ajouter une image"
+
+msgid "Measuring points"
+msgstr "Points de mesure"
+
+msgid "Add point"
+msgstr "Ajouter un point"
+
+msgid "Object reference"
+msgstr "Référence de l'objet"
+
+msgid "No object group / object selected"
+msgstr "Aucun groupe d'objets / objet sélectionné"

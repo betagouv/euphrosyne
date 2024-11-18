@@ -77,8 +77,10 @@ INSTALLED_APPS = [
     "django_filters",
     "lab",
     "data_request",
+    "lab_notebook",
     "orcid_oauth",
     "static_pages",
+    "standard",
 ] + (["debug_toolbar"] if DEBUG else [])
 
 MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else []) + [

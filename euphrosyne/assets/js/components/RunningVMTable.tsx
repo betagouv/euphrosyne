@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { jwtFetch } from "../../../../lab/assets/js/jwt.js";
+import { jwtFetch } from "../../../../shared/js/jwt.js";
 import euphrosyneToolsService from "../../../../lab/workplace/assets/js/euphrosyne-tools-service.js";
 
 const deleteVm = (vm: string) => {

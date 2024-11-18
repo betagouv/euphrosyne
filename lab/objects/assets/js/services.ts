@@ -7,11 +7,45 @@ interface ObjectGroupResponseElement {
   object_count: number;
   dating: string; // this is linked to Django ObjectGroup.dating_era
   materials: string[];
+  c2rmf_id: string;
 }
 
 interface RunObjectGroupsResponseElement {
   id: number;
   objectgroup: ObjectGroupResponseElement;
+}
+
+interface ObjectGroupCreateBody {
+  label: string;
+}
+
+interface ObjectGroupCreateResponse {
+  label: string;
+  id: number;
+}
+
+export async function createObjectGroup(
+  body: ObjectGroupCreateBody,
+): Promise<ObjectGroupCreateResponse> {
+  const response = await fetch("/api/lab/objectgroups", {
+    ...getBasePOSTParams(),
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    try {
+      throw new Error(await response.json());
+    } catch (e) {
+      throw new Error(
+        window.interpolate(
+          window.gettext(
+            "An error occured while creating the object group. %s",
+          ),
+          [(e as Error).toString()],
+        ),
+      );
+    }
+  }
+  return (await response.json()) as ObjectGroupCreateResponse;
 }
 
 export async function fetchRunObjectGroups(
@@ -28,6 +62,7 @@ export async function fetchRunObjectGroups(
       objectCount: ro.objectgroup.object_count,
       dating: ro.objectgroup.dating,
       materials: ro.objectgroup.materials,
+      c2rmfId: ro.objectgroup.c2rmf_id,
     },
   }));
 }
@@ -47,6 +82,7 @@ export async function fetchAvailableObjectGroups(
     objectCount: objectgroup.object_count,
     dating: objectgroup.dating,
     materials: objectgroup.materials,
+    c2rmfId: objectgroup.c2rmf_id,
   }));
 }
 
@@ -57,11 +93,7 @@ export async function addObjectGroupToRun(
   let response;
   try {
     response = await fetch(`/api/lab/runs/${runId}/objectgroups`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": getCSRFToken() || "",
-      },
+      ...getBasePOSTParams(),
       body: JSON.stringify({ objectgroup: objectGroupId }),
     });
   } catch (error) {
@@ -89,4 +121,14 @@ export async function deleteRunObjectGroup(runObjectGroupId: string) {
     console.error("Error deleting object group from run", response);
   }
   return response;
+}
+
+function getBasePOSTParams() {
+  return {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": getCSRFToken() || "",
+    },
+  };
 }

@@ -49,7 +49,6 @@ export default function DocumentUploadModal({
   };
 
   const uploadFiles = async () => {
-    console.log("uploading...");
     if (!formRef.current) {
       throw new Error("Form ref not set");
     }
@@ -57,9 +56,8 @@ export default function DocumentUploadModal({
     setIsSubmitting(true);
     try {
       results = await onUploadFile(Array.from(formRef.current.files.files));
-      console.log(results);
     } catch (error) {
-      console.log("error uploading...", error);
+      console.error("error uploading...", error);
       displayMessage(
         t[
           "An error has occured while generating the presigned URL. Please contact the support team."
@@ -70,7 +68,6 @@ export default function DocumentUploadModal({
       throw error;
     }
     results.forEach(async (result) => {
-      console.log("result...", result);
       if (result.status === "fulfilled") {
         displayMessage(
           window.interpolate(t["File %s has been uploaded."], [

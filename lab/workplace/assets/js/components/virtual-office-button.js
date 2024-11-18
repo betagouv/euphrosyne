@@ -2,6 +2,7 @@
 
 import euphrosyneToolsService from "../euphrosyne-tools-service.js";
 import utils from "../../../../assets/js/utils.js";
+import euphrosyneToolsFetch from "../../../../../shared/js/euphrosyne-tools-client.ts";
 
 export default class VirtualOfficeButton extends HTMLButtonElement {
   static init() {
@@ -17,6 +18,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
   constructor() {
     super();
     this.addEventListener("click", this.onButtonClick);
+    this.fetchFn = euphrosyneToolsFetch;
     window.addEventListener("vm-deleted", () => {
       this.disabled = false;
       this.innerText = window.gettext("Create virtual office");
@@ -35,7 +37,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
     } else {
       this.disabled = true;
       try {
-        await euphrosyneToolsService.deployVM(this.projectSlug);
+        await euphrosyneToolsService.deployVM(this.projectSlug, this.fetchFn);
       } catch (error) {
         this.disabled = false;
         utils.displayMessage(
@@ -68,6 +70,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
   async initButton() {
     const url = await euphrosyneToolsService.fetchVMConnectionLink(
       this.projectSlug,
+      this.fetchFn,
     );
     if (url) {
       this.connectionUrl = url;
@@ -75,7 +78,10 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
       this.onConnectReady();
     } else {
       const deploymentStatus =
-        await euphrosyneToolsService.fetchDeploymentStatus(this.projectSlug);
+        await euphrosyneToolsService.fetchDeploymentStatus(
+          this.projectSlug,
+          this.fetchFn,
+        );
       if (deploymentStatus) {
         this.deploymentStatus = deploymentStatus;
         if (deploymentStatus === "Failed") {
@@ -100,6 +106,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
   async checkDeploymentProgress() {
     const deploymentStatus = await euphrosyneToolsService.fetchDeploymentStatus(
       this.projectSlug,
+      this.fetchFn,
     );
     if (deploymentStatus === "Failed") {
       this.onFailedDeployment();
@@ -128,6 +135,7 @@ export default class VirtualOfficeButton extends HTMLButtonElement {
   async waitForConnectionLink() {
     const url = await euphrosyneToolsService.fetchVMConnectionLink(
       this.projectSlug,
+      this.fetchFn,
     );
     if (url) {
       this.connectionUrl = url;
