@@ -9,7 +9,10 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("lab", "0040_merge_20241024_1024"),
+        (
+            "lab",
+            "0044_runobjetgroupimage_run_object_group_image_unique_path_transform_perrun_object_group",
+        ),
     ]
 
     operations = [

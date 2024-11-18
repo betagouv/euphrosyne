@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("lab", "0038_alter_run_filters_for_detector_he1_and_more"),
+        ("lab", "0039_era_remove_period_period_unique_theso_joconde_id_and_more"),
     ]
 
     operations = [
