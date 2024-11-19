@@ -1,3 +1,5 @@
+import { css } from "@emotion/react";
+
 interface IImageLoadingProps {
   spinningRadius?: number;
 }
@@ -6,6 +8,9 @@ export default function ImageLoading({
   spinningRadius = 40,
   ...props
 }: React.SVGProps<SVGSVGElement> & IImageLoadingProps) {
+  const circleStyle = css({
+    transformOrigin: "center",
+  });
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" {...props}>
       <radialGradient
@@ -23,6 +28,7 @@ export default function ImageLoading({
         <stop offset="1" stopColor="#000091" stopOpacity="0"></stop>
       </radialGradient>
       <circle
+        css={circleStyle}
         fill="none"
         stroke="url(#a11)"
         strokeWidth="2"
@@ -45,6 +51,7 @@ export default function ImageLoading({
         ></animateTransform>
       </circle>
       <circle
+        css={circleStyle}
         fill="none"
         opacity=".2"
         stroke="#000091"
