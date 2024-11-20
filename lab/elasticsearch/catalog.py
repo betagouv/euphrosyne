@@ -74,12 +74,20 @@ def _create_project_page_data(
         dating_period_label: str | None = None
         if object_group.c2rmf_id:
             # Fetch object group from EROS
-            object_group = (
-                fetch_full_objectgroup_from_eros(
-                    c2rmf_id=object_group.c2rmf_id, object_group=object_group
+            try:
+                object_group = (
+                    fetch_full_objectgroup_from_eros(
+                        c2rmf_id=object_group.c2rmf_id, object_group=object_group
+                    )
+                    or object_group
                 )
-                or object_group
-            )
+            except ErosHTTPError as error:
+                logger.error(
+                    "Failed to fetch object group %s from EROS: %s",
+                    object_group.id,
+                    error,
+                    exc_info=True,
+                )
         else:
             # Fetch thesauri information for non-EROS object groups
             if object_group.dating_period:
