@@ -6,7 +6,7 @@ import graphene
 from django.db.models import F, Sum
 from django.utils import timezone
 
-from .models import ObjectGroup, Project, Run
+from .models import Object, ObjectGroup, Project, Run
 
 StatPeriodLiteral = Literal["all", "year"]
 
@@ -39,11 +39,16 @@ class LabStatsType(graphene.ObjectType):
         return qs.count()
 
     @staticmethod
-    def get_total_object_groups(period: StatPeriodLiteral):
+    def get_total_analyzed_objects(period: StatPeriodLiteral):
         run_qs = Run.objects.filter(end_date__lte=timezone.now())
         if period == "year":
             run_qs = run_qs.filter(start_date__gte=THIS_YEAR_START_DT)
-        return ObjectGroup.objects.filter(runs__in=run_qs).count()
+        object_group_qs = ObjectGroup.objects.filter(runs__in=run_qs)
+        object_qs = Object.objects.filter(group__in=object_group_qs)
+        object_group_count = object_group_qs.count()
+        object_count = object_qs.count()
+        distinct_object_group_count = object_qs.values("group").distinct().count()
+        return object_group_count + object_count - distinct_object_group_count
 
     @staticmethod
     def get_total_hours(period: StatPeriodLiteral):
@@ -64,12 +69,12 @@ class Query(graphene.ObjectType):
         return {
             "all": LabStatType(
                 total_projects=LabStatsType.get_total_projects("all"),
-                total_object_groups=LabStatsType.get_total_object_groups("all"),
+                total_object_groups=LabStatsType.get_total_analyzed_objects("all"),
                 total_hours=LabStatsType.get_total_hours("all"),
             ),
             "year": LabStatType(
                 total_projects=LabStatsType.get_total_projects("year"),
-                total_object_groups=LabStatsType.get_total_object_groups("year"),
+                total_object_groups=LabStatsType.get_total_analyzed_objects("year"),
                 total_hours=LabStatsType.get_total_hours("year"),
             ),
         }
