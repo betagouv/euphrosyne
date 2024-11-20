@@ -59,8 +59,8 @@ def test_resolve_stats(client):
     assert executed == {
         "data": {
             "stats": {
-                "all": {"totalProjects": 3, "totalObjectGroups": 3, "totalHours": 18},
-                "year": {"totalProjects": 2, "totalObjectGroups": 2, "totalHours": 12},
+                "all": {"totalProjects": 3, "totalObjectGroups": 9, "totalHours": 18},
+                "year": {"totalProjects": 2, "totalObjectGroups": 6, "totalHours": 12},
             }
         }
     }
