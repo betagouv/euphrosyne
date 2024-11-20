@@ -43,7 +43,7 @@ class CatalogClient(metaclass=Singleton):
             "ELASTICSEARCH_PASSWORD",
             "ELASTICSEARCH_HOST",
         ]:
-            if not getattr(settings, setting):
+            if getattr(settings, setting, None) is None:
                 raise ValueError(
                     "Incorrect elasticsearch configuration. %s is missing" % setting
                 )
