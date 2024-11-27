@@ -23,6 +23,9 @@ class MeasuringPointsView(
     def perform_create(self, serializer):
         serializer.save(run_id=self.kwargs["run_id"])
 
+    def get_queryset(self):
+        return super().get_queryset().select_related("image")
+
 
 class MeasuringPointView(MeasuringPointViewMixin, generics.UpdateAPIView):
     serializer_class = serializers.MeasuringPointsSerializer
