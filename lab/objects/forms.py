@@ -186,10 +186,14 @@ class ObjectGroupImportC2RMFForm(forms.ModelForm):
                 {"c2rmf_id": _("This ID was not found in Eros.")}
             )
         data = {
+            **self.cleaned_data,
             **eros_data,
             "object_count": 1,
         }
         return data
+
+    def clean_c2rmf_id(self):
+        return self.cleaned_data["c2rmf_id"].upper()
 
 
 class ObjectGroupImportC2RMFReadonlyForm(forms.ModelForm):

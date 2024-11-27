@@ -21,7 +21,7 @@ def test_form_conf():
 @mock.patch("lab.objects.forms.fetch_partial_objectgroup_from_eros")
 def test_clean_fetch_data(mock_fetch: mock.MagicMock):
     mock_fetch.return_value = {
-        "c2rmf_id": "C2RMF00000",
+        "worknbr": "C2RMF00000",
         "label": "Test",
     }
     form = ObjectGroupImportC2RMFForm()
@@ -64,3 +64,16 @@ def test_clean_set_form_if_obj_exists():
 
     assert form.instance
     assert form.instance.id == objectgroup.id
+
+
+@pytest.mark.django_db
+@mock.patch("lab.objects.forms.fetch_partial_objectgroup_from_eros")
+def test_clean_c2rmf_id_upper(mock_fetch: mock.MagicMock):
+    mock_fetch.return_value = {
+        "worknbr": "C2RMF00000",
+        "label": "Test",
+    }
+    form = ObjectGroupImportC2RMFForm(data={"c2rmf_id": "c2rmf00000"})
+    form.full_clean()
+
+    assert form.cleaned_data["c2rmf_id"] == "C2RMF00000"
