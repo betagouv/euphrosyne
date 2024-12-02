@@ -3,7 +3,7 @@
 black==24.10.0
 factory-boy==3.3.1
 flake8==7.1.1
-ipython==8.29.0
+ipython==8.30.0
 isort==5.13.2
 mypy==1.13.0
 pylint-django==2.6.1
