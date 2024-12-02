@@ -34,7 +34,7 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
 
   const getNextMeasuringPointName = () => {
     const n = measuringPoints.length + 1;
-    return n > 9 ? "0" + n : "00" + n;
+    return n.toString().padStart(3, "0");
   };
 
   const onAddPointClick = async () => {
@@ -42,6 +42,7 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
       name: getNextMeasuringPointName(),
     });
     setMeasuringPoints(await listMeasuringPoints(runId));
+    window.scrollTo(0, document.body.scrollHeight);
   };
 
   // useEffect
@@ -85,6 +86,17 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
                 listMeasuringPoints(runId).then(setMeasuringPoints)
               }
             />
+            {measuringPoints.length > 20 && (
+              <div className="flex-container">
+                <div></div>
+                <button
+                  className="fr-btn fr-btn--secondary fr-mt-2w"
+                  onClick={onAddPointClick}
+                >
+                  {t["Add point"]}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </NotebookContext.Provider>
