@@ -11,7 +11,7 @@ django-stubs[compatible-mypy]==5.1.1 # not dev because used in code (WithAnnotat
 graphene-django==3.2.2
 gunicorn==23.0.0
 markdown==3.7
-opensearch-py==2.7.1
+opensearch-py==2.8.0
 psycopg2==2.9.10
 python-dotenv==1.0.1
 python3-openid==3.2.0
