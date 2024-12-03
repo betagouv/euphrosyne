@@ -138,3 +138,32 @@ class RunObjetGroupImage(TimestampedModel):
                 name="run_object_group_image_unique_path_transform_perrun_object_group",
             ),
         ]
+
+    @property
+    def file_name(self) -> str:
+        if (
+            self.path.startswith("C2RMF")
+            or self.path.startswith("FZ")
+            or self.path.startswith("F")
+        ) and len(self.path.split("/")) == 2:
+            image_id = self.path.split("/")[1]
+            return f"{image_id}.tiff"
+        return self.path.rsplit("/", maxsplit=1)[-1].split("?")[0]
+
+
+def construct_image_url_from_path(
+    path: str, storage_base_url: str, storage_token: str | None = None
+) -> str:
+    # pylint: disable=import-outside-toplevel
+    from lab.objects.c2rmf import construct_image_url_from_eros_path
+
+    if (
+        path.startswith("C2RMF") or path.startswith("FZ") or path.startswith("F")
+    ) and len(path.split("/")) == 2:
+        return construct_image_url_from_eros_path(path)
+
+    return (
+        f"{storage_base_url}{path}?{storage_token}"
+        if storage_token
+        else f"{storage_base_url}{path}"
+    )

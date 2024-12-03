@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-15 18:14+0100\n"
+"POT-Creation-Date: 2024-12-03 17:20+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -1100,6 +1100,56 @@ msgid "Only alphanumeric, underscore, hyphen and space characters are allowed"
 msgstr ""
 "Seuls les lettres, chiffres, tirets bas, traits d'union et espaces sont des "
 "caractères valides"
+
+#, python-format
+msgid "Project: %s"
+msgstr "Projet: %s"
+
+#, python-format
+msgid "Run: %s"
+msgstr "Run: %s"
+
+msgid "Table of contents"
+msgstr "Table des matières"
+
+#, python-format
+msgid "Particle type: %s"
+msgstr "Type de particule: %s"
+
+#, python-format
+msgid "Energy: %s"
+msgstr "Energie: %s"
+
+#, python-format
+msgid "Beamline: %s"
+msgstr "Ligne de faisceau: %s"
+
+#, python-format
+msgid "Method: %s"
+msgstr "Méthode: %s"
+
+#, python-format
+msgid "Detector: %s"
+msgstr "Détecteur: %s"
+
+#, python-format
+msgid "Filter: %s"
+msgstr "Filtre: %s"
+
+msgid "Run images with point locations"
+msgstr "Images du run avec localisation des points"
+
+msgid "Measuring points"
+msgstr "Points de mesure"
+
+msgid "Analysis type"
+msgstr "Type d'analyse"
+
+msgid "Reference"
+msgstr "Référence"
+
+msgid "Standard"
+msgstr "Standard"
 
 msgid "Notebook"
 msgstr "Cahier de laboratoire"

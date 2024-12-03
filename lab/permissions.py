@@ -1,4 +1,5 @@
 import enum
+import typing
 from functools import wraps
 
 from django.contrib.auth.models import AnonymousUser
@@ -6,8 +7,10 @@ from django.http import HttpResponse, JsonResponse
 from django.http.request import HttpRequest
 
 from euphro_auth.models import User
-from lab.models import Project
 from shared.view_mixins import StaffUserRequiredMixin
+
+if typing.TYPE_CHECKING:
+    from lab.models import Project
 
 
 class LabRole(enum.IntEnum):
@@ -18,7 +21,7 @@ class LabRole(enum.IntEnum):
     LAB_ADMIN = 4
 
 
-def get_user_permission_group(request: HttpRequest, project: Project) -> LabRole:
+def get_user_permission_group(request: HttpRequest, project: "Project") -> LabRole:
     if request.user.is_anonymous:
         return LabRole.ANONYMOUS
     user: User = request.user
@@ -41,7 +44,7 @@ def is_lab_admin(user: User | AnonymousUser) -> bool:
     return bool(user.is_superuser or getattr(user, "is_lab_admin", None))
 
 
-def is_project_leader(user: User, project: Project) -> bool:
+def is_project_leader(user: User, project: "Project") -> bool:
     return project.participation_set.filter(user=user, is_leader=True).exists()
 
 
@@ -50,6 +53,8 @@ class ProjectMembershipRequiredMixin(StaffUserRequiredMixin):
     def dispatch(
         self, request: HttpRequest, project_id: int, *args, **kwargs
     ) -> HttpResponse:
+        from lab.models import Project  # pylint: disable=import-outside-toplevel
+
         response = super().dispatch(request, *args, **kwargs)
         if request.user.is_anonymous:
             return self.handle_no_permission()
@@ -65,6 +70,8 @@ class ProjectMembershipRequiredMixin(StaffUserRequiredMixin):
 def project_membership_required(view_func):
     @wraps(view_func)
     def _wrapped_view(request, project_id: int, *args, **kwargs):
+        from lab.models import Project  # pylint: disable=import-outside-toplevel
+
         try:
             project = Project.objects.get(pk=project_id)
         except Project.DoesNotExist:

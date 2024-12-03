@@ -4,6 +4,7 @@ from functools import lru_cache
 from typing import Any
 
 import requests
+from django.conf import settings
 
 from lab.thesauri.models import Era
 
@@ -99,3 +100,29 @@ def fetch_full_objectgroup_from_eros(
     updated_og.inventory = data.get("inv") or ""
     updated_og.materials = (data.get("support") or "").split(" / ")
     return updated_og
+
+
+def construct_image_url_from_eros_path(path: str) -> str:
+    # pylint: disable=import-outside-toplevel
+    from euphro_auth.jwt.tokens import EuphroToolsAPIToken
+
+    c2rmf_id, image_id = path.split("/")
+    if c2rmf_id.startswith("C2RMF"):
+        image_category = f"pyr-{c2rmf_id[:6]}"
+    elif c2rmf_id.startswith("F"):
+        image_category = f"pyr-{c2rmf_id[:2]}"
+    else:
+        image_category = "pyr-FZ"
+
+    eros_base_url = (
+        settings.EROS_BASE_IMAGE_URL or f"{settings.EUPHROSYNE_TOOLS_API_URL}/eros"
+    )
+
+    url = f"{eros_base_url}/iiif/{image_category}/{c2rmf_id}/{image_id}.tif/full/500,/0/default.jpg"  # pylint: disable=line-too-long
+
+    # Add token to the URL if using EROS direct URL. Else we use the EuphroTools API
+    # proxy which includes the token in the request headers.
+    if settings.EROS_BASE_IMAGE_URL:
+        token = EuphroToolsAPIToken.for_euphrosyne().access_token
+        return f"{url}?token={token}"
+    return url
