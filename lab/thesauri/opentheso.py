@@ -2,6 +2,7 @@ import logging
 from functools import lru_cache
 
 import requests
+from requests import JSONDecodeError
 
 from .models import Era, Period
 
@@ -26,7 +27,15 @@ def fetch_parent_ids_from_id(theso_id: str, concept_id: str) -> list[str]:
             response.text,
         )
         return []
-    data = response.json()
+    try:
+        data = response.json()
+    except JSONDecodeError as e:
+        logger.error(
+            "Failed to fetch parent ids from OpenTheso. Invalid JSON. %s\n%s",
+            e,
+            response.text,
+        )
+        return []
     if data and isinstance(data, dict):
         # We exclude the first item as it is common to all branches
         return [key.split("/")[-1] for key, _ in list(data.items())[1:]]
