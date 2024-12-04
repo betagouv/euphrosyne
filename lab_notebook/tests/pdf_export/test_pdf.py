@@ -176,6 +176,12 @@ def test_generate_measuring_points_story():
             "object_group": None,
             "standard": {"label": "standard test 2"},
         },
+        {
+            "name": "point-test-3",
+            "comments": "test comment 2",
+            "object_group": None,
+            "standard": None,
+        },
     ]
     notebook_images = [
         {

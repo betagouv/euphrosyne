@@ -271,7 +271,7 @@ def generate_measuring_points_story(  # pylint: disable=too-many-locals
                     styles["Normal"],
                 )
             )
-            cols.append(left_col)
+        cols.append(left_col)
 
         if measuring_point["name"] in measuring_point_images:
             img = generate_image_with_points(
