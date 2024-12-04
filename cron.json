@@ -9,7 +9,7 @@
       "size": "S"
     },
     {
-      "command": "5 */6 * * * python manage.py index_elasticsearch_catalog",
+      "command": "5 */6 * * * ./scripts/scalingo_index_and_build_catalog.sh",
       "size": "S"
     },
     {
