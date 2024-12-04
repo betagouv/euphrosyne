@@ -137,8 +137,9 @@ def create_pdf(
         story.extend(generate_experimental_conditions_story(run, run_methods))
         story.append(Spacer(1, 0.2 * inch))
         add_comments(story, run["run_notebook"]["comments"])
-        story.append(Spacer(1, 0.2 * inch))
-        story.extend(generate_images_with_points_story(images, tmpdirname))
+        if images:
+            story.append(Spacer(1, 0.2 * inch))
+            story.extend(generate_images_with_points_story(images, tmpdirname))
         story.append(PageBreak())
         add_table_of_contents(story)
         story.append(PageBreak())

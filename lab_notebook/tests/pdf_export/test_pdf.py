@@ -289,3 +289,46 @@ def test_create_pdf():
         f.close()
 
         assert Canvas(f.name, pagesize=A4)
+
+
+def test_create_pdf_with_no_image():
+    run = {
+        "label": "test-run",
+        "project": {"slug": "test-project", "name": "Test Project"},
+        "particle_type": "electron",
+        "energy_in_keV": "100",
+        "beamline": "test-beamline",
+        "run_notebook": {"comments": "Test comments"},
+    }
+    run_methods = [
+        mock.Mock(
+            name="Test Method",
+            detectors=[
+                mock.Mock(
+                    name="Test Detector",
+                    filters=["Test Filter"],
+                )
+            ],
+        )
+    ]
+    measuring_points = [
+        {
+            "name": "point-test-1",
+            "comments": "test comment 1",
+            "object_group": {"label": "object test 1"},
+            "standard": None,
+        },
+        {
+            "name": "point-test-2",
+            "comments": "test comment 2",
+            "object_group": None,
+            "standard": {"label": "standard test 2"},
+        },
+    ]
+    images = []
+
+    with tempfile.NamedTemporaryFile("w+b", suffix=".pdf", delete=False) as f:
+        create_pdf(f.name, run, run_methods, measuring_points, images)
+        f.close()
+
+        assert Canvas(f.name, pagesize=A4)
