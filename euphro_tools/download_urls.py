@@ -1,8 +1,8 @@
 """Everything related to getting signed download link from euphro tools."""
 
 import os
+import typing
 from datetime import datetime
-from typing import Literal
 
 import requests
 
@@ -11,7 +11,7 @@ from euphro_auth.jwt.tokens import EuphroToolsAPIToken
 from .exceptions import EuphroToolsException
 from .utils import get_run_data_path
 
-DataType = Literal["raw_data", "processed_data"]
+DataType = typing.Literal["raw_data", "processed_data"]
 
 
 def generate_download_url(
@@ -54,3 +54,29 @@ def fetch_token_for_run_data(
     except (requests.HTTPError, requests.ConnectionError) as error:
         raise EuphroToolsException from error
     return request.json()["token"]
+
+
+class GetUrlAndTokenForProjectImagesResponse(typing.TypedDict):
+    base_url: str
+    token: str
+
+
+def get_storage_info_for_project_images(
+    project_slug: str,
+) -> GetUrlAndTokenForProjectImagesResponse:
+    """Get a download URL and token for a project's images."""
+    url = (
+        os.environ["EUPHROSYNE_TOOLS_API_URL"]
+        + f"/images/projects/{project_slug}/signed-url"
+    )
+    token = EuphroToolsAPIToken.for_euphrosyne().access_token
+    try:
+        request = requests.get(
+            url,
+            timeout=5,
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        request.raise_for_status()
+    except (requests.HTTPError, requests.ConnectionError) as error:
+        raise EuphroToolsException from error
+    return request.json()
