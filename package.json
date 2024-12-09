@@ -34,7 +34,7 @@
     "@types/lodash.debounce": "^4.0.9",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "^7.37.2",
-    "prettier": "3.4.1",
+    "prettier": "3.4.2",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
   },
