@@ -26,7 +26,9 @@ export abstract class OpenThesoTypeAhead extends TypeAheadList {
       // autocomplete
       url = `https://opentheso.huma-num.fr/opentheso/openapi/v1/concept/${this.thesorusId}/autocomplete/${q}?lang=fr&exactMatch=false`;
     }
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: { Accept: "application/json" },
+    });
 
     if (response && response.status === 404) {
       return [];
