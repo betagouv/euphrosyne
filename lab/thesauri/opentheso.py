@@ -14,7 +14,8 @@ def fetch_parent_ids_from_id(theso_id: str, concept_id: str) -> list[str]:
     try:
         response = requests.get(
             # pylint: disable=line-too-long
-            f"https://opentheso.huma-num.fr/opentheso/openapi/v1/concept/{theso_id}/{concept_id}/expansion?way=top",
+            f"https://opentheso.huma-num.fr/openapi/v1/concept/{theso_id}/{concept_id}/expansion?way=top",
+            headers={"Accept": "application/json"},
             timeout=5,
         )
     except requests.exceptions.RequestException as e:

@@ -15,6 +15,7 @@ def test_fetch_parent_ids_from_id(request_mock: mock.MagicMock):
     assert fetch_parent_ids_from_id("theso_id", "concept_id") == ["FIRST", "SECOND"]
     request_mock.get.assert_called_once_with(
         # pylint: disable=line-too-long
-        "https://opentheso.huma-num.fr/opentheso/openapi/v1/concept/theso_id/concept_id/expansion?way=top",
+        "https://opentheso.huma-num.fr/openapi/v1/concept/theso_id/concept_id/expansion?way=top",
+        headers={"Accept": "application/json"},
         timeout=5,
     )
