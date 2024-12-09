@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   createMeasuringPoint,
   listMeasuringPoints,
@@ -32,15 +32,18 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
 
   const toolsClient = useClientContext();
 
+  const [isAddingPoint, setIsAddingPoint] = useState(false);
+
   const getNextMeasuringPointName = () => {
     const n = measuringPoints.length + 1;
     return n.toString().padStart(3, "0");
   };
 
   const onAddPointClick = async () => {
+    setIsAddingPoint(true);
     await createMeasuringPoint(runId, {
       name: getNextMeasuringPointName(),
-    });
+    }).finally(() => setIsAddingPoint(false));
     setMeasuringPoints(await listMeasuringPoints(runId));
     window.scrollTo(0, document.body.scrollHeight);
   };
@@ -58,6 +61,16 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
     listStandards().then(setStandards);
   }, []);
 
+  const AddButton = () => (
+    <button
+      className="fr-btn fr-btn--secondary fr-mt-2w"
+      onClick={onAddPointClick}
+      disabled={isAddingPoint}
+    >
+      {t["Add point"]}
+    </button>
+  );
+
   return (
     <EuphrosyneToolsClientContext.Provider value={toolsClient}>
       <NotebookContext.Provider value={notebookContext}>
@@ -71,12 +84,7 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
             <div className="flex-container">
               <h4>{t["Measuring points"]}</h4>
               <div>
-                <button
-                  className="fr-btn fr-btn--secondary"
-                  onClick={onAddPointClick}
-                >
-                  {t["Add point"]}
-                </button>
+                <AddButton />
               </div>
             </div>
             <MeasuringPoints
@@ -89,12 +97,7 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
             {measuringPoints.length > 20 && (
               <div className="flex-container">
                 <div></div>
-                <button
-                  className="fr-btn fr-btn--secondary fr-mt-2w"
-                  onClick={onAddPointClick}
-                >
-                  {t["Add point"]}
-                </button>
+                <AddButton />
               </div>
             )}
           </div>
