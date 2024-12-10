@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     "orcid_oauth",
     "static_pages",
     "standard",
+    "drf_spectacular",
 ] + (["debug_toolbar"] if DEBUG else [])
 
 MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else []) + [
@@ -324,7 +325,8 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+    ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 GRAPHENE = {"SCHEMA": "lab.schema.schema"}
