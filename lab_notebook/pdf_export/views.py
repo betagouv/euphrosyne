@@ -27,8 +27,18 @@ def _get_image_content(image_url: str):
 def export_notebook_to_pdf_view(request: HttpRequest, run_id: str):
     run = get_object_or_404(lab_models.Run, pk=run_id)
 
+    points_qs = (
+        MeasuringPoint.objects.filter(run=run)
+        .select_related("object_group", "standard")
+        .order_by("name")
+    )
+
     run_object_group_images = (
-        RunObjetGroupImage.objects.filter(run_object_group__run=run)
+        RunObjetGroupImage.objects.filter(
+            id__in=points_qs.filter(image__isnull=False)
+            .values_list("image__run_object_group_image", flat=True)
+            .distinct()
+        )
         .prefetch_related("measuring_point_images")
         .select_related("run_object_group", "run_object_group__objectgroup")
         .all()
