@@ -163,3 +163,17 @@ class RunObjectGroupImageSerializer(serializers.ModelSerializer):
         fields = ("id", "path", "transform")
 
         read_only_fields = ("id",)
+
+    def validate_transform(self, value: dict | None):
+        """
+        Check that image has valid size.
+        """
+        if value is None:
+            return value
+        if ("width" in value and value["width"] == 0) and (
+            "height" in value and value["height"] == 0
+        ):
+            raise serializers.ValidationError(
+                "Image transform must have width and height set to a non-zero value"
+            )
+        return value
