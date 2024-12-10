@@ -8,6 +8,7 @@ from ...api_views.serializers import (
     ProjectRunSerializer,
     ProjectSerializer,
     RunMethodsSerializer,
+    RunObjectGroupImageSerializer,
     UpcomingProjectSerializer,
 )
 from ...models import Run
@@ -131,3 +132,22 @@ class TestUpcomingProjectSerializer(TestCase):
         serializer.context["request"] = mock.MagicMock()
 
         assert serializer.data["start_date"] == run.start_date
+
+
+class TestRunObjectGroupImageSerializer(SimpleTestCase):
+    def test_transform_valid(self):
+        serializer = RunObjectGroupImageSerializer(
+            data={
+                "path": "/path",
+                "transform": {"width": 100, "height": 100, "x": 100, "y": 100},
+            }
+        )
+        assert serializer.is_valid()
+
+        serializer = RunObjectGroupImageSerializer(
+            data={
+                "path": "/path",
+                "transform": {"width": 0, "height": 0, "x": 100, "y": 100},
+            }
+        )
+        assert not serializer.is_valid()
