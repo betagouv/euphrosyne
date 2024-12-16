@@ -52,7 +52,7 @@
     "cropperjs": "^1.6.2",
     "css-loader": "^7.1.2",
     "css-minimizer-webpack-plugin": "^7.0.0",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.7",
     "glob": "^11.0.0",
     "lodash.debounce": "^4.0.8",
     "mini-css-extract-plugin": "^2.9.2",
