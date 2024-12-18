@@ -6,7 +6,7 @@ import "@gouvfr/dsfr/dist/component/tab/tab.module.js";
 import { renderComponent } from "../../../../../euphrosyne/assets/js/react";
 import { getTemplateJSONData } from "../../../../../shared/js/utils";
 
-import VirtualOfficeButton from "../components/virtual-office-button.js";
+import { registerVirtualOfficeButton } from "../components/virtual-office-button.js";
 import VirtualOfficeDeleteButton from "../components/virtual-office-delete-button.js";
 import VMSizeSelect from "../components/vm-size-select.js";
 import ProjectImageDefinitionSelect from "../components/ProjectImageDefinitionSelect";
@@ -23,7 +23,7 @@ export type WorkplacePageData = Omit<
   "rawDataFileService" | "processedDataFileService"
 >;
 
-VirtualOfficeButton.init();
+registerVirtualOfficeButton();
 VirtualOfficeDeleteButton.init();
 VMSizeSelect.init();
 
