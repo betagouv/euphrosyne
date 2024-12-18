@@ -123,6 +123,7 @@ def construct_image_url_from_eros_path(path: str) -> str:
     # Add token to the URL if using EROS direct URL. Else we use the EuphroTools API
     # proxy which includes the token in the request headers.
     if settings.EROS_BASE_IMAGE_URL:
+        token = os.environ["EROS_HTTP_TOKEN"]
+    else:
         token = EuphroToolsAPIToken.for_euphrosyne().access_token
-        return f"{url}?token={token}"
-    return url
+    return f"{url}?token={token}"
