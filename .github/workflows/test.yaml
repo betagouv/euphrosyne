@@ -15,6 +15,7 @@ env:
   SITE_URL: http://localhost:8000
   PYTHON_VERSION: 3.12.8
   EUPHROSYNE_TOOLS_API_URL: http://localhost:8001
+  EROS_HTTP_TOKEN: token
 
 jobs:
   python-checks:

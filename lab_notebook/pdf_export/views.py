@@ -20,7 +20,9 @@ from .pdf import NotebookImage, PointLocation, create_pdf
 
 
 def _get_image_content(image_url: str):
-    return BytesIO(requests.get(image_url, timeout=10).content)
+    response = requests.get(image_url, timeout=10)
+    response.raise_for_status()
+    return BytesIO(response.content)
 
 
 # pylint: disable=too-many-locals

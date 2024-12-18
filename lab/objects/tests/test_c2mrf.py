@@ -68,8 +68,8 @@ def test_construct_image_url_from_eros_path(mock_settings):
     )
     assert construct_image_url_from_eros_path(path).startswith(expected_url)
 
-    # No token when EROS_BASE_IMAGE_URL is None
+    # Euphro tools token when EROS_BASE_IMAGE_URL is None
     mock_settings.EROS_BASE_IMAGE_URL = None
     path = "C2RMF12345/67890"
-    expected_url = "http://tools.example.com/eros/iiif/pyr-C2RMF1/C2RMF12345/67890.tif/full/500,/0/default.jpg"  # pylint: disable=line-too-long
-    assert construct_image_url_from_eros_path(path) == expected_url
+    expected_url = "http://tools.example.com/eros/iiif/pyr-C2RMF1/C2RMF12345/67890.tif/full/500,/0/default.jpg?token="  # pylint: disable=line-too-long
+    assert construct_image_url_from_eros_path(path).startswith(expected_url)
