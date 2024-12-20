@@ -12,12 +12,17 @@ from .models import DataRequest
 
 NUM_DAYS_VALID = 7
 
+# All data types except processed_dataÒ
+AVAILABLE_DATA_TYPES = list(typing.get_args(DataType))
+AVAILABLE_DATA_TYPES.remove("processed_data")
+
 
 def send_links(data_request: DataRequest):
     links: list[LinkDict] = []
     expiration = datetime.datetime.now() + datetime.timedelta(days=NUM_DAYS_VALID)
     for run in data_request.runs.all():
-        for data_type in typing.get_args(DataType):
+        print(AVAILABLE_DATA_TYPES)
+        for data_type in AVAILABLE_DATA_TYPES:
             project_name = run.project.name
             token = fetch_token_for_run_data(
                 run.project.slug,

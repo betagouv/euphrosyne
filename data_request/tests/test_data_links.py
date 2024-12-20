@@ -37,10 +37,6 @@ class DataLinksTestCase(TestCase):
             assert (
                 self.fetch_token_mock.call_args_list[0][1]["expiration"] == expiration
             )
-            # data_type processed_data
-            assert (
-                self.fetch_token_mock.call_args_list[1][1]["expiration"] == expiration
-            )
 
     def test_send_data_email_context(self):
         dr = factories.DataRequestFactory()
@@ -53,22 +49,11 @@ class DataLinksTestCase(TestCase):
         # data_type raw_data
         assert self.send_data_email_mock.call_args_list[0][1]["context"]["links"] == [
             {"name": "Run 1 (Project 1)", "url": "http://url", "data_type": "raw_data"},
-            {
-                "name": "Run 1 (Project 1)",
-                "url": "http://url",
-                "data_type": "processed_data",
-            },
         ]
         self.generate_download_url_mock.assert_has_calls(
             [
                 mock.call(
                     data_type="raw_data",
-                    project_slug="project-1",
-                    run_label="Run 1",
-                    token="token",
-                ),
-                mock.call(
-                    data_type="processed_data",
                     project_slug="project-1",
                     run_label="Run 1",
                     token="token",
@@ -83,5 +68,5 @@ class DataLinksTestCase(TestCase):
         send_links(dr)
 
         assert (
-            len(self.send_data_email_mock.call_args_list[0][1]["context"]["links"]) == 6
+            len(self.send_data_email_mock.call_args_list[0][1]["context"]["links"]) == 3
         )
