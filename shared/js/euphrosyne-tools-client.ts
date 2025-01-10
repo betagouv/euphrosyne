@@ -36,6 +36,7 @@ export default async function euphrosyneToolsFetch(
   return _fetch(`${baseURL}${input}`, {
     ...init,
     headers: {
+      "Content-Type": "application/json",
       ...init?.headers,
       Authorization: `Bearer ${getAccessToken()}`,
     },
