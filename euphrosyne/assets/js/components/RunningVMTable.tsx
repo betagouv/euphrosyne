@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { jwtFetch } from "../../../../shared/js/jwt.js";
 import euphrosyneToolsService from "../../../../lab/workplace/assets/js/euphrosyne-tools-service.js";
+import euphrosyneToolsFetch from "../../../../shared/js/euphrosyne-tools-client";
 
 const deleteVm = (vm: string) => {
   // Vm name starts with euphro-stg-vm, so we need to remove it
   // Quick and dirty solution
   vm = vm.replace(/euphro-(stg|prod)-vm-/, "");
-  return euphrosyneToolsService.deleteVM(vm);
+  return euphrosyneToolsService.deleteVM(vm, euphrosyneToolsFetch);
 };
 
 function DeleteButton({ vmName }: { vmName: string }) {

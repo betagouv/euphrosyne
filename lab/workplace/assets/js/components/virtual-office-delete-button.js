@@ -2,6 +2,7 @@
 
 import euphrosyneToolsService from "../euphrosyne-tools-service.js";
 import utils from "../../../../assets/js/utils.js";
+import euphrosyneToolsFetch from "../../../../../shared/js/euphrosyne-tools-client.ts";
 
 export default class VirtualOfficeDeleteButton extends HTMLButtonElement {
   static init() {
@@ -36,7 +37,10 @@ export default class VirtualOfficeDeleteButton extends HTMLButtonElement {
     }
     this.disabled = true;
     try {
-      await euphrosyneToolsService.deleteVM(this.projectSlug);
+      await euphrosyneToolsService.deleteVM(
+        this.projectSlug,
+        euphrosyneToolsFetch,
+      );
     } catch (error) {
       this.disabled = false;
       utils.displayMessage(
