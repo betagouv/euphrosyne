@@ -1,6 +1,7 @@
 import "../../../js_tests/_jsdom_mocks/gettext";
 import euphrosyneToolsService from "../../assets/js/euphrosyne-tools-service";
 import VMSizeSelect from "../../assets/js/components/vm-size-select";
+import euphrosyneToolsFetch from "../../../../shared/js/euphrosyne-tools-client";
 
 describe("Test VMSizeSelect", () => {
   let vmSizeSelect;
@@ -34,6 +35,7 @@ describe("Test VMSizeSelect", () => {
     expect(euphrosyneToolsService.setProjectVmSize).toHaveBeenCalledWith(
       "projet tango",
       "value",
+      euphrosyneToolsFetch,
     );
   });
 });
