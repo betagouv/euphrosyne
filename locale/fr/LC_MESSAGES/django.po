@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-03 17:20+0100\n"
+"POT-Creation-Date: 2025-01-10 15:12+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -1057,9 +1057,6 @@ msgstr "Importer avec un numéro C2RMF"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "Modifier l’objet %(model)s sélectionné"
-
-msgid "Access virtual office"
-msgstr "Accéder au bureau distant"
 
 msgid "Administration"
 msgstr "Administration"

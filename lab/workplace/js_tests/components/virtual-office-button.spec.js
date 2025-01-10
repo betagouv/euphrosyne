@@ -34,7 +34,7 @@ describe("Test VirtualOfficeButton", () => {
         await voButton.initButton();
         expect(voButton.projectSlug).toBe("projet-tango");
         expect(voButton.connectionUrl).toBe("url");
-        expect(voButton.disabled).toBeFalsy();
+        expect(voButton.buttonEl.disabled).toBeFalsy();
       });
     });
 
@@ -83,7 +83,7 @@ describe("Test VirtualOfficeButton", () => {
       vi.useRealTimers();
 
       expect(fetchVMMock).toHaveBeenCalledTimes(1);
-      expect(voButton.disabled).toBeFalsy();
+      expect(voButton.buttonEl.disabled).toBeFalsy();
       expect(voButton.checkDeploymentIntervalId).toBeNull();
     });
 
@@ -111,7 +111,7 @@ describe("Test VirtualOfficeButton", () => {
     it("opens a new window on click when connection url is set", async () => {
       voButton.connectionUrl = "url";
       const openSpy = vi.spyOn(window, "open");
-      voButton.click();
+      voButton.buttonEl.click();
       expect(openSpy).toHaveBeenCalledWith("url", "_blank");
     });
 
@@ -127,7 +127,7 @@ describe("Test VirtualOfficeButton", () => {
         "projet-tango",
         euphrosyneToolsFetch,
       );
-      expect(voButton.disabled).toBe(true);
+      expect(voButton.buttonEl.disabled).toBe(true);
     });
 
     it("waits and then fetch deployment status", () => {
@@ -158,7 +158,7 @@ describe("Test VirtualOfficeButton", () => {
       }
 
       expect(hadError).toBe(true);
-      expect(voButton.disabled).toBe(false);
+      expect(voButton.buttonEl.disabled).toBe(false);
 
       deployMock.mockRestore();
     });
@@ -168,7 +168,7 @@ describe("Test VirtualOfficeButton", () => {
     it("reset button and display an error message", () => {
       voButton.onFailedDeployment();
 
-      expect(voButton.innerText).toBe("Access virtual office");
+      expect(voButton.buttonEl.innerText).toBe("Access virtual office");
       expect(utils.displayMessage).toHaveBeenNthCalledWith(
         1,
         "We could not create the virtual office. Please contact an administrator.",
@@ -197,14 +197,14 @@ describe("Test VirtualOfficeButton", () => {
 
   describe("when receiving delete event", () => {
     it("reset the button", () => {
-      voButton.disabled = true;
-      voButton.innerText = "Another text";
+      voButton.buttonEl.disabled = true;
+      voButton.buttonEl.innerText = "Another text";
       voButton.connectionUrl = "url";
 
       window.dispatchEvent(new CustomEvent("vm-deleted"));
 
-      expect(voButton.disabled).toBe(false);
-      expect(voButton.innerText).toBe("Create virtual office");
+      expect(voButton.buttonEl.disabled).toBe(false);
+      expect(voButton.buttonEl.innerText).toBe("Create virtual office");
       expect(voButton.connectionUrl).toBeNull();
     });
   });

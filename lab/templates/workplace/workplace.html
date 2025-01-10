@@ -22,9 +22,7 @@
 <div id="content-main" class="fr-container workplace">
     <ul class="messagelist"></ul>
     <div class="fr-grid-row fr-grid-row--right">
-        <button is="virtual-office-button" 
-                project-slug="{{ project.slug }}" 
-                class="fr-btn fr-icon-arrow-right-line fr-btn--icon-right">{% trans "Access virtual office" %}</button>
+        <virtual-office-button project-slug="{{ project.slug }}"></virtual-office-button>
     </div>
     {% if user.is_lab_admin %}
     <fieldset class="module aligned fr-mt-3w">
