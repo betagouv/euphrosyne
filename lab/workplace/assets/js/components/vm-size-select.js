@@ -1,6 +1,7 @@
 "use strict";
 
 import euphrosyneToolsService from "../euphrosyne-tools-service.js";
+import euphrosyneToolsFetch from "../../../../../shared/js/euphrosyne-tools-client.ts";
 
 export default class VMSizeSelect extends HTMLSelectElement {
   static init() {
@@ -16,7 +17,7 @@ export default class VMSizeSelect extends HTMLSelectElement {
   connectedCallback() {
     this.disabled = true;
     euphrosyneToolsService
-      .fetchProjectVmSize(this.projectName)
+      .fetchProjectVmSize(this.projectName, euphrosyneToolsFetch)
       .then((vmSize) => {
         this.value = vmSize || "";
         this.addEventListener("change", this.onSelectChange);
@@ -26,6 +27,10 @@ export default class VMSizeSelect extends HTMLSelectElement {
 
   async onSelectChange({ target }) {
     const { value } = target;
-    await euphrosyneToolsService.setProjectVmSize(this.projectName, value);
+    await euphrosyneToolsService.setProjectVmSize(
+      this.projectName,
+      value,
+      euphrosyneToolsFetch,
+    );
   }
 }
