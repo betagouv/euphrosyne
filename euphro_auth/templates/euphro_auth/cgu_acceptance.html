@@ -1,0 +1,37 @@
+{% extends "unauthorized.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static "admin/css/login.css" %}">
+<link rel="stylesheet" type="text/css" href="{% static "css/login.css" %}">
+{{ block.super }}
+{{ form.media }}
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+
+{% block usertools %}{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content_panel %}
+  {{ block.super }}
+  <div id="content-main">
+
+    <h3>{% translate "Accept T&Cs" %}</h3>
+
+    <form method="post">
+        {% csrf_token %}
+        <p>{% trans "We have updated our Terms and Conditions (T&Cs). Please review and accept the new terms to continue using the Euphrosyne platform." %}
+            <a href="{% url 'static_cgu' %}">{% trans "Read the T&Cs." %}</a>
+        </p>
+        <button type="submit" class="fr-btn">{% trans "Accept" %}</button>
+    </form>
+  </div>
+{% endblock %}

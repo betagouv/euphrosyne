@@ -1,7 +1,10 @@
 from typing import Any, Dict
 
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordResetConfirmView
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from .forms import UserInvitationRegistrationForm
@@ -26,3 +29,13 @@ class UserTokenRegistrationView(PasswordResetConfirmView):
         context = super().get_context_data(**kwargs)
         context.update({"user_id": self.user.id})
         return context
+
+
+@login_required
+def cgu_acceptance_view(request):
+    if request.method == "POST":
+        request.user.cgu_accepted_at = timezone.now()
+        request.user.save()
+        return redirect("/")
+
+    return render(request, "euphro_auth/cgu_acceptance.html")

@@ -21,6 +21,8 @@ class User(AbstractUser):
     )
     is_lab_admin = models.BooleanField(_("is Euphrosyne admin"), default=False)
 
+    cgu_accepted_at = models.DateTimeField(_("CGU accepted at"), blank=True, null=True)
+
     objects = UserManager()  # type: ignore
 
     def __str__(self):

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-10 15:12+0100\n"
+"POT-Creation-Date: 2025-01-14 13:01+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -227,6 +227,9 @@ msgstr "invitation complétée le"
 msgid "is Euphrosyne admin"
 msgstr "admin Euphrosyne"
 
+msgid "CGU accepted at"
+msgstr "CGU acceptées le"
+
 msgid "User invitation"
 msgstr "Invitation utilisateur"
 
@@ -245,6 +248,22 @@ msgstr ""
 
 msgid "Enter an email and password."
 msgstr "Entrez un email et un mot de passe"
+
+msgid "Accept T&Cs"
+msgstr "Accepter les CGU"
+
+msgid ""
+"We have updated our Terms and Conditions (T&Cs). Please review and accept "
+"the new terms to continue using the Euphrosyne platform."
+msgstr ""
+"Nous avons mis à jour nos Conditions Générales d'Utilisation (CGU). Veuillez "
+"les lire et les accepter pour continuer à utiliser la plateforme Euphrosyne."
+
+msgid "Read the T&Cs."
+msgstr "Lire les CGU."
+
+msgid "Accept"
+msgstr "Accepter"
 
 msgid "Create your account"
 msgstr "Créer votre compte"

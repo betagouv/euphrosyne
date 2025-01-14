@@ -10,15 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-# pylint: disable=line-too-long
 import os
 import subprocess
+
+# pylint: disable=line-too-long
+from datetime import datetime
 from pathlib import Path
 
 import dj_database_url
 import psycopg2
 import sentry_sdk
 from django.http import HttpRequest
+from django.utils import timezone
 from sentry_sdk.integrations.django import DjangoIntegration
 
 # pylint: disable=abstract-class-instantiated
@@ -95,6 +98,7 @@ MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else 
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "euphro_auth.middlewares.CGUAcceptanceMiddleware",
 ]
 
 ROOT_URLCONF = "euphrosyne.urls"
@@ -345,3 +349,12 @@ def _get_nav_items(request: HttpRequest) -> list:
 
 
 NAV_GET_NAV_ITEMS = _get_nav_items
+
+
+FORCE_LAST_CGU_ACCEPTANCE_DT = (
+    timezone.make_aware(
+        datetime.fromisoformat(os.environ["FORCE_LAST_CGU_ACCEPTANCE_DT"])
+    )
+    if os.getenv("FORCE_LAST_CGU_ACCEPTANCE_DT")
+    else None
+)
