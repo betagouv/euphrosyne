@@ -2,6 +2,8 @@ from unittest import mock
 
 import pytest
 from django.test import RequestFactory
+from django.urls import reverse
+from django.utils import timezone
 from slugify import slugify
 
 from euphro_auth.tests import factories as auth_factories
@@ -92,3 +94,29 @@ def test_export_notebook_to_pdf_view__run_not_found(
             "object_group_label": og.label,
         }
     ]
+
+
+@pytest.mark.django_db
+def test_cgu_acceptance_view_get(client):
+    user = auth_factories.StaffUserFactory()
+    client.force_login(user)
+
+    response = client.get(reverse("cgu_acceptance"))
+
+    assert response.status_code == 200
+    assert "euphro_auth/cgu_acceptance.html" in [t.name for t in response.templates]
+
+
+@pytest.mark.django_db
+def test_cgu_acceptance_view_post(client):
+    user = auth_factories.StaffUserFactory()
+    client.force_login(user)
+
+    request_time = timezone.now()
+    response = client.post(reverse("cgu_acceptance"))
+
+    user.refresh_from_db()
+    assert response.status_code == 302
+    assert response.url == "/"
+    assert user.cgu_accepted_at is not None
+    assert request_time <= user.cgu_accepted_at <= timezone.now()

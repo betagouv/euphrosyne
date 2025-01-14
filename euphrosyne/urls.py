@@ -23,7 +23,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.i18n import JavaScriptCatalog
 from graphene_django.views import GraphQLView
 
-from euphro_auth.views import UserTokenRegistrationView
+from euphro_auth.views import UserTokenRegistrationView, cgu_acceptance_view
 from orcid_oauth.views import UserCompleteAccountView
 
 urlpatterns = [
@@ -59,6 +59,11 @@ urlpatterns = [
         "registration/orcid/verify/<token>",
         UserCompleteAccountView.as_view(),
         name="complete_registration_orcid",
+    ),
+    path(
+        "cgu-acceptance/",
+        cgu_acceptance_view,
+        name="cgu_acceptance",
     ),
     path("api/", include("euphrosyne.api_urls"), name="api"),
     path("i18n/", include("django.conf.urls.i18n")),
