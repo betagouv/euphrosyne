@@ -58,3 +58,9 @@ class UserInvitationRegistrationForm(DjangoSetPasswordForm):
         self.user.last_name = self.cleaned_data["last_name"]
         self.user.invitation_completed_at = timezone.now()
         return super().save(commit=commit)
+
+
+class CGUAcceptanceForm(forms.Form):
+    accept_cgu = forms.BooleanField(
+        label=_("I have read and accept the Terms and Conditions."), required=True
+    )

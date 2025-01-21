@@ -7,8 +7,9 @@ logging.getLogger("faker").setLevel(logging.WARNING)
 
 
 @pytest.fixture(autouse=True)
-def setup_envs(monkeypatch: pytest.MonkeyPatch):
+def setup_django_conf(monkeypatch: pytest.MonkeyPatch, settings):
     monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "https://tools")
+    settings.FORCE_LAST_CGU_ACCEPTANCE_DT = None
 
 
 @pytest.fixture(autouse=True, scope="session")
