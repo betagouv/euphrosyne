@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-21 10:09+0100\n"
+"POT-Creation-Date: 2025-01-21 13:10+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -318,6 +318,12 @@ msgstr "Euphro tools n'est pas disponible."
 
 msgid "Dashboard"
 msgstr "Tableau de bord"
+
+msgid "English"
+msgstr "Anglais"
+
+msgid "French"
+msgstr "Français"
 
 msgid "History"
 msgstr "Historique"
@@ -755,9 +761,6 @@ msgid ""
 msgstr ""
 "Un projet avec un nom similaire existe déjà. Le slug correspondant au nom "
 "que vous avez entré est '%s' et un autre projet avec ce slug existe."
-
-msgid "French"
-msgstr "Français"
 
 msgid "European"
 msgstr "Européen"

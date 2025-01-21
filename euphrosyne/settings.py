@@ -22,6 +22,7 @@ import psycopg2
 import sentry_sdk
 from django.http import HttpRequest
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
 # pylint: disable=abstract-class-instantiated
@@ -212,6 +213,11 @@ AUTHENTICATION_BACKENDS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
+
+LANGUAGES = [
+    ("en", _("English")),
+    ("fr", _("French")),
+]
 
 LANGUAGE_CODE = "fr-fr"
 
