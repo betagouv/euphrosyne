@@ -1,6 +1,7 @@
 import factory
 import factory.fuzzy
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 
 class StaffUserFactory(factory.django.DjangoModelFactory):
@@ -14,6 +15,7 @@ class StaffUserFactory(factory.django.DjangoModelFactory):
     )
     password = factory.Faker("password")
     is_staff = True
+    cgu_accepted_at = timezone.now()
 
 
 class LabAdminUserFactory(StaffUserFactory):

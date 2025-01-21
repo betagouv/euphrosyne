@@ -1,12 +1,12 @@
 from typing import Any, Dict
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordResetConfirmView
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.contrib import messages
 
 from .forms import CGUAcceptanceForm, UserInvitationRegistrationForm
 
@@ -40,10 +40,9 @@ def cgu_acceptance_view(request):
             request.user.cgu_accepted_at = timezone.now()
             request.user.save()
             return redirect("/")
-        else:
-            messages.error(
-                request, _("You must accept the Terms and Conditions to continue.")
-            )
+        messages.error(
+            request, _("You must accept the Terms and Conditions to continue.")
+        )
 
     else:
         form = CGUAcceptanceForm()

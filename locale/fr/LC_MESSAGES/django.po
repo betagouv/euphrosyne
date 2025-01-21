@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-14 13:01+0100\n"
+"POT-Creation-Date: 2025-01-21 10:09+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -203,6 +203,9 @@ msgstr "Email"
 msgid "An account with this email already exists."
 msgstr "Un compte avec cet email existe déjà."
 
+msgid "I have read and accept the Terms and Conditions."
+msgstr "J'ai lu et j'accepte les conditions générales d'Euphrosyne."
+
 msgid "The Email must be set"
 msgstr "L'email doit être défini"
 
@@ -249,8 +252,8 @@ msgstr ""
 msgid "Enter an email and password."
 msgstr "Entrez un email et un mot de passe"
 
-msgid "Accept T&Cs"
-msgstr "Accepter les CGU"
+msgid "Accept Terms and Conditions"
+msgstr "Accepter les Conditions Générales d'Utilisation"
 
 msgid ""
 "We have updated our Terms and Conditions (T&Cs). Please review and accept "
@@ -302,6 +305,13 @@ msgstr "L'équipe Euphrosyne"
 
 msgid "Enter your information"
 msgstr "Entrez vos informations"
+
+msgid "You must accept the Terms and Conditions to continue."
+msgstr ""
+"Vous devez accepter les Conditions Générales d'Utilisation pour continuer."
+
+msgid "Terms and Conditions Agreement"
+msgstr "Conditions Générales d'Utilisation"
 
 msgid "Euphro tools is not available."
 msgstr "Euphro tools n'est pas disponible."
