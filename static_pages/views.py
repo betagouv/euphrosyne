@@ -4,6 +4,7 @@ from pathlib import Path
 from django.contrib.admin import site
 from django.http import HttpRequest
 from django.template.response import TemplateResponse
+from django.utils.translation import get_language, get_supported_language_variant
 from django.utils.translation import gettext_lazy as _
 from markdown import markdown
 
@@ -23,12 +24,16 @@ class StaticPageResponse(TemplateResponse):
         )
 
 
+def _read_markdown_file(file: Path):
+    with open(file, "r", encoding="utf-8") as md_page:
+        return markdown(md_page.read())
+
+
 def static_page(page_file_markdown):
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
-            with open(page_file_markdown, "r", encoding="utf-8") as md_page:
-                html = markdown(md_page.read())
+            html = _read_markdown_file(page_file_markdown)
             return view_func(request, html, *args, **kwargs)
 
         return _wrapped_view
@@ -36,7 +41,20 @@ def static_page(page_file_markdown):
     return decorator
 
 
-@static_page(Path(__file__).resolve().parent / "pages/cgu.md")
+def i18n_static_page(folder_file_markdown: Path):
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped_view(request, *args, **kwargs):
+            locale = get_supported_language_variant(get_language())
+            html = _read_markdown_file(folder_file_markdown / f"{locale}.md")
+            return view_func(request, html, *args, **kwargs)
+
+        return _wrapped_view
+
+    return decorator
+
+
+@i18n_static_page(Path(__file__).resolve().parent / "pages/cgu")
 def cgu_view(request, html):
     return StaticPageResponse(request, _("End-user license agreement"), html)
 
