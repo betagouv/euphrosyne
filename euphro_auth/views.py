@@ -6,8 +6,9 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.contrib import messages
 
-from .forms import UserInvitationRegistrationForm
+from .forms import CGUAcceptanceForm, UserInvitationRegistrationForm
 
 
 class UserTokenRegistrationView(PasswordResetConfirmView):
@@ -34,8 +35,25 @@ class UserTokenRegistrationView(PasswordResetConfirmView):
 @login_required
 def cgu_acceptance_view(request):
     if request.method == "POST":
-        request.user.cgu_accepted_at = timezone.now()
-        request.user.save()
-        return redirect("/")
+        form = CGUAcceptanceForm(request.POST)
+        if form.is_valid():
+            request.user.cgu_accepted_at = timezone.now()
+            request.user.save()
+            return redirect("/")
+        else:
+            messages.error(
+                request, _("You must accept the Terms and Conditions to continue.")
+            )
 
-    return render(request, "euphro_auth/cgu_acceptance.html")
+    else:
+        form = CGUAcceptanceForm()
+
+    return render(
+        request,
+        "euphro_auth/cgu_acceptance.html",
+        context={
+            "title": _("Terms and Conditions Agreement"),
+            "site_title": "Euphrosyne",
+            "form": form,
+        },
+    )

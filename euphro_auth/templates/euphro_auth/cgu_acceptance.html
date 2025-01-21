@@ -24,14 +24,18 @@
   {{ block.super }}
   <div id="content-main">
 
-    <h3>{% translate "Accept T&Cs" %}</h3>
+    <h3>{% translate "Accept Terms and Conditions" %}</h3>
+
+    <p>{% trans "We have updated our Terms and Conditions (T&Cs). Please review and accept the new terms to continue using the Euphrosyne platform." %}
+      <a href="{% url 'static_cgu' %}">{% trans "Read the T&Cs." %}</a>
+    </p>
 
     <form method="post">
-        {% csrf_token %}
-        <p>{% trans "We have updated our Terms and Conditions (T&Cs). Please review and accept the new terms to continue using the Euphrosyne platform." %}
-            <a href="{% url 'static_cgu' %}">{% trans "Read the T&Cs." %}</a>
-        </p>
-        <button type="submit" class="fr-btn">{% trans "Accept" %}</button>
+      {% csrf_token %}
+      {{ form }}
+
+      <button type="submit" class="fr-btn fr-mt-3w">{% trans "Accept" %}</button>
     </form>
+    
   </div>
 {% endblock %}
