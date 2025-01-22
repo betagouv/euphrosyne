@@ -34,7 +34,7 @@ def _validate_signature(request):
 
 @csrf_exempt
 @require_POST
-def tally_webhook(request: HttpRequest):
+def tally_webhook(request: HttpRequest):  # pylint: disable=too-many-return-statements
     is_signature_valid = _validate_signature(request)
     if not is_signature_valid:
         logger.error("Tally webhook : invalid signature")

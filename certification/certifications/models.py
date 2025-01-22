@@ -1,8 +1,10 @@
 import random
+from datetime import timedelta
 
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models import Count
+from django.utils import timezone
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
@@ -36,6 +38,21 @@ class QuizCertificationQuerySet(models.QuerySet):
         quizzes = self._get_next_quizzes_for_user(certification, user)
         return quizzes[random.randint(0, len(quizzes) - 1)] if quizzes else None
 
+    def has_valid_certification_for_user(
+        self, user: User, certification: "Certification"
+    ):
+        qs = self.filter(
+            certification=certification,
+            quizresult__user=user,
+            quizresult__is_passed=True,
+        )
+        if certification.num_days_valid:
+            qs = qs.filter(
+                quizresult__created__gte=timezone.now()
+                - timedelta(days=certification.num_days_valid)
+            )
+        return qs.exists()
+
 
 class QuizCertificationManager(models.Manager):
     def get_queryset(self):
@@ -45,6 +62,13 @@ class QuizCertificationManager(models.Manager):
         self, certification: "Certification", user: User
     ):
         return self.get_queryset().get_random_next_quizz_for_user(
+            certification=certification, user=user
+        )
+
+    def has_valid_certification_for_user(
+        self, user: User, certification: "Certification"
+    ):
+        return self.get_queryset().has_valid_certification_for_user(
             certification=certification, user=user
         )
 
@@ -112,6 +136,16 @@ class Certification(models.Model):
     class Meta:
         verbose_name = _("Certification")
         verbose_name_plural = _("Certifications")
+
+    def user_has_valid_participation(self, user: User) -> bool:
+        if self.type_of == CertificationType.QUIZ:
+            return QuizCertification.objects.has_valid_certification_for_user(
+                user=user, certification=self
+            )
+        raise NotImplementedError(
+            gettext("Certification type %(type)s not implemented.")
+            % {"type": self.type_of}
+        )
 
 
 class QuizResult(models.Model):
