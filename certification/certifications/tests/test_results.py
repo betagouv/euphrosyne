@@ -1,13 +1,13 @@
 import pytest
-from django.contrib.auth import get_user_model
+
+from certification.certifications.models import QuizResult
 from certification.certifications.results import create_quiz_result
-from certification.certifications.models import Certification, QuizResult
 from certification.notifications.models import (
     CertificationNotification,
     NotificationType,
 )
-
 from lab.tests.factories import StaffUserFactory
+
 from . import factories
 
 

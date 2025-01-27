@@ -14,6 +14,11 @@ from ..radiation_protection import (
 )
 
 
+@pytest.fixture(autouse=True)
+def set_certification_name_settings(settings):
+    settings.RADIATION_PROTECTION_CERTIFICATION_NAME = "radiation"
+
+
 @pytest.fixture(name="certification")
 def certification_fixture():
     return Certification.objects.create(name="radiation", num_days_valid=5)
@@ -92,9 +97,12 @@ def test_check_radio_protection_certification_when_no_valid_result(
     has_active_certification: bool,
 ):
     with mock.patch(
-        "certification.radiation_protection.user_has_active_certification",
-        return_value=has_active_certification,
-    ):
+        "certification.radiation_protection._get_radioprotection_certification"
+    ) as get_certification_mock:
+        # pylint: disable=line-too-long
+        get_certification_mock.return_value.user_has_valid_participation.return_value = (
+            has_active_certification
+        )
         with mock.patch(
             "certification.radiation_protection.create_invitation_notification"
         ) as create_invitation_notification_mock:

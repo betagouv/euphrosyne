@@ -3,9 +3,8 @@ from functools import lru_cache
 
 from django.conf import settings
 from django.contrib.auth.base_user import AbstractBaseUser
-from django.utils import timezone
 
-from .certifications.models import Certification, QuizCertification, QuizResult
+from .certifications.models import Certification
 from .notifications.models import CertificationNotification, NotificationType
 
 logger = logging.getLogger(__name__)
@@ -15,13 +14,6 @@ logger = logging.getLogger(__name__)
 def _get_radioprotection_certification() -> Certification:
     return Certification.objects.get(
         name=settings.RADIATION_PROTECTION_CERTIFICATION_NAME
-    )
-
-
-@lru_cache
-def _get_radioprotection_quizzes() -> QuizCertification:
-    return QuizCertification.objects.filter(
-        certification=_get_radioprotection_certification()
     )
 
 
@@ -40,17 +32,7 @@ def user_has_active_certification(user: AbstractBaseUser) -> bool:
             settings.RADIATION_PROTECTION_CERTIFICATION_NAME,
         )
         return False
-    filter_kwargs = {}
-    if certification.num_days_valid:
-        filter_kwargs["created__gte"] = timezone.now() - timezone.timedelta(
-            days=certification.num_days_valid
-        )
-    return QuizResult.objects.filter(
-        quiz__in=_get_radioprotection_quizzes(),
-        user=user,
-        is_passed=True,
-        **filter_kwargs,
-    ).exists()
+    return certification.user_has_valid_participation(user)
 
 
 def create_invitation_notification(

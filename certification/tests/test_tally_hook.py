@@ -30,7 +30,9 @@ class TestTallyHook(TestCase):
             name="test", type_of=CertificationType.QUIZ
         )
         QuizCertification.objects.create(
-            certification=self.certification, passing_score=PASSING_SCORE
+            certification=self.certification,
+            passing_score=PASSING_SCORE,
+            url="http://test.test",
         )
 
     def test_validate_signature(self):
@@ -76,7 +78,10 @@ class TestTallyHook(TestCase):
             "/certification/hooks/tally",
             data=b'{"data": {"user_email": null, "score": "test"}}',
             content_type="application/json",
-            HTTP_EUPHROSYNE_CERTIFICATION=self.certification.name,
+            headers={
+                "Euphrosyne-Certification": self.certification.name,
+                "Euphrosyne-QuizUrl": "http://test.test",
+            },
         )
         assert response.status_code == 400
         assert response.json() == {"error": "Email is required"}
@@ -92,7 +97,10 @@ class TestTallyHook(TestCase):
             "/certification/hooks/tally",
             data=b'{"data": {"user_email": null, "score": "test"}}',
             content_type="application/json",
-            HTTP_EUPHROSYNE_CERTIFICATION=self.certification.name,
+            headers={
+                "Euphrosyne-Certification": self.certification.name,
+                "Euphrosyne-QuizUrl": "http://test.test",
+            },
         )
         assert response.status_code == 400
         assert response.json() == {"error": "Score is required"}
@@ -108,7 +116,10 @@ class TestTallyHook(TestCase):
             "/certification/hooks/tally",
             data=b'{"data": {"user_email": null, "score": 0}}',
             content_type="application/json",
-            HTTP_EUPHROSYNE_CERTIFICATION=self.certification.name,
+            headers={
+                "Euphrosyne-Certification": self.certification.name,
+                "Euphrosyne-QuizUrl": "http://test.test",
+            },
         )
         assert response.status_code == 200
 
@@ -129,7 +140,10 @@ class TestTallyHook(TestCase):
             "/certification/hooks/tally",
             data=b"{}",
             content_type="application/json",
-            HTTP_EUPHROSYNE_CERTIFICATION=self.certification.name,
+            headers={
+                "Euphrosyne-Certification": "wrongcertification",
+                "Euphrosyne-QuizUrl": "http://test.test",
+            },
         )
         assert response.status_code == 400
         assert response.json() == {"error": "Certification not found"}
@@ -144,7 +158,10 @@ class TestTallyHook(TestCase):
             "/certification/hooks/tally",
             data=json.dumps(get_tally_data(user.email, success_score)),
             content_type="application/json",
-            headers={"Euphrosyne-Certification": self.certification.name},
+            headers={
+                "Euphrosyne-Certification": self.certification.name,
+                "Euphrosyne-QuizUrl": "http://test.test",
+            },
         )
 
         assert response.status_code == 200
@@ -170,7 +187,10 @@ class TestTallyHook(TestCase):
             "/certification/hooks/tally",
             data=json.dumps(get_tally_data(user.email, failed_score)),
             content_type="application/json",
-            headers={"Euphrosyne-Certification": self.certification.name},
+            headers={
+                "Euphrosyne-Certification": self.certification.name,
+                "Euphrosyne-QuizUrl": "http://test.test",
+            },
         )
 
         assert response.status_code == 200
@@ -185,3 +205,42 @@ class TestTallyHook(TestCase):
             type_of=NotificationType.SUCCESS,
             quiz_result=quiz_result_qs.first(),
         ).exists()
+
+    @mock.patch(
+        "certification.providers.tally.hooks._validate_signature", lambda _: True
+    )
+    @mock.patch("certification.providers.tally.hooks.TallyWebhookData.from_tally_data")
+    def test_hook_when_score_when_no_quiz_url(
+        self, mock_from_tally_data: mock.MagicMock
+    ):
+        mock_from_tally_data.return_value.user_email = StaffUserFactory().email
+        mock_from_tally_data.return_value.score = 0
+        response = self.client.post(
+            "/certification/hooks/tally",
+            data=b'{"data": {"user_email": "test@test.com", "score": 8}}',
+            content_type="application/json",
+            headers={
+                "Euphrosyne-Certification": self.certification.name,
+            },
+        )
+        assert response.status_code == 400
+        assert response.json() == {"error": "quiz url is required"}
+
+    @mock.patch(
+        "certification.providers.tally.hooks._validate_signature", lambda _: True
+    )
+    @mock.patch("certification.providers.tally.hooks.TallyWebhookData.from_tally_data")
+    def test_hook_when_invalid_quiz_url(self, mock_from_tally_data: mock.MagicMock):
+        mock_from_tally_data.return_value.user_email = StaffUserFactory().email
+        mock_from_tally_data.return_value.score = 0
+        response = self.client.post(
+            "/certification/hooks/tally",
+            data=b'{"data": {"user_email": null, "score": 0}}',
+            content_type="application/json",
+            headers={
+                "Euphrosyne-Certification": self.certification.name,
+                "Euphrosyne-QuizUrl": "http://invalid.test",
+            },
+        )
+        assert response.status_code == 400
+        assert response.json() == {"error": "Quiz with url not found"}
