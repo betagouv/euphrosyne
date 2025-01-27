@@ -32,7 +32,7 @@
     "@typescript-eslint/eslint-plugin": "^8.20.0",
     "@typescript-eslint/parser": "^8.19.1",
     "@types/lodash.debounce": "^4.0.9",
-    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-react": "^7.37.4",
     "prettier": "3.4.2",
     "typescript": "^5.7.3",
