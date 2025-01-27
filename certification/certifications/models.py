@@ -41,17 +41,20 @@ class QuizCertificationQuerySet(models.QuerySet):
     def has_valid_certification_for_user(
         self, user: User, certification: "Certification"
     ):
-        qs = self.filter(
-            certification=certification,
-            quizresult__user=user,
-            quizresult__is_passed=True,
-        )
+        base_qs_args = {
+            "certification": certification,
+            "quizresult__user": user,
+            "quizresult__is_passed": True,
+        }
         if certification.num_days_valid:
-            qs = qs.filter(
+            return self.filter(
+                **base_qs_args,
                 quizresult__created__gte=timezone.now()
-                - timedelta(days=certification.num_days_valid)
-            )
-        return qs.exists()
+                - timedelta(days=certification.num_days_valid),
+            ).exists()
+        return self.filter(
+            **base_qs_args,
+        ).exists()
 
 
 class QuizCertificationManager(models.Manager):

@@ -11,6 +11,7 @@ from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
+from certification.certifications.models import QuizCertification
 from certification.providers.tally.dataclasses import TallyWebhookData
 
 from ...certifications.results import create_quiz_result
@@ -74,5 +75,10 @@ def tally_webhook(request: HttpRequest):  # pylint: disable=too-many-return-stat
             "Tally webhook : certification %s not found in DB", certificate_name
         )
         return JsonResponse({"error": "Certification not found"}, status=400)
+    except QuizCertification.DoesNotExist:
+        logger.error(
+            "Tally webhook : quiz certification with %s not found in DB", quiz_url
+        )
+        return JsonResponse({"error": "Quiz with url not found"}, status=400)
 
     return JsonResponse({"status": "success"})
