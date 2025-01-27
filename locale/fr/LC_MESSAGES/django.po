@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-31 09:49+0100\n"
+"POT-Creation-Date: 2025-01-27 15:58+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -56,6 +56,10 @@ msgstr "Certification"
 msgid "Certifications"
 msgstr "Certifications"
 
+#, python-format
+msgid "Certification type %(type)s not implemented."
+msgstr "Le type de certification %(type)s n'est pas implémenté."
+
 msgid "Quiz passed"
 msgstr "Quiz réussi"
 
@@ -92,7 +96,7 @@ msgstr "[Euphrosyne] Invitation à compléter la certification %s."
 msgid "[Euphrosyne] Certification %s completed."
 msgstr "[Euphrosyne] Certification %s complétée."
 
-#| msgid "[Euphrosyne] Invitation to complete certification %s."
+#, python-format
 msgid "[Euphrosyne] Invitation to retry certification %s."
 msgstr "[Euphrosyne] Invitation à retenter la certification %s."
 
