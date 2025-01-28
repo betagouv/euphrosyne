@@ -103,6 +103,17 @@ class LeaderParticipationFormSet(OnPremisesParticipationFormSet):
             self[0].instance.is_leader = True
         return super().save(commit)
 
+    def save_existing_objects(self, commit=True):
+        saved_instance = super().save_existing_objects(commit)
+        if "user" in self.forms[0].changed_data:
+            transaction.on_commit(
+                functools.partial(
+                    radiation_protection.check_radio_protection_certification,
+                    self.forms[0].instance.user,
+                )
+            )
+        return saved_instance
+
 
 class MemberParticipationInline(LabPermissionMixin, admin.TabularInline):
     model = Participation
