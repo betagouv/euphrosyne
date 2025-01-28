@@ -5,6 +5,10 @@ Sentry.init({
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),
+    Sentry.feedbackIntegration({
+      triggerLabel: window.gettext("Need help?"),
+      // User Feedback configuration options
+    }),
   ],
   tracesSampleRate: 0.1,
 });
