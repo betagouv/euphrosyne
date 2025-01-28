@@ -1,3 +1,4 @@
+import "./sentry.js";
 import "./matomo.js";
 
 import { createElement } from "react";
