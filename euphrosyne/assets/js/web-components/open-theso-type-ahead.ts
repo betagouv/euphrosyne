@@ -21,10 +21,10 @@ export abstract class OpenThesoTypeAhead extends TypeAheadList {
     let url;
 
     if (this.searchType === "fullpathSearch") {
-      url = `https://opentheso.huma-num.fr/opentheso/openapi/v1/concept/${this.thesorusId}/search/fullpath?q=${q}&lang=fr&exactMatch=false`;
+      url = `https://opentheso.huma-num.fr/openapi/v1/concept/${this.thesorusId}/search/fullpath?q=${q}&lang=fr&exactMatch=false`;
     } else {
       // autocomplete
-      url = `https://opentheso.huma-num.fr/opentheso/openapi/v1/concept/${this.thesorusId}/autocomplete/${q}?lang=fr&exactMatch=false`;
+      url = `https://opentheso.huma-num.fr/openapi/v1/concept/${this.thesorusId}/autocomplete/${q}?lang=fr&exactMatch=false`;
     }
     const response = await fetch(url, {
       headers: { Accept: "application/json" },
