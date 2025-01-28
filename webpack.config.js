@@ -125,6 +125,7 @@ export default {
       EUPHROSYNE_TOOLS_API_URL: null,
       GEONAMES_USERNAME: "",
       HDF5_ENABLE: "false",
+      SENTRY_DSN: null,
     }),
     new MiniCssExtractPlugin(),
     new PurgeCSSPlugin({

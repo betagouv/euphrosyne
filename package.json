@@ -29,9 +29,9 @@
   },
   "homepage": "https://github.com/betagouv/euphrosyne#readme",
   "devDependencies": {
+    "@types/lodash.debounce": "^4.0.9",
     "@typescript-eslint/eslint-plugin": "^8.21.0",
     "@typescript-eslint/parser": "^8.19.1",
-    "@types/lodash.debounce": "^4.0.9",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-react": "^7.37.4",
     "prettier": "3.4.2",
@@ -47,6 +47,7 @@
     "@fullcalendar/react": "^6.1.15",
     "@gouvfr/dsfr": "^1.13.0",
     "@h5web/app": "^13.0.0",
+    "@sentry/browser": "^8.51.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "cropperjs": "^1.6.2",
