@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-15 18:17+0100\n"
+"POT-Creation-Date: 2025-01-30 11:23+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -40,6 +40,42 @@ msgstr "Sélectionner un langage"
 
 msgid "User"
 msgstr "Utilisateur"
+
+msgid "Need help?"
+msgstr "Besoin d'aide ?"
+
+msgid "Send us a message"
+msgstr "Envoyez-nous un message"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Full name"
+msgstr "Nom complet"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Message"
+msgstr "Message"
+
+msgid "(Required)"
+msgstr "(Requis)"
+
+msgid "Type your message here"
+msgstr "Tapez votre message ici"
+
+msgid "Add Screenshot"
+msgstr "Ajouter une capture d'écran"
+
+msgid "Remove Screenshot"
+msgstr "Supprimer la capture d'écran"
+
+msgid "Send message"
+msgstr "Envoyer le message"
+
+msgid "Cancel"
+msgstr "Annuler"
 
 msgid "No results"
 msgstr "Aucun résultat"

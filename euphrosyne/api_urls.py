@@ -11,4 +11,5 @@ urlpatterns = [
     path("data-request/", include("data_request.api_urls")),
     path("notebook/", include("lab_notebook.api.urls")),
     path("standard/", include("standard.api.urls")),
+    path("feedback/", include("feedback.api_urls"), name="feedback"),
 ]

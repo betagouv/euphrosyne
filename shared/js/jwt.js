@@ -5,7 +5,8 @@
 
 import { getCSRFToken } from "../../lab/assets/js/utils.js";
 
-export async function jwtFetch(input, init = {}) {
+export async function jwtFetch(input, init = {}, contentType) {
+  console.log(contentType);
   // Same as fetch, but tries to refresh token if status is 401
   let attemps = 0,
     response;
@@ -17,11 +18,19 @@ export async function jwtFetch(input, init = {}) {
     }
     const shouldRefreshToken = attemps > 0;
     const token = await getToken(!shouldRefreshToken);
+    const headers = new Headers({
+      ...init.headers,
+      Authorization: `Bearer ${token}`,
+    });
+    if (contentType !== null) {
+      // Let the possibility to not set the content type (for form data)
+      headers.set("Content-Type", contentType || "application/json");
+    }
+    if (init.method !== "GET") {
+      headers.set("X-CSRFToken", getCSRFToken());
+    }
     response = await fetch(input, {
-      headers: new Headers({
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      }),
+      headers,
       ...init,
     });
     if (response.status !== 401) {

@@ -1,4 +1,4 @@
-import "./sentry.js";
+import "./sentry";
 import "./matomo.js";
 
 import { createElement } from "react";
