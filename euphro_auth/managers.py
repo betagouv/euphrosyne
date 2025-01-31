@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.base_user import BaseUserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -8,6 +9,11 @@ class UserManagerQuerySet(models.QuerySet):
 
     def delete(self):
         self.update(is_active=False)
+
+    def filter_has_accepted_cgu(self):
+        if not settings.FORCE_LAST_CGU_ACCEPTANCE_DT:
+            return self
+        return self.filter(cgu_accepted_at__gte=settings.FORCE_LAST_CGU_ACCEPTANCE_DT)
 
 
 class UserManager(BaseUserManager):
@@ -35,3 +41,6 @@ class UserManager(BaseUserManager):
 
     def get_queryset(self):
         return UserManagerQuerySet(self.model, using=self._db)
+
+    def filter_has_accepted_cgu(self):
+        return self.get_queryset().filter_has_accepted_cgu()
