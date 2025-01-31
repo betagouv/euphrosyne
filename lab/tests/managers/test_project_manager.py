@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from ...models import Project
-from ..factories import ProjectFactory, RunFactory
+from ..factories import ProjectFactory, ProjectWithLeaderFactory, RunFactory
 
 
 class ProjectModelTestCase(TestCase):
@@ -20,30 +20,62 @@ class ProjectModelTestCase(TestCase):
         self.assertEqual(Project.objects.only_finished().count(), 1)
 
     def test_project_only_public_confidential(self):
-        public = Project.objects.create(name="Public Project", confidential=False)
-        confidential = Project.objects.create(
-            name="Confidential Project", confidential=True
-        )
-        for p in [public, confidential]:  # both have runs over embargo date
-            RunFactory(
-                project=p,
-                embargo_date=timezone.now() - timezone.timedelta(days=1),
+        with self.settings(FORCE_LAST_CGU_ACCEPTANCE_DT=None):
+            public = ProjectWithLeaderFactory(confidential=False)
+            confidential = Project.objects.create(
+                name="Confidential Project", confidential=True
             )
-        self.assertEqual(Project.objects.only_public().count(), 1)
+            for p in [public, confidential]:  # both have runs over embargo date
+                RunFactory(
+                    project=p,
+                    embargo_date=timezone.now() - timezone.timedelta(days=1),
+                )
+            self.assertEqual(Project.objects.only_public().count(), 1)
 
     def test_project_only_public_when_no_run(self):
-        public_project = Project.objects.create(
-            name="Public Project", confidential=False
-        )
-        RunFactory(
-            project=public_project,
-            embargo_date=timezone.now() - timezone.timedelta(days=1),
-        )
-        Project.objects.create(name="No run Project", confidential=False)
+        with self.settings(FORCE_LAST_CGU_ACCEPTANCE_DT=None):
+            public_project = ProjectWithLeaderFactory(
+                name="Public Project", confidential=False
+            )
+            RunFactory(
+                project=public_project,
+                embargo_date=timezone.now() - timezone.timedelta(days=1),
+            )
+            Project.objects.create(name="No run Project", confidential=False)
 
-        qs = Project.objects.only_public()
-        self.assertEqual(qs.count(), 1)
-        self.assertEqual(qs.first().id, public_project.id)
+            qs = Project.objects.only_public()
+            self.assertEqual(qs.count(), 1)
+            self.assertEqual(qs.first().id, public_project.id)
+
+    def test_project_only_public_when_has_not_accepted_cgu(self):
+        with self.settings(
+            FORCE_LAST_CGU_ACCEPTANCE_DT=timezone.now() - timezone.timedelta(days=1)
+        ):
+            leader_has_accepted_cgu_project = ProjectWithLeaderFactory(
+                confidential=False
+            )
+            RunFactory(
+                project=leader_has_accepted_cgu_project,
+                embargo_date=timezone.now() - timezone.timedelta(days=1),
+            )
+            user = leader_has_accepted_cgu_project.leader.user
+            user.cgu_accepted_at = timezone.now()
+            user.save()
+
+            leader_has_not_accepted_cgu_project = ProjectWithLeaderFactory(
+                confidential=False
+            )
+            RunFactory(
+                project=leader_has_not_accepted_cgu_project,
+                embargo_date=timezone.now() - timezone.timedelta(days=1),
+            )
+            user = leader_has_not_accepted_cgu_project.leader.user
+            user.cgu_accepted_at = None
+            user.save()
+
+            qs = Project.objects.only_public()
+            assert qs.count() == 1
+            assert leader_has_accepted_cgu_project in qs
 
     def test_filter_by_status(self):
         to_schedule_ids = [

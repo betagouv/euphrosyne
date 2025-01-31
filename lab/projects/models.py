@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from slugify import slugify
 
+from euphro_auth.models import User
 from lab.participations.models import Participation
 from lab.runs.models import Run
 from lab.validators import valid_filename
@@ -26,7 +27,12 @@ class ProjectQuerySet(models.QuerySet):
         return self.filter(runs__end_date__lt=timezone.now())
 
     def only_public(self):
-        return self.filter(confidential=False, runs__isnull=False)
+        has_accepted_cgu_leader_participations = Participation.objects.filter(
+            is_leader=True, user__in=User.objects.filter_has_accepted_cgu()
+        )
+        return self.filter(confidential=False, runs__isnull=False).filter(
+            participation__in=has_accepted_cgu_leader_participations
+        )
 
     def filter_by_status(self, status: "Project.Status"):
         if status == Project.Status.TO_SCHEDULE:
