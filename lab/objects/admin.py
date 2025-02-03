@@ -14,6 +14,7 @@ from django.http import HttpResponse, HttpResponseRedirect, QueryDict
 from django.http.request import HttpRequest
 from django.template.response import TemplateResponse
 from django.utils.datastructures import MultiValueDict
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from lab.models import Project, Run
@@ -21,12 +22,28 @@ from lab.permissions import is_lab_admin
 
 from .c2rmf import fetch_full_objectgroup_from_eros
 from .csv_upload import CSVParseError, parse_csv
-from .forms import ObjectGroupForm, ObjectGroupImportC2RMFReadonlyForm
-from .models import Object, ObjectGroup
+from .forms import (
+    ObjectGroupForm,
+    ObjectGroupImportC2RMFReadonlyForm,
+    ObjectGroupThumbnailForm,
+)
+from .models import Object, ObjectGroup, ObjectGroupThumbnail
 
 
 class CSVValidationError(ValidationError):
     pass
+
+
+class ObjectGroupThumbnailInline(admin.StackedInline):
+    def image_tag(self, obj):
+        return format_html('<img src="{}" />', obj.image.url)
+
+    image_tag.short_description = _("Preview")  # type: ignore[attr-defined]
+
+    model = ObjectGroupThumbnail
+    verbose_name = _("Thumbnail")
+    form = ObjectGroupThumbnailForm
+    readonly_fields = ("image_tag",)
 
 
 class ProjectInline(admin.TabularInline):
@@ -211,7 +228,7 @@ class ObjectInline(admin.TabularInline):
 
 @admin.register(ObjectGroup)
 class ObjectGroupAdmin(ModelAdmin):
-    inlines = (ObjectInline,)
+    inlines = (ObjectInline, ObjectGroupThumbnailInline)
     form = ObjectGroupForm
     list_display = ("label", "project_num", "c2rmf_id")
 
@@ -277,7 +294,7 @@ class ObjectGroupAdmin(ModelAdmin):
     def get_inlines(self, request: HttpRequest, obj: ObjectGroup | None):
         if "run" not in request.GET and is_lab_admin(request.user):
             return (ObjectInline, ProjectInline)
-        return (ObjectInline,)
+        return (ObjectInline, ObjectGroupThumbnailInline)
 
     def get_object(
         self, request: HttpRequest, object_id: str, from_field=None

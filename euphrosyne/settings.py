@@ -239,6 +239,14 @@ STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
+    "objectstorage": {
+        "BACKEND": "storages.backends.azure_storage.AzureStorage",
+        "OPTIONS": {
+            "azure_container": "static",
+            "connection_string": os.getenv("AZURE_STORAGE_CONNECTION_STRING"),
+            "overwrite_files": True,
+        },
+    },
 }
 
 

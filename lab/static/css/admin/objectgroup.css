@@ -46,3 +46,16 @@ input[type="submit"][disabled].default {
 .tags-input.typeahead-field .typeahead-list {
   top: 84px;
 }
+
+#thumbnail-heading, .dynamic-thumbnail .inline_label {
+  display: none;
+}
+
+.dynamic-thumbnail {
+  margin-top: 0 !important;
+}
+
+.field-image_tag img {
+  max-width: 100%;
+  height: auto;
+}
