@@ -1,4 +1,5 @@
 from django.contrib.postgres.fields import ArrayField
+from django.core.files.storage import storages
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -25,6 +26,32 @@ class Location(models.Model):
 
     def __str__(self) -> str:
         return str(self.label)
+
+
+def get_thumbnail_path(instance: "ObjectGroupThumbnail", *args):
+    return f"ogs/thumbnails/{instance.object_group_id}/thumbnail"
+
+
+def get_thumbnail_storage():  # prevent migration credentials leak
+    return storages["objectstorage"]
+
+
+class ObjectGroupThumbnail(models.Model):
+    object_group = models.OneToOneField(
+        "lab.ObjectGroup",
+        on_delete=models.CASCADE,
+        related_name="thumbnail",
+    )
+    image = models.ImageField(
+        storage=get_thumbnail_storage,
+        verbose_name=_("Image"),
+        upload_to=get_thumbnail_path,
+    )
+    copyright = models.CharField(
+        _("Copyright"),
+        max_length=255,
+        blank=True,
+    )
 
 
 class ObjectGroup(TimestampedModel):

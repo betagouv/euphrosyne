@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-21 13:10+0100\n"
+"POT-Creation-Date: 2025-02-03 14:20+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -529,6 +529,12 @@ msgstr "Projets"
 msgid "Account"
 msgstr "Compte"
 
+msgid "Preview"
+msgstr "Aperçu"
+
+msgid "Thumbnail"
+msgstr "Vignette"
+
 msgid ""
 "We cannot process the CSV file because it is not valid. Please refer to the "
 "template to fill it properly."
@@ -586,6 +592,12 @@ msgstr "Latitude"
 
 msgid "Longitude"
 msgstr "Longitude"
+
+msgid "Image"
+msgstr "Image"
+
+msgid "Copyright"
+msgstr "Mention / droit d'auteur"
 
 msgid "C2RMF ID"
 msgstr "Numéro C2RMF"

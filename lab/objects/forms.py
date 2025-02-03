@@ -9,7 +9,7 @@ from lab.widgets import ChoiceTag, TagsInput
 
 from . import widgets
 from .c2rmf import ErosHTTPError, fetch_partial_objectgroup_from_eros
-from .models import Era, Location, ObjectGroup, Period
+from .models import Era, Location, ObjectGroup, ObjectGroupThumbnail, Period
 
 logger = logging.getLogger(__name__)
 
@@ -210,3 +210,14 @@ class ObjectGroupImportC2RMFReadonlyForm(forms.ModelForm):
             "inventory",
             "collection",
         )
+
+
+class ObjectGroupThumbnailForm(forms.ModelForm):
+
+    class Meta:
+        model = ObjectGroupThumbnail
+        fields = ("image", "copyright")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["copyright"].required = True
