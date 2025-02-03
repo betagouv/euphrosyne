@@ -4,7 +4,7 @@ from typing import TypedDict
 from slugify import slugify
 
 from lab.methods.dto import method_model_to_dto
-from lab.models import ObjectGroup, Project
+from lab.models import ObjectGroup, ObjectGroupThumbnail, Project
 from lab.objects.c2rmf import ErosHTTPError, fetch_full_objectgroup_from_eros
 from lab.participations.models import Participation
 from lab.runs.models import Run
@@ -37,6 +37,17 @@ class DatingDict(TypedDict, total=False):
     dating_era_label: str | None
     dating_era_theso_huma_num_id: str | None
     dating_era_theso_huma_num_parent_ids: list[str] | None
+
+
+def _get_thumbnail_from_object_groups(
+    object_groups: list[ObjectGroup],
+) -> str | None:
+    for object_group in object_groups:
+        try:
+            return object_group.thumbnail.image.url
+        except ObjectGroupThumbnail.DoesNotExist:
+            pass
+    return None
 
 
 def _create_leader_doc(leader: Participation):
@@ -169,6 +180,7 @@ def build_project_catalog_document(
         project_page_data=page_data,
         discovery_place_points=object_group_locations,
         is_data_available=project.is_data_available,
+        thumbnail=_get_thumbnail_from_object_groups(object_groups=object_groups),
     )
     return catalog_item
 
@@ -231,6 +243,14 @@ def build_object_group_catalog_document(  # noqa: C901
                 # type: ignore
                 f"{field_name}_theso_huma_num_parent_ids": theso_huma_num_parent_ids,
             }
+
+    # Thumbnail
+    thumbnail = None
+    try:
+        thumbnail = object_group.thumbnail.image.url
+    except ObjectGroupThumbnail.DoesNotExist:
+        pass
+
     _id = f"object-{object_group.id}"
     catalog_item = CatalogItem(
         meta={"id": _id},
@@ -239,6 +259,7 @@ def build_object_group_catalog_document(  # noqa: C901
         name=object_group.label,
         slug=slugify(object_group.label) + f"-{object_group.id}",
         is_data_available=is_data_available,
+        thumbnail=thumbnail,
         created=object_group.created,
         materials=object_group.materials,
         object_page_data=page_data,

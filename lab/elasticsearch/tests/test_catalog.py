@@ -5,11 +5,13 @@ from django.test import TestCase
 from slugify import slugify
 
 from lab.objects.c2rmf import ErosHTTPError
+from lab.objects.models import ObjectGroupThumbnail
 from lab.tests import factories
 
 from ..catalog import (
     _create_project_page_data,
     _fetch_object_group_from_eros,
+    _get_thumbnail_from_object_groups,
     build_object_group_catalog_document,
     build_project_catalog_document,
 )
@@ -39,6 +41,7 @@ class TestProjectCatalogDocument(TestCase):
         assert document.slug == self.project.slug
         assert document.materials == ["or", "verre"]
         assert document.comments == self.project.comments
+        assert "thumbnail" in document
         assert document.status == str(self.project.status)
         assert document.created == self.project.created
         assert document.project_page_data.leader == {
@@ -156,6 +159,7 @@ class TestObjectGroupCatalogDocument(TestCase):
             == slugify(self.object_group.label) + f"-{self.object_group.id}"
         )
         assert document.is_data_available is True
+        assert "thumbnail" in document
         assert document.materials == self.object_group.materials
         assert document.collection == self.object_group.collection
         assert document.c2rmf_id == self.object_group.c2rmf_id
@@ -278,3 +282,30 @@ def test_fetch_object_group_from_eros_if_eros_fails_returns_og(
         )
         == object_group
     )
+
+
+def test_get_thumbnail_from_object_groups():
+    object_group_with_thumbnail = mock.Mock()
+    object_group_with_thumbnail.thumbnail.image.url = "http://example.com/thumbnail.jpg"
+
+    object_group_without_thumbnail = mock.Mock()
+    type(object_group_without_thumbnail).thumbnail = mock.PropertyMock(
+        side_effect=ObjectGroupThumbnail.DoesNotExist
+    )
+
+    object_groups = [object_group_without_thumbnail, object_group_with_thumbnail]
+
+    thumbnail_url = _get_thumbnail_from_object_groups(object_groups)
+    assert thumbnail_url == "http://example.com/thumbnail.jpg"
+
+
+def test_get_thumbnail_from_object_groups_no_thumbnail():
+    object_group_without_thumbnail = mock.Mock()
+    type(object_group_without_thumbnail).thumbnail = mock.PropertyMock(
+        side_effect=ObjectGroupThumbnail.DoesNotExist
+    )
+
+    object_groups = [object_group_without_thumbnail]
+
+    thumbnail_url = _get_thumbnail_from_object_groups(object_groups)
+    assert thumbnail_url is None

@@ -148,6 +148,7 @@ class CatalogItem(os.Document):
     created = os.Date()
     materials = os.Keyword(multi=True)
     is_data_available = os.Boolean()
+    thumbnail = os.Keyword()
 
     project_page_data = os.Object(ProjectPageData)
     object_page_data = os.Object(ObjectPageData)
