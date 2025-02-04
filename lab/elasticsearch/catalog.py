@@ -15,6 +15,7 @@ from lab.thesauri.opentheso import (
 
 from .documents import (
     CatalogItem,
+    ImageDoc,
     LeaderDoc,
     ObjectGroupDoc,
     ObjectPageData,
@@ -41,10 +42,13 @@ class DatingDict(TypedDict, total=False):
 
 def _get_thumbnail_from_object_groups(
     object_groups: list[ObjectGroup],
-) -> str | None:
+) -> ImageDoc | None:
     for object_group in object_groups:
         try:
-            return object_group.thumbnail.image.url
+            return ImageDoc(
+                url=object_group.thumbnail.image.url,
+                copyright=object_group.thumbnail.copyright,
+            )
         except ObjectGroupThumbnail.DoesNotExist:
             pass
     return None
@@ -245,9 +249,12 @@ def build_object_group_catalog_document(  # noqa: C901
             }
 
     # Thumbnail
-    thumbnail = None
+    thumbnail: ImageDoc | None = None
     try:
-        thumbnail = object_group.thumbnail.image.url
+        thumbnail = ImageDoc(
+            url=object_group.thumbnail.image.url,
+            copyright=object_group.thumbnail.copyright,
+        )
     except ObjectGroupThumbnail.DoesNotExist:
         pass
 

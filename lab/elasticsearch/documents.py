@@ -11,6 +11,11 @@ class _ObjectDict(TypedDict):
     inventory: str
 
 
+class ImageDoc(os.InnerDoc):
+    url = os.Keyword()
+    copyright = os.Text()
+
+
 class ObjectDoc(os.InnerDoc):
     label = os.Text()
     collection = os.Keyword()
@@ -148,7 +153,7 @@ class CatalogItem(os.Document):
     created = os.Date()
     materials = os.Keyword(multi=True)
     is_data_available = os.Boolean()
-    thumbnail = os.Keyword()
+    thumbnail = os.Object(ImageDoc)
 
     project_page_data = os.Object(ProjectPageData)
     object_page_data = os.Object(ObjectPageData)

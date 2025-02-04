@@ -287,6 +287,7 @@ def test_fetch_object_group_from_eros_if_eros_fails_returns_og(
 def test_get_thumbnail_from_object_groups():
     object_group_with_thumbnail = mock.Mock()
     object_group_with_thumbnail.thumbnail.image.url = "http://example.com/thumbnail.jpg"
+    object_group_with_thumbnail.thumbnail.copyright = "Copyright"
 
     object_group_without_thumbnail = mock.Mock()
     type(object_group_without_thumbnail).thumbnail = mock.PropertyMock(
@@ -295,8 +296,9 @@ def test_get_thumbnail_from_object_groups():
 
     object_groups = [object_group_without_thumbnail, object_group_with_thumbnail]
 
-    thumbnail_url = _get_thumbnail_from_object_groups(object_groups)
-    assert thumbnail_url == "http://example.com/thumbnail.jpg"
+    thumbnail = _get_thumbnail_from_object_groups(object_groups)
+    assert thumbnail.url == "http://example.com/thumbnail.jpg"
+    assert thumbnail.copyright == "Copyright"
 
 
 def test_get_thumbnail_from_object_groups_no_thumbnail():
