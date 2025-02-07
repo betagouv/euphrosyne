@@ -15,6 +15,8 @@ import {
   listRunMeasuringPointsStandard,
   listStandards,
 } from "../../../../standard/assets/js/standard-services";
+import { fetchRunObjectGroups } from "../../../../lab/objects/assets/js/services";
+import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 
 interface NotebookProps {
   runId: string;
@@ -42,6 +44,8 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
   const toolsClient = useClientContext();
 
   const [isAddingPoint, setIsAddingPoint] = useState(false);
+
+  const [objectGroups, setObjectGroups] = useState<RunObjectGroup[]>([]);
 
   const getNextMeasuringPointName = () => {
     const n = measuringPoints.length + 1;
@@ -76,6 +80,10 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
     });
   }, []);
 
+  useEffect(() => {
+    fetchRunObjectGroups(runId).then(setObjectGroups);
+  }, []);
+
   const AddButton = () => (
     <button
       className="fr-btn fr-btn--secondary fr-mt-2w"
@@ -93,7 +101,7 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
           <div className="flex-container fr-mt-3w">
             <h4>{t.gallery}</h4>
           </div>
-          <MeasuringPointImageGallery />
+          <MeasuringPointImageGallery runObjectGroups={objectGroups} />
 
           <div className="fr-mt-4w">
             <div className="flex-container">
@@ -106,9 +114,11 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
               points={measuringPoints}
               runId={runId}
               runMeasuringPointStandards={runMeasuringPointStandards}
+              objectGroups={objectGroups}
               onAddObjectToPoint={() =>
                 listMeasuringPoints(runId).then(setMeasuringPoints)
               }
+              setObjectGroups={(objectGroups) => setObjectGroups(objectGroups)}
             />
             {measuringPoints.length > 20 && (
               <div className="flex-container">

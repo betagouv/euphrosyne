@@ -10,13 +10,17 @@ import { RunMeasuringPointStandards } from "../../../../standard/assets/js/IStan
 export default function MeasuringPoints({
   runId,
   points,
+  objectGroups,
   runMeasuringPointStandards,
   onAddObjectToPoint,
+  setObjectGroups,
 }: {
   points: IMeasuringPoint[];
   runId: string;
   runMeasuringPointStandards: RunMeasuringPointStandards;
+  objectGroups: RunObjectGroup[];
   onAddObjectToPoint: () => void;
+  setObjectGroups: (objectGroups: RunObjectGroup[]) => void;
 }) {
   const t = {
     noPoint: window.gettext(
@@ -25,8 +29,6 @@ export default function MeasuringPoints({
     unfoldAll: window.gettext("Unfold all"),
     closeAll: window.gettext("Close all"),
   };
-
-  const [objectGroups, setObjectGroups] = useState<RunObjectGroup[]>([]);
 
   // Selected measuring point for object group modal
   const [addObjectModalPointId, setAddObjectModalPointId] = useState<
@@ -39,7 +41,6 @@ export default function MeasuringPoints({
 
   useEffect(() => {
     // Init object group selection & image location modal
-    fetchRunObjectGroups(runId).then(setObjectGroups);
     if (objectGroups.length > 0) {
       setAddObjectModalPointId(objectGroups[0].id);
     }
