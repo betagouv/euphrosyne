@@ -1,6 +1,10 @@
 import { createContext, Dispatch, SetStateAction, useState } from "react";
 import { IMeasuringPoint, IMeasuringPointImage } from "./IMeasuringPoint";
-import { IStandard } from "../../../standard/assets/js/IStandard";
+import {
+  RunMeasuringPointStandards,
+  IStandard,
+  IMeasuringPointStandard,
+} from "../../../standard/assets/js/IStandard";
 
 interface ImageStorage {
   baseUrl: string;
@@ -24,6 +28,14 @@ export interface INotebookContext {
   ) => void;
   standards: IStandard[];
   setStandards: Dispatch<SetStateAction<IStandard[]>>;
+  runMeasuringPointStandards: RunMeasuringPointStandards;
+  setRunMeasuringPointStandards: Dispatch<
+    SetStateAction<RunMeasuringPointStandards>
+  >;
+  updatedMeasuringPointStandard: (
+    measuringPointId: string,
+    standard?: IMeasuringPointStandard,
+  ) => void;
 }
 
 export const NotebookContext = createContext<INotebookContext>({
@@ -31,11 +43,14 @@ export const NotebookContext = createContext<INotebookContext>({
   runId: "",
   measuringPoints: [],
   standards: [],
+  runMeasuringPointStandards: {},
   addObjectToMeasuringPoint: () => {},
   setMeasuringPoints: () => {},
   setImageStorage: () => {},
   updateMeasuringPointImage: () => {},
   setStandards: () => {},
+  setRunMeasuringPointStandards: () => {},
+  updatedMeasuringPointStandard: () => {},
 });
 
 export function useNotebookContext(
@@ -45,6 +60,8 @@ export function useNotebookContext(
   const [imageStorage, setImageStorage] = useState<ImageStorage>();
   const [measuringPoints, setMeasuringPoints] = useState<IMeasuringPoint[]>([]);
   const [standards, setStandards] = useState<IStandard[]>([]);
+  const [runMeasuringPointStandards, setRunMeasuringPointStandards] =
+    useState<RunMeasuringPointStandards>({});
 
   const addObjectToMeasuringPoint = (
     measuringPointId: string,
@@ -68,6 +85,22 @@ export function useNotebookContext(
     );
   };
 
+  const updatedMeasuringPointStandard = (
+    measuringPointId: string,
+    standard?: IMeasuringPointStandard,
+  ) => {
+    if (!standard) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [measuringPointId]: _, ...rest } = runMeasuringPointStandards;
+      setRunMeasuringPointStandards(rest);
+    } else {
+      setRunMeasuringPointStandards({
+        ...runMeasuringPointStandards,
+        [measuringPointId]: standard,
+      });
+    }
+  };
+
   return {
     projectSlug,
     runId,
@@ -79,5 +112,8 @@ export function useNotebookContext(
     updateMeasuringPointImage,
     standards,
     setStandards,
+    runMeasuringPointStandards,
+    setRunMeasuringPointStandards,
+    updatedMeasuringPointStandard,
   };
 }

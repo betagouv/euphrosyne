@@ -5,14 +5,17 @@ import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 import { fetchRunObjectGroups } from "../../../../lab/objects/assets/js/services";
 import AddObjectGroupModal from "./AddObjectGroupModal";
 import AddImageToMeasuringModal from "./AddImageToMeasuringModal";
+import { RunMeasuringPointStandards } from "../../../../standard/assets/js/IStandard";
 
 export default function MeasuringPoints({
   runId,
   points,
+  runMeasuringPointStandards,
   onAddObjectToPoint,
 }: {
   points: IMeasuringPoint[];
   runId: string;
+  runMeasuringPointStandards: RunMeasuringPointStandards;
   onAddObjectToPoint: () => void;
 }) {
   const t = {
@@ -84,6 +87,22 @@ export default function MeasuringPoints({
     setAllExpanded(action === "open" ? true : false);
   };
 
+  const getMeasuringPointLabel = useCallback(
+    (point: IMeasuringPoint) => {
+      let label: string | undefined = undefined;
+      if (point.objectGroupId) {
+        label = objectGroups.find(
+          (rog) => rog.objectGroup.id === point.objectGroupId,
+        )?.objectGroup.label;
+      } else if (point.id in runMeasuringPointStandards) {
+        label = "[STD] " + runMeasuringPointStandards[point.id].standard.label;
+      }
+      if (label) return `${point.name} - ${label}`;
+      return point.name;
+    },
+    [objectGroups, runMeasuringPointStandards],
+  );
+
   return (
     <div>
       <AddObjectGroupModal
@@ -121,7 +140,7 @@ export default function MeasuringPoints({
                 ref={(el) => (accordionButtons.current[index] = el)}
                 onClick={onAccordionClick}
               >
-                {point.name}
+                {getMeasuringPointLabel(point)}
               </button>
             </h3>
             <div className="fr-collapse" id={`accordiong-${point.name}`}>
@@ -129,6 +148,7 @@ export default function MeasuringPoints({
                 point={point}
                 runObjectGroups={objectGroups}
                 runId={runId}
+                measuringPointStandard={runMeasuringPointStandards[point.id]}
                 onAddObjectClicked={() => setAddObjectModalPointId(point.id)}
                 onLocalizeImageClicked={() =>
                   setAddImageToMeasuringPoint(point)

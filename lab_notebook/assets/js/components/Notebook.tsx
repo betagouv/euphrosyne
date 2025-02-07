@@ -11,7 +11,10 @@ import {
   EuphrosyneToolsClientContext,
   useClientContext,
 } from "../../../../shared/js/EuphrosyneToolsClient.context";
-import { listStandards } from "../../../../standard/assets/js/standard-services";
+import {
+  listRunMeasuringPointsStandard,
+  listStandards,
+} from "../../../../standard/assets/js/standard-services";
 
 interface NotebookProps {
   runId: string;
@@ -27,8 +30,14 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
   };
 
   const notebookContext = useNotebookContext(projectSlug, runId);
-  const { setImageStorage, measuringPoints, setMeasuringPoints, setStandards } =
-    notebookContext;
+  const {
+    measuringPoints,
+    runMeasuringPointStandards,
+    setImageStorage,
+    setMeasuringPoints,
+    setStandards,
+    setRunMeasuringPointStandards,
+  } = notebookContext;
 
   const toolsClient = useClientContext();
 
@@ -61,6 +70,12 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
     listStandards().then(setStandards);
   }, []);
 
+  useEffect(() => {
+    listRunMeasuringPointsStandard(runId).then((data) => {
+      setRunMeasuringPointStandards(data);
+    });
+  }, []);
+
   const AddButton = () => (
     <button
       className="fr-btn fr-btn--secondary fr-mt-2w"
@@ -90,6 +105,7 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
             <MeasuringPoints
               points={measuringPoints}
               runId={runId}
+              runMeasuringPointStandards={runMeasuringPointStandards}
               onAddObjectToPoint={() =>
                 listMeasuringPoints(runId).then(setMeasuringPoints)
               }
