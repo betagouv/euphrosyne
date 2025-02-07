@@ -6,6 +6,12 @@ interface IMeasuringPointStandardResponse {
   standard: { label: string };
 }
 
+interface IRunMeasuringPointStandardResponse {
+  id: number;
+  measuring_point: number;
+  standard: { label: string };
+}
+
 export async function listStandards(): Promise<IStandard[]> {
   const response = await fetch(`/api/standard/standards`, {
     method: "GET",
@@ -40,6 +46,29 @@ export async function addOrUpdateStandardToMeasuringPoint(
   return parseMeasuringPointStandardData(
     (await response.json()) as IMeasuringPointStandardResponse,
   );
+}
+
+export async function listRunMeasuringPointsStandard(
+  runId: string,
+): Promise<{ [id: string]: IMeasuringPointStandard }> {
+  const response = await fetch(`/api/standard/runs/${runId}`, {
+    method: "GET",
+  });
+  if (response.ok) {
+    const data =
+      (await response.json()) as IRunMeasuringPointStandardResponse[];
+    return data.reduce(
+      (acc, item) => {
+        acc[item.measuring_point.toString()] = {
+          standard: item.standard,
+          id: item.id.toString(),
+        };
+        return acc;
+      },
+      {} as { [id: string]: IMeasuringPointStandard },
+    );
+  }
+  throw new Error("Failed to fetch measuring points");
 }
 
 export async function retrieveMeasuringPointStandard(

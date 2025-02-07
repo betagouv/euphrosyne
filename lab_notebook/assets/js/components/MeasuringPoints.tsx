@@ -5,15 +5,22 @@ import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 import { fetchRunObjectGroups } from "../../../../lab/objects/assets/js/services";
 import AddObjectGroupModal from "./AddObjectGroupModal";
 import AddImageToMeasuringModal from "./AddImageToMeasuringModal";
+import { RunMeasuringPointStandards } from "../../../../standard/assets/js/IStandard";
 
 export default function MeasuringPoints({
   runId,
   points,
+  objectGroups,
+  runMeasuringPointStandards,
   onAddObjectToPoint,
+  setObjectGroups,
 }: {
   points: IMeasuringPoint[];
   runId: string;
+  runMeasuringPointStandards: RunMeasuringPointStandards;
+  objectGroups: RunObjectGroup[];
   onAddObjectToPoint: () => void;
+  setObjectGroups: (objectGroups: RunObjectGroup[]) => void;
 }) {
   const t = {
     noPoint: window.gettext(
@@ -22,8 +29,6 @@ export default function MeasuringPoints({
     unfoldAll: window.gettext("Unfold all"),
     closeAll: window.gettext("Close all"),
   };
-
-  const [objectGroups, setObjectGroups] = useState<RunObjectGroup[]>([]);
 
   // Selected measuring point for object group modal
   const [addObjectModalPointId, setAddObjectModalPointId] = useState<
@@ -36,7 +41,6 @@ export default function MeasuringPoints({
 
   useEffect(() => {
     // Init object group selection & image location modal
-    fetchRunObjectGroups(runId).then(setObjectGroups);
     if (objectGroups.length > 0) {
       setAddObjectModalPointId(objectGroups[0].id);
     }
@@ -84,6 +88,22 @@ export default function MeasuringPoints({
     setAllExpanded(action === "open" ? true : false);
   };
 
+  const getMeasuringPointLabel = useCallback(
+    (point: IMeasuringPoint) => {
+      let label: string | undefined = undefined;
+      if (point.objectGroupId) {
+        label = objectGroups.find(
+          (rog) => rog.objectGroup.id === point.objectGroupId,
+        )?.objectGroup.label;
+      } else if (point.id in runMeasuringPointStandards) {
+        label = "[STD] " + runMeasuringPointStandards[point.id].standard.label;
+      }
+      if (label) return `${point.name} - ${label}`;
+      return point.name;
+    },
+    [objectGroups, runMeasuringPointStandards],
+  );
+
   return (
     <div>
       <AddObjectGroupModal
@@ -121,7 +141,7 @@ export default function MeasuringPoints({
                 ref={(el) => (accordionButtons.current[index] = el)}
                 onClick={onAccordionClick}
               >
-                {point.name}
+                {getMeasuringPointLabel(point)}
               </button>
             </h3>
             <div className="fr-collapse" id={`accordiong-${point.name}`}>
@@ -129,6 +149,7 @@ export default function MeasuringPoints({
                 point={point}
                 runObjectGroups={objectGroups}
                 runId={runId}
+                measuringPointStandard={runMeasuringPointStandards[point.id]}
                 onAddObjectClicked={() => setAddObjectModalPointId(point.id)}
                 onLocalizeImageClicked={() =>
                   setAddImageToMeasuringPoint(point)

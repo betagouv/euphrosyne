@@ -15,7 +15,6 @@ import MeasuringPointStandard from "./MeasuringPointStandard";
 import {
   addOrUpdateStandardToMeasuringPoint,
   deleteMeasuringPointStandard,
-  retrieveMeasuringPointStandard,
 } from "../../../../standard/assets/js/standard-services";
 import { IMeasuringPointStandard } from "../../../../standard/assets/js/IStandard";
 
@@ -40,10 +39,12 @@ export default function MeasuringPoint({
   runObjectGroups,
   onAddObjectClicked,
   onLocalizeImageClicked,
+  measuringPointStandard,
 }: {
   point: IMeasuringPoint;
   runObjectGroups: RunObjectGroup[];
   runId: string;
+  measuringPointStandard?: IMeasuringPointStandard;
   onAddObjectClicked: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onLocalizeImageClicked: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }) {
@@ -52,20 +53,16 @@ export default function MeasuringPoint({
       "Unset the object group or standard to change the analysis type",
     ),
   };
+  const { updatedMeasuringPointStandard } = useContext(NotebookContext);
+
   const [selectedMeasuringPointType, setSelectedMeasuringPointType] =
     useState<MeasuringPointType>("objectGroup");
 
-  const [pointStandard, setPointStandard] =
-    useState<IMeasuringPointStandard | null>(null);
-
   useEffect(() => {
-    if (!point.objectGroupId) {
-      retrieveMeasuringPointStandard(point.id).then((standard) => {
-        setPointStandard(standard);
-        if (standard) setSelectedMeasuringPointType("standard");
-      });
+    if (!point.objectGroupId && measuringPointStandard) {
+      setSelectedMeasuringPointType("standard");
     }
-  }, [point.objectGroupId]);
+  }, [point.objectGroupId, measuringPointStandard]);
 
   const onStandardChange = (selectedStandard: string | null) => {
     let promise: Promise<void | IMeasuringPointStandard> | null = null;
@@ -73,13 +70,15 @@ export default function MeasuringPoint({
       promise = addOrUpdateStandardToMeasuringPoint(
         selectedStandard,
         point.id,
-        !pointStandard,
+        !measuringPointStandard,
       );
-    } else if (pointStandard) {
+    } else if (measuringPointStandard) {
       promise = deleteMeasuringPointStandard(point.id);
     }
     if (promise) {
-      promise.then((result) => setPointStandard(result || null));
+      promise.then((result) =>
+        updatedMeasuringPointStandard(point.id, result || undefined),
+      );
     }
   };
 
@@ -89,10 +88,10 @@ export default function MeasuringPoint({
         selectedType={selectedMeasuringPointType}
         onTypeSelect={(type) => setSelectedMeasuringPointType(type)}
         className="fr-mb-2w"
-        disabled={!!point.objectGroupId || !!pointStandard}
+        disabled={!!point.objectGroupId || !!measuringPointStandard}
         aria-describedby="tooltip-2989"
       />
-      {(!!point.objectGroupId || !!pointStandard) && (
+      {(!!point.objectGroupId || !!measuringPointStandard) && (
         <span
           className="fr-tooltip fr-placement"
           id="tooltip-2989"
@@ -114,7 +113,7 @@ export default function MeasuringPoint({
         <div className="fr-col-12 fr-col-md-7">
           {selectedMeasuringPointType === "standard" ? (
             <MeasuringPointStandard
-              standard={pointStandard?.standard.label || null}
+              standard={measuringPointStandard?.standard.label || null}
               onStandardChange={onStandardChange}
             />
           ) : (

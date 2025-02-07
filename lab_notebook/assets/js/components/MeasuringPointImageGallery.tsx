@@ -6,6 +6,8 @@ import { css } from "@emotion/react";
 import ImageGrid from "./ImageGrid";
 import CroppedImageDisplay from "./CroppedImageDisplay";
 import { getToken } from "../../../../shared/js/jwt";
+import { IMeasuringPointImage } from "../IMeasuringPoint";
+import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 
 const modalStyle = css({
   position: "fixed",
@@ -16,7 +18,15 @@ const modalStyle = css({
   backgroundColor: "rgba(0, 0, 0, 0.7)",
 });
 
-export default function MeasuringPointImageGallery() {
+interface IRunObjectImageWithObjectRef extends IRunObjectImage {
+  objectRef: string;
+}
+
+export default function MeasuringPointImageGallery({
+  runObjectGroups,
+}: {
+  runObjectGroups: RunObjectGroup[];
+}) {
   const t = {
     noImage: window.gettext(
       "There is no image for this run yet. You can add images to the measurement points below, and they will appear here with their corresponding point locations.",
@@ -29,23 +39,37 @@ export default function MeasuringPointImageGallery() {
   const [euphrosyneToken, setEuphrosyneToken] = useState<string | null>(null);
 
   const pointImages = measuringPoints
-    .map((point) => point.image)
-    .filter((i) => !!i);
+    .map((point) => ({
+      image: point.image,
+      objectGroupId: point.objectGroupId,
+    }))
+    .filter((i) => !!i.image);
 
   const [usedRunObjectImages, setUsedRunObjectImages] = useState<
-    IRunObjectImage[]
+    IRunObjectImageWithObjectRef[]
   >([]);
 
   useEffect(() => {
     setUsedRunObjectImages([
       ...new Map(
         pointImages.map((i) => [
-          `${i.runObjectGroupImage.id} : ${JSON.stringify(i.runObjectGroupImage.transform)}`,
-          i.runObjectGroupImage,
+          `${(i.image as IMeasuringPointImage).runObjectGroupImage.id} : ${JSON.stringify((i.image as IMeasuringPointImage).runObjectGroupImage.transform)}`,
+          {
+            ...(i.image as IMeasuringPointImage).runObjectGroupImage,
+            objectRef:
+              runObjectGroups.find(
+                (og) => og.objectGroup.id === i.objectGroupId,
+              )?.objectGroup.label || "",
+          },
         ]),
       ).values(),
     ]);
-  }, [pointImages.map((i) => i.runObjectGroupImage.path).join(",")]);
+  }, [
+    pointImages
+      .map((i) => (i.image as IMeasuringPointImage).runObjectGroupImage.path)
+      .join(","),
+    runObjectGroups,
+  ]);
 
   useEffect(() => {
     getToken().then(setEuphrosyneToken);
@@ -105,6 +129,7 @@ export default function MeasuringPointImageGallery() {
               }
               css={openedImageIndex === idx && modalStyle}
             >
+              <p className="fr-text--sm">{image.objectRef}</p>
               <CroppedImageDisplay
                 css={getCroppedImageStyle(idx)}
                 src={constructImageStorageUrl(

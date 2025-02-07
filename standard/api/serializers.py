@@ -24,3 +24,14 @@ class MeasuringPointStandardSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.MeasuringPointStandard
         fields = ("standard", "id")
+
+
+class RunMeasuringPointStandardViewSerializer(serializers.ModelSerializer):
+    standard = StandardSerializer()
+    measuring_point = serializers.PrimaryKeyRelatedField(
+        queryset=models.MeasuringPoint.objects.all()
+    )
+
+    class Meta:
+        model = models.MeasuringPointStandard
+        fields = ("id", "standard", "measuring_point")
