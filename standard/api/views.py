@@ -2,9 +2,9 @@ from rest_framework import generics
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAdminUser
 
+from lab import models as lab_models
 from lab.api_views.permissions import ProjectMembershipRequiredMixin
 from lab.measuring_points.models import MeasuringPoint
-from lab.projects.models import Project
 
 from .. import models
 from . import serializers
@@ -16,6 +16,26 @@ class StandardListView(generics.ListAPIView):
 
     def get_queryset(self):
         return models.Standard.objects.all()
+
+
+class RunMeasuringPointStandardView(  # pylint: disable=too-many-ancestors
+    ProjectMembershipRequiredMixin,
+    generics.ListAPIView,
+):
+    serializer_class = serializers.RunMeasuringPointStandardViewSerializer
+    permission_classes = [IsAdminUser]
+
+    def get_queryset(self):
+        return models.MeasuringPointStandard.objects.filter(
+            measuring_point__run=self.kwargs["run_id"]
+        ).all()
+
+    def get_related_project(
+        self, obj: models.MeasuringPointStandard | None = None
+    ) -> lab_models.Project | None:
+        run_id = self.kwargs["run_id"]
+        # pylint: disable=protected-access
+        return lab_models.Run.objects.get(id=run_id).project
 
 
 class MeasuringPointStandardView(  # pylint: disable=too-many-ancestors
@@ -33,7 +53,7 @@ class MeasuringPointStandardView(  # pylint: disable=too-many-ancestors
 
     def get_related_project(
         self, obj: models.MeasuringPointStandard | None = None
-    ) -> Project | None:
+    ) -> lab_models.Project | None:
         if not obj:
             point_id = self.kwargs["measuring_point_id"]
             # pylint: disable=protected-access
