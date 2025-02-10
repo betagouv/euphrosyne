@@ -27,7 +27,7 @@ def _get_image_content(image_url: str):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError as error:
-        logger.error(f"Error while downloading image: {error}")
+        logger.error("Error while downloading image", exc_info=error)
         return BytesIO()
     return BytesIO(response.content)
 
