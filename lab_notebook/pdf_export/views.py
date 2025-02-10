@@ -2,6 +2,7 @@ import concurrent.futures
 import tempfile
 import typing
 from io import BytesIO
+import logging
 
 import requests
 from django.http import HttpRequest, HttpResponse
@@ -18,9 +19,17 @@ from lab.permissions import is_lab_admin
 from .pdf import MeasuringPoint as MeasuringPointMapping
 from .pdf import NotebookImage, PointLocation, create_pdf
 
+logger = logging.getLogger(__name__)
+
 
 def _get_image_content(image_url: str):
-    return BytesIO(requests.get(image_url, timeout=10).content)
+    response = requests.get(image_url, timeout=10)
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as error:
+        logger.error("Error while downloading image", exc_info=error)
+        return BytesIO()
+    return BytesIO(response.content)
 
 
 # pylint: disable=too-many-locals
