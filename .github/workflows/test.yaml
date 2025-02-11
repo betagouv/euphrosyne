@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Use the cached python install for dev requirements
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         id: python-cache
         with:
           path: /opt/hostedtoolcache/Python/${{ env.PYTHON_VERSION }}
@@ -90,7 +90,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Use the cached python install for dev requirements
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         id: python-cache
         with:
           path: /opt/hostedtoolcache/Python/${{ env.PYTHON_VERSION }}
