@@ -23,7 +23,7 @@ def send_project_invitation_email(email: str, project: Project):
         "project_id": project.id,
         "project_name": project.name,
     }
-    subject = _(f"[Euphrosyne] Invitation to join project {project.name}")
+    subject = _("[Euphrosyne] Invitation to join project %s" % project.name)
     body = loader.render_to_string("project_invitation_email.txt", context)
 
     email_message = EmailMultiAlternatives(subject=subject, body=body, to=[email])
@@ -37,4 +37,32 @@ def send_project_invitation_email(email: str, project: Project):
             "Error sending invitation email to %s. Reason: %s",
             email,
             str(e),
+        )
+
+
+def send_long_lasting_email(emails: list[str], project: Project):
+    """
+    Send an email to the admins if any VM has been running for a long time.
+    """
+
+    context = {
+        "emails": emails,
+        "site_url": settings.SITE_URL,
+        "project_id": project.id,
+        "project_name": project.name,
+    }
+    subject = _(f"[Euphrosyne] Alert: Long lasting VMs in project {project.name}")
+    body = loader.render_to_string("long_lasting_vm_email.txt", context)
+
+    email_message = EmailMultiAlternatives(subject, body, to=emails)
+    html_email = loader.render_to_string("long_lasting_vm_email.html", context)
+    email_message.attach_alternative(html_email, "text/html")
+
+    try:
+        email_message.send()
+    except (smtplib.SMTPException, ConnectionError) as e:
+        logger.error(
+            "Error sending long lasting VMs email to %s.",
+            emails,
+            exc_info=e,
         )
