@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-03 14:20+0100\n"
+"POT-Creation-Date: 2025-02-12 15:10+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -489,9 +489,15 @@ msgstr ""
 "Plusieurs fichiers autorisés. Fichiers supportés : images, documents et "
 "archives."
 
+#, python-format
+msgid "[Euphrosyne] Invitation to join project %s"
+msgstr "[Euphrosyne] Invitation à rejoindre le projet %s"
+
 #, python-brace-format
-msgid "[Euphrosyne] Invitation to join project {project.name}"
-msgstr "[Euphrosyne] Invitation à rejoindre le projet {project.name}"
+msgid "[Euphrosyne] Alert: Long lasting VMs in project {project.name}"
+msgstr ""
+"[Euphrosyne] Alerte : VMs du projet {project.name} en cours depuis un "
+"certain emps"
 
 msgid "HDF5 Viewer"
 msgstr "Visionneur HDF5"
@@ -1068,6 +1074,18 @@ msgid "Other"
 msgstr "Autre"
 
 #, python-format
+msgid ""
+"The VM of project %(project_name)s has been running for a long time now."
+msgstr "La VM du projet %(project_name)s tourne depuis un certain temps."
+
+msgid "Please visit the project page to shutdown the VMs if necessary:"
+msgstr ""
+"Veuillez visiter la page du projet pour éteindre les VMs si nécessaire :"
+
+msgid "Workplace"
+msgstr "Workplace"
+
+#, python-format
 msgid "You've been invited to join %(project_name)s on Euphrosyne."
 msgstr ""
 "Vous avez été invité à rejoindre le projet %(project_name)s sur Euphrosyne"
@@ -1133,9 +1151,6 @@ msgstr "Télécharger les données travaillées du run %(label)s"
 
 msgid "Run(s)"
 msgstr "Run(s)"
-
-msgid "Workplace"
-msgstr "Workplace"
 
 msgid "Only alphanumeric, underscore, hyphen and space characters are allowed"
 msgstr ""

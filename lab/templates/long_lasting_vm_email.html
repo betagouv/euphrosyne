@@ -1,0 +1,6 @@
+{% load i18n %}
+<p>{% blocktrans %}The VM of project {{ project_name }} has been running for a long time now.{% endblocktrans %}</p>
+
+<p>{% blocktrans %}Please visit the project page to shutdown the VMs if necessary:{% endblocktrans %}
+    <a href="{{site_url}}{% url 'admin:lab_project_workplace' project_id %}">{% blocktrans %}Workplace{% endblocktrans %}</a>
+</p>
