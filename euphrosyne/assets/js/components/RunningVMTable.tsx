@@ -36,7 +36,7 @@ export default function RunningVMTable() {
   };
 
   const [isLoading, setIsLoading] = useState(true);
-  const [vms, setVms] = useState([]);
+  const [vms, setVms] = useState<string[]>([]);
 
   useEffect(() => {
     jwtFetch(`${process.env.EUPHROSYNE_TOOLS_API_URL}/vms/`, {
