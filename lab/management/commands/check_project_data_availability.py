@@ -1,6 +1,7 @@
 import os
 
 import requests
+import sentry_sdk
 from django.core.management.base import BaseCommand
 
 from euphro_auth.jwt.tokens import EuphroToolsAPIToken
@@ -39,15 +40,22 @@ class Command(BaseCommand):
                         ),
                         self.style.WARNING,
                     )
+                    sentry_sdk.set_extra("response", response.text)
+                    sentry_sdk.set_extra("status_code", response.status_code)
+                    sentry_sdk.capture_message(
+                        "Failed to check project data availability",
+                        level="error",
+                    )
                     continue
                 if response.json()["available"]:
                     project.is_data_available = True
                     project.save()
-            except requests.exceptions.Timeout:
+            except requests.exceptions.Timeout as e:
                 self.stderr.write(
                     "[data availability] Timeout for project %s" % project.name,
                     self.style.WARNING,
                 )
+                sentry_sdk.capture_exception(e)
                 continue
 
         self.stdout.write(

@@ -2,6 +2,7 @@ import os
 from datetime import timedelta
 
 import requests
+import sentry_sdk
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -54,6 +55,12 @@ class Command(BaseCommand):
                     response.text,
                 ),
                 self.style.ERROR,
+            )
+            sentry_sdk.set_extra("response", response.text)
+            sentry_sdk.set_extra("status_code", response.status_code)
+            sentry_sdk.capture_message(
+                "Failed to list vms",
+                level="error",
             )
             return
         vms = response.json()
