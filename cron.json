@@ -1,7 +1,8 @@
 {
   "jobs": [
     {
-      "command": "0 20 * * 1 python manage.py finish_runs",
+      "command": "0 7 * * 1 python manage.py every_week_job",
+
       "size": "S"
     },
     {
@@ -10,10 +11,6 @@
     },
     {
       "command": "5 */6 * * * ./scripts/scalingo_index_and_build_catalog.sh",
-      "size": "S"
-    },
-    {
-      "command": "0 0 * * * python manage.py run_checks",
       "size": "S"
     }
   ]

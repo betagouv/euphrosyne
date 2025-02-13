@@ -42,12 +42,17 @@ class Command(BaseCommand):
                     ),
                     self.style.WARNING,
                 )
+                sentry_sdk.set_extra("response", response.text)
+                sentry_sdk.set_extra("status_code", response.status_code)
+                sentry_sdk.capture_message("Failed to check project folders sync")
+                return
             results = response.json()
-        except requests.exceptions.Timeout:
+        except requests.exceptions.Timeout as e:
             self.stderr.write(
                 "[check-folders-sync] Timeout",
                 self.style.WARNING,
             )
+            sentry_sdk.capture_exception(e)
             return
 
         if results and (results["orphan_dirs"] or results["unsynced_dirs"]):
