@@ -22,6 +22,10 @@
 {% block content_title %}{% endblock %}
 {% block content %}
 <div class="fr-container">
+    <h3>{% trans "Running virtual machines" %}</h3>
+    <div class="module calendar fr-p-1w fr-col-6">
+        <div id="running-vms"></div>
+    </div>
     <div class="upcoming-projects-banner">
         <h3>{% trans "Upcoming projects" %}</h3>
         <div>
@@ -35,10 +39,6 @@
         <div is="admin-calendar" id="admin-calendar"></div>
     </div>
 
-    <h3>{% trans "Running virtual machines" %}</h3>
-    <div class="module calendar fr-p-3w fr-col-6">
-        <div id="running-vms"></div>
-    </div>
 </div>
 
 {% endblock %}

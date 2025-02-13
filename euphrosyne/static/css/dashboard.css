@@ -74,3 +74,11 @@
     padding: 0.6em;
   }
 }
+
+#running-vms .fr-table > table tbody::after, #running-vms .fr-table > table thead::after {
+  background-image: none;
+}
+
+#running-vms table tr, #running-vms table th {
+  background-color: var(--body-bg);
+}
