@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-13 11:29+0100\n"
+"POT-Creation-Date: 2025-02-14 15:06+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -331,6 +331,9 @@ msgstr "Historique"
 msgid "View on site"
 msgstr "Voir sur le site"
 
+msgid "Running virtual machines"
+msgstr "Machines virtuelles en cours d'exécution"
+
 msgid "Upcoming projects"
 msgstr "Projets à venir"
 
@@ -339,9 +342,6 @@ msgstr "Voir plus"
 
 msgid "Calendar"
 msgstr "Calendrier"
-
-msgid "Running virtual machines"
-msgstr "Machines virtuelles en cours d'exécution"
 
 msgid "Search"
 msgstr "Rechercher"
