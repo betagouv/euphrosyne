@@ -130,14 +130,17 @@ export default function DocumentManager({
 
       <h2>{t["Images"]}</h2>
       <ImageGrid hideFrom={10}>
-        {images.map((image) => (
+        {images.map((image, index) => (
           <ImageWithPlaceholder
             key={image.url.split("?")[0]}
             src={image.url}
-            alt=""
+            alt={`Image ${index} in ${project.name}`}
           />
         ))}
       </ImageGrid>
+      {images.length === 0 && (
+        <p className="fr-mt-2w">{window.gettext("No images yet")}</p>
+      )}
 
       <DocumentUploadModal
         id={uploadModalId}
