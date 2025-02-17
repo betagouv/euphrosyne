@@ -2,7 +2,7 @@
 -r base.txt
 black==25.1.0
 factory-boy==3.3.1
-flake8==7.1.1
+flake8==7.1.2
 ipython==8.32.0
 isort==6.0.0
 mypy==1.14.1
