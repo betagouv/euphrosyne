@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-30 11:23+0100\n"
+"POT-Creation-Date: 2025-02-18 14:45+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -282,6 +282,9 @@ msgstr ""
 msgid "Creating virtual office..."
 msgstr "Création du bureau distant..."
 
+msgid "Deleting virtual office..."
+msgstr "Suppression du bureau distant..."
+
 msgid "The virtual machine has been deployed and is being configured."
 msgstr "La machine virtuelle a été déployée et est en cours de configuration."
 
@@ -316,6 +319,13 @@ msgstr "Une erreur s'est produite lors de la suppression du bureau distant."
 
 msgid "The virtual office has been deleted."
 msgstr "Le bureau virtuel a bien été supprimé."
+
+msgid ""
+"The virtual machine has been shut down and deleted. Please wait for the "
+"Guacamole connection to be deleted."
+msgstr ""
+"La machine virtuelle a été arrêtée et supprimée. Veuillez patienter jusqu'à "
+"ce que la connexion Guacamole soit supprimée."
 
 msgid "Object group / object choice"
 msgstr "Choix du groupe d'objets / objet"

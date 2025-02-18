@@ -21,6 +21,7 @@ export default class VirtualOfficeDeleteButton extends HTMLButtonElement {
 
   constructor() {
     super();
+    this.checkDeletingIntervalId = null;
     this.addEventListener("click", this.onButtonClick);
     window.addEventListener("vm-ready", () => {
       this.disabled = false;
@@ -36,11 +37,16 @@ export default class VirtualOfficeDeleteButton extends HTMLButtonElement {
       return;
     }
     this.disabled = true;
+    const promise = euphrosyneToolsService.deleteVM(
+      this.projectSlug,
+      euphrosyneToolsFetch,
+    );
+    this.checkDeletingIntervalId = setInterval(
+      this.checkDeletingProgress.bind(this),
+      5000,
+    );
     try {
-      await euphrosyneToolsService.deleteVM(
-        this.projectSlug,
-        euphrosyneToolsFetch,
-      );
+      await promise;
     } catch (error) {
       this.disabled = false;
       utils.displayMessage(
@@ -54,5 +60,22 @@ export default class VirtualOfficeDeleteButton extends HTMLButtonElement {
       "success",
     );
     window.dispatchEvent(new CustomEvent("vm-deleted"));
+  }
+
+  async checkDeletingProgress() {
+    const vmStatus = await euphrosyneToolsService.fetchVMProvisioningState(
+      this.projectSlug,
+      euphrosyneToolsFetch,
+    );
+    if (!vmStatus) {
+      utils.displayMessage(
+        window.gettext(
+          "The virtual machine has been shut down and deleted. Please wait for the Guacamole connection to be deleted.",
+        ),
+        "info",
+      );
+      clearInterval(this.checkDeletingIntervalId);
+      this.checkDeletingIntervalId = null;
+    }
   }
 }

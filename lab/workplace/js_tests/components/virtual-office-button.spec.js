@@ -15,6 +15,10 @@ describe("Test VirtualOfficeButton", () => {
       euphrosyneToolsService,
       "fetchDeploymentStatus",
     );
+    vi.spyOn(
+      euphrosyneToolsService,
+      "fetchVMProvisioningState",
+    ).mockResolvedValue(null);
     vi.spyOn(utils, "displayMessage");
 
     voButton = new VirtualOfficeButton();

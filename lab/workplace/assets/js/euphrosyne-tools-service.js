@@ -12,6 +12,20 @@ async function fetchVMConnectionLink(projectSlug, fetchFn = jwtFetch) {
   throw new Error(`An error occured while fetching project ${projectSlug} VM`);
 }
 
+async function fetchVMProvisioningState(projectSlug, fetchFn = jwtFetch) {
+  const response = await fetchFn(`/vms/${projectSlug}`, {
+    method: "GET",
+  });
+  if (response.ok) {
+    return (await response.json())["provisioning_state"];
+  } else if (response.status === 404) {
+    return null;
+  }
+  throw new Error(
+    `An error occured while fetching project ${projectSlug} vm provisioning state`,
+  );
+}
+
 async function fetchDeploymentStatus(projectSlug, fetchFn = jwtFetch) {
   const response = await fetchFn(`/deployments/${projectSlug}`, {
     method: "GET",
@@ -61,5 +75,6 @@ const exports = {
   deleteVM,
   fetchProjectVmSize,
   setProjectVmSize,
+  fetchVMProvisioningState,
 };
 export default exports;
