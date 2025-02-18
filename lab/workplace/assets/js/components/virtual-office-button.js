@@ -77,39 +77,52 @@ export default class VirtualOfficeButton extends HTMLElement {
   }
 
   async initButton() {
-    const url = await euphrosyneToolsService.fetchVMConnectionLink(
+    const vmStatus = await euphrosyneToolsService.fetchVMProvisioningState(
       this.projectSlug,
       this.fetchFn,
     );
-    if (url) {
-      this.connectionUrl = url;
-      this.buttonEl.disabled = false;
-      this.onConnectReady();
+    if (vmStatus === "Deleting") {
+      this.buttonEl.disabled = true;
+      this.buttonEl.innerText = window.gettext("Deleting virtual office...");
+      this.checkDeletingIntervalId = setInterval(
+        () => this.checkDeletingProgress(),
+        10000,
+      );
     } else {
-      const deploymentStatus =
-        await euphrosyneToolsService.fetchDeploymentStatus(
-          this.projectSlug,
-          this.fetchFn,
-        );
-      if (deploymentStatus) {
-        this.deploymentStatus = deploymentStatus;
-        if (deploymentStatus === "Failed") {
-          this.onFailedDeployment();
-        } else {
-          this.buttonEl.innerText = window.gettext(
-            "Creating virtual office...",
-          );
-          utils.displayMessage(
-            window.gettext(
-              "The virtual office is being created. This can take up to 10 minutes.",
-            ),
-            "info",
-          );
-          this.waitForDeploymentComplete();
-        }
-      } else {
+      const url = await euphrosyneToolsService.fetchVMConnectionLink(
+        this.projectSlug,
+        this.fetchFn,
+      );
+      if (url) {
+        this.connectionUrl = url;
         this.buttonEl.disabled = false;
-        this.buttonEl.innerText = window.gettext("Create virtual office");
+        this.onConnectReady();
+      } else {
+        const deploymentStatus =
+          await euphrosyneToolsService.fetchDeploymentStatus(
+            this.projectSlug,
+            this.fetchFn,
+          );
+        if (deploymentStatus) {
+          this.deploymentStatus = deploymentStatus;
+          if (deploymentStatus === "Failed") {
+            this.onFailedDeployment();
+          } else {
+            this.buttonEl.innerText = window.gettext(
+              "Creating virtual office...",
+            );
+            utils.displayMessage(
+              window.gettext(
+                "The virtual office is being created. This can take up to 10 minutes.",
+              ),
+              "info",
+            );
+            this.waitForDeploymentComplete();
+          }
+        } else {
+          this.buttonEl.disabled = false;
+          this.buttonEl.innerText = window.gettext("Create virtual office");
+        }
       }
     }
   }
@@ -140,6 +153,19 @@ export default class VirtualOfficeButton extends HTMLElement {
         () => this.reportNoConnectionLinkTimeoutError(),
         2 * 60 * 1000,
       ); // Wait 3 minutes before reporting a timeout error
+    }
+  }
+
+  async checkDeletingProgress() {
+    const vmStatus = await euphrosyneToolsService.fetchVMProvisioningState(
+      this.projectSlug,
+      this.fetchFn,
+    );
+    if (!vmStatus) {
+      this.buttonEl.disabled = false;
+      this.buttonEl.innerText = window.gettext("Create virtual office");
+      clearInterval(this.checkDeletingIntervalId);
+      this.checkDeletingIntervalId = null;
     }
   }
 
