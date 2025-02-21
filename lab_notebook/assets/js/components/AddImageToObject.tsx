@@ -77,28 +77,31 @@ export default function AddImageToObject({
 
   const onUpload = (url: string) => {
     // Refetch images
-    projectImageService.listProjectImages().then((images) => {
-      setObjectImages(images);
-      // Select uploaded image
-      const _image = images.find(
-        (i) => i.url.split("?")[0] === url.split("?")[0],
-      );
-      if (_image) onImageSelect(_image);
-    });
+    projectImageService
+      .listProjectImages(imageStorage?.token)
+      .then((images) => {
+        setObjectImages(images);
+        // Select uploaded image
+        const _image = images.find(
+          (i) => i.url.split("?")[0] === url.split("?")[0],
+        );
+        if (_image) onImageSelect(_image);
+      });
   };
 
   // FETCH PROJECT IMAGES
   useEffect(() => {
+    if (!imageStorage) return;
     setFetchingObjectImages(true);
     projectImageService
-      .listProjectImages()
+      .listProjectImages(imageStorage.token)
       .then((images) => {
         setObjectImages(images);
       })
       .finally(() => {
         setFetchingObjectImages(false);
       });
-  }, [objectGroup.id]);
+  }, [objectGroup.id, imageStorage]);
 
   // FETCH RUN OBJECT IMAGES
   useEffect(() => {
