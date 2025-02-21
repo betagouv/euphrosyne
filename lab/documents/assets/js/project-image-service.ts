@@ -12,8 +12,8 @@ export class ProjectImageServices extends UploadSasUrlMixin {
       `/images/upload/signed-url` + `?project_name=${projectSlug}`;
   }
 
-  async listProjectImages(): Promise<IImagewithUrl[]> {
-    const url = `/images/projects/${this.projectSlug}`;
+  async listProjectImages(sasToken?: string): Promise<IImagewithUrl[]> {
+    const url = `/images/projects/${this.projectSlug}?with_sas_token=${!sasToken}`;
 
     const requestInit: RequestInit = {
       method: "GET",
@@ -32,7 +32,7 @@ export class ProjectImageServices extends UploadSasUrlMixin {
 
     if (images) {
       return images.images.map((image) => ({
-        url: image,
+        url: sasToken ? image + "?" + sasToken : image, // assume there is no query string in the image url
         transform: undefined,
       }));
     }

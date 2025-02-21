@@ -5,7 +5,6 @@ import {
 } from "../../../../lab/assets/js/measuring-point.services";
 import MeasuringPoints from "./MeasuringPoints";
 import { NotebookContext, useNotebookContext } from "../Notebook.context";
-import { StorageImageServices } from "../notebook-image.services";
 import MeasuringPointImageGallery from "./MeasuringPointImageGallery";
 import {
   EuphrosyneToolsClientContext,
@@ -17,6 +16,7 @@ import {
 } from "../../../../standard/assets/js/standard-services";
 import { fetchRunObjectGroups } from "../../../../lab/objects/assets/js/services";
 import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
+import { useImageStorage } from "../hooks/useImageStorage";
 
 interface NotebookProps {
   runId: string;
@@ -31,11 +31,12 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
     "Add point": window.gettext("Add point"),
   };
 
-  const notebookContext = useNotebookContext(projectSlug, runId);
+  const imageStorage = useImageStorage(projectSlug);
+
+  const notebookContext = useNotebookContext(projectSlug, runId, imageStorage);
   const {
     measuringPoints,
     runMeasuringPointStandards,
-    setImageStorage,
     setMeasuringPoints,
     setStandards,
     setRunMeasuringPointStandards,
@@ -65,9 +66,6 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
 
   useEffect(() => {
     listMeasuringPoints(runId).then(setMeasuringPoints);
-    new StorageImageServices(notebookContext.projectSlug, toolsClient.fetchFn)
-      .getImagesUrlAndToken()
-      .then(setImageStorage);
   }, []);
 
   useEffect(() => {
