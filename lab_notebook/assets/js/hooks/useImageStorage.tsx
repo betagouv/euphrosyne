@@ -12,8 +12,10 @@ function getTokenExpiration(signedToken: string): Date | null {
   if (!expirationString) return null;
   return new Date(expirationString);
 }
-function tryGetValidImageStorageFromLocalStorage(): ImageStorage | null {
-  const imageStorageInLocalStorage = localStorage.getItem("imageStorage");
+function tryGetValidImageStorageFromLocalStorage(
+  localStorageKey: string,
+): ImageStorage | null {
+  const imageStorageInLocalStorage = localStorage.getItem(localStorageKey);
   if (!imageStorageInLocalStorage) return null;
   const parsedImageStorage = JSON.parse(
     imageStorageInLocalStorage,
@@ -24,17 +26,19 @@ function tryGetValidImageStorageFromLocalStorage(): ImageStorage | null {
 }
 
 export const useImageStorage = (projectSlug: string) => {
+  const localStorageKey = `${projectSlug}-imageStorage`;
   const toolsClient = useClientContext();
 
   const [imageStorage, setImageStorage] = useState<ImageStorage | null>(null);
 
   const onImageStorageChange = (newImageStorage: ImageStorage) => {
     setImageStorage(newImageStorage);
-    localStorage.setItem("imageStorage", JSON.stringify(newImageStorage));
+    localStorage.setItem(localStorageKey, JSON.stringify(newImageStorage));
   };
 
   useEffect(() => {
-    const localStorageImageStorage = tryGetValidImageStorageFromLocalStorage();
+    const localStorageImageStorage =
+      tryGetValidImageStorageFromLocalStorage(localStorageKey);
     const imageService = new StorageImageServices(
       projectSlug,
       toolsClient.fetchFn,
