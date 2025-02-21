@@ -52,7 +52,6 @@ export const useImageStorage = (projectSlug: string) => {
 
     // If we did not get the image storage from local storage or it is expired, we fetch it immediately,
     // otherwise we fetch it after the expiration time.
-    timeout = 5000;
     const timeoutId = setTimeout(
       () => imageService.getImagesUrlAndToken().then(onImageStorageChange),
       timeout,
