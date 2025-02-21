@@ -23,6 +23,7 @@ export default function ImageCropper({
   useEffect(() => {
     if (croppedImageRef.current) {
       new Cropper(croppedImageRef.current, {
+        checkCrossOrigin: false,
         data: transform || undefined,
         viewMode: 1,
         dragMode: readonly ? "none" : "move",
@@ -46,6 +47,7 @@ export default function ImageCropper({
       {...props}
       ref={croppedImageRef}
       css={{ maxWidth: "100%", display: "block" }}
+      crossOrigin="anonymous"
     />
   );
 }
