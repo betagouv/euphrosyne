@@ -91,6 +91,7 @@ export default function ImageMeasuringPointer({
   useEffect(() => {
     if (originalImageRef.current) {
       const _cropper = new Cropper(originalImageRef.current, {
+        checkCrossOrigin: false,
         viewMode: 1,
         ready: () => {
           if (transform) {
@@ -170,7 +171,12 @@ export default function ImageMeasuringPointer({
       </div>
       {!croppedDataUrl && (
         <div>
-          <img {...props} ref={originalImageRef} css={{ maxWidth: "100%" }} />
+          <img
+            {...props}
+            ref={originalImageRef}
+            css={{ maxWidth: "100%" }}
+            crossOrigin="anonymous"
+          />
         </div>
       )}
     </Fragment>

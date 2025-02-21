@@ -18,6 +18,7 @@ export default function CroppedImage({
   useEffect(() => {
     if (originalImageRef.current) {
       const _cropper = new Cropper(originalImageRef.current, {
+        checkCrossOrigin: false,
         viewMode: 1,
         ready: () => {
           if (!props.src) {
@@ -38,5 +39,12 @@ export default function CroppedImage({
     }
   }, [props.src]);
 
-  return <img ref={originalImageRef} {...props} css={{ maxWidth: "100%" }} />;
+  return (
+    <img
+      ref={originalImageRef}
+      {...props}
+      crossOrigin="anonymous"
+      css={{ maxWidth: "100%" }}
+    />
+  );
 }
