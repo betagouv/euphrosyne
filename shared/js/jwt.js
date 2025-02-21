@@ -4,6 +4,7 @@
  */
 
 import { getCSRFToken } from "../../lab/assets/js/utils.js";
+import { jwtDecode } from "jwt-decode";
 
 export async function jwtFetch(input, init = {}, contentType) {
   console.log(contentType);
@@ -44,7 +45,18 @@ export async function jwtFetch(input, init = {}, contentType) {
 export async function getToken(checkLocalStorage = true) {
   if (checkLocalStorage) {
     const localToken = localStorage.getItem("euphrosyne-jwt-access");
-    if (localToken) return localToken;
+    if (localToken) {
+      let decoded;
+      try {
+        decoded = jwtDecode(localToken);
+      } catch (e) {
+        console.error("Failed to decode token", e);
+        return getToken(false);
+      }
+      if (decoded.exp > Date.now() / 1000) {
+        return localToken;
+      }
+    }
   }
 
   // Try refresh
