@@ -1,5 +1,9 @@
 import { getToken } from "../jwt";
 
+vi.mock("jwt-decode", () => ({
+  jwtDecode: vi.fn().mockReturnValue({ exp: Date.now() / 1000 + 1000 }),
+}));
+
 describe("Test getToken", () => {
   describe("local storage usage", () => {
     // Mocks localStorage
@@ -33,7 +37,6 @@ describe("Test getToken", () => {
       const token = await getToken(false);
 
       expect(token).toBe("remote token");
-      console.log(getItemMock.mock.calls);
       expect(getItemMock).toHaveBeenCalledTimes(2);
       expect(getItemMock).toHaveBeenCalledWith("euphrosyne-jwt-refresh");
       expect(fetchTokenMock).toHaveBeenCalled();

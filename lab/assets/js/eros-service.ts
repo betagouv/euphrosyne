@@ -61,7 +61,7 @@ export async function getImagesURLForObject(c2rmfId: string) {
   const objectDetailsURL = `${EROS_BASE_URL}/rails/oeuvres/${c2rmfId}.json`;
   let fetchFailed = false,
     objectResponse: Response | undefined = undefined;
-  const token = await getToken(false);
+  const token = await getToken();
   try {
     objectResponse = await fetch(`${objectDetailsURL}?token=${token}`);
   } catch (error) {
