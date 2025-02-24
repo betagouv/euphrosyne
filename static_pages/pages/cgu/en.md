@@ -200,7 +200,7 @@ links of the https://doi.org/xxxx type. They can also directly contact
 the FIXLAB Project Leader who has published a dataset.
 
 Any DIGILAB User can participate in quality control of the Euphrosyne
-platform by reporting (to support-euphrosyne@culture.gouv.fr) in
+platform by reporting (to euphrosyne-support@culture.gouv.fr) in
 particular content that is not intended to appear (illegal or contrary
 to the GTC).
 
@@ -250,7 +250,7 @@ The raw data sets are available under a CC-BY 4.0 licence
 
 (https://creativecommons.org/licenses/by/4.0/).
 
-Use of the contact address support-euphrosyne@culture.gouv.fr
+Use of the contact address euphrosyne-support@culture.gouv.fr
 
 The contact address is used to contact the Administrators of the
 Euphrosyne platform and is not intended to receive requests relating to
@@ -301,7 +301,7 @@ Project Leaders on the Euphrosyne platform. As soon as they become aware
 of illegal content, the Administrators act quickly to remove this data
 or make access to it impossible. Any User may report content that does
 not comply with these Terms of Use by sending an e-mail to
-support-euphrosyne@culture.gouv.fr with the subject line: Euphrosyne -
+euphrosyne-support@culture.gouv.fr with the subject line: Euphrosyne -
 reporting.
 
 The administrators of Euphrosyne reserve the right to delete or make
@@ -400,7 +400,7 @@ l\'Informatique et des Libertés (CNIL).
 You may exercise these rights by contacting the publisher of the
 Euphrosyne platform (with the exception of the right to lodge a
 complaint which must be exercised directly with a supervisory authority)
-by email at <support-euphrosyne@culture.gouv.fr>.
+by email at <euphrosyne-support@culture.gouv.fr>.
 
 ## Cookies
 
@@ -443,4 +443,4 @@ C2RMF - Palais du Louvre 14 quai F. Mitterrand
 
 75001 Paris
 
-<support-euphrosyne@culture.gouv.fr>
+<euphrosyne-support@culture.gouv.fr>

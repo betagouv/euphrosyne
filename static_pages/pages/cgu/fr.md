@@ -221,7 +221,7 @@ un jeu de données.
 
 Tout Utilisateur DIGILAB peut participer au contrôle de la qualité de la
 plateforme *Euphrosyne* en signalant
-(à [support-euphrosyne@culture.gouv.fr](mailto:support-euphrosyne@culture.gouv.fr))
+(à [euphrosyne-support@culture.gouv.fr](mailto:euphrosyne-support@culture.gouv.fr))
 notamment les contenus n'ayant pas vocation à y figurer (illicites ou
 contraires aux CGU).
 
@@ -272,7 +272,7 @@ Il prend toute mesure nécessaire à cette fin.
 Les jeux de données brutes sont accessibles sous licence CC-BY 4.0
 (<https://creativecommons.org/licenses/by/4.0/>).
 
-## Utilisation de l'adresse de contact <support-euphrosyne@culture.gouv.fr>
+## Utilisation de l'adresse de contact <euphrosyne-support@culture.gouv.fr>
 
 L'adresse de contact permet de contacter les Administrateurs de la
 plateforme *Euphrosyne* et n'a pas pour objet de recevoir des demandes
@@ -327,7 +327,7 @@ qu'ils ont connaissance de contenus illicites, les Administrateurs
 agissent rapidement pour retirer ces données ou en rendre l'accès
 impossible. Tout Utilisateur peut signaler un contenu non conforme aux
 présentes conditions d'utilisation en envoyant un e-mail à l'adresse
-[support-euphrosyne@culture.gouv.fr](mailto:support-euphrosyne@culture.gouv.fr)
+[euphrosyne-support@culture.gouv.fr](mailto:euphrosyne-support@culture.gouv.fr)
 avec en objet: Euphrosyne - signalement.
 
 Les administrateurs d'*Euphrosyne* se réservent notamment la possibilité
@@ -436,7 +436,7 @@ Vous pouvez exercer ces droits en vous adressant à l'éditeur de la
 plateforme *Euphrosyne* (à l'exception du droit d'introduire une
 réclamation qui doit être exercé directement auprès d'une autorité de
 contrôle) par email
-à [support-euphrosyne@culture.gouv.fr](mailto:support-euphrosyne@culture.gouv.fr)
+à [euphrosyne-support@culture.gouv.fr](mailto:euphrosyne-support@culture.gouv.fr)
 
 ## Cookies
 
@@ -491,4 +491,4 @@ C2RMF - Palais du Louvre 14 quai F. Mitterrand
 
 75001 Paris
 
-[support-euphrosyne@culture.gouv.fr](mailto:support-euphrosyne@culture.gouv.fr)
+[euphrosyne-support@culture.gouv.fr](mailto:euphrosyne-support@culture.gouv.fr)
