@@ -4,7 +4,7 @@ from io import BytesIO
 
 from django.utils.translation import gettext as _
 from PIL import Image as PILImage
-from PIL import ImageDraw, ImageFont
+from PIL import ImageDraw, ImageFont, ImageOps
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
@@ -353,10 +353,16 @@ def resize_image(img: Image, max_width: float, max_height: float):
     return width, height
 
 
+# pylint: disable=too-many-locals
 def draw_image_with_points(image: NotebookImage, output_path: str):
     pil_image: PILImage.ImageFile.ImageFile | PILImage.Image = PILImage.open(
         image["content"]
     )
+    # Prevent image rotation
+    transposed_image = ImageOps.exif_transpose(pil_image)
+    if transposed_image:
+        pil_image = transposed_image
+
     if image["transform"]:
         pil_image = pil_image.crop(
             (
