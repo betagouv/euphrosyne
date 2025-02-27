@@ -104,6 +104,6 @@ class EraDatingAutoCompleteWidget(DatingAutoCompleteWidget):
     class Media:
         js = (
             "web-components/dating-open-theso-type-ahead.js",
-            "js/widgets/era-autocomplete-widget.js",
+            "js/widgets/dating-autocomplete-widget.js",
         )
         css = {"all": ("css/widgets/autocomplete-widget.css",)}
