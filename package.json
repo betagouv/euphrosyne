@@ -30,7 +30,7 @@
   "homepage": "https://github.com/betagouv/euphrosyne#readme",
   "devDependencies": {
     "@types/lodash.debounce": "^4.0.9",
-    "@typescript-eslint/eslint-plugin": "^8.24.1",
+    "@typescript-eslint/eslint-plugin": "^8.25.0",
     "@typescript-eslint/parser": "^8.24.1",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-react": "^7.37.4",
