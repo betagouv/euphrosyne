@@ -55,6 +55,22 @@ class ObjectGroupThumbnail(models.Model):
 
 
 class ObjectGroup(TimestampedModel):
+    parent_group = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="differentiated_objects",
+        verbose_name=_("Parent Object Group"),
+    )
+
+    is_differentiated = models.BooleanField(
+        _("Is differentiated object?"), default=False
+    )
+    object_count = models.PositiveIntegerField(
+        _("Number of objects"),
+    )
+
     c2rmf_id = models.CharField(
         _("C2RMF ID"),
         max_length=255,
@@ -64,9 +80,6 @@ class ObjectGroup(TimestampedModel):
     label = models.CharField(
         _("Label"),
         max_length=255,
-    )
-    object_count = models.PositiveIntegerField(
-        _("Number of objects"),
     )
     inventory = models.CharField(
         _("Inventory number"),
@@ -126,21 +139,6 @@ class ObjectGroup(TimestampedModel):
     class Meta:
         verbose_name = _("Object / Sample")
         verbose_name_plural = _("Object(s) / Sample(s")
-
-
-class Object(models.Model):
-    group = models.ForeignKey(ObjectGroup, on_delete=models.CASCADE)
-    label = models.CharField(_("Label"), max_length=255)
-    inventory = models.CharField(
-        _("Inventory"),
-        max_length=255,
-        blank=True,
-    )
-    collection = models.CharField(
-        _("Collection"),
-        max_length=255,
-        blank=True,
-    )
 
 
 class RunObjectGroup(TimestampedModel):

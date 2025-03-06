@@ -27,7 +27,7 @@ from .forms import (
     ObjectGroupImportC2RMFReadonlyForm,
     ObjectGroupThumbnailForm,
 )
-from .models import Object, ObjectGroup, ObjectGroupThumbnail
+from .models import ObjectGroup, ObjectGroupThumbnail
 
 
 class CSVValidationError(ValidationError):
@@ -76,7 +76,7 @@ class ObjectFormSet(BaseInlineFormSet):
         self,
         data: QueryDict | None = None,
         files: MultiValueDict[str, UploadedFile] | None = None,
-        instance: Object | None = None,
+        instance: ObjectGroup | None = None,
         save_as_new: bool = False,
         prefix: str | None = None,
         queryset: QuerySet | None = None,
@@ -168,7 +168,7 @@ class ObjectFormSet(BaseInlineFormSet):
 
 
 class ObjectInline(admin.TabularInline):
-    model = Object
+    model = ObjectGroup
     verbose_name = _("Object")
     template = "admin/edit_inline/tabular_object_in_objectgroup.html"
     fields = (

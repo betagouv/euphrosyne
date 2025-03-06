@@ -2,7 +2,6 @@
 
 from .objects import (  # noqa: F401
     Location,
-    Object,
     ObjectGroup,
     ObjectGroupThumbnail,
     Period,
