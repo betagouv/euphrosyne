@@ -10,13 +10,13 @@ from django.urls import reverse
 
 from lab.tests.factories import ObjectGroupFactory
 
-from ..admin import CSVValidationError, ObjectFormSet, ObjectInline
+from ..admin import CSVValidationError, ObjectFormSet, DifferentiatedObjectInline
 from ..models import ObjectGroup, Period
 
 
 class TestObjectFormset(TestCase):
     def setUp(self):
-        self.inline = ObjectInline(ObjectGroup, admin_site=AdminSite())
+        self.inline = DifferentiatedObjectInline(ObjectGroup, admin_site=AdminSite())
 
     def test_disables_collection_when_parent_instance_has_collection(self):
         objectgroup: ObjectGroup = ObjectGroupFactory(collection="abc")
@@ -144,7 +144,7 @@ class TestObjectFormset(TestCase):
 
 class TestObjectFormsetWithTemplateUpload(TestCase):
     def setUp(self):
-        self.inline = ObjectInline(ObjectGroup, admin_site=AdminSite())
+        self.inline = DifferentiatedObjectInline(ObjectGroup, admin_site=AdminSite())
         self.objectgroup = ObjectGroup(
             label="Object group",
             dating_period=Period.objects.get_or_create(label="XIXe")[0],

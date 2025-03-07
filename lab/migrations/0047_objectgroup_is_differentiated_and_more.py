@@ -30,7 +30,4 @@ class Migration(migrations.Migration):
                 verbose_name="Parent Object Group",
             ),
         ),
-        migrations.DeleteModel(
-            name="Object",
-        ),
     ]

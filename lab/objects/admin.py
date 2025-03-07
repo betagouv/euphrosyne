@@ -13,6 +13,7 @@ from django.forms.utils import ErrorList
 from django.http import HttpResponse, HttpResponseRedirect, QueryDict
 from django.http.request import HttpRequest
 from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -95,9 +96,12 @@ class ObjectFormSet(BaseInlineFormSet):
     def save(self, commit: bool = True):
         saved_objects = super().save(commit)
         if self.instance.pk:
-            object_set_count = self.instance.object_set.count()
-            if object_set_count and self.instance.object_count != object_set_count:
-                self.instance.object_count = object_set_count
+            differentiated_objects_count = self.instance.differentiated_objects.count()
+            if (
+                differentiated_objects_count
+                and self.instance.object_count != differentiated_objects_count
+            ):
+                self.instance.object_count = differentiated_objects_count
                 self.instance.save()
         return saved_objects
 
@@ -167,16 +171,17 @@ class ObjectFormSet(BaseInlineFormSet):
         return errors
 
 
-class ObjectInline(admin.TabularInline):
+class DifferentiatedObjectInline(admin.TabularInline):
     model = ObjectGroup
-    verbose_name = _("Object")
-    template = "admin/edit_inline/tabular_object_in_objectgroup.html"
-    fields = (
-        "label",
-        "inventory",
-        "collection",
-    )
+    fk_name = "parent_group"
+    # template = "admin/edit_inline/tabular_object_in_objectgroup.html"
+    verbose_name = _("Differentiated Object")
+    verbose_name_plural = _("Differentiated Objects")
+    fields = ("label", "inventory", "collection", "is_differentiated")
     extra = 0
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(is_differentiated=True)
 
     def has_view_permission(
         self, request: HttpRequest, obj: Optional[ObjectGroup] = None
@@ -203,6 +208,7 @@ class ObjectInline(admin.TabularInline):
     ):
         return super().get_formset(request, obj, formset=ObjectFormSet, **kwargs)
 
+    """
     def get_min_num(
         self,
         request: HttpRequest,
@@ -212,7 +218,7 @@ class ObjectInline(admin.TabularInline):
         if request.method == "POST":
             # Forbids empty form in formset to enforce object_count is equal to
             # number of differentiared objects.
-            return int(request.POST["object_set-TOTAL_FORMS"])
+            return int(request.POST["differentiated_objects-TOTAL_FORMS"])
         return super().get_min_num(request, obj, **kwargs)
 
     def get_max_num(
@@ -221,14 +227,15 @@ class ObjectInline(admin.TabularInline):
         obj: Optional[ObjectGroup] = None,
         **kwargs: Mapping[str, Any],
     ) -> Optional[int]:
-        if obj and obj.object_set.count() == 1:
+        if obj and obj.differentiated_objects.count() == 1:
             return 1
-        return super().get_max_num(request, obj=obj, **kwargs)
+        return super().get_max_num(request, obj=obj, **kwargs)"
+    """
 
 
 @admin.register(ObjectGroup)
 class ObjectGroupAdmin(ModelAdmin):
-    inlines = (ObjectInline, ObjectGroupThumbnailInline)
+    inlines = (DifferentiatedObjectInline, ObjectGroupThumbnailInline)
     form = ObjectGroupForm
     list_display = ("label", "project_num", "c2rmf_id")
 
@@ -293,12 +300,12 @@ class ObjectGroupAdmin(ModelAdmin):
 
     def get_inlines(self, request: HttpRequest, obj: ObjectGroup | None):
         if "run" not in request.GET and is_lab_admin(request.user):
-            return (ObjectInline, ProjectInline)
-        return (ObjectInline, ObjectGroupThumbnailInline)
+            return (DifferentiatedObjectInline, ProjectInline)
+        return (DifferentiatedObjectInline, ObjectGroupThumbnailInline)
 
     def get_object(
         self, request: HttpRequest, object_id: str, from_field=None
-    ) -> Any | None:
+    ) -> ObjectGroup | None:
         object_group = super().get_object(request, object_id, from_field)
         if object_group and object_group.c2rmf_id:
             object_group = fetch_full_objectgroup_from_eros(
@@ -395,12 +402,24 @@ class ObjectGroupAdmin(ModelAdmin):
         run_ids = obj.runs.values_list("id", flat=True)
         return Project.objects.filter(runs__id__in=run_ids).distinct().count()
 
+    @admin.display
+    def project_num(self, obj: ObjectGroup) -> int:
+        if obj.parent_group:
+            return reverse(
+                "admin:lab_objectgroup_change",
+                args=[obj.parent_group.id],
+            )
+        return ""
+
     @staticmethod
     def get_are_objects_differentiated(
         request: HttpRequest, obj: ObjectGroup | None = None
     ):
         if obj:
-            return obj.object_set.exists()
-        if request.method == "POST" and "object_set-TOTAL_FORMS" in request.POST:
-            return int(request.POST["object_set-TOTAL_FORMS"]) > 0
+            return obj.differentiated_objects.exists()
+        if (
+            request.method == "POST"
+            and "differentiated_objects-TOTAL_FORMS" in request.POST
+        ):
+            return int(request.POST["differentiated_objects-TOTAL_FORMS"]) > 0
         return False
