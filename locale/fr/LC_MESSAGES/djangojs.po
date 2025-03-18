@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-18 14:45+0100\n"
+"POT-Creation-Date: 2025-03-18 09:18+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -163,6 +163,9 @@ msgstr "Ajouter un document"
 
 msgid "Images"
 msgstr "Images"
+
+msgid "No images yet"
+msgstr "Aucune image"
 
 msgid "Add files"
 msgstr "Ajouter des fichiers"

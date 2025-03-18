@@ -58,6 +58,7 @@ export default function DocumentManager({
   const t = {
     "Add a document": window.gettext("Add a document"),
     Images: window.gettext("Images"),
+    "No images yet": window.gettext("No images yet"),
   };
 
   const [isLoading, setIsLoading] = useState(true);
@@ -138,9 +139,7 @@ export default function DocumentManager({
           />
         ))}
       </ImageGrid>
-      {images.length === 0 && (
-        <p className="fr-mt-2w">{window.gettext("No images yet")}</p>
-      )}
+      {images.length === 0 && <p className="fr-mt-2w">{t["No images yet"]}</p>}
 
       <DocumentUploadModal
         id={uploadModalId}
