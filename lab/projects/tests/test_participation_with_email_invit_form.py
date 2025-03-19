@@ -3,7 +3,7 @@ from unittest import mock
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.forms.models import BaseModelForm
-from django.test import SimpleTestCase
+from django.test import TestCase
 
 from lab.models import Participation
 from lab.projects.models import Project
@@ -11,7 +11,7 @@ from lab.projects.models import Project
 from ..forms import BaseParticipationForm
 
 
-class TestBaseParticipationForm(SimpleTestCase):
+class TestBaseParticipationForm(TestCase):
     def test_send_email_on_save(self):
         member = get_user_model()(id=2, email="member@test.com", password="test")
         project = Project(id=1, name="Test project")

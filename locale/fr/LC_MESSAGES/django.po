@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-19 12:16+0100\n"
+"POT-Creation-Date: 2025-03-20 16:41+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -123,6 +123,9 @@ msgstr "Merci"
 msgid "The New AGLAE Team"
 msgstr "L'équipe New AGLAE"
 
+msgid "Thank you,"
+msgstr "Merci,"
+
 msgid "Data request received"
 msgstr "Demande de données reçue"
 
@@ -135,6 +138,13 @@ msgstr ""
 
 msgid "Have a good day,"
 msgstr "Bonne journée,"
+
+msgid ""
+"We have received your data request. A member of the New AGLAE team will "
+"review it as soon as possible and get back to you."
+msgstr ""
+"Nous avons bien reçu votre demande de données. Un membre de l'équipe New "
+"AGLAE la traitera dès que possible."
 
 msgid "Related project"
 msgstr "Projet apparenté"
@@ -223,6 +233,9 @@ msgstr "prénom"
 
 msgid "last name"
 msgstr "nom"
+
+msgid "preferred language"
+msgstr "langue préférée"
 
 msgid "invitation completed at"
 msgstr "invitation complétée le"
@@ -493,11 +506,12 @@ msgstr ""
 msgid "[Euphrosyne] Invitation to join project %s"
 msgstr "[Euphrosyne] Invitation à rejoindre le projet %s"
 
-#, python-brace-format
-msgid "[Euphrosyne] Alert: Long lasting VMs in project {project.name}"
+#, fuzzy, python-format
+#| msgid "[Euphrosyne] Alert: Long lasting VMs in project %s"
+msgid "[Euphrosyne] Alert: Long lasting VMs in project %s"
 msgstr ""
 "[Euphrosyne] Alerte : VMs du projet {project.name} en cours depuis un "
-"certain emps"
+"certain temps"
 
 #, python-format
 msgid ""
@@ -1282,6 +1296,9 @@ msgstr "Date de création de cette entrée"
 
 msgid "Date this entry was most recently changed."
 msgstr "Date de la dernière modification de cette entrée"
+
+msgid "Welcome to Euphrosyne"
+msgstr "Bienvenue sur Euphrosyne"
 
 msgid "standard"
 msgstr "standard"

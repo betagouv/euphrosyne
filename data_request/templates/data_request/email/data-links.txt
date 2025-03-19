@@ -1,0 +1,16 @@
+{% load i18n %}
+
+{% blocktrans %}Data Request{% endblocktrans %}
+
+{% blocktrans %}Thank you for your interest in New AGLAE data catalog. We have processed your request and generated the following links for you to download the data you have selected:{% endblocktrans %}
+
+{% for link in links %}
+- {{ link.name }} ({{ link.url }}) - {% if link.data_type == "raw_data" %}{% blocktrans %}Raw data{% endblocktrans %}{% else %}{% blocktrans %}Processed data{% endblocktrans %}{% endif %}
+{% endfor %}
+
+{% blocktrans %}Please click on the links above to download the data. If you have any further questions or need assistance, please feel free to contact us.{% endblocktrans %}
+
+{% blocktranslate with formatted_exp_date=expiration_date|date:"DATETIME_FORMAT" %}Note that the links will be active until {{ formatted_exp_date }}.{% endblocktranslate %}
+
+{% blocktrans %}Thank you,{% endblocktrans %}
+{% blocktrans %}The New AGLAE Team{% endblocktrans %}
