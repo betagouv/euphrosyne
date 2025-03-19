@@ -1,6 +1,8 @@
+from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from social_core.pipeline.partial import partial
 from social_core.pipeline.social_auth import social_user as social_social_user
 from social_django.models import Partial
@@ -22,7 +24,16 @@ def social_user(
     user_id = strategy.session_get("user_id")
     if user_id:
         user = get_user_model().objects.get(id=user_id)
-    return social_social_user(backend, uid, user, *args, **kwargs)
+    out = social_social_user(backend, uid, user, *args, **kwargs)
+    if not out.get("user") and not out.get("social"):
+        messages.warning(
+            strategy.request,
+            _(
+                # pylint: disable=line-too-long
+                "Your ORCID account isn't connected to an existing account. Please use email/password to sign in, or register with ORCID first using the link you received in the invitation email."
+            ),
+        )
+    return out
 
 
 @partial
