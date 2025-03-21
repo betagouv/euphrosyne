@@ -17,6 +17,7 @@ def graphene_client():
 @pytest.mark.django_db
 def test_resolve_stats(client):
     last_year_project = ProjectFactory()
+    # Make sure created date is timezone aware
     last_year_project.created = timezone.now() - timedelta(days=365)
     last_year_project.save()
 

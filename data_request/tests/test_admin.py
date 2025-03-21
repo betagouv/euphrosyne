@@ -1,9 +1,9 @@
-import datetime
 from unittest import mock
 
 from django.contrib.admin.sites import AdminSite
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from euphro_auth.tests import factories as auth_factories
 from euphro_tools.exceptions import EuphroToolsException
@@ -53,7 +53,7 @@ class TestAdminActionSendLink(TestCase):
 class TestAdminFilterBeenSeen(TestCase):
     def setUp(self):
         self.admin = DataRequestAdmin(DataRequest, admin_site=AdminSite())
-        self.dr_sent = factories.DataRequestFactory(sent_at=datetime.datetime.now())
+        self.dr_sent = factories.DataRequestFactory(sent_at=timezone.now())
         self.dr_not_sent = factories.DataRequestFactory(sent_at=None)
 
     def test_filter_when_no_value(self):
@@ -108,9 +108,7 @@ class TestAdminDataRequest(TestCase):
 
     def test_display_is_sent(self):
         assert (
-            self.admin.is_sent(
-                factories.DataRequestFactory(sent_at=datetime.datetime.now())
-            )
+            self.admin.is_sent(factories.DataRequestFactory(sent_at=timezone.now()))
             is True
         )
         assert self.admin.is_sent(factories.DataRequestFactory(sent_at=None)) is False

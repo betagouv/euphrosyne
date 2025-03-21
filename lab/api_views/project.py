@@ -20,10 +20,16 @@ class ProjectFilter(filters.FilterSet):
         fields = ["start_before", "start_after", "end_before", "end_after"]
 
     def filter_before(self, queryset, name, value):
+        # Ensure value is timezone-aware
+        if hasattr(value, "tzinfo") and value.tzinfo is None:
+            value = timezone.make_aware(value)
         lookup = f"runs__{name}__lte"
         return queryset.filter(**{lookup: value}).distinct()
 
     def filter_after(self, queryset, name, value):
+        # Ensure value is timezone-aware
+        if hasattr(value, "tzinfo") and value.tzinfo is None:
+            value = timezone.make_aware(value)
         lookup = f"runs__{name}__gte"
         return queryset.filter(**{lookup: value}).distinct()
 
