@@ -15,6 +15,9 @@ class User(AbstractUser):
     first_name = models.CharField(_("first name"), max_length=150, blank=False)
     last_name = models.CharField(_("last name"), max_length=150, blank=False)
     username = None  # type: ignore[assignment]
+    preferred_language = models.CharField(
+        _("preferred language"), max_length=10, blank=True, null=True
+    )
 
     invitation_completed_at = models.DateTimeField(
         _("invitation completed at"), blank=True, null=True

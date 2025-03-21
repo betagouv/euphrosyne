@@ -1,14 +1,13 @@
 import logging
-import smtplib
 import typing
 
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
-from django.core.mail.message import EmailMultiAlternatives
-from django.template import loader
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
+
+from shared.email_utils import send_email_with_language, use_user_language
 
 if typing.TYPE_CHECKING:
     from euphro_auth.models import User
@@ -19,7 +18,7 @@ logger = logging.getLogger(__name__)
 def send_invitation_email(user: "User"):
     """
     Send an email with an invitation link based on a user ID and a token used for
-    authentication.
+    authentication. Uses the user's preferred language if available.
     """
     token = default_token_generator.make_token(user)
     context = {
@@ -28,18 +27,14 @@ def send_invitation_email(user: "User"):
         "uid": urlsafe_base64_encode(force_bytes(user.id)),
         "token": token,
     }
-    subject = _("[Euphrosyne] Invitation to register")
-    body = loader.render_to_string("invitation_email.txt", context)
 
-    email_message = EmailMultiAlternatives(subject=subject, body=body, to=[user.email])
-    html_email = loader.render_to_string("invitation_email.html", context)
-    email_message.attach_alternative(html_email, "text/html")
+    with use_user_language(user=user):
+        subject = _("[Euphrosyne] Invitation to register")
 
-    try:
-        email_message.send()
-    except (smtplib.SMTPException, ConnectionError) as e:
-        logger.error(
-            "Error sending invitation email to %s. Reason: %s",
-            user.email,
-            str(e),
-        )
+    send_email_with_language(
+        subject=subject,
+        template_name="invitation_email",
+        context=context,
+        to_emails=[user.email],
+        user=user,
+    )

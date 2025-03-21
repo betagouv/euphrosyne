@@ -1,11 +1,11 @@
 from django.core import mail
-from django.test import SimpleTestCase
+from django.test import TestCase
 from django.utils.translation import gettext
 
 from ..emails import send_data_email, send_data_request_created_email
 
 
-class DataRequestEmailsTestCase(SimpleTestCase):
+class DataRequestEmailsTestCase(TestCase):
     def test_send_data_request_created_email(self):
         send_data_request_created_email("test@test.fr")
 

@@ -1,24 +1,26 @@
 from django.conf import settings
 from django.core import mail
-from django.test import SimpleTestCase
+from django.test import TestCase
 
+from euphro_auth.tests.factories import StaffUserFactory
 from lab.models import Project
 
 from ...emails import send_project_invitation_email
 
 
-class TestSendProjectInvitationEmail(SimpleTestCase):
+class TestSendProjectInvitationEmail(TestCase):
     def test_send_email(self):
         project = Project(id=1, name="Test Project")
+        user = StaffUserFactory()
 
         send_project_invitation_email(
-            email="test@test.com",
+            email=user.email,
             project=project,
         )
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            f"[Euphrosyne] Invitation to join project {project.name}",
+            "[Euphrosyne] Invitation à rejoindre le projet Test Project",
         )
         self.assertIn(
             f"{settings.SITE_URL}/lab/project/{project.id}/change/",

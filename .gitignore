@@ -6,3 +6,4 @@ venv*
 local.*
 node_modules
 **/assets/dist/
+CLAUDE.md
