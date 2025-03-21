@@ -28,12 +28,20 @@ class ProjectFactory(factory.django.DjangoModelFactory):
 
 
 class ProjectWithLeaderFactory(ProjectFactory):
+    class Meta:
+        model = Project
+        skip_postgeneration_save = True
+
     leader_participation = factory.RelatedFactory(
         ParticipationFactory, factory_related_name="project", is_leader=True
     )
 
 
 class FinishedProject(ProjectFactory):
+    class Meta:
+        model = Project
+        skip_postgeneration_save = True
+
     @factory.post_generation
     def runs(self, create, *args, **kwargs):
         if not create:
@@ -47,6 +55,10 @@ class FinishedProject(ProjectFactory):
 
 
 class ProjectWithMultipleParticipationsFactory(ProjectWithLeaderFactory):
+    class Meta:
+        model = Project
+        skip_postgeneration_save = True
+
     member_1 = factory.RelatedFactory(
         ParticipationFactory, factory_related_name="project", is_leader=False
     )
@@ -127,6 +139,7 @@ class ObjectFactory(factory.django.DjangoModelFactory):
 class ObjectGroupFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = ObjectGroup
+        skip_postgeneration_save = True
 
     label = factory.Faker("name")
     dating_period = factory.SubFactory(PeriodFactory)

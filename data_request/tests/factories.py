@@ -19,6 +19,10 @@ class DataRequestFactory(factory.django.DjangoModelFactory):
 
 
 class DataRequestWithRunsFactory(DataRequestFactory):
+    class Meta:
+        model = DataRequest
+        skip_postgeneration_save = True
+
     @factory.post_generation
     def runs(obj: DataRequest, create: bool, *args, **kwargs):
         if not create:
