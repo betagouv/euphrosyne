@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     "orcid_oauth",
     "static_pages",
     "standard",
+    "certification",
     "drf_spectacular",
 ] + (["debug_toolbar"] if DEBUG else [])
 
@@ -383,3 +384,11 @@ FORCE_LAST_CGU_ACCEPTANCE_DT = (
     if os.getenv("FORCE_LAST_CGU_ACCEPTANCE_DT")
     else None
 )
+
+# CERTIFICATIONS
+RADIATION_PROTECTION_CERTIFICATION_NAME = os.environ[
+    "RADIATION_PROTECTION_CERTIFICATION_NAME"
+]
+RADIATION_PROTECTION_TALLY_SECRET_KEY = os.environ[
+    "RADIATION_PROTECTION_TALLY_SECRET_KEY"
+]

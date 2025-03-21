@@ -1,0 +1,13 @@
+{% load i18n %}{% autoescape off %}
+
+<p>{% trans "Hello" %},</p>
+
+<p>{% blocktranslate %}Congratulations on successfully completing the radiation protection course and quiz! Your are now certified to use the New AGLAE particle accelerator at the Louvre.{% endblocktranslate %}</p>
+
+<p>{% blocktranslate %}Please keep this email as a record of your certification. You may be asked to present proof of your radiation protection certification when accessing the New AGLAE facilities.{% endblocktranslate %}</p>
+
+{% if valid_until %}<p>{% blocktranslate %}The certification is valid until:{% endblocktranslate %} {{ valid_until|date:"SHORT_DATE_FORMAT" }}.</p>{% endif %}
+
+<p>{% blocktranslate %}Best regards,{% endblocktranslate %}</p>
+
+{% trans "The New AGLAE team" %} {% endautoescape %}
