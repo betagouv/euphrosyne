@@ -74,7 +74,9 @@ class CalendarViewTestCase(TestCase):
 
 class CalendarSerializerTestCase(TestCase):
     def test_run_serializaition(self):
-        date = timezone.datetime(2023, 3, 2, 16, 56)
+        date = timezone.datetime(
+            2023, 3, 2, 16, 56, tzinfo=timezone.get_current_timezone()
+        )
         run = RunFactory(
             label="run",
             project__name="project",

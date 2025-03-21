@@ -10,7 +10,9 @@ from .models import Object, ObjectGroup, Project, Run
 
 StatPeriodLiteral = Literal["all", "year"]
 
-THIS_YEAR_START_DT = datetime(timezone.now().year, 1, 1)
+THIS_YEAR_START_DT = datetime(
+    timezone.now().year, 1, 1, tzinfo=timezone.get_current_timezone()
+)
 
 
 class LabStatType(graphene.ObjectType):

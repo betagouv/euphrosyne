@@ -1,5 +1,6 @@
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from euphro_auth.tests import factories as auth_factories
 
@@ -14,14 +15,18 @@ class TestRunView(TestCase):
 
         client.force_login(auth_factories.LabAdminUserFactory())
 
+        tz = timezone.get_current_timezone()
         self.june_project = factories.RunFactory(
-            start_date="2023-06-01 10:00:00", end_date="2023-06-30 10:00:00"
+            start_date=timezone.datetime(2023, 6, 1, 10, 0, 0, tzinfo=tz),
+            end_date=timezone.datetime(2023, 6, 30, 10, 0, 0, tzinfo=tz),
         ).project
         self.july_project = factories.RunFactory(
-            start_date="2023-07-01 10:00:00", end_date="2023-07-30 10:00:00"
+            start_date=timezone.datetime(2023, 7, 1, 10, 0, 0, tzinfo=tz),
+            end_date=timezone.datetime(2023, 7, 30, 10, 0, 0, tzinfo=tz),
         ).project
         self.august_project = factories.RunFactory(
-            start_date="2023-08-01 10:00:00", end_date="2023-08-30 10:00:00"
+            start_date=timezone.datetime(2023, 8, 1, 10, 0, 0, tzinfo=tz),
+            end_date=timezone.datetime(2023, 8, 30, 10, 0, 0, tzinfo=tz),
         ).project
 
     def test_run_detail_methods(self):
