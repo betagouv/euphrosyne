@@ -4,6 +4,7 @@ from typing import Optional
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Prefetch, QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from slugify import slugify
@@ -54,6 +55,22 @@ class ProjectQuerySet(models.QuerySet):
     def annotate_first_run_date(self):
         return self.annotate(first_run_date=models.Min("runs__start_date"))
 
+    def with_prefetched_leaders(self):
+        """
+        Prefetch the leader participations for the projects in this queryset.
+
+        This optimization helps reduce database queries
+        when accessing the project leader.
+        """
+        leader_prefetch = Prefetch(
+            "participation_set",
+            queryset=Participation.objects.filter(is_leader=True).select_related(
+                "user", "institution"
+            ),
+            to_attr="prefetched_leaders",
+        )
+        return self.prefetch_related(leader_prefetch)
+
 
 class ProjectManager(models.Manager):
     def get_queryset(self):
@@ -73,6 +90,15 @@ class ProjectManager(models.Manager):
 
     def annotate_first_run_date(self):
         return self.get_queryset().annotate_first_run_date()
+
+    def with_prefetched_leaders(self):
+        """
+        Prefetch the leader participations for all projects.
+
+        This optimization helps reduce database queries
+        when accessing the project leader.
+        """
+        return self.get_queryset().with_prefetched_leaders()
 
 
 class Project(TimestampedModel):
@@ -126,11 +152,37 @@ class Project(TimestampedModel):
         help_text=_("Has at least one run with data available."),
     )
 
+    # For optimization, when queryset is created with with_prefetched_leaders
+    # manager method, this attribute will be populated with the leader participation
+    prefetched_leaders: QuerySet[Participation]
+
     def __str__(self):
         return f"{self.name}"
 
     @property
     def leader(self) -> Optional["Participation"]:
+        """Get the leader participation for this project.
+
+        This property uses one of two methods to retrieve the leader:
+        1. If the project was loaded with Project.objects.with_prefetched_leaders(),
+           it will use the prefetched data (most efficient)
+        2. Otherwise, it will execute a database query (less efficient)
+
+        For optimal performance in admin interfaces or list views, use:
+        `Project.objects.with_prefetched_leaders()` to load projects.
+
+        Returns:
+            The Participation object for the project leader, or None if no leader exists
+        """
+        # First check if we have prefetched leaders
+        if (
+            # pylint: disable=no-member
+            hasattr(self, "prefetched_leaders")
+            and self.prefetched_leaders
+        ):
+            return self.prefetched_leaders[0]  # pylint: disable=no-member
+
+        # Fall back to database query
         try:
             return self.participation_set.select_related("user", "institution").get(
                 is_leader=True
