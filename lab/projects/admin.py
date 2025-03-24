@@ -37,12 +37,16 @@ class ProjectChangeList(ChangeList):
         qs = super().get_queryset(request, exclude_parameters)
         if request.method == "POST" and request.POST.get("action") == "delete_selected":
             return qs  # use more general queryset for delete action
+
         return (
             # qs with projects having at least one scheduled runs
             qs.filter(runs__start_date__isnull=False)  # type: ignore[attr-defined]
             .distinct()
             .annotate_first_run_date()
             .annotate(number_of_runs=Count("runs"))
+            .select_related("admin")  # Add select_related for admin user
+            .with_prefetched_leaders()  # Use optimized prefetch for leaders
+            .prefetch_related("runs")
             .order_by("-first_run_date")
         )
 
@@ -163,7 +167,8 @@ class ProjectDisplayMixin:
     @admin.display(description=_("First run"))
     def first_run_date(obj: Optional[Project]):
         if obj:
-            if hasattr(obj, "first_run_date"):  # from annotated queryset
+            # Use annotated value if available (most efficient)
+            if hasattr(obj, "first_run_date"):
                 return obj.first_run_date
             run_dates = (
                 obj.runs.filter(start_date__isnull=False)
@@ -196,7 +201,7 @@ class ProjectDisplayMixin:
     def number_of_runs(obj: Optional[Project]) -> Optional[int]:
         if obj:
             if hasattr(obj, "number_of_runs"):
-                return obj.number_of_runs  # from annotated queryset
+                return obj.number_of_runs
             return obj.runs.count()
         return None
 
@@ -405,9 +410,13 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                     )
                 )  # db query optimization
                 .annotate(number_of_runs=Count("runs"))
+                .select_related("admin")  # Add select_related for admin user
+                .with_prefetched_leaders()  # Use optimized prefetch for leaders
+                .prefetch_related("runs")
                 .order_by("-created")
                 .distinct()
             )
+            # Use select_related and prefetch_related to reduce database queries
             changelist_view.context_data["extra_qs"].append(
                 {"qs": to_schedule_projects, "title": _("To schedule")}
             )

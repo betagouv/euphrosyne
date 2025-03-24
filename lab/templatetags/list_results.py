@@ -66,10 +66,21 @@ def project_results(
     if not project_list_results:
         rl: ProjectQuerySet = changelist.result_list
         project_list_results = rl
-    return [
-        update_result(changelist, _project, _result)
-        for _project, _result in zip(project_list_results, results)
-    ]
+
+    # Calculate and store list display indices once to avoid repeated lookups
+    status_index = changelist.list_display.index("status")
+    admin_index = changelist.list_display.index("admin")
+    leader_index = changelist.list_display.index("leader_user")
+
+    updated_results = []
+    for _project, _result in zip(project_list_results, results):
+        # Update results inline instead of calling update_result function
+        _result[status_index] = _get_status_cell(_project)
+        _result[admin_index] = _get_admin_cell(_project)
+        _result[leader_index] = _get_leader_cell(_project)
+        updated_results.append(_result)
+
+    return updated_results
 
 
 @register.tag(name="project_result_list")
@@ -157,25 +168,29 @@ def _group_results(changelist: ChangeList, attr_getter_fn: Callable):
         tuple: A tuple containing the group and a list of ResultList objects
             for that group.
     """
-    grouped_results = groupby(
-        sorted(changelist.result_list, key=attr_getter_fn, reverse=True),
-        attr_getter_fn,
-    )
+    # Sort once and cache results
+    sorted_results = sorted(changelist.result_list, key=attr_getter_fn, reverse=True)
+    grouped_results = groupby(sorted_results, attr_getter_fn)
+
+    # Calculate indices once outside the loop
+    status_index = changelist.list_display.index("status")
+    admin_index = changelist.list_display.index("admin")
+    leader_index = changelist.list_display.index("leader_user")
 
     for group, result_grouper in grouped_results:
         results = list(result_grouper)
-        yield (
-            group,
-            project_results(
-                changelist,
-                results=[
-                    update_result(
-                        changelist,
-                        result,
-                        ResultList(None, items_for_result(changelist, result, None)),
-                    )
-                    for result in results
-                ],
-                project_list_results=results,
-            ),
-        )
+
+        # Prepare all result lists at once
+        all_items = [items_for_result(changelist, result, None) for result in results]
+
+        # Process in batch instead of one-by-one
+        result_lists = []
+        for result, items in zip(results, all_items):
+            rl = ResultList(None, items)
+            # Update in-place
+            rl[status_index] = _get_status_cell(result)
+            rl[admin_index] = _get_admin_cell(result)
+            rl[leader_index] = _get_leader_cell(result)
+            result_lists.append(rl)
+
+        yield (group, result_lists)
