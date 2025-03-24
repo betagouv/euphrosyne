@@ -67,6 +67,7 @@ SITE_URL = os.environ["SITE_URL"]
 INSTALLED_APPS = [
     "corsheaders",
     "euphrosyne.apps.AdminConfig",
+    "objectstorage",
     "euphro_auth",
     "django.forms",
     "django.contrib.admindocs",
