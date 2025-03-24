@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "euphrosyne.apps.AdminConfig",
     "euphrosyne.methods.apps.MethodsConfig",  # Use explicit app config for methods
+    "objectstorage",
     "euphro_auth",
     "django.forms",
     "django.contrib.admindocs",
