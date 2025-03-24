@@ -1,0 +1,72 @@
+{
+  "methods": [
+    {
+      "name": "XRF",
+      "description": "X-ray Fluorescence for elemental analysis",
+      "detectors": [
+        {
+          "name": "Silicon Drift",
+          "is_other_field": false,
+          "filters": [
+            "No Filter",
+            "Ti Filter",
+            "Al Filter",
+            "Cu Filter"
+          ]
+        },
+        {
+          "name": "PIN Diode",
+          "is_other_field": false,
+          "filters": [
+            "No Filter",
+            "Ti Filter",
+            "Al Filter"
+          ]
+        },
+        {
+          "name": "Custom Detector",
+          "is_other_field": true
+        }
+      ]
+    },
+    {
+      "name": "Micro-XRF",
+      "description": "Micro X-ray Fluorescence for detailed elemental mapping",
+      "detectors": [
+        {
+          "name": "SDD",
+          "is_other_field": false,
+          "filters": [
+            "No Filter",
+            "25μm Al",
+            "100μm Al",
+            "25μm Ti"
+          ]
+        },
+        {
+          "name": "Custom Detector",
+          "is_other_field": true
+        }
+      ]
+    },
+    {
+      "name": "MA-XRF",
+      "description": "Macro X-ray Fluorescence for large area scanning",
+      "detectors": [
+        {
+          "name": "Bruker",
+          "is_other_field": false,
+          "filters": [
+            "No Filter",
+            "Cu Filter",
+            "Al Filter"
+          ]
+        },
+        {
+          "name": "Custom Scanner",
+          "is_other_field": true
+        }
+      ]
+    }
+  ]
+}

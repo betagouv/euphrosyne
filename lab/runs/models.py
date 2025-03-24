@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from lab.methods import MethodModel
+from lab.methods.models import ConfigurableMethodModel
 from lab.validators import valid_filename
 from shared.models import TimestampedModel
 
@@ -15,7 +15,7 @@ class RunManager(models.Manager):
         return super().get_queryset().filter(embargo_date__lte=timezone.now())
 
 
-class Run(TimestampedModel, MethodModel):
+class Run(TimestampedModel, ConfigurableMethodModel):
     class Meta:
         constraints = [
             models.UniqueConstraint(

@@ -1,0 +1,68 @@
+{
+  "methods": [
+    {
+      "name": "X-ray Tomography",
+      "description": "3D imaging using X-rays to visualize internal structures",
+      "detectors": [
+        {
+          "name": "Flat Panel",
+          "is_other_field": false,
+          "filters": [
+            "1mm Cu",
+            "0.5mm Cu",
+            "0.2mm Al",
+            "1mm Al"
+          ]
+        },
+        {
+          "name": "CCD Camera",
+          "is_other_field": false,
+          "filters": [
+            "0.5mm Cu",
+            "1mm Al"
+          ]
+        },
+        {
+          "name": "Custom Detector",
+          "is_other_field": true
+        }
+      ]
+    },
+    {
+      "name": "Neutron Tomography",
+      "description": "3D imaging using neutrons, complementary to X-ray tomography",
+      "detectors": [
+        {
+          "name": "Scintillator",
+          "is_other_field": false,
+          "filters": [
+            "Cadmium Filter",
+            "Boron Filter"
+          ]
+        },
+        {
+          "name": "Custom Detector",
+          "is_other_field": true
+        }
+      ]
+    },
+    {
+      "name": "Phase Contrast",
+      "description": "Imaging technique that enhances contrast in samples with similar densities",
+      "detectors": [
+        {
+          "name": "High Resolution Detector",
+          "is_other_field": false,
+          "filters": [
+            "Phase Ring",
+            "Phase Plate"
+          ]
+        },
+        {
+          "name": "Custom Detector",
+          "is_other_field": true
+        }
+      ]
+    }
+  ]
+}
