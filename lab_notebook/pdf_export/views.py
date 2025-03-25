@@ -15,29 +15,31 @@ from lab.methods.dto import method_model_to_dto
 from lab.objects.models import RunObjetGroupImage, construct_image_url_from_path
 from lab.permissions import is_lab_admin
 
-from .pdf import MeasuringPoint as MeasuringPointMapping
 from .pdf import NotebookImage, PointLocation, create_pdf
 
 
-def _get_image_content(image_url: str):
+def _get_image_content(image_url: str) -> BytesIO:
+    """Fetch image content from URL"""
     response = requests.get(image_url, timeout=10)
     response.raise_for_status()
     return BytesIO(response.content)
 
 
-# pylint: disable=too-many-locals
-def export_notebook_to_pdf_view(request: HttpRequest, run_id: str):
+def _get_run_data(run_id: str):
+    """Get run data including measuring points and images"""
     run = get_object_or_404(lab_models.Run, pk=run_id)
 
-    points_qs = (
+    # Get all measuring points for the run
+    measuring_points_qs = (
         MeasuringPoint.objects.filter(run=run)
         .select_related("object_group", "standard")
         .order_by("name")
     )
 
+    # Get images related to measuring points
     run_object_group_images = (
         RunObjetGroupImage.objects.filter(
-            id__in=points_qs.filter(image__isnull=False)
+            id__in=measuring_points_qs.filter(image__isnull=False)
             .values_list("image__run_object_group_image", flat=True)
             .distinct()
         )
@@ -45,26 +47,49 @@ def export_notebook_to_pdf_view(request: HttpRequest, run_id: str):
         .select_related("run_object_group", "run_object_group__objectgroup")
         .all()
     )
+
+    # Get storage info for constructing image URLs
     storage_info = get_storage_info_for_project_images(run.project.slug)
+
+    # Transform measuring points to the format expected by PDF generator
+    measuring_points = [
+        {
+            "name": point.name,
+            "comments": point.comments,
+            "object_group": (
+                {"label": point.object_group.label} if point.object_group else None
+            ),
+            "standard": (
+                {"label": point.standard.standard.label}
+                if hasattr(point, "standard") and point.standard
+                else None
+            ),
+        }
+        for point in measuring_points_qs
+    ]
+
+    return run, run_object_group_images, storage_info, measuring_points
+
+
+def _prepare_images(run_object_group_images, storage_info) -> list[NotebookImage]:
+    """Prepare images with their content for PDF generation"""
     images: list[NotebookImage] = []
 
+    # Fetch image content in parallel
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-        futures = [
-            executor.submit(
-                _get_image_content,
-                construct_image_url_from_path(
-                    image.path, storage_info["base_url"], storage_info["token"]
-                ),
+        image_urls = [
+            construct_image_url_from_path(
+                image.path, storage_info["base_url"], storage_info["token"]
             )
             for image in run_object_group_images
         ]
+
+        futures = [executor.submit(_get_image_content, url) for url in image_urls]
         concurrent.futures.wait(futures)
         images_content = [future.result() for future in futures]
 
-    for image, content in zip(run_object_group_images, images_content):
-        image_url = construct_image_url_from_path(
-            image.path, storage_info["base_url"], storage_info["token"]
-        )
+    # Build image objects with their content
+    for image, content, url in zip(run_object_group_images, images_content, image_urls):
         locations: list[tuple[str, PointLocation]] = []
         for name, location in image.measuring_point_images.values_list(
             "measuring_point__name", "point_location"
@@ -75,7 +100,7 @@ def export_notebook_to_pdf_view(request: HttpRequest, run_id: str):
         images.append(
             {
                 "file_name": image.file_name,
-                "url": image_url,
+                "url": url,
                 "transform": image.transform,
                 "point_locations": locations,
                 "content": content,
@@ -83,29 +108,25 @@ def export_notebook_to_pdf_view(request: HttpRequest, run_id: str):
             }
         )
 
-    measuring_points: list[MeasuringPointMapping] = [
-        {
-            "name": point.name,
-            "comments": point.comments,
-            "object_group": (
-                {"label": point.object_group.label} if point.object_group else None
-            ),
-            "standard": (
-                {"label": point.standard.standard.label}
-                if hasattr(point, "standard")
-                else None
-            ),
-        }
-        for point in MeasuringPoint.objects.filter(run=run)
-        .select_related("object_group", "standard")
-        .order_by("name")
-    ]
+    return images
 
+
+def export_notebook_to_pdf_view(request: HttpRequest, run_id: str) -> HttpResponse:
+    """Generate and serve a PDF export of a run notebook"""
+    # Get run data
+    run, run_object_group_images, storage_info, measuring_points = _get_run_data(run_id)
+
+    # Check permissions
     if not (
         is_lab_admin(request.user)
         or run.project.members.filter(id=request.user.id).exists()
     ):
         return HttpResponse(status=403)
+
+    # Prepare images with content
+    images = _prepare_images(run_object_group_images, storage_info)
+
+    # Generate PDF
     with tempfile.NamedTemporaryFile(delete_on_close=False) as fp:
         create_pdf(
             path=fp.name,
@@ -122,6 +143,8 @@ def export_notebook_to_pdf_view(request: HttpRequest, run_id: str):
             images=images,
         )
         fp.close()
+
+        # Serve the generated PDF
         with open(fp.name, mode="rb") as f:
             response = HttpResponse(f.read(), content_type="application/pdf")
             response["Content-Disposition"] = (
