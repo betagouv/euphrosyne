@@ -1,10 +1,14 @@
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
 
-from lab.methods import MethodModel
 from lab.validators import valid_filename
 from shared.models import TimestampedModel
+
+# Dynamically import the configured method model based on settings
+MethodModelClass = import_string(settings.METHOD_MODEL_CLASS)
 
 
 class RunManager(models.Manager):
@@ -15,7 +19,7 @@ class RunManager(models.Manager):
         return super().get_queryset().filter(embargo_date__lte=timezone.now())
 
 
-class Run(TimestampedModel, MethodModel):
+class Run(TimestampedModel, MethodModelClass):  # type: ignore
     class Meta:
         constraints = [
             models.UniqueConstraint(

@@ -1,11 +1,14 @@
 from typing import Literal, Optional
 
+from django.conf import settings
 from django.contrib.admin.helpers import AdminField, AdminForm
+from django.utils.module_loading import import_string
 
 from lab.runs.models import Run
 
 from .dto import MethodDTO, method_model_to_dto
-from .models import MethodModel
+
+LabMethodModel = import_string(settings.METHOD_MODEL_CLASS)
 
 
 def _get_adminfield_name(admin_field: AdminField) -> str:
@@ -32,15 +35,16 @@ def _get_adminfields(adminform: AdminForm, select: list[str]) -> list[AdminField
 
 def method_fields(adminform: AdminForm) -> list[AdminField]:
     return _get_adminfields(
-        adminform, [f.name for f in MethodModel.get_method_fields()]
+        adminform, [f.name for f in LabMethodModel.get_method_fields()]
     )
 
 
 def detector_fields(adminform: AdminForm, method_fieldname: str) -> list[AdminField]:
     detector_fieldnames = [
         detector_field.name
-        for detector_field in MethodModel.get_detector_fields()
-        if MethodModel.get_method_field(detector_field.method).name == method_fieldname
+        for detector_field in LabMethodModel.get_detector_fields()
+        if LabMethodModel.get_method_field(detector_field.method).name
+        == method_fieldname
     ]
     return _get_adminfields(adminform, detector_fieldnames)
 
@@ -48,8 +52,8 @@ def detector_fields(adminform: AdminForm, method_fieldname: str) -> list[AdminFi
 def filters_field(
     adminform: AdminForm, detector_fieldname: str
 ) -> Optional[AdminField]:
-    detector_modelfield = getattr(MethodModel, detector_fieldname).field
-    filters_modelfield = MethodModel.get_filters_field(
+    detector_modelfield = getattr(LabMethodModel, detector_fieldname).field
+    filters_modelfield = LabMethodModel.get_filters_field(
         detector_modelfield.method, detector_modelfield.detector
     )
     if filters_modelfield:
