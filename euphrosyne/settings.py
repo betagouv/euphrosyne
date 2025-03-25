@@ -67,6 +67,7 @@ SITE_URL = os.environ["SITE_URL"]
 INSTALLED_APPS = [
     "corsheaders",
     "euphrosyne.apps.AdminConfig",
+    "euphrosyne.methods.apps.MethodsConfig",  # Use explicit app config for methods
     "euphro_auth",
     "django.forms",
     "django.contrib.admindocs",
@@ -383,3 +384,7 @@ FORCE_LAST_CGU_ACCEPTANCE_DT = (
     if os.getenv("FORCE_LAST_CGU_ACCEPTANCE_DT")
     else None
 )
+# Lab-specific method model configuration
+# This should point to the concrete implementation with field definitions
+# All migrations related to these fields will be generated in the euphrosyne app
+METHOD_MODEL_CLASS = "euphrosyne.methods.models.EuphrosyneMethodModel"

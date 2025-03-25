@@ -36,31 +36,34 @@ The project is configured using environment variables listed in the [.env.exampl
 
 You can copy this file to a new `.env` file to easily set up your environment.
 
-| Variable Name                   | Description                                                                                                                                                                                                        |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AZURE_STORAGE_CONNECTION_STRING | Azure Storage account connection string for static file storage                                                                                                                                                                    |
-| CORS_ALLOWED_ORIGINS            | Access-Control-Allow-Origin header value for REST API endpoints                                                                                                                                                                   |
-| DJANGO_SETTINGS_MODULE          | Python path to the Django settings module                                                                                                                                                                                         |
-| DB\_\*                          | Database configuration variables                                                                                                                                                                                                  |
-| DJANGO_SECRET_KEY               | [Secret key](https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-SECRET_KEY) used by Django for cryptographic signing; also used to sign JWT tokens                                                                   |
-| DJANGO_DEBUG                    | Optional. Django debug mode                                                                                                                                                                                                       |
-| ELASTICSEARCH_HOST              | Elasticsearch instance host (data catalog)                                                                                                                                                                                        |
-| ELASTICSEARCH_USERNAME          | Elasticsearch credentials                                                                                                                                                                                                         |
-| ELASTICSEARCH_PASSWORD          | Elasticsearch credentials                                                                                                                                                                                                         |
-| EMAIL_HOST                      | Email service configuration                                                                                                                                                                                                       |
-| EMAIL_PORT                      | Email service configuration                                                                                                                                                                                                       |
-| EMAIL_HOST_USER                 | Email service configuration                                                                                                                                                                                                       |
-| EMAIL_HOST_PASSWORD             | Email service configuration                                                                                                                                                                                                       |
-| EUPHROSYNE_TOOLS_API_URL        | URL to Euphrosyne Tools API                                                                                                                                                                                                       |
-| DEFAULT_FROM_EMAIL              | Default sender email address                                                                                                                                                                                                      |
-| CGU_ACCEPTANCE_DATE             | Optional. Deadline from which users must accept the new Terms of Use. If a user has not accepted by this date, they will be redirected to the acceptance page                                                                     |
-| MATOMO_SITE_ID                  | Matomo site ID for analytics                                                                                                                                                                                                      |
-| ORCID_USE_SANDBOX               | ORCID authentication environment selection. If set to 'true', sandbox environment is used. Defaults to false                                                                                                                       |
-| SITE_URL                        | The URL of this Euphrosyne instance                                                                                                                                                                                               |
-| SENTRY_DSN                      | Optional. Sentry DSN. If omitted, Sentry will not be used                                                                                                                                                                         |
-| SENTRY_ENVIRONMENT              | Tag used to filter Sentry events. Possible choices: 'production', 'staging' or 'dev'                                                                                                                                              |
-| SOCIAL_AUTH_ORCID_KEY           | ORCID application credentials for user authentication                                                                                                                                                                             |
-| SOCIAL_AUTH_ORCID_SECRET        | ORCID application credentials for user authentication                                                                                                                                                                             |
+For complete instructions on configuring Euphrosyne for a new laboratory environment, please refer to:
+
+- [Configure New Lab Guide](docs/configure_new_lab.md) - Comprehensive setup for new laboratory deployments
+  | Variable Name | Description |
+  | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | AZURE_STORAGE_CONNECTION_STRING | Azure Storage account connection string for static file storage |
+  | CORS_ALLOWED_ORIGINS | Access-Control-Allow-Origin header value for REST API endpoints |
+  | DJANGO_SETTINGS_MODULE | Python path to the Django settings module |
+  | DB\_\* | Database configuration variables |
+  | DJANGO_SECRET_KEY | [Secret key](https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-SECRET_KEY) used by Django for cryptographic signing; also used to sign JWT tokens |
+  | DJANGO_DEBUG | Optional. Django debug mode |
+  | ELASTICSEARCH_HOST | Elasticsearch instance host (data catalog) |
+  | ELASTICSEARCH_USERNAME | Elasticsearch credentials |
+  | ELASTICSEARCH_PASSWORD | Elasticsearch credentials |
+  | EMAIL_HOST | Email service configuration |
+  | EMAIL_PORT | Email service configuration |
+  | EMAIL_HOST_USER | Email service configuration |
+  | EMAIL_HOST_PASSWORD | Email service configuration |
+  | EUPHROSYNE_TOOLS_API_URL | URL to Euphrosyne Tools API |
+  | DEFAULT_FROM_EMAIL | Default sender email address |
+  | CGU_ACCEPTANCE_DATE | Optional. Deadline from which users must accept the new Terms of Use. If a user has not accepted by this date, they will be redirected to the acceptance page |
+  | MATOMO_SITE_ID | Matomo site ID for analytics |
+  | ORCID_USE_SANDBOX | ORCID authentication environment selection. If set to 'true', sandbox environment is used. Defaults to false |
+  | SITE_URL | The URL of this Euphrosyne instance |
+  | SENTRY_DSN | Optional. Sentry DSN. If omitted, Sentry will not be used |
+  | SENTRY_ENVIRONMENT | Tag used to filter Sentry events. Possible choices: 'production', 'staging' or 'dev' |
+  | SOCIAL_AUTH_ORCID_KEY | ORCID application credentials for user authentication |
+  | SOCIAL_AUTH_ORCID_SECRET | ORCID application credentials for user authentication |
 
 ## Development
 
