@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -31,6 +32,33 @@ class MeasuringPoint(TimestampedModel):
         constraints = [
             models.UniqueConstraint(fields=["name", "run"], name="unique_name_per_run"),
         ]
+
+    @property
+    def is_meaningful(self) -> bool:
+        """
+        Check if the measuring point has meaningful data.
+
+        A measuring point is considered meaningful if it has at least one of:
+        - Comments
+        - Associated object group
+        - Associated standard
+
+        Returns:
+            bool: True if the measuring point has meaningful data, False otherwise
+        """
+        if self.comments.strip():
+            return True
+
+        if self.object_group is not None:
+            return True
+
+        try:
+            if self.standard:
+                return True
+        except (AttributeError, ObjectDoesNotExist):
+            pass
+
+        return False
 
 
 class MeasuringPointImage(TimestampedModel):
