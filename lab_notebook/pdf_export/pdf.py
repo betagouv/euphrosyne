@@ -311,15 +311,15 @@ class PDFGenerator:
         # Organize basic run info in a table for better layout
         basic_info = [
             [
-                Paragraph(_("Particle type:"), styles["Heading4"]),
+                Paragraph(_("Particle type") + _(":"), styles["Heading4"]),
                 Paragraph(run["particle_type"] or "-", styles["Normal"]),
             ],
             [
-                Paragraph(_("Energy:"), styles["Heading4"]),
+                Paragraph(_("Energy") + _(":"), styles["Heading4"]),
                 Paragraph(f"{run['energy_in_keV'] or '-'} keV", styles["Normal"]),
             ],
             [
-                Paragraph(_("Beamline:"), styles["Heading4"]),
+                Paragraph(_("Beamline") + _(":"), styles["Heading4"]),
                 Paragraph(run["beamline"] or "-", styles["Normal"]),
             ],
         ]
@@ -358,7 +358,7 @@ class PDFGenerator:
                 for detector in method.detectors:
                     # Detector row
                     detector_row = [
-                        Paragraph(_("Detector:"), styles["Normal"]),
+                        Paragraph(_("Detector") + _(":"), styles["Normal"]),
                         Paragraph(detector.name, styles["Normal"]),
                     ]
                     method_content.append(detector_row)
@@ -366,7 +366,7 @@ class PDFGenerator:
                     # Filters rows (if any)
                     for filter_item in detector.filters:
                         filter_row = [
-                            Paragraph(_("Filter:"), INDENTED_STYLE),
+                            Paragraph(_("Filter") + _(":"), INDENTED_STYLE),
                             Paragraph(filter_item, styles["Normal"]),
                         ]
                         method_content.append(filter_row)

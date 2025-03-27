@@ -4,6 +4,7 @@ import typing
 from io import BytesIO
 
 import requests
+from django import forms
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from slugify import slugify
@@ -64,6 +65,7 @@ def _get_run_data(run_id: str):
                 if hasattr(point, "standard") and point.standard
                 else None
             ),
+            "is_meaningful": point.is_meaningful,
         }
         for point in measuring_points_qs
     ]
@@ -111,10 +113,30 @@ def _prepare_images(run_object_group_images, storage_info) -> list[NotebookImage
     return images
 
 
+class ExportNotebookToPdfQueryParamsForm(forms.Form):
+    skip_meaningless_points = forms.BooleanField(
+        required=False,
+    )
+
+
 def export_notebook_to_pdf_view(request: HttpRequest, run_id: str) -> HttpResponse:
     """Generate and serve a PDF export of a run notebook"""
     # Get run data
     run, run_object_group_images, storage_info, measuring_points = _get_run_data(run_id)
+
+    # Parse query parameters
+    query_params_form = ExportNotebookToPdfQueryParamsForm(request.GET)
+    if not query_params_form.is_valid():
+        return HttpResponse(status=400)
+
+    # Filter out meaningless points if requested
+    skip_meaningless_points = query_params_form.cleaned_data.get(
+        "skip_meaningless_points", False
+    )
+    if skip_meaningless_points:
+        measuring_points = [
+            point for point in measuring_points if point["is_meaningful"]
+        ]
 
     # Check permissions
     if not (

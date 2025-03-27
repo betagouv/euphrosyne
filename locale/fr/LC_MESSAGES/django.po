@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-20 16:41+0100\n"
+"POT-Creation-Date: 2025-03-27 11:00+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -1224,32 +1224,14 @@ msgstr "Projet: %s"
 msgid "Run: %s"
 msgstr "Run: %s"
 
+msgid ":"
+msgstr " :"
+
+msgid "Detector"
+msgstr "Détecteur"
+
 msgid "Table of contents"
 msgstr "Table des matières"
-
-#, python-format
-msgid "Particle type: %s"
-msgstr "Type de particule: %s"
-
-#, python-format
-msgid "Energy: %s"
-msgstr "Energie: %s"
-
-#, python-format
-msgid "Beamline: %s"
-msgstr "Ligne de faisceau: %s"
-
-#, python-format
-msgid "Method: %s"
-msgstr "Méthode: %s"
-
-#, python-format
-msgid "Detector: %s"
-msgstr "Détecteur: %s"
-
-#, python-format
-msgid "Filter: %s"
-msgstr "Filtre: %s"
 
 msgid "Run images with point locations"
 msgstr "Images du run avec localisation des points"

@@ -18,22 +18,28 @@ EXPORT_PDF_URL = "/lab/run/%s/notebook/export-pdf"
 class PDFExportTestCase(TestCase):
 
     def test_export_notebook_to_pdf_view__permission_denied(self):
+        """Test permission denied response (403) when user doesn't have access"""
         run = lab_factories.RunFactory()
 
-        request = RequestFactory()
+        # Create a request with a user that doesn't have access to the run
+        request = RequestFactory().get(EXPORT_PDF_URL % run.id)
         request.user = auth_factories.StaffUserFactory()
 
+        # Force login and make request
         self.client.force_login(request.user)
+        response = self.client.get(
+            EXPORT_PDF_URL % run.id + "?skip_meaningless_points=True"
+        )
 
-        response = self.client.get(EXPORT_PDF_URL % run.id)
-
+        # Verify permission denied
         assert response.status_code == 403
 
     @mock.patch("lab_notebook.pdf_export.views._prepare_images")
     @mock.patch("lab_notebook.pdf_export.views.create_pdf")
     def test_export_notebook_to_pdf_view__valid_request(
-        self, create_pdf_mock: mock.MagicMock, prepare_images_mock: mock.MagicMock
+        self, create_pdf_mock, prepare_images_mock
     ):
+        """Test a valid request to the export PDF view"""
         # Setup mocks
         prepare_images_mock.return_value = [
             {
@@ -49,12 +55,13 @@ class PDFExportTestCase(TestCase):
         ]
 
         # Setup test data
-        request = RequestFactory()
-        request.user = auth_factories.LabAdminUserFactory()  # type: ignore
-
         run = lab_factories.RunFactory()
         og = lab_factories.ObjectGroupFactory()
 
+        # Create project relationship
+        lab_admin = auth_factories.LabAdminUserFactory()
+
+        # Setup object and image relationships
         rog = RunObjectGroup.objects.create(run=run, objectgroup=og)
         rogi = RunObjetGroupImage.objects.create(
             run_object_group=rog,
@@ -71,11 +78,12 @@ class PDFExportTestCase(TestCase):
             point_location={"width": 55, "height": 55, "x": 2, "y": 3},
         )
 
-        # Call view
-        self.client.force_login(request.user)
+        # Force login and make request
+        self.client.force_login(lab_admin)
         response = self.client.get(EXPORT_PDF_URL % run.id)
 
         # Assertions
+        assert response.status_code == 200
         assert response.headers["Content-Type"] == "application/pdf"
         assert response.headers["Content-Disposition"] == (
             f"attachment; filename={slugify(run.label)}_{run.project.slug}.pdf"
@@ -97,6 +105,68 @@ class PDFExportTestCase(TestCase):
         assert (
             create_pdf_mock.call_args[1]["images"] == prepare_images_mock.return_value
         )
+
+    @mock.patch("lab_notebook.pdf_export.views._prepare_images")
+    @mock.patch("lab_notebook.pdf_export.views.create_pdf")
+    @mock.patch("lab_notebook.pdf_export.views._get_run_data")
+    def test_skip_meaningless_points__enabled(
+        self,
+        get_run_data_mock: mock.MagicMock,
+        create_pdf_mock: mock.MagicMock,
+        prepare_images_mock: mock.MagicMock,
+    ):
+        """Test that empty measuring points
+        count depending on skip_meaningless_points"""
+        for filter_meaningless_points_enabled, count_expected in (
+            (True, 1),
+            (False, 2),
+        ):
+            # Setup mocks
+            prepare_images_mock.return_value = []
+
+            # Setup test data
+            request = RequestFactory().get(
+                EXPORT_PDF_URL % "1" + "?skip_meaningless_points=True"
+            )
+            request.user = auth_factories.LabAdminUserFactory()  # type: ignore
+
+            run = lab_factories.RunFactory()
+
+            # Create mock measuring points data
+            measuring_points = [
+                # Meaningful point
+                {
+                    "name": "001",
+                    "comments": "Point with data",
+                    "object_group": {"label": "Test Object"},
+                    "standard": None,
+                    "is_meaningful": True,
+                },
+                # Empty point
+                {
+                    "name": "002",
+                    "comments": "",
+                    "object_group": None,
+                    "standard": None,
+                    "is_meaningful": False,
+                },
+            ]
+
+            # Mock the _get_run_data function to return our test data
+            get_run_data_mock.return_value = (
+                run,  # run
+                [],  # run_object_group_images
+                {"base_url": "", "token": ""},  # storage_info
+                measuring_points.copy(),  # (copy to avoid modification)
+            )
+
+            self.client.force_login(request.user)
+            self.client.get(
+                EXPORT_PDF_URL % run.id
+                + f"?skip_meaningless_points={filter_meaningless_points_enabled}"
+            )
+
+            assert create_pdf_mock.call_count == count_expected
 
 
 class PDFExportFunctionTestCase(TestCase):
