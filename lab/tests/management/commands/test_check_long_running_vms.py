@@ -18,13 +18,15 @@ class CheckLongRunningVMsTest(TestCase):
         mock_get.return_value.ok = True
         mock_get.return_value.json.return_value = []
 
-        with patch("django.utils.timezone.now", return_value=timezone.now()):
+        now = timezone.now()
+        with patch("django.utils.timezone.now", return_value=now):
             call_command("check_long_running_vms", "60")
 
+        expected_time = (now - timedelta(minutes=60)).strftime("%Y-%m-%dT%H:%M:%S")
         mock_get.assert_called_once_with(
             os.environ["EUPHROSYNE_TOOLS_API_URL"]
             + "/vms?created_before="
-            + (timezone.now() - timedelta(minutes=60)).isoformat(timespec="seconds"),
+            + expected_time,
             timeout=5,
             headers={"Authorization": "Bearer fake_token"},
         )
@@ -36,13 +38,15 @@ class CheckLongRunningVMsTest(TestCase):
         mock_get.return_value.ok = True
         mock_get.return_value.json.return_value = ["project1-vm-123"]
 
-        with patch("django.utils.timezone.now", return_value=timezone.now()):
+        now = timezone.now()
+        with patch("django.utils.timezone.now", return_value=now):
             call_command("check_long_running_vms", "60")
 
+        expected_time = (now - timedelta(minutes=60)).strftime("%Y-%m-%dT%H:%M:%S")
         mock_get.assert_called_once_with(
             os.environ["EUPHROSYNE_TOOLS_API_URL"]
             + "/vms?created_before="
-            + (timezone.now() - timedelta(minutes=60)).isoformat(timespec="seconds"),
+            + expected_time,
             timeout=5,
             headers={"Authorization": "Bearer fake_token"},
         )
@@ -64,10 +68,11 @@ class CheckLongRunningVMsTest(TestCase):
         with patch("django.utils.timezone.now", return_value=now):
             call_command("check_long_running_vms", "60", "--send-alerts")
 
+        expected_time = (now - timedelta(minutes=60)).strftime("%Y-%m-%dT%H:%M:%S")
         mock_get.assert_called_once_with(
             os.environ["EUPHROSYNE_TOOLS_API_URL"]
             + "/vms?created_before="
-            + (now - timedelta(minutes=60)).isoformat(timespec="seconds"),
+            + expected_time,
             timeout=5,
             headers={"Authorization": "Bearer fake_token"},
         )
