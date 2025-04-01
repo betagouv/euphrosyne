@@ -40,9 +40,11 @@ class Command(BaseCommand):
         )
 
         started_from = timezone.now() - timedelta(minutes=options["elapsed_time"])
+        # Format without space before timezone to avoid parsing error
+        formatted_time = started_from.strftime("%Y-%m-%dT%H:%M:%S")
         response = requests.get(
             os.environ["EUPHROSYNE_TOOLS_API_URL"]
-            + f"/vms?created_before={started_from.isoformat(timespec='seconds')}",
+            + f"/vms?created_before={formatted_time}",
             timeout=5,
             headers={"Authorization": f"Bearer {token}"},
         )
