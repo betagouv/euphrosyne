@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 
 _T = TypeVar("_T")
 
+INDEX_NAME = "catalog"
+
 
 class Singleton(type, Generic[_T]):
     _instances: dict["Singleton[_T]", _T] = {}
@@ -37,7 +39,8 @@ class ObjectGroupExtraDict(TypedDict):
 
 
 class CatalogClient(metaclass=Singleton):
-    def __init__(self):
+    def __init__(self, index_name: str = INDEX_NAME):
+        self.index_name = index_name
         for setting in [
             "ELASTICSEARCH_USERNAME",
             "ELASTICSEARCH_PASSWORD",
@@ -63,7 +66,7 @@ class CatalogClient(metaclass=Singleton):
 
     def search(self, **kwargs: Unpack[queries.QueryParams]):
         query = queries.filter_query(kwargs)
-        return self.client.search(index="catalog", body=query)
+        return self.client.search(index=self.index_name, body=query)
 
     def aggregate_terms(
         self, field: str, query: str | None = None, exclude: list[str] | None = None
@@ -132,3 +135,11 @@ class CatalogClient(metaclass=Singleton):
                 skip_eros=skip_eros,
             )
             item.save(using=self.client)
+
+    def delete_index(self):
+        """Delete an index by name"""
+        if self.client.indices.exists(index=self.index_name):
+            self.client.indices.delete(index=self.index_name)
+            logger.info("Deleted index: %s", self.index_name)
+        else:
+            logger.warning("Index %s does not exist. Skipping delete.", self.index_name)

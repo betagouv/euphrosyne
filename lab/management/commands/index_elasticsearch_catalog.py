@@ -29,6 +29,8 @@ class Command(BaseCommand):
         # Get client instance
         catalog_client = CatalogClient()
 
+        # Delete the index if it exists
+        catalog_client.delete_index()
+
         # First, index all public projects (updates existing entries)
         catalog_client.index_from_projects(projects, skip_eros=options["skip_eros"])
-
