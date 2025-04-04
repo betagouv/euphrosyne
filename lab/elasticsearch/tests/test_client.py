@@ -103,6 +103,7 @@ def test_index_from_projects(catalog_client: CatalogClient):
             }
         ],
         runs=[run],
+        skip_eros=False,
     )
 
     build_object_group_mock.assert_called_once_with(
@@ -110,4 +111,5 @@ def test_index_from_projects(catalog_client: CatalogClient):
         projects=[project],
         runs=[run],
         is_data_available=project.is_data_available,
+        skip_eros=False,
     )

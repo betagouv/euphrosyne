@@ -50,7 +50,7 @@ class CatalogClient(metaclass=Singleton):
         user, password, (protocol, host) = (
             settings.ELASTICSEARCH_USERNAME,
             settings.ELASTICSEARCH_PASSWORD,
-            settings.ELASTICSEARCH_HOST.split("://"),
+            settings.ELASTICSEARCH_HOST.split("://"),  # type: ignore
         )
         self.client = client = OpenSearch(
             hosts=[f"{protocol}://{user}:{password}@{host}"],
@@ -75,7 +75,7 @@ class CatalogClient(metaclass=Singleton):
     def aggregate_date(self, field: str, interval: str):
         return self.client.search(queries.date_historiogram_agg(field, interval))
 
-    def index_from_projects(self, projects: list[Project]):
+    def index_from_projects(self, projects: list[Project], skip_eros: bool = False):
         """Index projects and related object groups"""
         objectgroups_dict: dict[ObjectGroup, ObjectGroupExtraDict] = {}
         for project in projects:
@@ -119,6 +119,7 @@ class CatalogClient(metaclass=Singleton):
                 object_groups=objectgroups,
                 object_group_locations=locations,
                 runs=runs,
+                skip_eros=skip_eros,
             )
             item.save(using=self.client)
         for obj, extra in objectgroups_dict.items():
@@ -128,5 +129,6 @@ class CatalogClient(metaclass=Singleton):
                 projects=extra["projects"],
                 runs=extra["runs"],
                 is_data_available=extra["is_data_available"],
+                skip_eros=skip_eros,
             )
             item.save(using=self.client)
