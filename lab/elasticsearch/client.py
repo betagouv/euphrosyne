@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 
 _T = TypeVar("_T")
 
+INDEX_NAME = "catalog"
+
 
 class Singleton(type, Generic[_T]):
     _instances: dict["Singleton[_T]", _T] = {}
@@ -37,7 +39,8 @@ class ObjectGroupExtraDict(TypedDict):
 
 
 class CatalogClient(metaclass=Singleton):
-    def __init__(self):
+    def __init__(self, index_name: str = INDEX_NAME):
+        self.index_name = index_name
         for setting in [
             "ELASTICSEARCH_USERNAME",
             "ELASTICSEARCH_PASSWORD",
@@ -50,7 +53,7 @@ class CatalogClient(metaclass=Singleton):
         user, password, (protocol, host) = (
             settings.ELASTICSEARCH_USERNAME,
             settings.ELASTICSEARCH_PASSWORD,
-            settings.ELASTICSEARCH_HOST.split("://"),
+            settings.ELASTICSEARCH_HOST.split("://"),  # type: ignore
         )
         self.client = client = OpenSearch(
             hosts=[f"{protocol}://{user}:{password}@{host}"],
@@ -63,7 +66,7 @@ class CatalogClient(metaclass=Singleton):
 
     def search(self, **kwargs: Unpack[queries.QueryParams]):
         query = queries.filter_query(kwargs)
-        return self.client.search(index="catalog", body=query)
+        return self.client.search(index=self.index_name, body=query)
 
     def aggregate_terms(
         self, field: str, query: str | None = None, exclude: list[str] | None = None
@@ -75,7 +78,7 @@ class CatalogClient(metaclass=Singleton):
     def aggregate_date(self, field: str, interval: str):
         return self.client.search(queries.date_historiogram_agg(field, interval))
 
-    def index_from_projects(self, projects: list[Project]):
+    def index_from_projects(self, projects: list[Project], skip_eros: bool = False):
         """Index projects and related object groups"""
         objectgroups_dict: dict[ObjectGroup, ObjectGroupExtraDict] = {}
         for project in projects:
@@ -119,6 +122,7 @@ class CatalogClient(metaclass=Singleton):
                 object_groups=objectgroups,
                 object_group_locations=locations,
                 runs=runs,
+                skip_eros=skip_eros,
             )
             item.save(using=self.client)
         for obj, extra in objectgroups_dict.items():
@@ -128,5 +132,14 @@ class CatalogClient(metaclass=Singleton):
                 projects=extra["projects"],
                 runs=extra["runs"],
                 is_data_available=extra["is_data_available"],
+                skip_eros=skip_eros,
             )
             item.save(using=self.client)
+
+    def delete_index(self):
+        """Delete an index by name"""
+        if self.client.indices.exists(index=self.index_name):
+            self.client.indices.delete(index=self.index_name)
+            logger.info("Deleted index: %s", self.index_name)
+        else:
+            logger.warning("Index %s does not exist. Skipping delete.", self.index_name)

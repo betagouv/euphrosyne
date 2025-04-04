@@ -66,7 +66,10 @@ def _create_leader_doc(leader: Participation):
 
 
 def _create_project_page_data(
-    runs: list[Run], object_groups: list[ObjectGroup], leader: Participation | None
+    runs: list[Run],
+    object_groups: list[ObjectGroup],
+    leader: Participation | None,
+    skip_eros: bool = False,
 ):
     page_data = ProjectPageData(leader=_create_leader_doc(leader) if leader else None)
     for run in runs:
@@ -87,7 +90,7 @@ def _create_project_page_data(
         discovery_place_label: str | None = None
         dating_era_label: str | None = None
         dating_period_label: str | None = None
-        if object_group.c2rmf_id:
+        if object_group.c2rmf_id and not skip_eros:
             # Fetch object group from EROS
             try:
                 object_group = (
@@ -166,9 +169,10 @@ def build_project_catalog_document(
     object_groups: list[ObjectGroup],
     object_group_locations: list[LocationDict],
     runs: list[Run],
+    skip_eros: bool = False,
 ):
     page_data = _create_project_page_data(
-        leader=leader, runs=runs, object_groups=object_groups
+        leader=leader, runs=runs, object_groups=object_groups, skip_eros=skip_eros
     )
     _id = f"project-{project.id}"
     catalog_item = CatalogItem(
@@ -195,6 +199,7 @@ def build_object_group_catalog_document(  # noqa: C901
     projects: list[Project],
     runs: list[Run],
     is_data_available: bool,
+    skip_eros: bool = False,
 ):
     # Page data
     page_data = _create_object_group_page_data(projects=projects, runs=runs)
@@ -204,7 +209,7 @@ def build_object_group_catalog_document(  # noqa: C901
     location_label: str | None = None
     locations = []
 
-    if object_group.c2rmf_id:
+    if object_group.c2rmf_id and not skip_eros:
         # Fetch object group from EROS
         object_group = _fetch_object_group_from_eros(
             c2rmf_id=object_group.c2rmf_id, object_group=object_group
