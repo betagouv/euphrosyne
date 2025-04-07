@@ -55,14 +55,13 @@ class CatalogClient(metaclass=Singleton):
             settings.ELASTICSEARCH_PASSWORD,
             settings.ELASTICSEARCH_HOST.split("://"),  # type: ignore
         )
-        self.client = client = OpenSearch(
+        self.client = OpenSearch(
             hosts=[f"{protocol}://{user}:{password}@{host}"],
             http_compress=True,  # enables gzip compression for request bodies
             use_ssl=False,
             ssl_assert_hostname=False,
             ssl_show_warn=False,
         )
-        CatalogItem.init(using=client)
 
     def search(self, **kwargs: Unpack[queries.QueryParams]):
         query = queries.filter_query(kwargs)
@@ -80,6 +79,8 @@ class CatalogClient(metaclass=Singleton):
 
     def index_from_projects(self, projects: list[Project], skip_eros: bool = False):
         """Index projects and related object groups"""
+        CatalogItem.init(using=self.client)
+
         objectgroups_dict: dict[ObjectGroup, ObjectGroupExtraDict] = {}
         for project in projects:
             leader = project.leader
