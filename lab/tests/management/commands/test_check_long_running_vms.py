@@ -1,78 +1,87 @@
 import os
-from datetime import timedelta
-from unittest.mock import patch
+from datetime import datetime, timedelta, timezone
+from unittest.mock import MagicMock, patch
 
 from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.test import TestCase
-from django.utils import timezone
 
 from ...factories import ProjectFactory
 
 
 class CheckLongRunningVMsTest(TestCase):
-    @patch("requests.get")
-    @patch("euphro_auth.jwt.tokens.EuphroToolsAPIToken.for_euphrosyne")
-    def test_no_long_running_vms(self, mock_token, mock_get):
-        mock_token.return_value.access_token = "fake_token"
-        mock_get.return_value.ok = True
-        mock_get.return_value.json.return_value = []
+    def setUp(self):
+        self.token_patcher = patch(
+            "euphro_auth.jwt.tokens.EuphroToolsAPIToken.for_euphrosyne"
+        )
+        self.mock_token = self.token_patcher.start()
+        self.mock_token.return_value.access_token = "fake_token"
 
-        now = timezone.now()
-        with patch("django.utils.timezone.now", return_value=now):
-            call_command("check_long_running_vms", "60")
+        self.get_patcher = patch("requests.get")
+        self.mock_get = self.get_patcher.start()
+        self.mock_get.return_value.ok = True
 
-        expected_time = (now - timedelta(minutes=60)).strftime("%Y-%m-%dT%H:%M:%S")
-        mock_get.assert_called_once_with(
+        self.now = datetime.now(timezone.utc)
+        self.datetime_mock = MagicMock(now=MagicMock(return_value=self.now))
+        self.datetime_patcher = patch(
+            "lab.management.commands.check_long_running_vms.datetime",
+            self.datetime_mock,
+        )
+        self.datetime_patcher.start()
+
+    def tearDown(self):
+        self.token_patcher.stop()
+        self.get_patcher.stop()
+        self.datetime_patcher.stop()
+
+    def _get_expected_api_call(self, minutes: int):
+        expected_time = (self.now - timedelta(minutes=minutes)).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
+        return (
             os.environ["EUPHROSYNE_TOOLS_API_URL"]
             + "/vms?created_before="
-            + expected_time,
+            + expected_time
+        )
+
+    # TESTS #
+
+    def test_no_long_running_vms(self):
+        self.mock_get.return_value.json.return_value = []
+
+        call_command("check_long_running_vms", "60")
+
+        self.mock_get.assert_called_once_with(
+            self._get_expected_api_call(60),
             timeout=5,
             headers={"Authorization": "Bearer fake_token"},
         )
 
-    @patch("requests.get")
-    @patch("euphro_auth.jwt.tokens.EuphroToolsAPIToken.for_euphrosyne")
-    def test_long_running_vms_found(self, mock_token, mock_get):
-        mock_token.return_value.access_token = "fake_token"
-        mock_get.return_value.ok = True
-        mock_get.return_value.json.return_value = ["project1-vm-123"]
+    def test_long_running_vms_found(self):
+        self.mock_get.return_value.json.return_value = ["project1-vm-123"]
 
-        now = timezone.now()
-        with patch("django.utils.timezone.now", return_value=now):
-            call_command("check_long_running_vms", "60")
+        call_command("check_long_running_vms", "60")
 
-        expected_time = (now - timedelta(minutes=60)).strftime("%Y-%m-%dT%H:%M:%S")
-        mock_get.assert_called_once_with(
-            os.environ["EUPHROSYNE_TOOLS_API_URL"]
-            + "/vms?created_before="
-            + expected_time,
+        self.mock_get.assert_called_once_with(
+            self._get_expected_api_call(60),
             timeout=5,
             headers={"Authorization": "Bearer fake_token"},
         )
 
-    @patch("requests.get")
-    @patch("euphro_auth.jwt.tokens.EuphroToolsAPIToken.for_euphrosyne")
     @patch("lab.management.commands.check_long_running_vms.send_long_lasting_email")
-    def test_send_alerts(self, mock_send_email, mock_token, mock_get):
+    def test_send_alerts(self, mock_send_email):
         project = ProjectFactory()
-        mock_token.return_value.access_token = "fake_token"
-        mock_get.return_value.ok = True
-        mock_get.return_value.json.return_value = [f"euphrosyne-prod-vm-{project.slug}"]
+        self.mock_get.return_value.json.return_value = [
+            f"euphrosyne-prod-vm-{project.slug}"
+        ]
 
         group = Group.objects.get(name="vm admin")
         group.user_set.create(email="admin@example.com")
 
-        now = timezone.now()
+        call_command("check_long_running_vms", "60", "--send-alerts")
 
-        with patch("django.utils.timezone.now", return_value=now):
-            call_command("check_long_running_vms", "60", "--send-alerts")
-
-        expected_time = (now - timedelta(minutes=60)).strftime("%Y-%m-%dT%H:%M:%S")
-        mock_get.assert_called_once_with(
-            os.environ["EUPHROSYNE_TOOLS_API_URL"]
-            + "/vms?created_before="
-            + expected_time,
+        self.mock_get.assert_called_once_with(
+            self._get_expected_api_call(60),
             timeout=5,
             headers={"Authorization": "Bearer fake_token"},
         )

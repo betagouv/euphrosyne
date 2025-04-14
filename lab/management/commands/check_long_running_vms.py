@@ -1,11 +1,10 @@
 import os
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 
 import requests
 import sentry_sdk
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
-from django.utils import timezone
 
 from euphro_auth.jwt.tokens import EuphroToolsAPIToken
 from lab.emails import send_long_lasting_email
@@ -39,9 +38,11 @@ class Command(BaseCommand):
             "[long running vms] Making request to Euphrosyne Tools",
         )
 
-        started_from = timezone.now() - timedelta(minutes=options["elapsed_time"])
+        started_from = datetime.now(timezone.utc) - timedelta(
+            minutes=options["elapsed_time"]
+        )
         # Format without space before timezone to avoid parsing error
-        formatted_time = started_from.strftime("%Y-%m-%dT%H:%M:%S")
+        formatted_time = started_from.strftime("%Y-%m-%dT%H:%M:%SZ")
         response = requests.get(
             os.environ["EUPHROSYNE_TOOLS_API_URL"]
             + f"/vms?created_before={formatted_time}",
