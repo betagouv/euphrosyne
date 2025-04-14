@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, JSX } from "react";
 import { css } from "@emotion/react";
 
 import { UpcomingProject } from "../IProject";

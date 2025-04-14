@@ -31,7 +31,7 @@ export default function ImageGrid({
 
   const visibleImages = Children.map(children, (child) =>
     isValidElement(child) ? (
-      cloneElement(child as ReactElement, {
+      cloneElement(child as ReactElement<{ className?: string }>, {
         className: "fr-responsive-img fr-ratio-1x1",
       })
     ) : (

@@ -60,12 +60,14 @@ export default function ImageMeasuringPointer({
       : "point";
   const [selectionMode, seSelectiontMode] =
     useState<SelectionMode>(initalSelectionMode);
-  const selectionModeRef = useRef<SelectionMode>();
+  const selectionModeRef = useRef<SelectionMode>(null);
   selectionModeRef.current = selectionMode;
 
   const [cropper, setCropper] = useState<Cropper>();
-  const cropperRef = useRef<Cropper>();
-  cropperRef.current = cropper;
+  const cropperRef = useRef<Cropper>(null);
+  // TODO: move this to useEffect
+  // See pitfall : https://react.dev/reference/react/useRef#referencing-a-value-with-a-ref
+  cropperRef.current = cropper || null;
 
   const setCropperData = (_cropper: Cropper, _mode: SelectionMode) => {
     if (!cropperRef.current) return;
