@@ -45,7 +45,7 @@
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/list": "^6.1.15",
     "@fullcalendar/react": "^6.1.15",
-    "@gouvfr/dsfr": "^1.13.0",
+    "@gouvfr/dsfr": "^1.13.1",
     "@h5web/app": "^13.0.0",
     "@sentry/browser": "^9.10.1",
     "@types/react": "^18.3.12",
