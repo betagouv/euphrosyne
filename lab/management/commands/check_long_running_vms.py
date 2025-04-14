@@ -81,11 +81,18 @@ class Command(BaseCommand):
         )
 
         if options["send_alerts"]:
+            vm_admin_emails = Group.objects.get(name="vm admin").user_set.values_list(
+                "email", flat=True
+            )
+            if not vm_admin_emails:
+                self.stdout.write(
+                    self.style.WARNING(
+                        "[long running vms] No VM admin found. Not sending email."
+                    )
+                )
+                return
             for vm in vms:
                 project = Project.objects.get(
                     slug=_get_project_slug_from_vm_name(vm),
                 )
-                vm_admin_emails = Group.objects.get(
-                    name="vm admin"
-                ).user_set.values_list("email", flat=True)
                 send_long_lasting_email(list(vm_admin_emails), project)
