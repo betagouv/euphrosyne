@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { UpcomingProject } from "../IProject";
 
 interface UpcomingProjectCardProps {

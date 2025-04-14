@@ -138,7 +138,9 @@ export default function MeasuringPoints({
                 className="fr-accordion__btn"
                 aria-expanded="false"
                 aria-controls={`accordiong-${point.name}`}
-                ref={(el) => (accordionButtons.current[index] = el)}
+                ref={(el) => {
+                  accordionButtons.current[index] = el;
+                }}
                 onClick={onAccordionClick}
               >
                 {getMeasuringPointLabel(point)}
