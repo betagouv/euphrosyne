@@ -103,7 +103,7 @@ jobs:
         if: steps.python-cache.outputs.cache-hit != 'true'
         run: pip install -r requirements/dev.txt
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: "npm"
@@ -129,7 +129,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: "npm"
