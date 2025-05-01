@@ -13,6 +13,18 @@ class TestProjectListView(SimpleTestCase):
         self.client = Client()
 
     @mock.patch("lab.elasticsearch.api_views.CatalogClient")
+    def test_list_all_items_view(self, mock_cls: mock.MagicMock):
+        mock_cls.return_value.list_all_items.return_value = {"items": []}
+
+        url = f"{BASE_API_URL}/list-all"
+        response = self.client.get(url)
+
+        mock_cls.return_value.list_all_items.assert_called_once()
+
+        assert response.status_code == 200
+        assert response.json() == {"items": []}
+
+    @mock.patch("lab.elasticsearch.api_views.CatalogClient")
     def test_search_view(self, mock_cls: mock.MagicMock):
         mock_cls.return_value.search.return_value = {"results": []}
         params = BASE_SEARCH_PARAMS

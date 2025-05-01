@@ -35,7 +35,7 @@ class Singleton(type, Generic[_T]):
 class ObjectGroupExtraDict(TypedDict):
     projects: list[Project]
     runs: list[Run]
-    is_data_available: bool
+    is_data_embargoed: bool
 
 
 class CatalogClient(metaclass=Singleton):
@@ -63,6 +63,10 @@ class CatalogClient(metaclass=Singleton):
             ssl_show_warn=False,
         )
 
+    def list_all_items(self):
+        query = {"query": {"match_all": {}}, "size": 10000}
+        return self.client.search(index=self.index_name, body=query)
+
     def search(self, **kwargs: Unpack[queries.QueryParams]):
         query = queries.filter_query(kwargs)
         return self.client.search(index=self.index_name, body=query)
@@ -84,7 +88,7 @@ class CatalogClient(metaclass=Singleton):
         objectgroups_dict: dict[ObjectGroup, ObjectGroupExtraDict] = {}
         for project in projects:
             leader = project.leader
-            runs = list(project.runs.all())
+            runs: list[Run] = list(project.runs.all())
             objectgroups = list(
                 set(obj for run in runs for obj in run.run_object_groups.all())
             )
@@ -107,14 +111,14 @@ class CatalogClient(metaclass=Singleton):
                     objectgroups_dict[objectgroup] = {
                         "projects": [project],
                         "runs": runs,
-                        "is_data_available": project.is_data_available,
+                        "is_data_embargoed": all(run.is_data_embargoed for run in runs),
                     }
                 else:
                     objectgroups_dict[objectgroup]["runs"].extend(runs)
                     objectgroups_dict[objectgroup]["projects"].append(project)
-                    objectgroups_dict[objectgroup][
-                        "is_data_available"
-                    ] |= project.is_data_available
+                    objectgroups_dict[objectgroup]["is_data_embargoed"] |= all(
+                        run.is_data_embargoed for run in runs
+                    )
             logger.debug("Saving project %s", str(project))
             item = build_project_catalog_document(
                 project=project,
@@ -132,7 +136,7 @@ class CatalogClient(metaclass=Singleton):
                 object_group=obj,
                 projects=extra["projects"],
                 runs=extra["runs"],
-                is_data_available=extra["is_data_available"],
+                is_data_embargoed=extra["is_data_embargoed"],
                 skip_eros=skip_eros,
             )
             item.save(using=self.client)

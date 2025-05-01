@@ -22,6 +22,13 @@ def set_es_settings(settings):
     settings.ELASTICSEARCH_HOST = "http://localhost:9200"
 
 
+def test_list_all_items(catalog_client: CatalogClient):
+    catalog_client.list_all_items()
+    catalog_client.client.search.assert_called_with(
+        index="catalog", body={"query": {"match_all": {}}, "size": 10000}
+    )
+
+
 def test_search(catalog_client: CatalogClient):
     catalog_client.search(**BASE_SEARCH_PARAMS)  # type: ignore
     catalog_client.client.search.assert_called_with(
@@ -110,6 +117,6 @@ def test_index_from_projects(catalog_client: CatalogClient):
         object_group=object_group,
         projects=[project],
         runs=[run],
-        is_data_available=project.is_data_available,
+        is_data_embargoed=run.is_data_embargoed,
         skip_eros=False,
     )

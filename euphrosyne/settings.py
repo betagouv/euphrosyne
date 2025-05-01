@@ -78,7 +78,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "social_django",
     "rest_framework",
-    "graphene_django",
     "django_filters",
     "lab",
     "data_request",
@@ -359,7 +358,6 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
-GRAPHENE = {"SCHEMA": "lab.schema.schema"}
 
 HDF5_ENABLE = os.getenv("HDF5_ENABLE", "false") == "true"
 

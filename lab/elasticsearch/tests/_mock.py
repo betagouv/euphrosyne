@@ -18,7 +18,7 @@ BASE_SEARCH_PARAMS = {
     },
     "collection": "collection",
     "inventory": "inventory",
-    "is_data_available": True,
+    "is_data_embargoed": False,
     "_from": 0,
     "size": 10,
     "sort": "asc",
@@ -31,9 +31,22 @@ BASE_SEARCH_PARAMS_RELATED_QUERY = {
             "filter": [{"term": {"category": "project"}}],
             "must": [
                 {
-                    "multi_match": {
-                        "query": "q",
-                        "fields": ["name", "collections", "collection", "materials"],
+                    "bool": {
+                        "should": [
+                            {"match": {"name": {"query": "q"}}},
+                            {"match_phrase_prefix": {"name": {"query": "q"}}},
+                            {"match": {"comments": {"query": "q"}}},
+                            {
+                                "multi_match": {
+                                    "query": "q",
+                                    "fields": [
+                                        "collections",
+                                        "collection",
+                                        "materials",
+                                    ],
+                                }
+                            },
+                        ]
                     }
                 },
                 {"term": {"status": "Status.DATA_AVAILABLE"}},
@@ -122,7 +135,7 @@ BASE_SEARCH_PARAMS_RELATED_QUERY = {
                         ]
                     }
                 },
-                {"term": {"is_data_available": True}},
+                {"term": {"is_data_embargoed": False}},
             ],
         }
     },

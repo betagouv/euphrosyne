@@ -19,9 +19,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
-from django.views.decorators.csrf import csrf_exempt
 from django.views.i18n import JavaScriptCatalog
-from graphene_django.views import GraphQLView
 
 from euphro_auth.views import UserTokenRegistrationView, cgu_acceptance_view
 from orcid_oauth.views import UserCompleteAccountView
@@ -29,7 +27,6 @@ from orcid_oauth.views import UserCompleteAccountView
 urlpatterns = [
     path("", include("social_django.urls")),
     path("doc/", include("django.contrib.admindocs.urls")),
-    path("graphql", csrf_exempt(GraphQLView.as_view(graphiql=True))),
     path(
         "password_reset/",
         auth_views.PasswordResetView.as_view(),

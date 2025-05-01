@@ -4,6 +4,13 @@ from rest_framework.response import Response
 from .client import CatalogClient
 
 
+@api_view(["GET"])
+def list_all_items(request):
+    """Catalog items listing endpoint"""
+    results = CatalogClient().list_all_items()
+    return Response(results)
+
+
 @api_view(["POST"])
 def search(request):
     """Catalog search endpoint"""
