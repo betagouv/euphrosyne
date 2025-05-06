@@ -33,6 +33,7 @@
                 <select name="vm_size" id="vm-size-select" is="vm-size-select" project-name="{{ project.name }}" class="fr-select">
                     <option selected value="">{% trans "Default" %}</option>
                     <option value="IMAGERY">{% trans "Imagery" %}</option>
+                    <option value="IMAGERY_LARGE">{% trans "Imagery (High-memory)" %}</option>
                 </select>
                 <div class="help">{% trans "Used to determine the virtual machine size." %}</div>
             </div>

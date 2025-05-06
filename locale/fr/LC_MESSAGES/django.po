@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-27 11:00+0100\n"
+"POT-Creation-Date: 2025-05-06 11:52+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -1190,6 +1190,9 @@ msgstr "Défaut"
 
 msgid "Imagery"
 msgstr "Imagerie"
+
+msgid "Imagery (High-memory)"
+msgstr "Imagerie (Mémoire élevée)"
 
 msgid "Used to determine the virtual machine size."
 msgstr "Utilisé pour déterminer la taille de la machine virtuelle."
