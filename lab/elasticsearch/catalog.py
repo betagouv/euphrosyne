@@ -174,7 +174,14 @@ def build_project_catalog_document(
     page_data = _create_project_page_data(
         leader=leader, runs=runs, object_groups=object_groups, skip_eros=skip_eros
     )
+
     _id = f"project-{project.id}"
+
+    is_data_embargoed = all(run.is_data_embargoed for run in runs)
+
+    if project.slug == "2025-itineris":
+        print(is_data_embargoed)
+
     catalog_item = CatalogItem(
         meta={"id": _id},
         category="project",
@@ -187,7 +194,7 @@ def build_project_catalog_document(
         created=project.created,
         project_page_data=page_data,
         discovery_place_points=object_group_locations,
-        is_data_available=project.is_data_available,
+        is_data_embargoed=is_data_embargoed,
         thumbnail=_get_thumbnail_from_object_groups(object_groups=object_groups),
     )
     return catalog_item
@@ -198,7 +205,7 @@ def build_object_group_catalog_document(  # noqa: C901
     object_group: ObjectGroup,
     projects: list[Project],
     runs: list[Run],
-    is_data_available: bool,
+    is_data_embargoed: bool,
     skip_eros: bool = False,
 ):
     # Page data
@@ -270,7 +277,7 @@ def build_object_group_catalog_document(  # noqa: C901
         category="object",
         name=object_group.label,
         slug=slugify(object_group.label) + f"-{object_group.id}",
-        is_data_available=is_data_available,
+        is_data_embargoed=is_data_embargoed,
         thumbnail=thumbnail,
         created=object_group.created,
         materials=object_group.materials,

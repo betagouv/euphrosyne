@@ -30,7 +30,7 @@ class QueryParams(TypedDict, total=False):
     location: Location
     collection: str
     inventory: str
-    is_data_available: bool
+    is_data_embargoed: bool
     _from: int
     size: int
     sort: Literal["asc", "desc"]
@@ -68,6 +68,7 @@ class Query:
         query = _paginate_query(query, size, _from)
         if sort:
             query["sort"] = _sort_expression("created", sort)
+        print(query)
         return query
 
     def _process_params(self, params: QueryParams):
@@ -97,10 +98,7 @@ class Query:
     ):
         match key:
             case "q":
-                return _search_box_query(
-                    params["q"],
-                    fields=["name", "collections", "collection", "materials"],
-                )
+                return search_box_query(params["q"])
             case "status":
                 return _status_query(params["status"])
             case "materials":
@@ -123,8 +121,8 @@ class Query:
                 return _collection_query(params["collection"])
             case "inventory":
                 return _inventory_query(params["inventory"])
-            case "is_data_available":
-                return _is_data_available_query(params["is_data_available"])
+            case "is_data_embargoed":
+                return _is_data_embargoed_query(params["is_data_embargoed"])
 
 
 def match_all_query():
@@ -180,7 +178,31 @@ def _paginate_query(query: dict, size: int | None = None, _from: int | None = No
     }
 
 
-def _search_box_query(q: str, fields: list[str]):
+def search_box_query(q: str):
+    return _should_query(
+        _full_text_match_query(q, "name"),
+        _match_phrase_prefix_query(q, "name"),
+        _full_text_match_query(q, "comments"),
+        _multi_match_query(
+            q,
+            ["collections", "collection", "materials"],
+        ),
+    )
+
+
+def _full_text_match_query(q: str, field: str):
+    return {
+        "match": {field: {"query": q}},
+    }
+
+
+def _match_phrase_prefix_query(q: str, field: str):
+    return {
+        "match_phrase_prefix": {field: {"query": q}},
+    }
+
+
+def _multi_match_query(q: str, fields: list[str]):
     return {
         "multi_match": {
             "query": q,
@@ -227,8 +249,8 @@ def _created_query(
     }
 
 
-def _is_data_available_query(is_data_available: bool):
-    return _term_query("is_data_available", is_data_available)
+def _is_data_embargoed_query(is_data_embargoed: bool):
+    return _term_query("is_data_embargoed", is_data_embargoed)
 
 
 # https:#opensearch.org/docs/latest/query-dsl/geo-and-xy/geo-bounding-box/
@@ -244,7 +266,7 @@ def _discovery_place_query(location: Location):
 
 def _collection_query(collection: str):
     return _should_query(
-        _search_box_query(
+        _multi_match_query(
             collection,
             [
                 "collection",

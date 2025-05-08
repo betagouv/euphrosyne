@@ -10,9 +10,15 @@ from .api_views.run_objectgroup import (
     RunObjectGroupImagesView,
     RunObjectGroupView,
 )
+from .api_views.stats import stats_view
 from .measuring_points.api import views as measuring_points_views
 
 urlpatterns = [
+    path(
+        "stats/",
+        stats_view,
+        name="stats",
+    ),
     path(
         "calendar/",
         CalendarView.as_view(),

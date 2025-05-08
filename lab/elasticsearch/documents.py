@@ -152,7 +152,7 @@ class CatalogItem(os.Document):
     slug = os.Keyword()
     created = os.Date()
     materials = os.Keyword(multi=True)
-    is_data_available = os.Boolean()
+    is_data_embargoed = os.Boolean()
     thumbnail = os.Object(ImageDoc)
 
     project_page_data = os.Object(ProjectPageData)

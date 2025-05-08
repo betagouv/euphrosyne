@@ -19,7 +19,9 @@ from ..catalog import (
 
 class TestProjectCatalogDocument(TestCase):
     def setUp(self):
-        self.run = factories.RunFactory(project=factories.ProjectWithLeaderFactory())
+        self.run = factories.NotEmbargoedRun(
+            project=factories.ProjectWithLeaderFactory()
+        )
         self.project = self.run.project
         self.objectgroups = factories.ObjectGroupFactory.create_batch(3)
         for objectgroup in self.objectgroups:
@@ -87,7 +89,7 @@ class TestProjectCatalogDocument(TestCase):
             for objectgroup in self.objectgroups
         ]
         assert document.discovery_place_points == [{"lat": 0, "lon": 0}]
-        assert document.is_data_available == self.project.is_data_available
+        assert document.is_data_embargoed is False
 
 
 class TestObjectGroupCatalogDocument(TestCase):
@@ -122,7 +124,7 @@ class TestObjectGroupCatalogDocument(TestCase):
                     object_group=self.object_group,
                     runs=[self.run],
                     projects=[self.run.project],
-                    is_data_available=True,
+                    is_data_embargoed=True,
                 )
 
         fetch_period_mock.assert_called_once_with(123)
@@ -158,7 +160,7 @@ class TestObjectGroupCatalogDocument(TestCase):
             document.slug
             == slugify(self.object_group.label) + f"-{self.object_group.id}"
         )
-        assert document.is_data_available is True
+        assert document.is_data_embargoed is True
         assert "thumbnail" in document
         assert document.materials == self.object_group.materials
         assert document.collection == self.object_group.collection
@@ -210,7 +212,7 @@ class TestObjectGroupCatalogDocument(TestCase):
                     object_group=self.object_group,
                     runs=[self.run],
                     projects=[self.run.project],
-                    is_data_available=True,
+                    is_data_embargoed=True,
                 )
 
         fetch_era_mock.assert_not_called()
@@ -229,7 +231,7 @@ class TestObjectGroupCatalogDocument(TestCase):
                     object_group=self.object_group,
                     runs=[self.run],
                     projects=[self.run.project],
-                    is_data_available=True,
+                    is_data_embargoed=True,
                 )
 
         fetch_period_mock.assert_not_called()
@@ -246,7 +248,7 @@ def test_build_object_group_calls_eros_if_c2rmf_id(eros_mock: mock.MagicMock):
         object_group=object_group,
         runs=[],
         projects=[],
-        is_data_available=True,
+        is_data_embargoed=True,
     )
 
     eros_mock.assert_called_once_with(c2rmf_id="abc", object_group=object_group)

@@ -1,12 +1,13 @@
-# pylint: disable=no-member,unused-argument
 from datetime import datetime
 from typing import Literal
 
-import graphene
 from django.db.models import F, Sum
 from django.utils import timezone
+from rest_framework import serializers
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
-from .models import Object, ObjectGroup, Project, Run
+from ..models import Object, ObjectGroup, Project, Run
 
 StatPeriodLiteral = Literal["all", "year"]
 
@@ -15,24 +16,18 @@ THIS_YEAR_START_DT = datetime(
 )
 
 
-class LabStatType(graphene.ObjectType):
-    total_projects = graphene.Int()
-    total_object_groups = graphene.Int()
-    total_hours = graphene.Int()
+class LabStatsSerializer(serializers.Serializer):  # pylint: disable=abstract-method
+    total_projects = serializers.IntegerField()
+    total_object_groups = serializers.IntegerField()
+    total_hours = serializers.IntegerField()
 
 
-class LabStatField(graphene.Field):
-    period: StatPeriodLiteral
-
-    def __init__(self, *args, period: StatPeriodLiteral = "all", **kwargs):
-        self.period = period
-        super().__init__(LabStatType, *args, **kwargs)
+class StatsResponse(serializers.Serializer):  # pylint: disable=abstract-method
+    all = LabStatsSerializer()
+    year = LabStatsSerializer()
 
 
-class LabStatsType(graphene.ObjectType):
-    all = LabStatField(period="all")
-    year = LabStatField(period="year")
-
+class LabStatsUtils:
     @staticmethod
     def get_total_projects(period: StatPeriodLiteral):
         qs = Project.objects
@@ -64,22 +59,19 @@ class LabStatsType(graphene.ObjectType):
         return int(aggregation["total_hours"].total_seconds() / 3600)
 
 
-class Query(graphene.ObjectType):
-    stats = graphene.Field(LabStatsType)
-
-    def resolve_stats(self, info):
-        return {
-            "all": LabStatType(
-                total_projects=LabStatsType.get_total_projects("all"),
-                total_object_groups=LabStatsType.get_total_analyzed_objects("all"),
-                total_hours=LabStatsType.get_total_hours("all"),
-            ),
-            "year": LabStatType(
-                total_projects=LabStatsType.get_total_projects("year"),
-                total_object_groups=LabStatsType.get_total_analyzed_objects("year"),
-                total_hours=LabStatsType.get_total_hours("year"),
-            ),
-        }
-
-
-schema = graphene.Schema(query=Query)
+@api_view(["GET"])
+def stats_view(request):
+    stats = {
+        "all": {
+            "total_projects": LabStatsUtils.get_total_projects("all"),
+            "total_object_groups": LabStatsUtils.get_total_analyzed_objects("all"),
+            "total_hours": LabStatsUtils.get_total_hours("all"),
+        },
+        "year": {
+            "total_projects": LabStatsUtils.get_total_projects("year"),
+            "total_object_groups": LabStatsUtils.get_total_analyzed_objects("year"),
+            "total_hours": LabStatsUtils.get_total_hours("year"),
+        },
+    }
+    serializer = StatsResponse(stats)
+    return Response(serializer.data)
