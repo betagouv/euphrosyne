@@ -2,6 +2,8 @@
 
 Euphrosyne is a web application designed for managing and exploring scientific data from heritage science analyses. The platform facilitates project management, experimental documentation, and data visualization for scientific research on cultural heritage objects. This project is built with Django, a Python web framework, and modern JavaScript/TypeScript with Web Components.
 
+For a comprehensive overview of the Euphrosyne ecosystem and its components, please refer to [EUPHROSYNE.md](EUPHROSYNE.md).
+
 ## Features
 
 - **Project Management**: Organize scientific investigations on cultural heritage objects with configurable workflows
