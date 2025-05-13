@@ -1,15 +1,15 @@
-<div>
-    <div class="fr-grid-row">
+<span>
+    <span class="fr-grid-row">
         {% for method in methods %}
-            <div
+            <span
               class="fr-col-6"
               style="display: flex;">
-              <div>
+              <span>
                 <strong>{{ method.name }}</strong>
-              </div>
-              <div class="fr-ml-2v">
+              </span>
+              <span class="fr-ml-2v">
                 {% for detector in method.detectors %}
-                      <div>
+                      <span>
                         <span>
                           {{ detector.name }}
                           {% if detector.filters %}
@@ -17,10 +17,10 @@
                           {% endif %}
                           {{ detector.filters|join:", " }}
                         </span>
-                      </div>
+                      </span>
                 {% endfor %}
-              </div>
-            </div>
+              </span>
+            </span>
         {% endfor %}
-    </div>
-  </div>
+    </span>
+  </span>

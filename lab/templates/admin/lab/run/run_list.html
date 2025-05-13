@@ -4,45 +4,48 @@
     {% if runs %}
     {% for run in runs %}
     <div class="fr-col-12 fr-col-md-6 fr-col-lg-4">
-      <div id="runs-{{ run.id }}" class="run-clickable-card fr-card fr-card--no-arrow" data-runid="{{ run.id }}" data-changestateaction="{% if run.change_state_action_name %}{{ run.change_state_action_name }}{% endif %}">
-        <div class="fr-card__body">      
-          <h4 class="fr-card__title flex-container">
-            {{ run.label }}
-            <input type="checkbox" name="_selected_action" value="{{ run.id }}" class="action-select">
-            <div class="align-right run-list-card-actions">
-              <a href="{% url "admin:lab_run_change" run.id %}" title="{% translate "Change" %}" class="fr-link">
-                <span class="fr-icon-edit-line" aria-hidden="true"></span>
-                <span class="fr-sr-only" rel="noopener noreferrer">{% translate "Change" %}</span>
-              </a>
-              <a href="{% url "admin:lab_run_delete" run.id  %}?_changelist_filters=project%3D{{ run.project_id }}" title="{% translate "Delete" %}" class="fr-link">
-                <span class="fr-icon-delete-line" aria-hidden="true"></span>
-                <span class="fr-sr-only" rel="noopener noreferrer">{% translate "Delete" %}</span>
-              </a>
+  
+      <div id="runs-{{ run.id }}" class="fr-card fr-card--no-arrow run-card" data-runid="{{ run.id }}" data-changestateaction="{% if run.change_state_action_name %}{{ run.change_state_action_name }}{% endif %}">
+            <div class="fr-card__body">
+                <div class="fr-card__content">
+                    <h3 class="fr-card__title">
+                        <a href="{% url "admin:lab_run_change" run.id %}">{{ run.label }}</a>
+                    </h3>
+                    <p class="fr-card__desc">
+                      <span class="flex-container fr-text--sm fr-mb-1w">
+                        <span class="fr-text--sm fr-mb-0">
+                          <span class="fr-text--xs">{% translate "Start" %}</span>
+                          <br>{% if run.start_date %}{{ run.start_date|date:"SHORT_DATE_FORMAT" }} {{ run.start_date|time:"H:i" }}{% else %}-{% endif %}
+                        </span>
+                        <span class="fr-text--sm fr-mb-0">
+                          <span class="fr-text--xs">{% translate "End" %}</span>
+                          <br>{% if run.end_date %}{{ run.end_date|date:"SHORT_DATE_FORMAT" }} {{ run.end_date|time:"H:i" }}{% else %}-{% endif %}
+                        </span>
+                      </span>
+
+                      <span class="fr-text--sm">
+                        <span class="fr-text--xs">{% translate "Embargo date" %}</span>
+                        <br>{% if run.embargo_date %}{{ run.embargo_date|date:"SHORT_DATE_FORMAT" }}{% else %}-{% endif %}
+                      </span>
+
+                      <br><br>
+                      
+                      {% include "admin/lab/run/includes/run_experimental_conditions.html" %}
+                    </p>
+                </div>
+                <div class="fr-card__footer">
+                    <ul class="fr-btns-group fr-btns-group--inline-reverse fr-btns-group--inline-lg">
+                        <li>
+                          <a href="{% url "admin:lab_run_delete" run.id  %}?_changelist_filters=project%3D{{ run.project_id }}" title="{% translate "Delete" %}" class="fr-link">
+                            <span class="fr-icon-delete-line" aria-hidden="true"></span>
+                            <span class="fr-sr-only" rel="noopener noreferrer">{% translate "Delete" %}</span>
+                          </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-          </h4>
-          <div class="fr-card__desc">
-
-            <div class="flex-container fr-text--sm fr-mb-1w">
-              <p class="fr-text--sm fr-mb-0">
-                <span class="fr-text--xs">{% translate "Start" %}</span>
-                <br>{% if run.start_date %}{{ run.start_date|date:"SHORT_DATE_FORMAT" }} {{ run.start_date|time:"H:i" }}{% else %}-{% endif %}
-              </p>
-              <p class="fr-text--sm fr-mb-0">
-                <span class="fr-text--xs">{% translate "End" %}</span>
-                <br>{% if run.end_date %}{{ run.end_date|date:"SHORT_DATE_FORMAT" }} {{ run.end_date|time:"H:i" }}{% else %}-{% endif %}
-              </p>
-            </div>
-
-            <p class="fr-text--sm">
-              <span class="fr-text--xs">{% translate "Embargo date" %}</span>
-              <br>{% if run.embargo_date %}{{ run.embargo_date|date:"SHORT_DATE_FORMAT" }}{% else %}-{% endif %}
-            </p>
-
-            {% include "admin/lab/run/includes/run_experimental_conditions.html" %}
-            
-          </div>
         </div>
-      </div>
+
     </div>
   {% endfor %}
   <div class="fr-col-6 fr-col-lg-4">
