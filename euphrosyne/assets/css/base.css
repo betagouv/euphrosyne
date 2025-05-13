@@ -115,6 +115,12 @@ a.fr-btn.fr-btn--secondary {
   font-weight: 400;
 }
 
+.module .fr-card ul {
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 0;
+}
+
 tr:nth-child(2n + 1),
 .row-form-errors {
   background: var(--darkened-bg);

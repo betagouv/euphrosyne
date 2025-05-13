@@ -19,13 +19,13 @@ body {
   display: none;
 }
 
-.run-clickable-card {
-  cursor: pointer;
-  padding: 6px;
+.run-card.fr-card {
+  min-height: 30rem;
+  height: auto;
 }
 
-.run-clickable-card__selected {
-  outline: 3px solid var(--border-default-blue-france);
+.run-card.fr-card .fr-card__content {
+  flex-grow: 1;
 }
 
 .run-footer {
@@ -39,7 +39,7 @@ body {
   padding: 1em;
 }
 
-#changelist .fr-card__title a {
+#changelist .fr-card__title a, #changelist .fr-card__footer a  {
   background-image: none;
   color: var(--text-action-high-blue-france);
 }
@@ -100,7 +100,7 @@ body {
   border-style: dashed;
   height: 100%;
   border-color: var(--border-default-grey);
-  min-height: 300px;
+  min-height: 30rem;
 }
 
 .module .fr-card__desc p {
