@@ -2,6 +2,7 @@ from io import StringIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import mock
+
 import pytest
 from django.core import mail
 from django.core.management import call_command

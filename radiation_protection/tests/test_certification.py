@@ -17,18 +17,17 @@ from lab.tests.factories import StaffUserFactory
 from radiation_protection.certification import (
     check_radio_protection_certification,
     create_invitation_notification,
+    get_radioprotection_certification,
     user_has_active_certification,
 )
-
-
-@pytest.fixture(autouse=True)
-def set_certification_name_settings(settings):
-    settings.RADIATION_PROTECTION_CERTIFICATION_NAME = "radiation"
+from radiation_protection.constants import (
+    RADIATION_PROTECTION_CERTIFICATION_NUM_DAYS_VALID,
+)
 
 
 @pytest.fixture(name="certification")
 def certification_fixture():
-    return Certification.objects.create(name="radiation", num_days_valid=5)
+    return get_radioprotection_certification()
 
 
 @pytest.fixture(name="quiz")
@@ -46,7 +45,7 @@ def test_user_has_active_certification(
 ):
     user = StaffUserFactory()
     with mock.patch(
-        "radiation_protection.certification._get_radioprotection_certification",
+        "radiation_protection.certification.get_radioprotection_certification",
         return_value=certification,
     ):
         # Result with is not passed
@@ -60,7 +59,9 @@ def test_user_has_active_certification(
             is_passed=True,
             score=95,
         )
-        result.created = timezone.now() - timedelta(days=6)
+        result.created = timezone.now() - timedelta(
+            days=RADIATION_PROTECTION_CERTIFICATION_NUM_DAYS_VALID + 1
+        )
         result.save()
         assert not user_has_active_certification(user)
 
@@ -78,7 +79,7 @@ def test_user_has_active_certification(
 
 def test_user_has_active_certification_when_certification_does_not_exist():
     with mock.patch(
-        "radiation_protection.certification._get_radioprotection_certification",
+        "radiation_protection.certification.get_radioprotection_certification",
         side_effect=Certification.DoesNotExist,
     ):
         assert user_has_active_certification(mock.MagicMock()) is False
@@ -88,7 +89,7 @@ def test_user_has_active_certification_when_certification_does_not_exist():
 def test_create_invitation_notification(certification: Certification):
     user = StaffUserFactory()
     with mock.patch(
-        "radiation_protection.certification._get_radioprotection_certification",
+        "radiation_protection.certification.get_radioprotection_certification",
         return_value=certification,
     ):
         notification = create_invitation_notification(user)
@@ -104,7 +105,7 @@ def test_check_radio_protection_certification_when_no_valid_result(
     has_active_certification: bool,
 ):
     with mock.patch(
-        "radiation_protection.certification._get_radioprotection_certification"
+        "radiation_protection.certification.get_radioprotection_certification"
     ) as get_certification_mock:
         # pylint: disable=line-too-long
         get_certification_mock.return_value.user_has_valid_participation.return_value = (
