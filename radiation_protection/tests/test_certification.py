@@ -4,11 +4,17 @@ from unittest import mock
 import pytest
 from django.utils import timezone
 
+from certification.certifications.models import (
+    Certification,
+    QuizCertification,
+    QuizResult,
+)
+from certification.notifications.models import (
+    CertificationNotification,
+    NotificationType,
+)
 from lab.tests.factories import StaffUserFactory
-
-from ..certifications.models import Certification, QuizCertification, QuizResult
-from ..notifications.models import CertificationNotification, NotificationType
-from ..radiation_protection import (
+from radiation_protection.certification import (
     check_radio_protection_certification,
     create_invitation_notification,
     user_has_active_certification,
@@ -40,7 +46,7 @@ def test_user_has_active_certification(
 ):
     user = StaffUserFactory()
     with mock.patch(
-        "certification.radiation_protection._get_radioprotection_certification",
+        "radiation_protection.certification._get_radioprotection_certification",
         return_value=certification,
     ):
         # Result with is not passed
@@ -72,7 +78,7 @@ def test_user_has_active_certification(
 
 def test_user_has_active_certification_when_certification_does_not_exist():
     with mock.patch(
-        "certification.radiation_protection._get_radioprotection_certification",
+        "radiation_protection.certification._get_radioprotection_certification",
         side_effect=Certification.DoesNotExist,
     ):
         assert user_has_active_certification(mock.MagicMock()) is False
@@ -82,7 +88,7 @@ def test_user_has_active_certification_when_certification_does_not_exist():
 def test_create_invitation_notification(certification: Certification):
     user = StaffUserFactory()
     with mock.patch(
-        "certification.radiation_protection._get_radioprotection_certification",
+        "radiation_protection.certification._get_radioprotection_certification",
         return_value=certification,
     ):
         notification = create_invitation_notification(user)
@@ -98,14 +104,14 @@ def test_check_radio_protection_certification_when_no_valid_result(
     has_active_certification: bool,
 ):
     with mock.patch(
-        "certification.radiation_protection._get_radioprotection_certification"
+        "radiation_protection.certification._get_radioprotection_certification"
     ) as get_certification_mock:
         # pylint: disable=line-too-long
         get_certification_mock.return_value.user_has_valid_participation.return_value = (
             has_active_certification
         )
         with mock.patch(
-            "certification.radiation_protection.create_invitation_notification"
+            "radiation_protection.certification.create_invitation_notification"
         ) as create_invitation_notification_mock:
             check_radio_protection_certification(mock.MagicMock())
             assert create_invitation_notification_mock.called == (
