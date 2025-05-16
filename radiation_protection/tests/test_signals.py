@@ -2,7 +2,6 @@ from datetime import timedelta
 from unittest import mock
 
 import pytest
-from django.test import override_settings
 from django.utils import timezone
 
 from certification.certifications.models import QuizResult
@@ -14,6 +13,7 @@ from euphro_auth.tests import factories as auth_factories
 from lab.participations.models import Participation
 from lab.runs.models import Run
 from lab.tests import factories as lab_factories
+from radiation_protection.certification import get_radioprotection_certification
 from radiation_protection.signals import handle_radiation_protection_certification
 
 
@@ -21,7 +21,10 @@ from radiation_protection.signals import handle_radiation_protection_certificati
 def quiz_result_fixture():
     """Create a quiz result for testing."""
     user = auth_factories.StaffUserFactory()
-    quiz = QuizCertificationFactory(certification__name="radiation_protection")
+    certification = get_radioprotection_certification()
+    quiz = QuizCertificationFactory(
+        certification=certification,
+    )
     return QuizResult.objects.create(
         user=user,
         quiz=quiz,
@@ -45,7 +48,6 @@ def next_user_run_fixture(quiz_result: QuizResult):
 
 
 @pytest.mark.django_db
-@override_settings(RADIATION_PROTECTION_CERTIFICATION_NAME="radiation_protection")
 def test_handle_radiation_protection_certification(
     quiz_result: QuizResult, next_user_run: Run
 ):
@@ -79,7 +81,6 @@ def test_handle_radiation_protection_certification(
 
 
 @pytest.mark.django_db
-@override_settings(RADIATION_PROTECTION_CERTIFICATION_NAME="radiation_protection")
 def test_handle_radiation_protection_certification_not_passed(
     quiz_result: QuizResult,
 ):
@@ -106,7 +107,6 @@ def test_handle_radiation_protection_certification_not_passed(
 
 
 @pytest.mark.django_db
-@override_settings(RADIATION_PROTECTION_CERTIFICATION_NAME="radiation_protection")
 def test_handle_radiation_protection_certification_not_created(
     quiz_result: QuizResult,
 ):
@@ -130,12 +130,12 @@ def test_handle_radiation_protection_certification_not_created(
 
 
 @pytest.mark.django_db
-@override_settings(RADIATION_PROTECTION_CERTIFICATION_NAME="radiation_protection")
 @mock.patch("radiation_protection.signals.send_document_to_risk_advisor")
 def test_signal_is_sent(mock_send_document_to_risk_advisor: mock.Mock):
     """Test that the signal is sent when the quiz is passed."""
+    certification = get_radioprotection_certification()
     QuizResultFactory(
-        quiz__certification__name="radiation_protection",
+        quiz__certification_id=certification.id,
         is_passed=True,
         score=95,
     )

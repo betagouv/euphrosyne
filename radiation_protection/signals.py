@@ -1,7 +1,6 @@
 import logging
 from typing import Type, cast
 
-from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -10,6 +9,7 @@ from certification.certifications.models import QuizResult
 from lab.participations.models import Participation
 from lab.runs.models import Run
 
+from .constants import RADIATION_PROTECTION_CERTIFICATION_NAME
 from .document import (
     fill_radiation_protection_documents,
     send_document_to_risk_advisor,
@@ -35,10 +35,7 @@ def handle_radiation_protection_certification(
 
     try:
         # Check if this is for the radiation protection certification
-        if (
-            instance.quiz.certification.name
-            != settings.RADIATION_PROTECTION_CERTIFICATION_NAME
-        ):
+        if instance.quiz.certification.name != RADIATION_PROTECTION_CERTIFICATION_NAME:
             return
 
         # Only proceed if the user passed the quiz
