@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     "static_pages",
     "standard",
     "certification",
+    "radiation_protection",
     "drf_spectacular",
 ] + (["debug_toolbar"] if DEBUG else [])
 
@@ -396,4 +397,7 @@ RADIATION_PROTECTION_CERTIFICATION_NAME = os.environ[
 ]
 RADIATION_PROTECTION_TALLY_SECRET_KEY = os.environ[
     "RADIATION_PROTECTION_TALLY_SECRET_KEY"
+]
+RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = os.environ[
+    "RADIATION_PROTECTION_RISK_ADVISOR_EMAIL"
 ]

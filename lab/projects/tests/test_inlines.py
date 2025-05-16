@@ -5,10 +5,10 @@ import pytest
 from django.test import RequestFactory
 from django.urls import reverse
 
-from certification import radiation_protection
 from euphro_auth.tests import factories as auth_factories
 from euphrosyne.admin import AdminSite
 from lab.tests import factories
+from radiation_protection import certification as radiation_protection
 
 from .. import inlines
 from ..models import Participation
