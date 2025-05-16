@@ -14,9 +14,9 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
-from certification import radiation_protection
 from lab.participations.models import Participation
 from lab.permissions import is_lab_admin
+from radiation_protection import certification as radiation_protection
 
 from .emails import send_invitation_email
 from .forms import UserChangeForm, UserCreationForm

@@ -9,9 +9,9 @@ from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
-from certification import radiation_protection
 from lab.admin.mixins import LabPermission, LabPermissionMixin, LabRole
 from lab.models import Participation
+from radiation_protection import certification as radiation_protection
 
 from .forms import (
     BaseParticipationForm,

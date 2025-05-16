@@ -4,8 +4,11 @@ from functools import lru_cache
 
 from django.conf import settings
 
-from .certifications.models import Certification
-from .notifications.models import CertificationNotification, NotificationType
+from certification.certifications.models import Certification
+from certification.notifications.models import (
+    CertificationNotification,
+    NotificationType,
+)
 
 if typing.TYPE_CHECKING:
     from euphro_auth.models import User
