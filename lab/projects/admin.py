@@ -1,10 +1,10 @@
-from typing import Any, Dict, Mapping, Optional, Type
+from typing import Any, Optional
 
 from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
 from django.db.models import Count, DateTimeField, Value
-from django.forms.models import BaseInlineFormSet, ModelForm, inlineformset_factory
+from django.forms.models import ModelForm
 from django.http.request import HttpRequest
 from django.urls import reverse
 from django.utils.formats import date_format
@@ -18,18 +18,14 @@ from euphro_tools.hooks import (
     rename_project_directory,
 )
 from lab.admin.mixins import LabPermission, LabPermissionMixin, LabRole
-from lab.models import Participation
 from lab.permissions import is_lab_admin, is_project_leader
 
-from . import admin_filters
+from . import admin_filters, inlines
 from .forms import (
-    BaseParticipationForm,
     BaseProjectForm,
-    BeamTimeRequestForm,
-    LeaderParticipationForm,
     MemberProjectForm,
 )
-from .models import BeamTimeRequest, Project
+from .models import Project
 
 
 class ProjectChangeList(ChangeList):
@@ -49,110 +45,6 @@ class ProjectChangeList(ChangeList):
             .prefetch_related("runs")
             .order_by("-first_run_date")
         )
-
-
-class ParticipationFormSet(BaseInlineFormSet):
-    # pylint: disable=too-many-arguments
-    def __init__(
-        self,
-        data: Optional[Any] = None,
-        files: Optional[Any] = None,
-        instance: Optional[Any] = None,
-        save_as_new: bool = False,
-        prefix: Optional[Any] = None,
-        queryset: Optional[Any] = None,
-        **kwargs: Any,
-    ):
-        super().__init__(
-            data=data,
-            files=files,
-            instance=instance,
-            save_as_new=save_as_new,
-            prefix=prefix,
-            queryset=queryset,
-            **kwargs,
-        )
-        for form in self:
-            if form.instance.is_leader and "DELETE" in form.fields:
-                form.fields["DELETE"].disabled = True
-
-    def get_queryset(self):
-        return super().get_queryset().order_by("-is_leader", "created")
-
-    def full_clean(self):
-        for form in self:
-            form.try_populate_institution()
-        return super().full_clean()
-
-    def save(self, commit: bool = True):
-        # Set first participation as leader
-        if len(self) > 0:
-            self[0].instance.is_leader = True
-        return super().save(commit)
-
-
-class ParticipationInline(LabPermissionMixin, admin.TabularInline):
-    model = Participation
-    verbose_name = _("Project member")
-    verbose_name_plural = _("Project members")
-    template = "admin/edit_inline/tabular_participation_in_project.html"
-
-    lab_permissions = LabPermission(
-        add_permission=LabRole.PROJECT_LEADER,
-        change_permission=LabRole.LAB_ADMIN,
-        view_permission=LabRole.PROJECT_MEMBER,
-        delete_permission=LabRole.PROJECT_LEADER,
-    )
-
-    def get_related_project(  # type: ignore[override]
-        self, obj: Project | None = None
-    ) -> Project | None:
-        return obj
-
-    def get_formset(
-        self,
-        request: HttpRequest,
-        obj: Optional[Project] = None,
-        **kwargs: Mapping[str, Any],
-    ):
-        form = BaseParticipationForm if obj else LeaderParticipationForm
-
-        formset: Type[BaseInlineFormSet] = inlineformset_factory(
-            Project,
-            Participation,
-            form=form,  # type: ignore[arg-type]
-            extra=0,
-            min_num=1,
-            # On creation, only leader participation can be added
-            max_num=1000 if obj else 1,
-            can_delete=bool(obj),
-            formset=ParticipationFormSet,
-        )
-        return formset
-
-
-class BeamTimeRequestInline(LabPermissionMixin, admin.StackedInline):
-    model = BeamTimeRequest
-    form = BeamTimeRequestForm
-    fields = ("request_type", "request_id", "form_type", "problem_statement")
-
-    lab_permissions = LabPermission(
-        add_permission=LabRole.PROJECT_MEMBER,
-        change_permission=LabRole.PROJECT_MEMBER,
-        view_permission=LabRole.PROJECT_MEMBER,
-    )
-
-    def get_related_project(  # type: ignore[override]
-        self,
-        obj: Project | None = None,
-    ) -> Project | None:
-        return obj
-
-    def has_delete_permission(
-        self, request: HttpRequest, obj: Project | None = None  # type: ignore[override]
-    ) -> bool:
-        # should only add or edit
-        return False
 
 
 class ProjectDisplayMixin:
@@ -322,15 +214,19 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
     def get_changelist(self, request, **kwargs):
         return ProjectChangeList
 
-    def get_inlines(self, request: HttpRequest, obj: Project | None = None):
-        inlines = []
+    def get_inlines(self, request: HttpRequest, obj: Optional[Project] = None):
+        admin_inlines = []
         if obj:
             if is_lab_admin(request.user) or is_project_leader(
                 request.user, obj  # type: ignore[arg-type]
             ):
-                inlines += [ParticipationInline]  # type: ignore[list-item]
-            inlines += [BeamTimeRequestInline]  # type: ignore[list-item]
-        return inlines
+                admin_inlines += [
+                    inlines.LeaderParticipationInline,
+                    inlines.OnPremisesParticipationInline,
+                    inlines.RemoteParticipationInline,
+                ]
+            admin_inlines += [inlines.BeamTimeRequestInline]  # type: ignore[list-item]
+        return admin_inlines
 
     def save_model(
         self,
@@ -361,11 +257,12 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                 obj.participation_set.create(
                     user=request.user,  # type: ignore[misc]
                     is_leader=True,
+                    on_premises=True,
                 )
             initialize_project_directory(obj.name)
 
     def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
-        return super().changeform_view(
+        view = super().changeform_view(
             request,
             object_id,
             form_url,
@@ -376,9 +273,10 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                 "show_save_and_add_another": False,
             },
         )
+        return view
 
     def changelist_view(
-        self, request: HttpRequest, extra_context: Optional[Dict[str, str]] = None
+        self, request: HttpRequest, extra_context: dict[str, str] | None = None
     ):
         changelist_view = super().changelist_view(
             request,
