@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-06 11:52+0200\n"
+"POT-Creation-Date: 2025-05-19 16:32+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -387,8 +387,8 @@ msgstr "Sauvegarder et ajouter un autre"
 msgid "Close"
 msgstr "Fermer"
 
-msgid "Sign in"
-msgstr "Inscription"
+msgid "Log in"
+msgstr "Connexion"
 
 #, python-format
 msgid ""
@@ -403,9 +403,6 @@ msgstr "Se connecter avec ORCID"
 
 msgid "Forgotten your password or username?"
 msgstr "Mot de passe oublié ?"
-
-msgid "Log in"
-msgstr "Connexion"
 
 #, python-format
 msgid "Euphrosyne, open %(aglae_link)s data."
