@@ -15,10 +15,16 @@ import { getImagesURLForObject } from "../../../../lab/assets/js/eros-service";
 import { constructImageStorageUrl } from "../utils";
 import { getToken } from "../../../../shared/js/jwt";
 import { EuphrosyneToolsClientContext } from "../../../../shared/js/EuphrosyneToolsClient.context";
+import { css } from "@emotion/react";
 
-const selectedImageStyle = {
+const baseImageStyle = css({
+  objectFit: "contain",
+});
+
+const selectedImageStyle = css({
+  ...baseImageStyle,
   outline: "3px solid var(--border-active-blue-france)",
-};
+});
 
 export default function AddImageToObject({
   runObjectGroup,
@@ -213,7 +219,7 @@ function ObjectImageGallery<T extends IImagewithUrl>({
             transform={i.transform}
             alt=""
             key={i.url + "-" + JSON.stringify(i.transform)}
-            css={selectedImage === i ? selectedImageStyle : undefined}
+            css={selectedImage === i ? selectedImageStyle : baseImageStyle}
           />
         ))}
       </ImageGrid>
