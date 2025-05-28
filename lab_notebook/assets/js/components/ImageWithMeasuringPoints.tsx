@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { IImageTransform } from "../IImageTransform";
 import { IPointLocation } from "../IImagePointLocation";
 import { Interpolation, Theme } from "@emotion/react";
+import CroppedImage from "./CroppedImage";
 
 interface IMeasuringPoint {
   name: string;
@@ -14,6 +15,7 @@ interface IImageWithMeasuringPointsProps {
   measuringPoints: IMeasuringPoint[];
   showNames?: boolean;
   css?: Interpolation<Theme>;
+  onImageLoaded?: () => void;
 }
 
 export default function ImageWithMeasuringPoints({
@@ -22,102 +24,98 @@ export default function ImageWithMeasuringPoints({
   className,
   measuringPoints,
   showNames = true,
-  css,
+  onImageLoaded,
 }: IImageWithMeasuringPointsProps & React.HTMLProps<HTMLElement>) {
-  const [height, setHeight] = useState(imageTransform?.height || 100);
-  const [width, setWidth] = useState(imageTransform?.width || 100);
-  const aspectRatio = width / height;
+  const [imageHeight, setImageHeight] = useState(imageTransform?.height || 100);
+  const [imageWidth, setImageWidth] = useState(imageTransform?.width || 100);
+  const aspectRatio = imageWidth / imageHeight;
 
-  useEffect(() => {
-    if (!imageTransform) {
-      const i = new Image();
-      i.addEventListener("load", () => {
-        setWidth(i.naturalWidth);
-        setHeight(i.naturalHeight);
-      });
-      i.src = src;
-    }
-  }, [src, imageTransform]);
+  const handleImageLoaded = useCallback(
+    (image: HTMLImageElement) => {
+      setImageWidth(image.naturalWidth);
+      setImageHeight(image.naturalHeight);
+      onImageLoaded?.();
+    },
+    [onImageLoaded],
+  );
 
-  const widthRatio = width / 100;
-  const heightRatio = height / 100;
-
-  const locationToRelativeLocation = ({
-    x,
-    y,
-    width,
-    height,
-  }: IPointLocation) => ({
-    rlvX: x / widthRatio,
-    rlvY: y / heightRatio / aspectRatio,
-    rlvWidth: width / widthRatio,
-    rlvHeight: height / heightRatio,
-  });
-
-  const rectProps = {
-    fill: "none",
-    strokeWidth: "0.3px",
-    stroke: "red",
-  };
-
-  const circleRadius = 0.7;
+  const relativeRadius = 0.01; // 1% of image width
+  const imageWidthRatio =
+    (imageTransform?.width || imageWidth) * relativeRadius;
 
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox={`0 0 100 100`}
+    <CroppedImage
+      src={src}
+      imageTransform={imageTransform}
       className={className}
-      css={css}
+      onImageLoaded={handleImageLoaded}
     >
-      <image href={src} width={100} />
-      {measuringPoints.map(({ pointLocation, name }) => {
-        const id = `${pointLocation?.x}-${pointLocation?.y}`;
-        const relativeLocation = pointLocation
-          ? locationToRelativeLocation(pointLocation)
-          : null;
-        return (
-          relativeLocation && (
-            <g key={`point-${id}`}>
-              {showNames && (
-                <svg
-                  x={relativeLocation.rlvX + 1.8}
-                  y={relativeLocation.rlvY - 5}
-                >
-                  <g>
+      <g
+        transform={`translate(${imageTransform?.x || 0}, ${imageTransform?.y || 0})`}
+      >
+        {measuringPoints.map(({ pointLocation, name }) => {
+          const id = `${pointLocation?.x}-${pointLocation?.y}`;
+          return (
+            pointLocation && (
+              <g
+                key={`point-${id}`}
+                transform={`translate(${pointLocation.x}, ${pointLocation.y})`}
+              >
+                {showNames && (
+                  <g transform={`translate(${pointLocation.width || 0}, 0)`}>
                     <rect
-                      x={0}
-                      y={0}
-                      width={name.length * 2}
-                      height={3.7}
-                      fill="white"
+                      x={0.8 * imageWidthRatio}
+                      y={0.8 * imageWidthRatio}
+                      width={name.length * 3.2 * imageWidthRatio}
+                      height={4.7 * imageWidthRatio}
+                      fill="#fff"
+                      stroke="#222"
+                      strokeWidth={0.3 * imageWidthRatio}
+                      rx={1.5 * imageWidthRatio}
+                      opacity={0.85}
                     ></rect>
-                    <text x={0.3} y={2.9} css={{ fontSize: "3px" }}>
+                    <text
+                      x={2 * imageWidthRatio}
+                      y={4.6 * imageWidthRatio}
+                      css={{
+                        fontSize: 4 * imageWidthRatio + "px",
+                        fontWeight: 700,
+                        fill: "#222",
+                      }}
+                      style={{ fontFamily: "monospace", fill: "#222" }}
+                    >
                       {name}
                     </text>
                   </g>
-                </svg>
-              )}
-              {relativeLocation.rlvWidth && relativeLocation.rlvHeight ? (
-                <rect
-                  x={relativeLocation.rlvX}
-                  y={relativeLocation.rlvY}
-                  width={relativeLocation.rlvWidth}
-                  height={relativeLocation.rlvHeight / aspectRatio}
-                  {...rectProps}
-                />
-              ) : (
-                <circle
-                  cx={relativeLocation.rlvX - circleRadius / 2}
-                  cy={relativeLocation.rlvY - circleRadius / 2}
-                  r={`${circleRadius}px`}
-                  fill="red"
-                />
-              )}
-              ,
-            </g>
-          )
-        );
-      })}
-    </svg>
+                )}
+                {pointLocation.width && pointLocation.height ? (
+                  <rect
+                    x={0}
+                    y={0}
+                    width={pointLocation.width}
+                    height={pointLocation.height / aspectRatio}
+                    fill="rgba(255,0,0,0.15)"
+                    stroke="#ff3b3b"
+                    strokeWidth={0.3 * imageWidthRatio}
+                    rx={1.5 * imageWidthRatio}
+                    style={{ filter: "drop-shadow(0 0 2px #ff3b3b)" }}
+                  />
+                ) : (
+                  <circle
+                    cx={0}
+                    cy={0}
+                    r={imageWidthRatio * 1.2}
+                    fill="#ff3b3b"
+                    stroke="#fff"
+                    strokeWidth={0.5 * imageWidthRatio}
+                    style={{ filter: "drop-shadow(0 0 4px #ff3b3b)" }}
+                  />
+                )}
+              </g>
+            )
+          );
+        })}
+      </g>
+    </CroppedImage>
   );
 }

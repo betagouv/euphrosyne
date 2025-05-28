@@ -2,7 +2,7 @@ import { Fragment, useState } from "react";
 import ImageLoading from "./components/ImageLoading";
 import { css } from "@emotion/react";
 import { IImageTransform } from "./IImageTransform";
-import ImageCropper from "./components/ImageCropper";
+import CroppedImage from "./components/CroppedImage";
 
 const visiblePlaceholderStyle = css({
   position: "absolute",
@@ -14,8 +14,10 @@ const hiddenPlaceholderStyle = css({
   display: "none",
 });
 
-interface IImageWithPlaceholderProps extends React.HTMLProps<HTMLImageElement> {
+interface IImageWithPlaceholderProps
+  extends Omit<React.HTMLProps<HTMLImageElement>, "src"> {
   transform?: IImageTransform | null;
+  src: string;
 }
 
 export default function ImageWithPlaceholder(
@@ -32,11 +34,10 @@ export default function ImageWithPlaceholder(
   return (
     <Fragment>
       {transform ? (
-        <ImageCropper
+        <CroppedImage
           {...otherProps}
-          onReady={() => setIsLoaded(true)}
-          transform={transform}
-          readonly={true}
+          onImageLoaded={() => setIsLoaded(true)}
+          imageTransform={transform}
         />
       ) : (
         <img {...otherProps} onLoad={onImageLoad} />
