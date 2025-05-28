@@ -1,50 +1,49 @@
-import { useRef, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { IImageTransform } from "../IImageTransform";
-import Cropper from "cropperjs";
+import { Interpolation, Theme } from "@emotion/react";
 
 interface ICroppedImageProps extends React.HTMLProps<HTMLImageElement> {
-  transform?: IImageTransform | null;
-  onReady: (dataURL: string) => void;
+  src: string;
+  imageTransform?: IImageTransform | null;
+  css?: Interpolation<Theme>;
+  onImageLoaded?: (image: HTMLImageElement) => void;
+  children?: React.ReactNode;
 }
 
 export default function CroppedImage({
-  transform,
-  onReady,
-  ...props
+  src,
+  imageTransform,
+  className,
+  css,
+  onImageLoaded,
+  children,
 }: ICroppedImageProps) {
-  const originalImageRef = useRef<HTMLImageElement>(null);
+  const [imageHeight, setImageHeight] = useState(imageTransform?.height || 100);
+  const [imageWidth, setImageWidth] = useState(imageTransform?.width || 100);
 
-  // INIT ORIGINAL (to crop image)
   useEffect(() => {
-    if (originalImageRef.current) {
-      const _cropper = new Cropper(originalImageRef.current, {
-        checkCrossOrigin: false,
-        viewMode: 1,
-        ready: () => {
-          if (!props.src) {
-            throw new Error("src is not defined");
-          }
-          if (transform) {
-            _cropper.setData(transform);
-            onReady(_cropper.getCroppedCanvas().toDataURL());
-          } else {
-            onReady(props.src);
-          }
-        },
-      });
-      _cropper.disable();
-      return () => {
-        _cropper.destroy();
-      };
-    }
-  }, [props.src]);
+    const i = new Image();
+    i.addEventListener("load", () => {
+      setImageWidth(i.naturalWidth);
+      setImageHeight(i.naturalHeight);
+      onImageLoaded?.(i);
+    });
+    i.src = src;
+  }, [src]);
+
+  const viewBox = imageTransform
+    ? `${imageTransform.x} ${imageTransform.y} ${imageTransform.width} ${imageTransform.height}`
+    : `0 0 ${imageWidth} ${imageHeight}`;
 
   return (
-    <img
-      ref={originalImageRef}
-      {...props}
-      crossOrigin="anonymous"
-      css={{ maxWidth: "100%" }}
-    />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox={viewBox}
+      className={className}
+      css={css}
+    >
+      <image href={src} width={imageWidth} height={imageHeight} />
+      {children}
+    </svg>
   );
 }

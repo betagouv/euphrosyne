@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-18 09:18+0100\n"
+"POT-Creation-Date: 2025-05-28 11:28+0200\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -402,6 +402,15 @@ msgstr "Images d'EROS"
 msgid "No images found in EROS for this object."
 msgstr "Pas d'image trouvée dans EROS pour cet objet."
 
+msgid ""
+"Move and zoom the image to select the measurement point or zone. Switch "
+"between point and area selection using the buttons located at the top left "
+"of the image."
+msgstr ""
+"Déplacez et zoomez l’image pour sélectionner le point ou la zone de mesure. "
+"Basculez entre la sélection de point et de zone à l’aide des boutons situés "
+"en haut à gauche de l’image."
+
 msgid "Add a new object group / object"
 msgstr "Ajouter un nouveau groupe d'objets ou un objet"
 
@@ -426,15 +435,6 @@ msgid ""
 msgstr ""
 "Une erreur s'est produite lors de l'ajout du groupe d'objets / objet au "
 "point de mesure."
-
-msgid "Point"
-msgstr "Point"
-
-msgid "Area"
-msgstr "Zone"
-
-msgid "Selection mode"
-msgstr "Mode de sélection"
 
 msgid "Unset the object group or standard to change the analysis type"
 msgstr ""
@@ -509,3 +509,12 @@ msgstr "Référence de l'objet"
 
 msgid "No object group / object selected"
 msgstr "Aucun groupe d'objets / objet sélectionné"
+
+msgid "Point"
+msgstr "Point"
+
+msgid "Area"
+msgstr "Zone"
+
+msgid "Selection mode"
+msgstr "Mode de sélection"
