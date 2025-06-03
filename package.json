@@ -47,7 +47,7 @@
     "@fullcalendar/react": "^6.1.17",
     "@gouvfr/dsfr": "^1.13.2",
     "@h5web/app": "^14.0.1",
-    "@sentry/browser": "^9.14.0",
+    "@sentry/browser": "^9.24.0",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
     "cropperjs": "^2.0.0",
