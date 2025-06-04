@@ -251,7 +251,7 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         basic_fields = (
             ["name", "admin", "comments", "first_run_date_with_link"]
             if obj
-            else ["name"]
+            else ["name", "comments"]
         )
         if is_lab_admin(request.user):
             basic_fields += ["confidential"]

@@ -201,6 +201,7 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
             data={
                 "name": "some project name",
                 "has_accepted_cgu": True,
+                "comments": "some comments",
             },
         )
         assert response.status_code == 302
@@ -305,7 +306,11 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
     def test_add_project_sets_user_as_leader(self):
         response = self.client.post(
             self.add_view_url,
-            data={"name": "some project name", "has_accepted_cgu": 1},
+            data={
+                "name": "some project name",
+                "has_accepted_cgu": 1,
+                "comments": "some comments",
+            },
         )
         project = Project.objects.get(name="some project name")
 
@@ -313,10 +318,23 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
         assert project.name == "some project name"
         assert project.leader.user_id == self.project_member.id
 
+    def test_add_project_comments_is_mandatory(self):
+        response = self.client.post(
+            self.add_view_url,
+            data={"name": "some project name", "has_accepted_cgu": 1, "comments": ""},
+        )
+
+        assert Project.objects.filter(name="some project name").first() is None
+        assert response.status_code == 200
+
     def test_add_project_adds_user_as_member(self):
         response = self.client.post(
             self.add_view_url,
-            data={"name": "some project name", "has_accepted_cgu": 1},
+            data={
+                "name": "some project name",
+                "has_accepted_cgu": 1,
+                "comments": "some comments",
+            },
         )
         assert response.status_code == 302
         project = Project.objects.get(name="some project name")

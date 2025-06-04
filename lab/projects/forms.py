@@ -27,7 +27,7 @@ class BeamTimeRequestForm(forms.ModelForm):
 class BaseProjectForm(forms.ModelForm):
     class Meta:
         model = models.Project
-        fields = ["name", "confidential"]
+        fields = ["name", "confidential", "comments"]
 
 
 class MemberProjectForm(BaseProjectForm):
@@ -35,6 +35,13 @@ class MemberProjectForm(BaseProjectForm):
         required=True,
         label=_("I have read and accepted the general conditions of Euphrosyne."),
     )
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(
+            *args,
+            **kwargs,
+        )
+        self.fields["comments"].required = True
 
 
 class ChangeLeaderForm(forms.Form):
