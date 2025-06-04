@@ -144,7 +144,7 @@ class Project(TimestampedModel):
         verbose_name=_("Administrator"),
     )
 
-    comments = models.TextField(_("Comments"), blank=True)
+    comments = models.TextField(_("Description"), blank=True)
 
     is_data_available = models.BooleanField(
         _("Data available"),
@@ -215,6 +215,10 @@ class Project(TimestampedModel):
 
     def clean(self):
         super().clean()
+        if not self.name:
+            raise ValidationError(
+                {"name": ValidationError(_("Project name cannot be empty."))}
+            )
         slug = self._generate_slug()
         qs = Project.objects.filter(slug=slug)
         if self.id:

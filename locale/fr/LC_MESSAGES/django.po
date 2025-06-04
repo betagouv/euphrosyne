@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-19 16:32+0200\n"
+"POT-Creation-Date: 2025-06-04 15:54+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -790,6 +790,9 @@ msgstr "Données disponibles"
 
 msgid "Has at least one run with data available."
 msgstr "A au moins un run avec des données disponibles."
+
+msgid "Project name cannot be empty."
+msgstr "Le nom du projet ne peut pas être vide."
 
 #, python-format
 msgid ""
