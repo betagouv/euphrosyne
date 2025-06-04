@@ -111,7 +111,7 @@ class NotEmbargoedRun(RunFactory):
 
 class RunReadyToAskExecFactory(RunFactory):
     # pylint: disable=no-member
-    status = Run.Status.CREATED.value
+    status = Run.Status.CREATED.value  # type: ignore[misc]
     method_PIXE = True
 
 
