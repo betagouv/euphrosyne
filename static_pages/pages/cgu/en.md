@@ -1,6 +1,6 @@
 _Updated: 15/01/2025_
 
-1.  **Purpose**
+## **Purpose**
 
 The Euphrosyne platform is the digital data platform of the New AGLAE
 particle accelerator dedicated to heritage science. These data are open,
@@ -120,11 +120,11 @@ environment in the cloud that runs its own operating system (OS) and
 benefits from the same equipment as a physical computer: CPU and/or GPU,
 RAM memory, hard disk and network card.
 
-2.  **Features**
+## **Features**
 
 Use of the Euphrosyne platform is free.
 
-## Features available to FIXLAB users
+#### Features available to FIXLAB users
 
 Any New AGLAE user can feed or update the Euphrosyne platform by
 publishing datasets and enriching them with metadata and documents
@@ -177,7 +177,7 @@ Once the embargo period has expired, the raw data can be accessed online
 under a CC-BY 4.0 licence
 (https://creativecommons.org/licenses/by/4.0/).
 
-## Consultation and downloading of data by a DIGILAB user
+#### Consultation and downloading of data by a DIGILAB user
 
 Consulting or downloading the metadata made available on the Euphrosyne
 platform does not require any prior registration, is anonymous and free
@@ -207,9 +207,9 @@ to the GTC).
 Any DIGILAB User may also be contacted as part of our quality approach
 based on continuous improvement.
 
-3.  **Code of conduct and responsibilities of Users**
+## **Code of conduct and responsibilities of Users**
 
-## Publication of a dataset
+#### Publication of a dataset
 
 **General rules**
 
@@ -242,7 +242,7 @@ datasets it publishes on the Euphrosyne platform and ensures that this
 publication complies with current legislation. He/she takes all
 necessary measures to this end.
 
-## Data covered by intellectual property rights
+#### Data covered by intellectual property rights
 
 **Licenses**
 
@@ -258,9 +258,9 @@ the individual situation of a user in his/her relations with an
 Administrative Authority. Nor is it a direct means of contacting a
 FIXLAB Project Leader.
 
-4.  **Commitments and responsibilities**
+## **Commitments and responsibilities**
 
-## Quality of service and facilities offered
+#### Quality of service and facilities offered
 
 Subject to the provisions of the following paragraph, the AGLAE team and
 the SNUM of the Ministry of Culture endeavour to guarantee the
@@ -293,7 +293,7 @@ User, through better referencing, and without ever altering the meaning,
 Euphrosyne\'s DIGILAB administrators reserve the right to modify the
 metadata associated with a dataset.
 
-## Responsibilities of DIGILAB administrators
+#### Responsibilities of DIGILAB administrators
 
 The DIGILAB Administrators do not carry out any _a priori_ control on
 the publications of Administrative Authorities or Contributors/FIXLAB
@@ -329,7 +329,7 @@ of the dataset title.
 Administrators reserve the right to highlight certain content through
 the sections of the Euphrosyne platform.
 
-## Changes to the Terms of Use
+#### Changes to the Terms of Use
 
 The terms of these Terms of Use may be amended at any time, without
 notice, based on changes to the Euphrosyne platform, changes in
@@ -339,9 +339,9 @@ administrators.
 The User will be asked to accept the Terms of Use again to continue to
 use the Euphrosyne platform, when changes to the TOU are applied.
 
-5.  **Privacy policy**
+## **Privacy policy**
 
-## Personal data
+#### Personal data
 
 Consultation of published metadata does not require registration or
 authentication. Consultation and downloading of certain published data
@@ -402,7 +402,7 @@ Euphrosyne platform (with the exception of the right to lodge a
 complaint which must be exercised directly with a supervisory authority)
 by email at <euphrosyne-support@culture.gouv.fr>.
 
-## Cookies
+#### Cookies
 
 The Euphrosyne platform deposits cookies to measure audience (number of
 visits, pages viewed), respecting the conditions of exemption from
@@ -412,7 +412,7 @@ Euphrosyne platform uses Matomo, an open-source software to measure web
 statistics. Thus, the tracking information of each visitor is anonymized
 and is not shared with third parties.
 
-6.  **Reference texts**
+## **Reference texts**
 
 Book III of the Code on relations between the public and the
 administrationLaw no. 78-17 of 6 January 1978 on information technology,
@@ -420,7 +420,7 @@ files and civil libertiesLaw no. 2004-575 of 21 June 2004 on confidence
 in the digital economyLaw no. 2016-1321 of 7 October 2016 on a digital
 republic
 
-7.  **Legal information**
+## **Legal information**
 
 **MC-C2RMF (Ministry of Culture - Centre de Recherche et de Restauration
 des Musées de France)**

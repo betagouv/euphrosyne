@@ -1,6 +1,6 @@
 _Mise à jour : 15/01/2025_
 
-1.  **Objet**
+### **Objet**
 
 La plateforme *Euphrosyne* est la plateforme numérique des données de
 l'accélérateur de particules dédié à l'étude des objets du patrimoine
@@ -135,11 +135,11 @@ son propre système d'exploitation (OS) et bénéficie des mêmes
 équipements qu'un ordinateur physique : CPU et/ou GPU, mémoire RAM,
 disque dur et carte réseau.
 
-# Fonctionnalités
+### Fonctionnalités
 
 L'utilisation de la plateforme *Euphrosyne* est gratuite.
 
-## Fonctionnalités accessibles aux utilisateurs FIXLAB
+#### Fonctionnalités accessibles aux utilisateurs FIXLAB
 
 Tout utilisateur de New AGLAE peut alimenter ou mettre à jour la
 plateforme *Euphrosyne*, en publiant des jeux de données et en les
@@ -193,7 +193,7 @@ La période d'embargo échue, les données brutes deviennent accessibles en
 ligne sous licence CC-BY 4.0
 ([https://creativecommons.org/licenses/by/4.0/](https://creativecommons.org/licenses/by/4.0/))
 
-## Consultation et téléchargement des données par un utilisateur DIGILAB
+#### Consultation et téléchargement des données par un utilisateur DIGILAB
 
 La consultation des métadonnées mises à disposition sur la
 plateforme *Euphrosyne* ou leur téléchargement ne nécessite aucune
@@ -228,9 +228,9 @@ contraires aux CGU).
 Tout Utilisateur DIGILAB peut également être contacté dans le cadre de
 notre démarche qualité fondée sur l'amélioration continue.
 
-# Code de conduite et responsabilités des Utilisateurs
+### Code de conduite et responsabilités des Utilisateurs
 
-## Publication d'un jeu de données
+#### Publication d'un jeu de données
 
 **Règles générales**
 
@@ -265,14 +265,14 @@ des jeux de données qu'il publie sur la plateforme *Euphrosyne* et
 s'assure que cette publication est conforme à la législation en vigueur.
 Il prend toute mesure nécessaire à cette fin.
 
-## Données couvertes par des droits de propriété intellectuelle
+#### Données couvertes par des droits de propriété intellectuelle
 
 **Licences**
 
 Les jeux de données brutes sont accessibles sous licence CC-BY 4.0
 (<https://creativecommons.org/licenses/by/4.0/>).
 
-## Utilisation de l'adresse de contact <euphrosyne-support@culture.gouv.fr>
+#### Utilisation de l'adresse de contact <euphrosyne-support@culture.gouv.fr>
 
 L'adresse de contact permet de contacter les Administrateurs de la
 plateforme *Euphrosyne* et n'a pas pour objet de recevoir des demandes
@@ -280,9 +280,9 @@ relatives à la situation individuelle d'un utilisateur dans ses
 relations avec une Autorité administrative. Elle n'est pas non plus un
 moyen direct de contacter un FIXLAB _Project Leader_.
 
-# Engagements et responsabilités
+### Engagements et responsabilités
 
-## Qualité de service et facilités offertes
+#### Qualité de service et facilités offertes
 
 Sous réserve des dispositions du paragraphe suivant, l'équipe AGLAE et
 le SNUM du Ministère de la Culture s'efforcent de garantir la
@@ -318,7 +318,7 @@ dénaturer le sens, les administrateurs DIGILAB *d'Euphrosyne* se
 réservent la possibilité de modifier les métadonnées associées à un jeu
 de données.
 
-## Responsabilités des administrateurs DIGILAB
+#### Responsabilités des administrateurs DIGILAB
 
 Les administrateurs DIGILAB n'effectuent pas de contrôle *a priori* sur
 les publications des Autorités administratives ou des
@@ -356,7 +356,7 @@ de données.
 Les administrateurs se réservent la possibilité de mettre en avant
 certains contenus à travers les rubriques de la plateforme *Euphrosyne*.
 
-## Évolution des conditions d'utilisation
+#### Évolution des conditions d'utilisation
 
 Les termes des présentes conditions d'utilisation peuvent être amendés à
 tout moment, sans préavis, en fonction des modifications apportées à la
@@ -367,9 +367,9 @@ L'Utilisateur sera invité à accepter de nouveau les conditions
 d'utilisation pour continuer à utiliser la plateforme *Euphrosyne*,
 lorsque des évolutions des CGU sont appliquées.
 
-# Vie privée
+### Vie privée
 
-## Données à caractère personnel
+#### Données à caractère personnel
 
 La consultation des métadonnées publiées ne nécessite pas de
 s'inscrire, ni de s'authentifier. La consultation et le téléchargement
@@ -438,7 +438,7 @@ réclamation qui doit être exercé directement auprès d'une autorité de
 contrôle) par email
 à [euphrosyne-support@culture.gouv.fr](mailto:euphrosyne-support@culture.gouv.fr)
 
-## Cookies
+#### Cookies
 
 La plateforme *Euphrosyne* dépose des cookies de mesure d'audience
 (nombre de visites, pages consultées), respectant les conditions
@@ -450,7 +450,7 @@ la plateforme *Euphrosyne* utilisent Matomo, un logiciel open source de
 mesure de statistiques web. Ainsi, les informations de suivi de chaque
 visiteur sont anonymisées et ne sont pas partagées avec des tiers.
 
-# Textes de référence
+### Textes de référence
 
 [Livre III du code des relations entre le public et
 l'administration](https://www.legifrance.gouv.fr/affichCode.do%3Bjsessionid=2B8CFC0D49E08E4D1843153F6E476CA7.tpdila11v_2?idSectionTA=LEGISCTA000031367685&cidTexte=LEGITEXT000031366350&dateTexte=20170808)
@@ -468,7 +468,7 @@ numérique](https://www.legifrance.gouv.fr/affichTexte.do?cidTexte=JORFTEXT00000
 n° 2016-1321 du 7 octobre 2016 pour une République
 numérique](https://www.legifrance.gouv.fr/affichTexte.do?cidTexte=JORFTEXT000033202746&categorieLien=id)
 
-# Mentions légales
+### Mentions légales
 
 **MC-C2RMF (Ministère de la Culture - Centre de Recherche et de
 Restauration des Musées de France)**
