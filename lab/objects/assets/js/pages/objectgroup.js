@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document
     .getElementById("objectgroup_form")
-    .addEventListener("submit", function () {
+    ?.addEventListener("submit", function () {
       // Disabled object inline formset if objects are not differentiated
       if (!getAreObjectsDifferentiated()) {
         document.getElementById("id_object_set-TOTAL_FORMS").value = "0";
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document
     .getElementById("id_add_type")
-    .addEventListener("change", function (event) {
+    ?.addEventListener("change", function (event) {
       const { value } = event.target;
       if (value === "SINGLE_OBJECT") {
         displaySingleObjectForm();
@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document
     .getElementById("id_object_count")
-    .addEventListener("input", function (event) {
+    ?.addEventListener("input", function (event) {
       if (document.getElementById("id_add_type").value === "SINGLE_OBJECT") {
         return;
       }
@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document
     .getElementById("id_inventory")
-    .addEventListener("change", (event) => {
+    ?.addEventListener("change", (event) => {
       toggleInlineInputsDisabledOnParentChange("inventory", event.target.value);
     });
   document
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
   django.jQuery(document).on("formset:added", onFormsetChange);
   django.jQuery(document).on("formset:removed", onFormsetChange);
 
-  if (document.getElementById("id_object_count").value === "1") {
+  if (document.getElementById("id_object_count")?.value === "1") {
     displaySingleObjectForm();
   } else {
     displayObjectGroupForm();
