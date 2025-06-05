@@ -1,8 +1,31 @@
 {% extends "admin/base_site.html" %}
-{% load static %}
+{% load static i18n %}
+
+{% block content_subtitle %}
+<div class="fr-container">
+    {{ block.super }}
+
+    <form action="{% url 'set_language' %}" method="post">{% csrf_token %}
+        <input name="next" type="hidden" value="{{ redirect_to }}">
+        <div style="display: flex;">
+            <select name="language" class="fr-select" style="width: 15rem;">
+                {% get_current_language as LANGUAGE_CODE %}
+                {% get_available_languages as LANGUAGES %}
+                {% get_language_info_list for LANGUAGES as languages %}
+                {% for language in languages %}
+                    <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected{% endif %}>
+                        {{ language.name_local }} ({{ language.code }})
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="fr-btn fr-icon-arrow-right-line">{% trans 'Change' %}</button>
+        </div>
+    </form>
+
+</div>{% endblock %}
 
 {% block content %}
-<div class="fr-container">
+<div class="fr-container fr-mt-3w">
     <div class="fr-row">
         <div class="fr-col-md-8">
             {% block breadcrumbs %}
