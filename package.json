@@ -36,7 +36,7 @@
     "eslint-plugin-react": "^7.37.5",
     "prettier": "3.5.3",
     "typescript": "^5.8.3",
-    "vitest": "^3.1.4"
+    "vitest": "^3.2.2"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.27.0",
