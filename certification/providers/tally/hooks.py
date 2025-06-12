@@ -10,6 +10,8 @@ from django.conf import settings
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.contrib.auth import get_user_model
+
 
 from certification.certifications.models import QuizCertification
 from certification.providers.tally.dataclasses import TallyWebhookData
@@ -63,6 +65,8 @@ def tally_webhook(request: HttpRequest):  # pylint: disable=too-many-return-stat
         logger.error("Tally webhook : score is required for %s", certificate_name)
         return JsonResponse({"error": "Score is required"}, status=400)
 
+    _update_user_name_with_form(data)
+
     try:
         create_quiz_result(
             certification_name=certificate_name,
@@ -82,3 +86,26 @@ def tally_webhook(request: HttpRequest):  # pylint: disable=too-many-return-stat
         return JsonResponse({"error": "Quiz with url not found"}, status=400)
 
     return JsonResponse({"status": "success"})
+
+
+def _update_user_name_with_form(data: TallyWebhookData):
+    """Update user name based on Tally form data."""
+    fields = data.data.fields
+    first_name = next(
+        (field.value for field in fields if field.label == "First name"), None
+    )
+    last_name = next(
+        (field.value for field in fields if field.label == "Last name"), None
+    )
+
+    if first_name and last_name:
+        user = get_user_model().objects.filter(email=data.user_email).first()
+        if user:
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+        else:
+            logger.warning(
+                "Tally webhook : user with email %s not found, cannot update name",
+                data.user_email,
+            )
