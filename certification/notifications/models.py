@@ -88,16 +88,16 @@ class CertificationNotification(models.Model):
     def get_subject_for_certification_type(self):
         if self.type_of == NotificationType.INVITATION_TO_COMPLETE:
             return (
-                _("[Euphrosyne] Invitation to complete certification %s.")
+                _("[Euphrosyne] Invitation to complete certification %s")
                 % self.certification.name
             )
         if self.type_of == NotificationType.SUCCESS:
             return (
-                _("[Euphrosyne] Certification %s completed.") % self.certification.name
+                _("[Euphrosyne] Certification %s completed") % self.certification.name
             )
         if self.type_of == NotificationType.RETRY:
             return (
-                _("[Euphrosyne] Invitation to retry certification %s.")
+                _("[Euphrosyne] Invitation to retry certification %s")
                 % self.certification.name
             )
         return ""

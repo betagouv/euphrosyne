@@ -95,16 +95,16 @@ msgid "Certification notifications"
 msgstr "Notifications des certifications"
 
 #, python-format
-msgid "[Euphrosyne] Invitation to complete certification %s."
-msgstr "[Euphrosyne] Invitation à compléter la certification %s."
+msgid "[Euphrosyne] Invitation to complete certification %s"
+msgstr "[Euphrosyne] Invitation à compléter la certification %s"
 
 #, python-format
-msgid "[Euphrosyne] Certification %s completed."
-msgstr "[Euphrosyne] Certification %s complétée."
+msgid "[Euphrosyne] Certification %s completed"
+msgstr "[Euphrosyne] Certification %s complétée"
 
 #, python-format
-msgid "[Euphrosyne] Invitation to retry certification %s."
-msgstr "[Euphrosyne] Invitation à retenter la certification %s."
+msgid "[Euphrosyne] Invitation to retry certification %s"
+msgstr "[Euphrosyne] Invitation à retenter la certification %s"
 
 msgid "Add"
 msgstr "Ajouter"
@@ -1472,26 +1472,41 @@ msgstr ""
 msgid "The New AGLAE team"
 msgstr "L'équipe New AGLAE"
 
-msgid ""
-"Congratulations on successfully completing the radiation protection course "
-"and quiz! Your are now certified to use the New AGLAE particle accelerator "
-"at the Louvre."
-msgstr ""
-"Félicitations pour avoir réussi le cours et le quiz de radioprotection ! "
-"Vous êtes maintenant abilité à utiliser l'accélérateur de particules New "
-"AGLAE au Louvre."
+msgid "Dear Sir or Madam,"
+msgstr "Bonjour,"
 
 msgid ""
-"Please keep this email as a record of your certification. You may be asked "
-"to present proof of your radiation protection certification when accessing "
-"the New AGLAE facilities."
+"Congratulations on successfully completing the training on specific risks "
+"associated with the use of the New AGLAE particle accelerator."
 msgstr ""
-"Gardez cet email comme preuve de votre certification. Vous pourriez être "
-"demandé de présenter une preuve de votre certification de radioprotection "
-"lors de l'accès aux installations de New AGLAE."
+"Félicitations pour la réussite au certificat de formation aux risques "
+"spécifiques liés à l’utilisation de l’accélérateur de particules New AGLAE !"
 
-msgid "The certification is valid until:"
-msgstr "La certification est valide jusqu'au :"
+msgid ""
+"This training grants you the necessary authorization to access the New AGLAE "
+"accelerator."
+msgstr ""
+"Cette formation vous confère l’habilitation nécessaire pour accéder aux "
+"installations de l’accélérateur New AGLAE. "
+
+msgid ""
+"Please retain this message as proof of your certification. It may be "
+"requested during access control procedures at the facility."
+msgstr ""
+"Nous vous invitons à conserver le présent message, qui fait office de "
+"certificat de formation. Il pourra vous être demandé lors de tout contrôle "
+"d’accès aux installations."
+
+#, python-format
+msgid "This certification is valid until %(valid_until_formatted)s."
+msgstr ""
+"La validité de cette habilitation court jusqu’au %(valid_until_formatted)s."
+
+msgid "Thank you for your commitment to safety."
+msgstr "Nous vous remercions pour votre engagement en matière de sécurité."
+
+msgid "Yours sincerely,"
+msgstr "Bien cordialement,"
 
 msgid "Date this entry was first created"
 msgstr "Date de création de cette entrée"
