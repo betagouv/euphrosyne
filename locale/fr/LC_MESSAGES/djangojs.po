@@ -29,9 +29,6 @@ msgstr "Déconnexion"
 msgid "Admin"
 msgstr "Admin"
 
-msgid "Close"
-msgstr "Fermer"
-
 msgid "Leader"
 msgstr "Chef.fe de projet"
 
@@ -166,6 +163,9 @@ msgstr "Images"
 
 msgid "No images yet"
 msgstr "Aucune image"
+
+msgid "Close"
+msgstr "Fermer"
 
 msgid "Add files"
 msgstr "Ajouter des fichiers"

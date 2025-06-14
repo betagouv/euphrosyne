@@ -258,3 +258,8 @@ ul li {
 .workplace .fr-tabs__panel {
   background-color: var(--background-default-grey);
 }
+
+#changelist .actions select {
+  width: auto;
+  display: inherit;
+}
