@@ -3,7 +3,7 @@
 <p>{% trans "Hello" %},</p>
 
 {% if invitation_type == "RETRY" %}
-<p>{% blocktranslate %}Here is a link to retry the quiz:{% endblocktranslate %} <a href="{{ quiz_link }}?email={{email}}&passing_score={{passing_score}}&nid={{notification}}">{% trans "Access quiz" %}</a></p>
+<p>{% blocktranslate %}Here is a link to retry the quiz:{% endblocktranslate %} <a href="{{ quiz_link }}?email={{user.email}}&passing_score={{passing_score}}&nid={{notification_id}}&knownnames={% if user.first_name and user.last_name %}1{% else %}0{% endif %}">{% trans "Access quiz" %}</a></p>
 
 
 {% else %}
@@ -17,7 +17,7 @@
 <p>{% blocktranslate %}In French: {% endblocktranslate %}<a href="{% objectstorage 'AGLAE-radioprotection-fr.pdf' %}">{% trans "Access course" %}</a></p>
 <p>{% blocktranslate %}In English: {% endblocktranslate %}<a href="{% objectstorage 'AGLAE-radioprotection-en.pdf' %}">{% trans "Access course" %}</a></p>
 
-<p>{% blocktranslate %}When you have reviewed the course and are ready to take the the quiz, click on the following link:{% endblocktranslate %} <a href="{{ quiz_link }}?email={{email}}&passing_score={{passing_score}}&nid={{notification_id}}">{% trans "Access quiz" %}</a></p>
+<p>{% blocktranslate %}When you have reviewed the course and are ready to take the the quiz, click on the following link:{% endblocktranslate %} <a href="{{ quiz_link }}?email={{user.email}}&passing_score={{passing_score}}&nid={{notification_id}}&knownnames={% if user.first_name and user.last_name %}1{% else %}0{% endif %}">{% trans "Access quiz" %}</a></p>
 
 {% endif %}
 
