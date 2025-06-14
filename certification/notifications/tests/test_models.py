@@ -65,7 +65,7 @@ def test_get_context_for_invitation_to_complete(certification: Certification):
         mock_fn.assert_called_once()
         assert context["quiz_link"] == "url123"
         assert context["passing_score"] == 3232
-        assert context["email"] == notification.user.email
+        assert context["user"] == notification.user
         assert context["notification_id"] == notification.id
         assert context["invitation_type"] == str(
             NotificationType.INVITATION_TO_COMPLETE
@@ -92,7 +92,7 @@ def test_get_context_for_retry(certification: Certification):
         mock_fn.assert_called_once()
         assert context["quiz_link"] == "url123"
         assert context["passing_score"] == 3232
-        assert context["email"] == notification.user.email
+        assert context["user"] == notification.user
         assert context["notification_id"] == notification.id
         assert context["invitation_type"] == str(NotificationType.RETRY)
 
