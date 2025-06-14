@@ -1,4 +1,3 @@
-from django.utils import timezone
 import logging
 from io import BytesIO
 from pathlib import Path
@@ -7,6 +6,7 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.core import mail
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.html import strip_tags
 from docx import Document
 from docx.text.paragraph import Paragraph
@@ -32,7 +32,9 @@ def _get_document_paths() -> list[Path]:
 
 
 def replace_text_in_paragraph(paragraph: Paragraph, key: str, value: str) -> None:
-    """Replace text in a paragraph, even if the key is split across runs, preserving formatting."""
+    """Replace text in a paragraph, even if the key is split across runs,
+    preserving formatting.
+    """
     # Join all run texts to find the full key
     full_text = "".join(run.text for run in paragraph.runs)
     if key not in full_text:
@@ -44,7 +46,9 @@ def replace_text_in_paragraph(paragraph: Paragraph, key: str, value: str) -> Non
     # Remove all runs except the first
     for _ in range(len(paragraph.runs) - 1):
         paragraph.runs[-1].clear()  # Remove text and formatting
-        paragraph._element.remove(paragraph.runs[-1]._element)
+        paragraph._element.remove(  # pylint: disable=protected-access
+            paragraph.runs[-1]._element  # pylint: disable=protected-access
+        )
 
     # Set the text of the first run to the new text
     paragraph.runs[0].text = new_text
