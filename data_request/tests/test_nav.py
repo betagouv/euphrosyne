@@ -21,10 +21,12 @@ def test_data_request_nav():
     assert get_nav_items(request) == [
         {
             "title": gettext("Data requests"),
-            "href": "/data_request/datarequest/",
-            "iconName": "fr-icon-download-line",
-            "exactPath": False,
-            "extraPath": None,
-            "badge": 1,
+            "item": {
+                "href": "/data_request/datarequest/",
+                "iconName": "fr-icon-download-line",
+                "exactPath": False,
+                "extraPath": None,
+                "badge": 1,
+            },
         }
     ]
