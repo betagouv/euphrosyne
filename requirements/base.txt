@@ -11,7 +11,7 @@ django-storages[azure]==1.14.6
 django-stubs[compatible-mypy]==5.2.0 # not dev because used in code (WithAnnotations)
 drf-spectacular==0.28.0
 gunicorn==23.0.0
-markdown==3.8
+markdown==3.8.2
 opensearch-py==2.8.0
 pillow==11.2.1 
 psycopg2==2.9.10
