@@ -8,7 +8,7 @@ Django==5.2.3
 djangorestframework==3.16.0
 djangorestframework-simplejwt==5.5.0
 django-storages[azure]==1.14.6
-django-stubs[compatible-mypy]==5.2.0 # not dev because used in code (WithAnnotations)
+django-stubs[compatible-mypy]==5.2.1 # not dev because used in code (WithAnnotations)
 drf-spectacular==0.28.0
 gunicorn==23.0.0
 markdown==3.8.2
