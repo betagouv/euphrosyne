@@ -327,6 +327,20 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
         assert Project.objects.filter(name="some project name").first() is None
         assert response.status_code == 200
 
+    def test_add_project_comments_max_length(self):
+        response = self.client.post(
+            self.add_view_url,
+            data={
+                "name": "some project name",
+                "has_accepted_cgu": 1,
+                "comments": "a" * 561,  # 561 characters
+            },
+        )
+
+        assert Project.objects.filter(name="some project name").first() is None
+        assert response.status_code == 200
+        assert "id_comments_error" in response.content.decode()
+
     def test_add_project_adds_user_as_member(self):
         response = self.client.post(
             self.add_view_url,

@@ -28,6 +28,23 @@ class BaseProjectForm(forms.ModelForm):
     class Meta:
         model = models.Project
         fields = ["name", "confidential", "comments"]
+        widgets = {"comments": CounterTextarea()}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["comments"].max_length = 560
+        self.fields["comments"].widget.attrs["maxlength"] = 560
+        self.fields["comments"].widget.attrs["placeholder"] = _(
+            "Describe your project in a few words (max 560 characters)."
+        )
+
+    def clean_comments(self):
+        comments = self.cleaned_data.get("comments", "").strip()
+        if len(comments) > 560:
+            raise forms.ValidationError(
+                _("This field must be less than 560 characters.")
+            )
+        return comments
 
 
 class MemberProjectForm(BaseProjectForm):
