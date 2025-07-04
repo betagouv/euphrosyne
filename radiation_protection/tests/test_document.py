@@ -22,6 +22,7 @@ from radiation_protection.document import (
     replace_text_in_paragraph,
     send_document_to_risk_advisor,
 )
+from radiation_protection.models import RiskPreventionPlan
 
 if TYPE_CHECKING:
     from docx.document import Document as DocumentObject
@@ -151,7 +152,7 @@ def test_fill_radiation_protection_document(
 
     result = _fill_radiation_protection_document(
         document_path=mock_document_paths[0],
-        quiz_result=quiz_result,
+        user=quiz_result.user,
         next_user_run=next_user_run,
     )
 
@@ -170,7 +171,7 @@ def test_fill_radiation_protection_documents(
     ) as mock_fill:
         mock_fill.return_value = b"test content"
         documents = fill_radiation_protection_documents(
-            quiz_result=quiz_result, next_user_run=next_user_run
+            user=quiz_result.user, next_user_run=next_user_run
         )
 
         assert len(documents) == 2
@@ -186,12 +187,21 @@ def test_fill_radiation_protection_documents(
 def test_send_document_to_risk_advisor():
     """Test sending document to risk advisor."""
     user = auth_factories.StaffUserFactory()
+    participation = lab_factories.ParticipationFactory(user=user)
+    run = lab_factories.RunFactory(
+        start_date=timezone.now() + timedelta(days=7),
+    )
+    plan = RiskPreventionPlan.objects.create(
+        participation=participation,
+        run=run,
+    )
+
     documents = [
         ("test_fr.docx", b"French content"),
         ("test_en.docx", b"English content"),
     ]
 
-    result = send_document_to_risk_advisor(user, documents)
+    result = send_document_to_risk_advisor(plan, documents)
 
     assert result is True
     assert len(mail.outbox) == 1

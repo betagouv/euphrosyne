@@ -1,5 +1,14 @@
+"""
+Django signals for radiation protection certification handling.
+
+This module contains signal handlers that manage the creation and maintenance
+of Risk Prevention Plans based on radiation protection certification events.
+It responds to quiz results, run scheduling, and participation changes to
+ensure proper radiation protection compliance for on-premises activities.
+"""
+
 import logging
-from typing import Type, cast
+from typing import Type
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -8,12 +17,11 @@ from django.utils import timezone
 from certification.certifications.models import QuizResult
 from lab.participations.models import Participation
 from lab.runs.models import Run
+from lab.runs.signals import run_scheduled
+from radiation_protection.certification import check_radio_protection_certification
 
 from .constants import RADIATION_PROTECTION_CERTIFICATION_NAME
-from .document import (
-    fill_radiation_protection_documents,
-    send_document_to_risk_advisor,
-)
+from .models import RiskPreventionPlan
 
 logger = logging.getLogger(__name__)
 
@@ -42,50 +50,114 @@ def handle_radiation_protection_certification(
         if not instance.is_passed:
             return
 
-        user_projects = Participation.objects.filter(user=instance.user).values_list(
-            "project_id", flat=True
-        )
-        next_user_run = (
+        # Get all upcoming runs that do not have a risk prevention plan
+        # for the user
+        participations = Participation.objects.filter(
+            user=instance.user, on_premises=True
+        ).values("project_id", "id")
+        user_prevention_plan_run_ids = RiskPreventionPlan.objects.filter(
+            participation__user=instance.user,
+        ).values_list("run_id", flat=True)
+        next_user_runs = (
             Run.objects.filter(
-                project__in=user_projects,
+                project__in=[
+                    participation["project_id"] for participation in participations
+                ],
                 start_date__gte=timezone.now(),
             )
-            .order_by("start_date")
+            .exclude(id__in=user_prevention_plan_run_ids)
             .select_related("project")
-            .first()
         )
 
-        # Generate the document
-        documents = fill_radiation_protection_documents(
-            quiz_result=instance, next_user_run=next_user_run
-        )
-        if not documents or not all(documents):
-            logger.error(
-                "Failed to generate radiation protection document for user %s",
-                instance.user.id,
+        for next_user_run in next_user_runs:
+            # Create a risk prevention plan for the user
+            participation_id = next(
+                participation["id"]
+                for participation in participations
+                if participation["project_id"] == next_user_run.project_id
             )
-            return
-        # After checking that all documents are not None,
-        # we can cast to the correct type
-        valid_documents = cast(list[tuple[str, bytes]], documents)
-
-        # Send the document to the risk advisor
-        if not send_document_to_risk_advisor(instance.user, valid_documents):
-            logger.error(
-                "Failed to send radiation protection document "
-                "to risk advisor for user %s",
-                instance.user.email,
+            RiskPreventionPlan.objects.get_or_create(
+                participation_id=participation_id,
+                run=next_user_run,
             )
-            return
-
-        logger.info(
-            "Successfully generated and sent radiation protection document for user %s",
-            instance.user.email,
-        )
 
     except Exception as e:
         logger.exception(
-            "Error processing radiation protection certification for user %s",
+            "Error processing radiation protection certification for user %s and quiz result %s",  # pylint: disable=line-too-long
             instance.user.email,
+            instance.id,
+            exc_info=e,
+        )
+
+
+@receiver(run_scheduled)
+def handle_radiation_protection_on_schedule_run(
+    sender, instance: Run, **kwargs  # pylint: disable=unused-argument
+):
+    """
+    When a run is scheduled, check participations to check if users have passed
+    the radiation protection certification.
+    If so, create a risk prevention plan for the user if it does not already exist.
+    This is only done for runs that are upcoming
+    and do not have a risk prevention plan yet
+    """
+    try:
+        participations = Participation.objects.filter(
+            project=instance.project, on_premises=True
+        )
+
+        for participation in participations:
+            if check_radio_protection_certification(participation.user):
+                # Create a risk prevention plan for the user
+                # if it does not already exist
+                RiskPreventionPlan.objects.get_or_create(
+                    participation=participation,
+                    run=instance,
+                )
+
+    except Exception as e:
+        logger.exception(
+            "Error checking radiation protection for scheduled run %s for project %s",
+            instance.label,
+            instance.project.name,
+            exc_info=e,
+        )
+
+
+@receiver(post_save, sender=Participation)
+def handle_radiation_protection_on_participation(
+    sender: Type[Participation],  # pylint: disable=unused-argument,
+    instance: Participation,
+    **kwargs
+):
+    """
+    When a participation to a project is added, check if any run has been scheduled if
+    so create a risk prevention plan for the user if it does not already exist.
+    This is only done for runs that are upcoming and do not have a risk prevention
+    plan yet
+    """
+    if not instance.on_premises:
+        return
+    try:
+        project_runs = Run.objects.filter(
+            project=instance.project,
+            start_date__gte=timezone.now(),
+        ).all()
+
+        # Check if the user has passed the radiation protection certification
+        if not check_radio_protection_certification(instance.user):
+            return
+
+        for run in project_runs:
+            # Create a risk prevention plan for the user if it does not already exist
+            RiskPreventionPlan.objects.get_or_create(
+                participation=instance,
+                run=run,
+            )
+
+    except Exception as e:
+        logger.exception(
+            "Error checking radiation protection for participation %s",
+            instance.id,
             exc_info=e,
         )

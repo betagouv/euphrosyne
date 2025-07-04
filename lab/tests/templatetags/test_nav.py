@@ -46,7 +46,7 @@ def test_nav_items_json_when_admin():
             mock.MagicMock(user=mock.MagicMock(is_lab_admin=True), path="/path")
         )
     )
-    assert len(data["items"]) == 5
+    assert len(data["items"]) == 6
     assert data["items"][0]["title"] == str(_("Dashboard"))
     assert data["items"][0]["item"]["href"] == reverse("admin:index")
     assert data["items"][0]["item"]["iconName"] == "fr-icon-calendar-line"
@@ -101,5 +101,12 @@ def test_nav_items_json_when_admin():
     )
     assert data["items"][4]["items"][2]["item"]["exactPath"] is False
     assert data["items"][4]["items"][2]["item"]["extraPath"] == []
+
+    assert data["items"][5]["title"] == str(_("Prevention plans"))
+    assert data["items"][5]["item"]["href"] == reverse(
+        "admin:radiation_protection_riskpreventionplan_changelist"
+    )
+    assert data["items"][5]["item"]["exactPath"] is False
+    assert data["items"][5]["item"]["extraPath"] is None
 
     assert data["currentPath"] == "/path"
