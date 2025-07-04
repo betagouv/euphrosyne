@@ -77,6 +77,14 @@ def test_get_nav_items_for_admin():
                 },
             ],
         },
+        {
+            "title": "Plans de prévention",
+            "item": {
+                "href": "/radiation_protection/riskpreventionplan/",
+                "exactPath": False,
+                "extraPath": None,
+            },
+        },
     ]
 
 

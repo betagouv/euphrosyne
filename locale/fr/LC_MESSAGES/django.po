@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-04 15:54+0200\n"
+"POT-Creation-Date: 2025-07-04 16:41+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -1342,6 +1342,9 @@ msgstr "Télécharger les données travaillées du run %(label)s"
 msgid "Run(s)"
 msgstr "Run(s)"
 
+msgid "Prevention plans"
+msgstr "Plans de prévention"
+
 msgid "Only alphanumeric, underscore, hyphen and space characters are allowed"
 msgstr ""
 "Seuls les lettres, chiffres, tirets bas, traits d'union et espaces sont des "
@@ -1403,6 +1406,18 @@ msgstr ""
 
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"
+
+msgid "Risk Advisor Notification Sent"
+msgstr "Notification envoyée au conseiller en risques"
+
+msgid "Indicates if the risk advisor has been notified about this plan."
+msgstr "Indique si le conseiller en risques a été informé de ce plan."
+
+msgid "Run Risk Prevention Plan"
+msgstr "Plan de prévention des risques du run"
+
+msgid "Run Risk Prevention Plans"
+msgstr "Plans de prévention des risques du run"
 
 msgid "Here is a link to retry the quiz:"
 msgstr "Voici un lien pour retenter le quiz :"

@@ -11,9 +11,9 @@ from django.utils.html import strip_tags
 from docx import Document
 from docx.text.paragraph import Paragraph
 
-from certification.certifications.models import QuizResult
 from euphro_auth.models import User
 from lab.runs.models import Run
+from radiation_protection.models import RiskPreventionPlan
 
 if TYPE_CHECKING:
     from docx.document import Document as DocumentObject
@@ -97,7 +97,7 @@ def _replace_variables_in_document(
 
 
 def fill_radiation_protection_documents(
-    quiz_result: QuizResult, next_user_run: Run | None
+    user: User, next_user_run: Run | None
 ) -> list[tuple[str, bytes | None]]:
     """Fill the radiation protection document template with user information."""
     documents = []
@@ -107,7 +107,7 @@ def fill_radiation_protection_documents(
                 document_path.name,
                 _fill_radiation_protection_document(
                     document_path=document_path,
-                    quiz_result=quiz_result,
+                    user=user,
                     next_user_run=next_user_run,
                 ),
             )
@@ -117,14 +117,13 @@ def fill_radiation_protection_documents(
 
 def _fill_radiation_protection_document(
     document_path: Path,
-    quiz_result: QuizResult,
+    user: User,
     next_user_run: Run | None,
 ) -> bytes | None:
     """
     Fill the radiation protection document template with user information.
     Returns the document content as bytes if successful, None otherwise.
     """
-    user = quiz_result.user
 
     # Create a copy of the template
     doc = Document(str(document_path))
@@ -142,7 +141,7 @@ def _fill_radiation_protection_document(
 
 
 def send_document_to_risk_advisor(
-    user: User, documents: list[tuple[str, bytes]]
+    plan: RiskPreventionPlan, documents: list[tuple[str, bytes]]
 ) -> bool:
     """
     Send the filled radiation protection document to the risk advisor.
@@ -151,10 +150,10 @@ def send_document_to_risk_advisor(
     risk_advisor_email = settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL
 
     context = {
-        "user": user,
+        "plan": plan,
     }
 
-    user_full_name = user.get_full_name()
+    user_full_name = plan.participation.user.get_full_name()
     subject = f"Document de certification des risques AGLAE pour {user_full_name}"
 
     html_message = render_to_string(
@@ -184,7 +183,7 @@ def send_document_to_risk_advisor(
         logger.error(
             "Failed to send radiation protection document to risk advisor "
             "for user %s: %s",
-            user.id,
+            plan.participation.user.id,
             str(e),
         )
         return False

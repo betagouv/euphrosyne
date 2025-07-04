@@ -25,6 +25,7 @@ from .forms import (
     RunScheduleForm,
 )
 from .models import Run
+from .signals import run_scheduled
 
 
 class RunChangeList(ChangeList):
@@ -259,7 +260,10 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         )
         if not is_lab_admin(request.user):
             raise PermissionDenied
+        was_run_scheduled = obj.start_date
         if schedule_form.is_valid():
             new_object = self.save_form(request, schedule_form, change=True)
             self.save_model(request, new_object, schedule_form, True)
+            if new_object.start_date and not was_run_scheduled:
+                run_scheduled.send(self.__class__, instance=new_object)
         return schedule_form
