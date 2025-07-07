@@ -172,6 +172,29 @@ class TestHandleRadiationProtectionCertification(TestCase):
             participation=other_run_participation, run=other_run
         ).exists()
 
+    def test_notify_additional_emails_is_called(self):
+        """Test that notify_additional_emails is called."""
+        user = auth_factories.StaffUserFactory()
+        quiz_result = RadiationProtectionQuizResult(is_passed=True, score=95, user=user)
+
+        user.participation_set.all().delete()  # Ensure no participations
+
+        run = lab_factories.RunFactory(start_date=timezone.now() + timedelta(days=7))
+        lab_factories.ParticipationFactory(
+            user=user, on_premises=True, project=run.project
+        )
+
+        with mock.patch(
+            "radiation_protection.signals.notify_additional_emails"
+        ) as mock_notify:
+            handle_radiation_protection_certification(
+                sender=QuizResult,
+                instance=quiz_result,
+                created=True,
+            )
+
+            mock_notify.assert_called_once_with(user)
+
     @mock.patch("radiation_protection.signals.logger")
     def test_exception_handling(self, mock_logger):
         """Test that exceptions are logged and don't crash the handler."""
