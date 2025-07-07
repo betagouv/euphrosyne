@@ -21,6 +21,7 @@ from lab.runs.signals import run_scheduled
 from radiation_protection.certification import check_radio_protection_certification
 
 from .constants import RADIATION_PROTECTION_CERTIFICATION_NAME
+from .email import notify_additional_emails
 from .models import RiskPreventionPlan
 
 logger = logging.getLogger(__name__)
@@ -80,6 +81,9 @@ def handle_radiation_protection_certification(
                 participation_id=participation_id,
                 run=next_user_run,
             )
+
+        # Notify additional emails about the radiation protection certification
+        notify_additional_emails(instance.user)
 
     except Exception as e:
         logger.exception(
