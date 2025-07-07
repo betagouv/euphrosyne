@@ -25,6 +25,8 @@ def check_radio_protection_certification(user: "User"):
     """Verify if a user has an active certification and send an invitation if not."""
     if not user_has_active_certification(user):
         create_invitation_notification(user)
+        return False
+    return True
 
 
 def user_has_active_certification(user: "User") -> bool:
