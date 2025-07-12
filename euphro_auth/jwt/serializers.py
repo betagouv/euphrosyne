@@ -1,8 +1,11 @@
 from rest_framework import exceptions
-from rest_framework_simplejwt.serializers import TokenObtainSerializer
+from rest_framework_simplejwt.serializers import (
+    TokenObtainPairSerializer,
+    TokenObtainSerializer,
+)
 from rest_framework_simplejwt.settings import api_settings as simplejwt_api_settings
 
-from .tokens import EuphroRefreshToken
+from .tokens import EuphroRefreshToken, LongEuphroRefreshToken
 
 
 # pylint: disable=abstract-method
@@ -32,3 +35,9 @@ class SessionTokenObtainSerializer(TokenObtainSerializer):
     @classmethod
     def get_token(cls, user):
         return cls.token_class.for_user(user)
+
+
+class LongTokenObtainSerializer(TokenObtainPairSerializer):
+    """Generate long-lived token for app-to-app communication"""
+
+    token_class = LongEuphroRefreshToken
