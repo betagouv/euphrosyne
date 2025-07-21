@@ -31,7 +31,7 @@
   "devDependencies": {
     "@types/lodash.debounce": "^4.0.9",
     "@typescript-eslint/eslint-plugin": "^8.35.0",
-    "@typescript-eslint/parser": "^8.32.1",
+    "@typescript-eslint/parser": "^8.37.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-react": "^7.37.5",
     "prettier": "3.6.2",
