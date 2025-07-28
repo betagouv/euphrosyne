@@ -50,7 +50,7 @@
     "@sentry/browser": "^9.35.0",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "cropperjs": "^2.0.0",
+    "cropperjs": "^2.0.1",
     "css-loader": "^7.1.2",
     "css-minimizer-webpack-plugin": "^7.0.2",
     "dotenv": "^16.5.0",
