@@ -1,6 +1,9 @@
 import logging
 import typing
+from datetime import timedelta
 from functools import lru_cache
+
+from django.utils import timezone
 
 from certification.certifications.models import Certification
 from certification.notifications.models import (
@@ -41,11 +44,24 @@ def user_has_active_certification(user: "User") -> bool:
     return certification.user_has_valid_participation(user)
 
 
+def has_active_invitation_notification(user: "User") -> bool:
+    """Check if the user has an active invitation notification."""
+    certification = get_radioprotection_certification()
+    return CertificationNotification.objects.filter(
+        user=user,
+        certification=certification,
+        type_of=NotificationType.INVITATION_TO_COMPLETE,
+        created__gte=timezone.now() - timedelta(days=1),
+    ).exists()
+
+
 def create_invitation_notification(
     user: "User",
-) -> CertificationNotification:
-    return CertificationNotification.objects.create(
-        user=user,
-        certification=get_radioprotection_certification(),
-        type_of=NotificationType.INVITATION_TO_COMPLETE,
-    )
+) -> CertificationNotification | None:
+    if not has_active_invitation_notification(user):
+        return CertificationNotification.objects.create(
+            user=user,
+            certification=get_radioprotection_certification(),
+            type_of=NotificationType.INVITATION_TO_COMPLETE,
+        )
+    return None

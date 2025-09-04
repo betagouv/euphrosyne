@@ -100,6 +100,42 @@ def test_create_invitation_notification(certification: Certification):
         assert notification.type_of == NotificationType.INVITATION_TO_COMPLETE
 
 
+@pytest.mark.django_db
+def test_no_create_invitation_notification_when_recent_notfication(
+    certification: Certification,
+):
+    user = StaffUserFactory()
+    with mock.patch(
+        "radiation_protection.certification.get_radioprotection_certification",
+        return_value=certification,
+    ):
+        notification_1 = create_invitation_notification(user)
+        notification_2 = create_invitation_notification(user)
+
+        assert notification_1
+        assert notification_2 is None
+
+
+@pytest.mark.django_db
+def test_create_invitation_notification_when_no_recent_notification(
+    certification: Certification,
+):
+    user = StaffUserFactory()
+    with mock.patch(
+        "radiation_protection.certification.get_radioprotection_certification",
+        return_value=certification,
+    ):
+        notification_1 = create_invitation_notification(user)
+        if notification_1:
+            notification_1.created = timezone.now() - timedelta(hours=25)
+            notification_1.save()
+
+        notification_2 = create_invitation_notification(user)
+
+        assert notification_1
+        assert notification_2
+
+
 @pytest.mark.parametrize("has_active_certification", [True, False])
 def test_check_radio_protection_certification_when_no_valid_result(
     has_active_certification: bool,
