@@ -11,17 +11,22 @@ from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 
-from euphro_auth.tests.factories import LabAdminUserFactory
+from euphro_auth.tests.factories import LabAdminUserFactory, StaffUserFactory
 from lab.models import Institution
-from lab.tests.factories import ProjectFactory, ProjectWithLeaderFactory, RunFactory
-
-from ..admin import (
-    BeamTimeRequestInline,
-    ParticipationInline,
-    ProjectAdmin,
-    ProjectChangeList,
+from lab.tests.factories import (
+    ProjectFactory,
+    ProjectWithLeaderFactory,
+    RunFactory,
 )
+
+from ..admin import ProjectAdmin, ProjectChangeList
 from ..admin_filters import ProjectStatusListFilter
+from ..inlines import (
+    BeamTimeRequestInline,
+    LeaderParticipationInline,
+    OnPremisesParticipationInline,
+    RemoteParticipationInline,
+)
 from ..models import Project
 
 
@@ -93,11 +98,13 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         assert "other project 1" in response.content.decode()
         assert "other project 2" in response.content.decode()
 
-    def test_participation_inline_is_present_in_changeview(self):
+    def test_participation_inlines_are_present_in_changeview(self):
         inlines = self.project_admin.get_inlines(
             self.change_request, self.change_project
         )
-        assert ParticipationInline in inlines
+        assert LeaderParticipationInline in inlines
+        assert OnPremisesParticipationInline in inlines
+        assert RemoteParticipationInline in inlines
 
     def test_add_project_form_has_confidential_checkbox(self):
         response = self.client.get(self.add_view_url)
@@ -113,13 +120,14 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         fieldsets = self.project_admin.get_fieldsets(self.add_request)
         assert len(fieldsets) == 1
 
-    def test_change_project_set_first_participation_as_leader(self):
+    def test_participation_inlines(self):
         project = ProjectFactory()
-        another_member = get_user_model().objects.create(email="aneweuser@mail.com")
+        on_premises_user = StaffUserFactory(email="aneweuser@mail.com")
+        remote_user = StaffUserFactory(email="remote@mail.com")
 
         participation_data = {
             "name": project.name,
-            "participation_set-TOTAL_FORMS": "2",
+            "participation_set-TOTAL_FORMS": "1",
             "participation_set-INITIAL_FORMS": "0",
             "participation_set-MIN_NUM_FORMS": "1",
             "participation_set-MAX_NUM_FORMS": "1000",
@@ -128,11 +136,24 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
             "participation_set-0-user": self.project_participant_user.email,
             "participation_set-0-institution__name": "Louvre",
             "participation_set-0-institution__country": "France",
-            "participation_set-1-id": "",
-            "participation_set-1-project": project.id,
-            "participation_set-1-user": another_member.email,
-            "participation_set-1-institution__name": "Louvre",
-            "participation_set-1-institution__country": "France",
+            "participation_set-2-TOTAL_FORMS": "1",
+            "participation_set-2-INITIAL_FORMS": "0",
+            "participation_set-2-MIN_NUM_FORMS": "0",
+            "participation_set-2-MAX_NUM_FORMS": "1000",
+            "participation_set-2-0-id": "",
+            "participation_set-2-0-project": project.id,
+            "participation_set-2-0-user": on_premises_user.email,
+            "participation_set-2-0-institution__name": "C2RMF",
+            "participation_set-2-0-institution__country": "France",
+            "participation_set-3-TOTAL_FORMS": "1",
+            "participation_set-3-INITIAL_FORMS": "0",
+            "participation_set-3-MIN_NUM_FORMS": "0",
+            "participation_set-3-MAX_NUM_FORMS": "1000",
+            "participation_set-3-0-id": "",
+            "participation_set-3-0-project": project.id,
+            "participation_set-3-0-user": remote_user.email,
+            "participation_set-3-0-institution__name": "LMRH",
+            "participation_set-3-0-institution__country": "France",
             # beamtime is mandatory
             "beamtimerequest-TOTAL_FORMS": "1",
             "beamtimerequest-INITIAL_FORMS": "0",
@@ -153,6 +174,15 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         assert response.status_code == 302
         project.refresh_from_db()
         assert project.leader.user == self.project_participant_user
+        assert project.participation_set.count() == 3
+        assert (
+            project.participation_set.get(on_premises=True, is_leader=False).user
+            == on_premises_user
+        )
+        assert (
+            project.participation_set.get(on_premises=False, is_leader=False).user
+            == remote_user
+        )
 
     @patch("lab.projects.admin.rename_project_directory")
     def test_change_project_name_calls_hook(self, rename_project_dir_mock):
@@ -193,7 +223,13 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
         inlines = self.project_admin.get_inlines(
             self.change_request, self.change_project
         )
-        assert ParticipationInline in inlines
+        assert LeaderParticipationInline in inlines
+        assert OnPremisesParticipationInline in inlines
+        assert RemoteParticipationInline in inlines
+
+    def test_leader_participation_inline_absent_in_create_changeview(self):
+        inlines = self.project_admin.get_inlines(self.add_request)
+        assert LeaderParticipationInline not in inlines
 
     def test_create_project(self):
         response = self.client.post(
@@ -367,12 +403,6 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
             change=False,
         )
         init_project_dir_mock.assert_called_once_with(project.name)
-
-    def test_participation_inline_is_absent_in_changeview(self):
-        inlines = self.project_admin.get_inlines(
-            self.change_request, self.change_project
-        )
-        assert ParticipationInline not in inlines
 
     def test_beamtimerequest_inline_is_present_in_changeview(self):
         inlines = self.project_admin.get_inlines(

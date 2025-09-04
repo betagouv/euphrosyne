@@ -16,6 +16,10 @@
     {
       "command": "0 0 * * * python manage.py run_checks",
       "size": "S"
+    },
+    {
+      "command": "*/10 * * * * python manage.py send_notifications",
+      "size": "S"
     }
   ]
 }

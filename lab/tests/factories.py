@@ -6,7 +6,15 @@ import factory.fuzzy
 from euphro_auth.tests.factories import StaffUserFactory
 from lab.thesauri.models import Era
 
-from ..models import Object, ObjectGroup, Participation, Period, Project, Run
+from ..models import (
+    Institution,
+    Object,
+    ObjectGroup,
+    Participation,
+    Period,
+    Project,
+    Run,
+)
 from ..objects.models import Location
 
 NOW = datetime.now(tz=timezone.utc)
@@ -159,3 +167,11 @@ class LocationFactory(factory.django.DjangoModelFactory):
     label = factory.Faker("name")
     latitude = factory.Faker("latitude")
     longitude = factory.Faker("longitude")
+
+
+class InstitutionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Institution
+
+    name = factory.Faker("company")
+    country = factory.Faker("country")

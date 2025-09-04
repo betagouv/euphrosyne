@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "euphrosyne.apps.AdminConfig",
     "euphrosyne.methods.apps.MethodsConfig",  # Use explicit app config for methods
+    "objectstorage",
     "euphro_auth",
     "django.forms",
     "django.contrib.admindocs",
@@ -85,6 +86,8 @@ INSTALLED_APPS = [
     "orcid_oauth",
     "static_pages",
     "standard",
+    "certification",
+    "radiation_protection",
     "drf_spectacular",
 ] + (["debug_toolbar"] if DEBUG else [])
 
@@ -382,7 +385,27 @@ FORCE_LAST_CGU_ACCEPTANCE_DT = (
     if os.getenv("FORCE_LAST_CGU_ACCEPTANCE_DT")
     else None
 )
+
 # Lab-specific method model configuration
 # This should point to the concrete implementation with field definitions
 # All migrations related to these fields will be generated in the euphrosyne app
 METHOD_MODEL_CLASS = "euphrosyne.methods.models.EuphrosyneMethodModel"
+
+# CERTIFICATIONS
+RADIATION_PROTECTION_TALLY_SECRET_KEY = os.environ[
+    "RADIATION_PROTECTION_TALLY_SECRET_KEY"
+]
+RADIATION_PROTECTION_RISK_ADVISOR_EMAILS = [
+    email
+    for email in os.environ.get("RADIATION_PROTECTION_RISK_ADVISOR_EMAILS", "").split(
+        ","
+    )
+    if email
+]
+RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS = [
+    email
+    for email in os.environ.get(
+        "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS", ""
+    ).split(",")
+    if email
+]
