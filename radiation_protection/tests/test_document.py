@@ -180,12 +180,15 @@ def test_fill_radiation_protection_documents(
 
 
 @override_settings(
-    RADIATION_PROTECTION_RISK_ADVISOR_EMAIL="risk@example.com",
+    RADIATION_PROTECTION_RISK_ADVISOR_EMAILS=[
+        "risk@example.com",
+        "another_risk@example.com",
+    ],
     DEFAULT_FROM_EMAIL="noreply@example.com",
 )
 @pytest.mark.django_db
-def test_send_document_to_risk_advisor():
-    """Test sending document to risk advisor."""
+def test_send_document_to_risk_advisors():
+    """Test sending document to risk advisors."""
     user = auth_factories.StaffUserFactory()
     participation = lab_factories.ParticipationFactory(user=user)
     run = lab_factories.RunFactory(
@@ -204,11 +207,18 @@ def test_send_document_to_risk_advisor():
     result = send_document_to_risk_advisor(plan, documents)
 
     assert result is True
-    assert len(mail.outbox) == 1
-    email = mail.outbox[0]
-    assert email.to == ["risk@example.com"]
+    assert len(mail.outbox) == 2
+    email1 = mail.outbox[0]
+    email2 = mail.outbox[1]
+    assert email1.to == ["risk@example.com"]
+    assert email2.to == ["another_risk@example.com"]
     assert (
-        email.subject
+        email1.subject
         == f"Document de certification des risques AGLAE pour {user.get_full_name()}"
     )
-    assert len(email.attachments) == 2
+    assert (
+        email2.subject
+        == f"Document de certification des risques AGLAE pour {user.get_full_name()}"
+    )
+    assert len(email1.attachments) == 2
+    assert len(email2.attachments) == 2

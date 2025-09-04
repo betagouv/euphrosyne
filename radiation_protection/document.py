@@ -147,7 +147,7 @@ def send_document_to_risk_advisor(
     Send the filled radiation protection document to the risk advisor.
     Returns True if the email was sent successfully, False otherwise.
     """
-    risk_advisor_email = settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL
+    risk_advisor_emails = settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAILS
 
     context = {
         "plan": plan,
@@ -161,29 +161,34 @@ def send_document_to_risk_advisor(
     )
     plain_message = strip_tags(html_message)
 
-    try:
-        email = mail.EmailMultiAlternatives(
-            subject=subject,
-            body=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[risk_advisor_email],
-            attachments=[
-                (
-                    f"{user_full_name}_{document_name}",
-                    document,
-                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",  # pylint: disable=line-too-long
-                )
-                for document_name, document in documents
-            ],
-        )
-        email.attach_alternative(html_message, "text/html")
-        email.send()
-        return True
-    except Exception as e:
-        logger.error(
-            "Failed to send radiation protection document to risk advisor "
-            "for user %s: %s",
-            plan.participation.user.id,
-            str(e),
-        )
-        return False
+    sending_statuses = []
+
+    for risk_advisor_email in risk_advisor_emails:
+        try:
+            email = mail.EmailMultiAlternatives(
+                subject=subject,
+                body=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[risk_advisor_email],
+                attachments=[
+                    (
+                        f"{user_full_name}_{document_name}",
+                        document,
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",  # pylint: disable=line-too-long
+                    )
+                    for document_name, document in documents
+                ],
+            )
+            email.attach_alternative(html_message, "text/html")
+            email.send()
+            sending_statuses.append(True)
+        except Exception as e:
+            logger.error(
+                "Failed to send radiation protection document to risk advisor "
+                "for user %s: %s",
+                plan.participation.user.id,
+                str(e),
+            )
+            sending_statuses.append(False)
+
+    return all(sending_statuses)
