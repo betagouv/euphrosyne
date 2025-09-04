@@ -1,20 +1,57 @@
-{% load i18n %}{% autoescape off %}
+{% autoescape off %}
 
-<p>{% blocktranslate %}Dear Sir or Madam,{% endblocktranslate %}</p>
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+<b>English version below</b>
+</p>
 
-<p>{% blocktranslate %}Congratulations on successfully completing the training on specific risks associated with the use of the New AGLAE particle accelerator.{% endblocktranslate %}</p>
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">Bonjour,</p>
 
-<p>{% blocktranslate %}This training grants you the necessary authorization to access the New AGLAE accelerator.{% endblocktranslate %}</p>
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Félicitations pour avoir réussi la formation sur les risques spécifiques liés à l’utilisation de l’accélérateur de particules New AGLAE.
+</p>
 
-<p>{% blocktranslate %}Please retain this message as proof of your certification. It may be requested during access control procedures at the facility.{% endblocktranslate %}</p>
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Cette formation vous donne l’autorisation nécessaire pour accéder à l’accélérateur New AGLAE.
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Veuillez conserver ce message comme preuve de votre certification. Il pourra vous être demandé lors des procédures de contrôle d’accès aux installations.
+</p>
 
 {% if valid_until %}
-<p>{% blocktranslate with valid_until_formatted=valid_until|date:"SHORT_DATE_FORMAT" %}This certification is valid until {{ valid_until_formatted }}.{% endblocktranslate %}</p>
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Cette certification est valable jusqu’au {{ valid_until|date:"SHORT_DATE_FORMAT" }}.
+</p>
 {% endif %}
 
-<p>{% blocktranslate %}Thank you for your commitment to safety.{% endblocktranslate %}</p>
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Cordialement,<br/>L’équipe New AGLAE
+</p>
 
-<p>{% blocktranslate %}Yours sincerely,{% endblocktranslate %}</p>
+<hr style="margin:30px 0; border:none; border-top:1px solid #ccc;" />
 
-<p>{% blocktranslate %}The AGLAE Team{% endblocktranslate %}</p>
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">Hello,</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Congratulations on successfully completing the training on the specific risks associated with the use of the New AGLAE particle accelerator.
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+This training grants you the required authorization to access the New AGLAE accelerator.
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Please keep this message as proof of your certification. It may be requested during access control procedures at the facility.
+</p>
+
+{% if valid_until %}
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+This certification is valid until {{ valid_until|date:"SHORT_DATE_FORMAT" }}.
+</p>
+{% endif %}
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Best regards,<br/>The New AGLAE Team
+</p>
+
 {% endautoescape %}

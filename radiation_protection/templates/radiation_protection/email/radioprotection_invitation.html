@@ -1,29 +1,111 @@
 {% load i18n objectstorage %}{% autoescape off %}
 
-<p>{% trans "Hello" %},</p>
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+<b>English version below</b>
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">Bonjour,</p>
 
 {% if invitation_type == "RETRY" %}
-<p>{% blocktranslate %}Here is a link to retry the quiz:{% endblocktranslate %} <a href="{{ quiz_link }}?email={{user.email}}&passing_score={{passing_score}}&nid={{notification_id}}&knownnames={% if user.first_name and user.last_name %}1{% else %}0{% endif %}">{% trans "Access quiz" %}</a></p>
-
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Vous pouvez retenter le quiz en cliquant sur le bouton ci-dessous :
+</p>
+<p>
+  <a href="{{ quiz_link }}?email={{user.email}}&passing_score={{passing_score}}&nid={{notification_id}}&knownnames={% if user.first_name and user.last_name %}1{% else %}0{% endif %}"
+     style="background:#007BFF; color:white; padding:10px 20px; border-radius:4px; text-decoration:none; font-family:Arial,sans-serif;">
+    Accéder au quiz
+  </a>
+</p>
 
 {% else %}
-<p>{% blocktranslate %}We are excited about your interest in conducting experiments using the New AGLAE particle accelerator at the Louvre.{% endblocktranslate %}</p>
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Merci de votre intérêt pour la réalisation d’expériences sur l’accélérateur de particules New AGLAE au Louvre.
+</p>
 
-<p>{% blocktranslate %}However, we noticed that you currently do not have a radiation protection certificate on file. This certification is a mandatory requirement for all researchers who wish to use the New AGLAE facilities, ensuring that everyone understands the necessary safety protocols and procedures.{% endblocktranslate %}</p>
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Cependant, nous avons constaté que vous n’avez pas encore de certificat de radioprotection enregistré. Cette certification est obligatoire pour tous les chercheurs afin de garantir une bonne connaissance des protocoles et procédures de sécurité.
+</p>
 
-<p>{% blocktranslate %}To assist you in obtaining this certification, we have prepared a comprehensive tutorial and quiz. By completing these, you will gain the necessary knowledge about radiation protection and be able to obtain your certificate.{% endblocktranslate %}</p>
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Pour vous aider à l’obtenir, nous avons préparé un cours et un quiz :
+</p>
 
-<p>{% blocktranslate %}The PDF course is available by cicking on the following link:{% endblocktranslate %}</p>
-<p>{% blocktranslate %}In French: {% endblocktranslate %}<a href="{% objectstorage 'AGLAE-radioprotection-fr.pdf' %}">{% trans "Access course" %}</a></p>
-<p>{% blocktranslate %}In English: {% endblocktranslate %}<a href="{% objectstorage 'AGLAE-radioprotection-en.pdf' %}">{% trans "Access course" %}</a></p>
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+  <a href="{% objectstorage 'AGLAE-radioprotection-fr.pdf' %}">Télécharger le cours</a>
+</p>
 
-<p>{% blocktranslate %}When you have reviewed the course and are ready to take the the quiz, click on the following link:{% endblocktranslate %} <a href="{{ quiz_link }}?email={{user.email}}&passing_score={{passing_score}}&nid={{notification_id}}&knownnames={% if user.first_name and user.last_name %}1{% else %}0{% endif %}">{% trans "Access quiz" %}</a></p>
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Une fois le cours consulté, cliquez ci-dessous pour passer le quiz :
+</p>
 
+<p>
+  <a href="{{ quiz_link }}?email={{user.email}}&passing_score={{passing_score}}&nid={{notification_id}}&knownnames={% if user.first_name and user.last_name %}1{% else %}0{% endif %}"
+     style="background:#007BFF; color:white; padding:10px 20px; border-radius:4px; text-decoration:none; font-family:Arial,sans-serif;">
+    Accéder au quiz
+  </a>
+</p>
 {% endif %}
 
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Une fois le quiz validé et votre certificat obtenu, vous aurez accès aux installations de New AGLAE.  
+Pour toute question, n’hésitez pas à nous contacter.
+</p>
 
-<p>{% blocktranslate %}Once you have completed the quiz and obtained your certificate, you will be granted access to the New AGLAE facilities. If you have any questions or need further assistance, please do not hesitate to contact us.{% endblocktranslate %}</p>
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Cordialement,<br/>L’équipe New AGLAE
+</p>
 
-<p>{% blocktranslate %}Best regards,{% endblocktranslate %}</p>
+<hr style="margin:30px 0; border:none; border-top:1px solid #ccc;" />
 
-{% trans "The New AGLAE team" %} {% endautoescape %}
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">Hello,</p>
+
+{% if invitation_type == "RETRY" %}
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+You can retry the quiz by clicking the button below:
+</p>
+<p>
+  <a href="{{ quiz_link }}?email={{user.email}}&passing_score={{passing_score}}&nid={{notification_id}}&knownnames={% if user.first_name and user.last_name %}1{% else %}0{% endif %}"
+     style="background:#007BFF; color:white; padding:10px 20px; border-radius:4px; text-decoration:none; font-family:Arial,sans-serif;">
+    Access Quiz
+  </a>
+</p>
+
+{% else %}
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Thank you for your interest in conducting experiments at the New AGLAE particle accelerator in the Louvre.
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+We noticed that you currently do not have a radiation protection certificate on file. This certification is required for all researchers to ensure proper knowledge of safety protocols.
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+To help you obtain this certification, we have prepared a tutorial and quiz:
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+  <a href="{% objectstorage 'AGLAE-radioprotection-en.pdf' %}">Download course</a>
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Once you have reviewed the course, click below to take the quiz:
+</p>
+
+<p>
+  <a href="{{ quiz_link }}?email={{user.email}}&passing_score={{passing_score}}&nid={{notification_id}}&knownnames={% if user.first_name and user.last_name %}1{% else %}0{% endif %}"
+     style="background:#007BFF; color:white; padding:10px 20px; border-radius:4px; text-decoration:none; font-family:Arial,sans-serif;">
+    Access Quiz
+  </a>
+</p>
+{% endif %}
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Once you have completed the quiz and obtained your certificate, you will be granted access to the New AGLAE facilities.  
+If you have any questions, please do not hesitate to contact us.
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Best regards,<br/>The New AGLAE Team
+</p>
+
+{% endautoescape %}
