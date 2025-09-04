@@ -1,11 +1,17 @@
 import { TypeAheadList, Result } from "../type-ahead-list.component";
 
 interface RorResult {
-  name: string;
   id: string;
-  country: {
-    country_name: string;
-  };
+  names: {
+    lang: string;
+    types: string[];
+    value: string;
+  }[];
+  locations: {
+    geonames_details: {
+      country_name: string;
+    };
+  }[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -36,11 +42,17 @@ class InstitutionTypeAhead extends TypeAheadList {
       throw new Error("Failed to fetch results");
     }
 
-    return (await response.json()).items.map((item: RorResult) => ({
-      label: `${item.name}, ${item.country.country_name}`,
-      id: item.id,
-      attrs: { country: item.country.country_name, name: item.name },
-    }));
+    return (await response.json()).items.map((item: RorResult) => {
+      console.log(item.locations[0]);
+      return {
+        label: `${item.names[0].value}, ${item.locations[0].geonames_details.country_name}`,
+        id: item.id,
+        attrs: {
+          country: item.locations[0].geonames_details.country_name,
+          name: item.names[0].value,
+        },
+      };
+    });
   }
 }
 
