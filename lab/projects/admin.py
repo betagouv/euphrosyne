@@ -159,8 +159,16 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         ]
         if not obj and not is_lab_admin(request.user):
             fieldsets += [
-                (  # type: ignore[list-item]
-                    None,
+                (
+                    "",
+                    {
+                        "fields": ["institution"],
+                        # pylint: disable=line-too-long
+                        "description": str(_("Project leader institution")),  # type: ignore
+                    },
+                ),
+                (
+                    "",
                     {
                         "fields": ["has_accepted_cgu"],
                         "description": "<p><strong>%s</strong></p>"  # type: ignore
@@ -171,7 +179,7 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                             )
                         ),
                     },
-                )
+                ),
             ]
 
         return fieldsets
@@ -256,6 +264,9 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
             if not is_lab_admin(request.user):
                 obj.participation_set.create(
                     user=request.user,  # type: ignore[misc]
+                    institution=form.cleaned_data[
+                        "institution"
+                    ],  # institution is set in form, throw error otherwise
                     is_leader=True,
                     on_premises=True,
                 )

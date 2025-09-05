@@ -61,12 +61,9 @@ fieldset {
   box-shadow: none;
 }
 
-fieldset .description {
-  padding: 0;
-}
-
 fieldset .description p {
   margin: 0;
+  padding: 0;
 }
 
 fieldset textarea.vLargeTextField {
@@ -126,8 +123,20 @@ td.field-status {
   background-color: transparent;
 }
 
-.field-institution {
+.project-change .field-institution {
   width: 300px;
+}
+
+.project-add .field-institution > div {
+  max-width: 600px;
+}
+
+.project-add .field-institution.form-row {
+  overflow: inherit; /* for  absolute-positioned typeahead list to overflow this element */
+}
+
+.project-add .field-institution div.autocomplete-input {
+  justify-content: normal;
 }
 
 #participation_set-group .field-institution div.autocomplete-input {
@@ -141,4 +150,15 @@ td.field-status {
 td.field-has_radiation_protection_certification {
   vertical-align: inherit;
   width: 40px;
+}
+
+input#id_institution__country {
+  max-width: none;
+}
+
+.field-institution .typeahead-field {
+  width: 60%;
+}
+.field-institution .autocomplete-input__country {
+  width: 40%;
 }
