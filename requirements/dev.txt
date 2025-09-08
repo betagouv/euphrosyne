@@ -12,5 +12,5 @@ pytest-django==4.11.1
 pytest==8.4.1
 pytest-dotenv==0.5.2
 raincoat==1.2.4
-types-Markdown==3.8.0.20250708
+types-Markdown==3.9.0.20250906
 types-requests<2.32.4.20250810 # See note in https://pypi.org/project/types-requests/ as opensearch-py 2.5.0 requires urllib3<2,>=1.26.18
