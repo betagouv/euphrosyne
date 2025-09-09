@@ -9,7 +9,7 @@
 
     <p>Veuillez trouver ci-joint le plan de prévention des risques pour une expérience qui aura lieu à AGLAE prochainement.</p>
     <p>Utilisateur : {{ plan.participation.user.get_full_name }}<br>Institution: {{ plan.participation.institution.name }}, {{ plan.participation.institution.country }}</p>
-    <p>Expérience : {{ plan.run.label }}<br>Prévue le {{ plan.run.start_date | date:"d/m/Y" }}</p>
+    <p>Projet : {{ plan.run.project.name }}<br>Expérience : {{ plan.run.label }}<br>Prévue le {{ plan.run.start_date | date:"d/m/Y" }}</p>
     <p>Nous vous en souhaitons bonne réception.</p>
     <p>Cordialement,</p>
 

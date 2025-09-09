@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 
 from lab.admin.mixins import LabPermission, LabPermissionMixin, LabRole
 from lab.models import Participation
+from lab.permissions import is_lab_admin
 from radiation_protection import certification as radiation_protection
 
 from .forms import (
@@ -18,6 +19,7 @@ from .forms import (
     BeamTimeRequestForm,
     LeaderParticipationForm,
     OnPremisesParticipationForm,
+    ReadonlyLeaderParticipationForm,
 )
 from .models import BeamTimeRequest, Project
 
@@ -35,7 +37,7 @@ class ParticipationFormSet(BaseInlineFormSet):
         prefix: Optional[Any] = None,
         queryset: Optional[Any] = None,
         **kwargs: Any,
-    ) -> None:
+    ):
         super().__init__(
             data=data,
             files=files,
@@ -69,10 +71,14 @@ class OnPremisesParticipationFormSet(ParticipationFormSet):
         prefix: Any | None = None,
         queryset: Any | None = None,
         **kwargs: Any,
-    ) -> None:
+    ):
         super().__init__(data, files, instance, save_as_new, prefix, queryset, **kwargs)
         for form in self:
-            if form.instance and form.instance.user_id:
+            if (
+                form.instance
+                and form.instance.user_id
+                and "has_radiation_protection_certification" in form.fields
+            ):
                 form.fields["has_radiation_protection_certification"].initial = (
                     radiation_protection.user_has_active_certification(
                         form.instance.user
@@ -221,62 +227,20 @@ class LeaderParticipationInline(LabPermissionMixin, admin.TabularInline):
         obj: Optional[Project] = None,
         **kwargs: Mapping[str, Any],
     ):
-        form = LeaderParticipationForm
-
         formset = inlineformset_factory(
             Project,
             Participation,
-            form=form,
             extra=0,
             min_num=1,
             # On creation, only leader participation can be added
             max_num=1,
             can_delete=False,
+            form=(
+                LeaderParticipationForm
+                if is_lab_admin(request.user)
+                else ReadonlyLeaderParticipationForm
+            ),
             formset=LeaderParticipationFormSet,
-        )
-        return formset
-
-
-class ParticipationInline(LabPermissionMixin, admin.TabularInline):
-    model = Participation
-    verbose_name = _("Project member")
-    verbose_name_plural = _("Project members")
-    template = "admin/edit_inline/tabular_participation_in_project.html"
-
-    lab_permissions = LabPermission(
-        add_permission=LabRole.PROJECT_LEADER,
-        change_permission=LabRole.LAB_ADMIN,
-        view_permission=LabRole.PROJECT_MEMBER,
-        delete_permission=LabRole.PROJECT_LEADER,
-    )
-
-    def get_related_project(
-        self,
-        obj: Optional[Project] = None,  # type: ignore[override]
-    ) -> Optional[Project]:
-        return obj
-
-    def get_queryset(self, request: HttpRequest) -> QuerySet[Any]:
-        return super().get_queryset(request).filter(is_leader=False)
-
-    def get_formset(
-        self,
-        request: HttpRequest,
-        obj: Optional[Project] = None,
-        **kwargs: Mapping[str, Any],
-    ):
-        form = BaseParticipationForm
-
-        formset = inlineformset_factory(
-            Project,
-            Participation,
-            form=form,
-            extra=0,
-            min_num=1,
-            # On creation, only leader participation can be added
-            max_num=1000,
-            can_delete=bool(obj),
-            formset=ParticipationFormSet,
         )
         return formset
 

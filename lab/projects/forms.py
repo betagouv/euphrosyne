@@ -1,10 +1,11 @@
-from typing import Any
+from typing import Any, Protocol
 
 from django import forms
 from django.contrib.auth import get_user_model
 from django.forms.fields import EmailField
 from django.forms.models import ModelForm
 from django.forms.utils import ErrorList
+from django.utils.datastructures import MultiValueDict
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User, UserInvitation
@@ -13,6 +14,31 @@ from lab.widgets import CounterTextarea
 
 from ..emails import send_project_invitation_email
 from . import models, widgets
+
+
+class PrefixFormProtocol(Protocol):
+    prefix: str
+
+    def add_prefix(self, field_name: str) -> str: ...  # noqa: E704
+
+    data: MultiValueDict | Any
+
+
+class InstitutionFormMixin:
+    def try_populate_institution(self: PrefixFormProtocol):
+        if not self.data.get(self.add_prefix("institution")) and self.data.get(
+            self.add_prefix("institution__name")
+        ):
+            (
+                institution,
+                _,
+            ) = Institution.objects.get_or_create(
+                name=self.data[self.add_prefix("institution__name")],
+                country=self.data.get(self.add_prefix("institution__country")),
+                ror_id=self.data.get(self.add_prefix("institution__ror_id")),
+            )
+            self.data = self.data.copy()
+            self.data[self.add_prefix("institution")] = institution.pk
 
 
 class BeamTimeRequestForm(forms.ModelForm):
@@ -45,10 +71,16 @@ class BaseProjectForm(forms.ModelForm):
         return comments
 
 
-class MemberProjectForm(BaseProjectForm):
+class MemberProjectForm(BaseProjectForm, InstitutionFormMixin):
     has_accepted_cgu = forms.BooleanField(
         required=True,
         label=_("I have read and accepted the general conditions of Euphrosyne."),
+    )
+    institution = forms.ModelChoiceField(
+        queryset=Institution.objects.all(),
+        required=True,
+        label=_("Institution"),
+        widget=widgets.InstitutionAutoCompleteWidget(),
     )
 
     def __init__(self, *args, **kwargs) -> None:
@@ -57,6 +89,10 @@ class MemberProjectForm(BaseProjectForm):
             **kwargs,
         )
         self.fields["comments"].required = True
+
+    def full_clean(self):
+        self.try_populate_institution()
+        return super().full_clean()
 
 
 class ChangeLeaderForm(forms.Form):
@@ -99,7 +135,7 @@ class ChangeLeaderForm(forms.Form):
         )
 
 
-class BaseParticipationForm(ModelForm):
+class BaseParticipationForm(ModelForm, InstitutionFormMixin):
     user = EmailField(label=_("User"))
 
     def __init__(
@@ -112,20 +148,6 @@ class BaseParticipationForm(ModelForm):
         self.fields["user"].label = _("Email")
         if instance:
             self.fields["institution"].widget.instance = instance.institution
-
-    def try_populate_institution(self):
-        if not self.data.get(f"{self.prefix}-institution") and self.data.get(
-            f"{self.prefix}-institution__name"
-        ):
-            (
-                institution,
-                _,
-            ) = Institution.objects.get_or_create(
-                name=self.data[f"{self.prefix}-institution__name"],
-                country=self.data.get(f"{self.prefix}-institution__country"),
-                ror_id=self.data.get(f"{self.prefix}-institution__ror_id"),
-            )
-            self.data[f"{self.prefix}-institution"] = institution.pk
 
     def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()
@@ -168,6 +190,20 @@ class OnPremisesParticipationForm(BaseParticipationForm):
         fields = ("user", "institution")
         widgets = {"institution": widgets.InstitutionAutoCompleteWidget()}
         labels = {"institution": _("Institution")}
+
+
+class ReadonlyLeaderParticipationForm(BaseParticipationForm):
+    """To display in read-only mode the leader participation
+    in the admin interface for non-admin users.
+    """
+
+    class Meta:
+        model = models.Participation
+        fields = ("user", "institution")
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.fields["user"].label = _("Email")
 
 
 class LeaderParticipationForm(BaseParticipationForm):

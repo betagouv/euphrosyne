@@ -238,6 +238,8 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
                 "name": "some project name",
                 "has_accepted_cgu": True,
                 "comments": "some comments",
+                "institution__name": "Louvre",
+                "institution__country": "France",
             },
         )
         assert response.status_code == 302
@@ -248,10 +250,61 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
             self.add_view_url,
             data={
                 "name": "some project name",
+                "comments": "some comments",
             },
         )
         assert response.status_code == 200
         assert not Project.objects.filter(name="some project name").exists()
+
+    def test_create_project_should_provide_institution(self):
+        response = self.client.post(
+            self.add_view_url,
+            data={
+                "name": "some project name",
+                "has_accepted_cgu": True,
+                "comments": "some comments",
+            },
+        )
+        assert response.status_code == 200
+        assert not Project.objects.filter(name="some project name").exists()
+
+    def test_create_project_creates_leader(self):
+        response = self.client.post(
+            self.add_view_url,
+            data={
+                "name": "some project name",
+                "has_accepted_cgu": True,
+                "comments": "some comments",
+                "institution__name": "C3",
+                "institution__country": "France",
+                "institution__ror_id": "https://ror.org/123456789",
+            },
+        )
+        assert response.status_code == 302
+        project = Project.objects.get(name="some project name")
+        assert project.leader
+        assert project.leader.user_id == self.project_leader.id
+        assert project.leader.institution.name == "C3"
+        assert project.leader.on_premises
+
+    def test_create_project_use_existing_institution(self):
+        i, _ = Institution.objects.get_or_create(
+            name="C2", country="France", ror_id="https://ror.org/123456789"
+        )
+        response = self.client.post(
+            self.add_view_url,
+            data={
+                "name": "some project name",
+                "has_accepted_cgu": True,
+                "comments": "some comments",
+                "institution__name": "C2",
+                "institution__country": "France",
+                "institution__ror_id": "https://ror.org/123456789",
+            },
+        )
+        assert response.status_code == 302
+        project = Project.objects.get(name="some project name")
+        assert project.leader.institution_id == i.id
 
     def test_change_leader_link_is_hidden(self):
         response = self.client.get(
@@ -283,7 +336,7 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
 
     def test_add_project_has_cgu_checkbox(self):
         fieldsets = self.project_admin.get_fieldsets(self.add_request)
-        assert "has_accepted_cgu" in fieldsets[1][1]["fields"]
+        assert "has_accepted_cgu" in fieldsets[2][1]["fields"]
 
     @patch("lab.projects.admin.rename_project_directory")
     def test_change_project_name_not_call_hook(self, rename_project_dir_mock):
@@ -339,21 +392,6 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
             not in response.content.decode()
         )
 
-    def test_add_project_sets_user_as_leader(self):
-        response = self.client.post(
-            self.add_view_url,
-            data={
-                "name": "some project name",
-                "has_accepted_cgu": 1,
-                "comments": "some comments",
-            },
-        )
-        project = Project.objects.get(name="some project name")
-
-        assert response.status_code == 302
-        assert project.name == "some project name"
-        assert project.leader.user_id == self.project_member.id
-
     def test_add_project_comments_is_mandatory(self):
         response = self.client.post(
             self.add_view_url,
@@ -384,6 +422,8 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
                 "name": "some project name",
                 "has_accepted_cgu": 1,
                 "comments": "some comments",
+                "institution__name": "Louvre",
+                "institution__country": "France",
             },
         )
         assert response.status_code == 302
@@ -395,7 +435,7 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
     def test_add_project_calls_init_directroy_hook(self, init_project_dir_mock):
         request = self.request_factory.post(self.add_view_url)
         request.user = self.project_member
-        project = Project(name="Projet Notre Dame")
+        project = MagicMock(name="Projet Notre Dame")
         ProjectAdmin(Project, admin_site=AdminSite()).save_model(
             request,
             project,
