@@ -192,6 +192,20 @@ class OnPremisesParticipationForm(BaseParticipationForm):
         labels = {"institution": _("Institution")}
 
 
+class ReadonlyLeaderParticipationForm(BaseParticipationForm):
+    """To display in read-only mode the leader participation
+    in the admin interface for non-admin users.
+    """
+
+    class Meta:
+        model = models.Participation
+        fields = ("user", "institution")
+
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.fields["user"].label = _("Email")
+
+
 class LeaderParticipationForm(BaseParticipationForm):
     """Participation model form that automatically set `is_leader` to
     `True` when saving the instance.

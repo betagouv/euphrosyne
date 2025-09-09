@@ -31,6 +31,7 @@ def test_leader_participation_inline_save():
     request = RequestFactory().post(
         reverse("admin:lab_project_change", args=(project.id,)), data=data
     )
+    request.user = user
 
     inline = inlines.LeaderParticipationInline(Participation, admin_site=AdminSite())
     formset_class = inline.get_formset(request, project)
@@ -64,6 +65,7 @@ def test_leader_participation_inline_only_accept_one():
     request = RequestFactory().post(
         reverse("admin:lab_project_change", args=(project.id,)), data=data
     )
+    request.user = user
 
     inline = inlines.LeaderParticipationInline(Participation, admin_site=AdminSite())
     formset_class = inline.get_formset(request, project)
@@ -151,6 +153,7 @@ def test_leader_user_change_triggers_radioprotection_check():
     request = RequestFactory().post(
         reverse("admin:lab_project_change", args=(project.id,)), data=data
     )
+    request.user = new_leader
 
     inline = inlines.LeaderParticipationInline(Participation, admin_site=AdminSite())
     formset_class = inline.get_formset(request, project)
@@ -200,6 +203,7 @@ def test_change_leader_participaiton_same_user_no_trigger_radioprotection_check(
     request = RequestFactory().post(
         reverse("admin:lab_project_change", args=(project.id,)), data=data
     )
+    request.user = participation.user
 
     inline = inlines.LeaderParticipationInline(Participation, admin_site=AdminSite())
     formset_class = inline.get_formset(request, project)
