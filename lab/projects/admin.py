@@ -284,6 +284,18 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                 "show_save_and_add_another": False,
             },
         )
+        if (
+            not object_id
+            and hasattr(view, "context_data")
+            and not is_lab_admin(request.user)
+        ):
+            last_participation = request.user.participation_set.order_by(
+                "-created"
+            ).first()
+            if last_participation and last_participation.institution:
+                view.context_data["adminform"].fields[
+                    "institution"
+                ].widget.instance = last_participation.institution
         return view
 
     def changelist_view(
