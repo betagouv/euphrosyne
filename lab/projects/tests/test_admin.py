@@ -14,6 +14,8 @@ from django.utils.translation import gettext_lazy as _
 from euphro_auth.tests.factories import LabAdminUserFactory, StaffUserFactory
 from lab.models import Institution
 from lab.tests.factories import (
+    InstitutionFactory,
+    ParticipationFactory,
     ProjectFactory,
     ProjectWithLeaderFactory,
     RunFactory,
@@ -443,6 +445,19 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
             change=False,
         )
         init_project_dir_mock.assert_called_once_with(project.name)
+
+    def test_add_project_form_prefill_last_institution(self):
+        """Prefill institution field with the last used institution."""
+        institution = InstitutionFactory()
+        ParticipationFactory(user=self.project_member, institution=institution)
+        response = self.client.get(self.add_view_url)
+        assert f'value="{institution.name}"' in response.content.decode()
+
+    def test_add_project_form_prefill_last_institution_when_no_participaion(self):
+        """No prefill when user has no participation."""
+        self.project_member.participation_set.all().delete()
+        response = self.client.get(self.add_view_url)
+        assert response.status_code == HTTPStatus.OK
 
     def test_beamtimerequest_inline_is_present_in_changeview(self):
         inlines = self.project_admin.get_inlines(
