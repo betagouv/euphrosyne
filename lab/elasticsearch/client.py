@@ -75,11 +75,11 @@ class CatalogClient(metaclass=Singleton):
         self, field: str, query: str | None = None, exclude: list[str] | None = None
     ):
         return self.client.search(
-            queries.terms_agg(field, query=query, exclude=exclude)
+            body=queries.terms_agg(field, query=query, exclude=exclude)
         )
 
     def aggregate_date(self, field: str, interval: str):
-        return self.client.search(queries.date_historiogram_agg(field, interval))
+        return self.client.search(body=queries.date_historiogram_agg(field, interval))
 
     def index_from_projects(self, projects: list[Project], skip_eros: bool = False):
         """Index projects and related object groups"""
