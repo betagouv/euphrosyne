@@ -16,6 +16,8 @@ class EuphroRefreshToken(RefreshToken):
             user.project_set.values("id", "name", "slug")  # type: ignore[misc]
         )
         token["is_admin"] = is_lab_admin(user)
+        # because https://github.com/jazzband/djangorestframework-simplejwt/pull/887
+        token["user_id"] = int(token["user_id"])
         return token
 
 
