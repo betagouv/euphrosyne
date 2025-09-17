@@ -1,7 +1,7 @@
 -i https://pypi.org/simple
 -r base.txt
 black==25.1.0
-factory-boy==3.3.1
+factory-boy==3.3.3
 flake8==7.3.0
 ipython==9.5.0
 isort==6.0.1
