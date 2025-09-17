@@ -43,7 +43,7 @@ def test_search(catalog_client: CatalogClient):
 def test_aggregate_terms(catalog_client: CatalogClient):
     catalog_client.aggregate_terms("field", query="query", exclude=["exclude"])
     catalog_client.client.search.assert_called_with(
-        {
+        body={
             "size": 0,
             "aggs": {
                 "field": {
@@ -61,7 +61,7 @@ def test_aggregate_terms(catalog_client: CatalogClient):
 def test_aggregate_date(catalog_client: CatalogClient):
     catalog_client.aggregate_date("field", "interval")
     catalog_client.client.search.assert_called_with(
-        {
+        body={
             "size": 0,
             "aggs": {
                 "field": {
