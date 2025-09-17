@@ -22,9 +22,13 @@ function sendFeedback(feedback: IFeedbackForm) {
 
   if (feedback.attachments) {
     feedback.attachments.forEach((attachment) => {
-      const file = new File([attachment.data], attachment.filename, {
-        type: attachment.contentType,
-      });
+      const file = new File(
+        [attachment.data.buffer as ArrayBuffer],
+        attachment.filename,
+        {
+          type: attachment.contentType,
+        },
+      );
       formData.append(`attachments`, file);
     });
   }
