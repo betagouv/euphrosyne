@@ -57,7 +57,7 @@
     "glob": "^11.0.3",
     "jwt-decode": "^4.0.0",
     "lodash.debounce": "^4.0.8",
-    "mini-css-extract-plugin": "^2.9.2",
+    "mini-css-extract-plugin": "^2.9.4",
     "promise-polyfill": "8.3.0",
     "purgecss-webpack-plugin": "^7.0.2",
     "react": "^19.1.1",
