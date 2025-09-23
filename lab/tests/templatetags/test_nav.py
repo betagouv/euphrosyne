@@ -81,26 +81,11 @@ def test_nav_items_json_when_admin():
     assert data["items"][3]["item"]["badge"] == 0
 
     assert data["items"][4]["title"] == str(_("Certifications"))
-    assert data["items"][4]["items"][0]["title"] == str(_("Certifications"))
-    assert data["items"][4]["items"][0]["item"]["href"] == reverse(
+    assert data["items"][4]["item"]["href"] == reverse(
         "admin:certification_certification_changelist"
     )
-    assert data["items"][4]["items"][0]["item"]["exactPath"] is False
-    assert data["items"][4]["items"][0]["item"]["extraPath"] == []
-
-    assert data["items"][4]["items"][1]["title"] == str(_("Notifications"))
-    assert data["items"][4]["items"][1]["item"]["href"] == reverse(
-        "admin:certification_certificationnotification_changelist"
-    )
-    assert data["items"][4]["items"][1]["item"]["exactPath"] is False
-    assert data["items"][4]["items"][1]["item"]["extraPath"] == []
-
-    assert data["items"][4]["items"][2]["title"] == str(_("Results"))
-    assert data["items"][4]["items"][2]["item"]["href"] == reverse(
-        "admin:certification_quizresult_changelist"
-    )
-    assert data["items"][4]["items"][2]["item"]["exactPath"] is False
-    assert data["items"][4]["items"][2]["item"]["extraPath"] == []
+    assert data["items"][4]["item"]["exactPath"] is False
+    assert data["items"][4]["item"]["extraPath"] == []
 
     assert data["items"][5]["title"] == str(_("Prevention plans"))
     assert data["items"][5]["item"]["href"] == reverse(

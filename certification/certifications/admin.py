@@ -6,6 +6,8 @@ from django.contrib.admin.options import InlineModelAdmin
 from django.http import HttpRequest
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
+from django.urls import reverse
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from lab.admin.mixins import LabAdminAllowedMixin
@@ -74,13 +76,57 @@ class CertificationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
             return [QuizCertificationInline]
         return []
 
+    def get_readonly_fields(self, request, obj=None):
+        fields = super().get_readonly_fields(request, obj)
+        if obj:
+            fields += ("results_display", "notifications_display")
+        return fields
+
+    def get_fieldsets(self, request, obj: Certification | None = None):
+        fieldsets = super().get_fieldsets(request, obj)
+        if obj:
+            fieldsets = list(fieldsets)
+            fieldsets.append(
+                (
+                    _("Certification Activity"),
+                    {
+                        "fields": ("results_display", "notifications_display"),
+                    },
+                )
+            )
+        return fieldsets
+
+    @admin.display(description=_("Results"))
+    def results_display(self, obj: Certification):
+        results_link = format_html(
+            '<a href="{}" class="fr-link fr-icon-award-line fr-link--icon-left">{}</a>',
+            reverse(
+                "admin:certification_quizresult_changelist",
+            )
+            + f"?quiz__certification={obj.id}",
+            _("View results"),
+        )
+        return results_link
+
+    @admin.display(description=_("Notifications"))
+    def notifications_display(self, obj: Certification):
+        notifications_link = format_html(
+            '<a href="{}" class="fr-link fr-icon-mail-line fr-link--icon-left">{}</a>',
+            reverse(
+                "admin:certification_certificationnotification_changelist",
+            )
+            + f"?certification={obj.id}",
+            _("See notifications for this certification"),
+        )
+        return notifications_link
+
 
 @admin.register(QuizResult)
 class QuizResultAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
     list_display = ("quiz", "user", "score_with_passing_score", "is_passed", "created")
     fields = ("quiz", "user", "score", "is_passed")
     readonly_fields = ("created",)
-    list_filter = ("is_passed", "quiz__certification__name")
+    list_filter = ("is_passed", "quiz__certification__name", "quiz__certification")
     search_fields = ("user__email",)
 
     @admin.display(description=_("Score"))
