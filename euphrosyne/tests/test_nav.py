@@ -50,32 +50,11 @@ def test_get_nav_items_for_admin():
         },
         {
             "title": "Certifications",
-            "items": [
-                {
-                    "title": "Certifications",
-                    "item": {
-                        "href": "/certification/certification/",
-                        "exactPath": False,
-                        "extraPath": [],
-                    },
-                },
-                {
-                    "title": "Notifications",
-                    "item": {
-                        "href": "/certification/certificationnotification/",
-                        "exactPath": False,
-                        "extraPath": [],
-                    },
-                },
-                {
-                    "title": "Résultats",
-                    "item": {
-                        "href": "/certification/quizresult/",
-                        "exactPath": False,
-                        "extraPath": [],
-                    },
-                },
-            ],
+            "item": {
+                "href": "/certification/certification/",
+                "exactPath": False,
+                "extraPath": [],
+            },
         },
         {
             "title": "Plans de prévention",

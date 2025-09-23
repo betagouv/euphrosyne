@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-05 16:51+0200\n"
+"POT-Creation-Date: 2025-09-23 10:59+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -15,6 +15,21 @@ msgstr "Le template n'existe pas"
 
 msgid "Quiz certification"
 msgstr "Certification de quiz"
+
+msgid "Certification Activity"
+msgstr "Activité de la certification"
+
+msgid "Results"
+msgstr "Résultats"
+
+msgid "View results"
+msgstr "Voir les résultats"
+
+msgid "Notifications"
+msgstr "Notifications"
+
+msgid "See notifications for this certification"
+msgstr "Voir les notifications pour cette certification"
 
 msgid "Score"
 msgstr "Score"
@@ -72,12 +87,6 @@ msgstr "Résultats des quiz"
 #, python-format
 msgid "Result for %(quiz)s - %(user)s - %(score)s - %(created)s"
 msgstr "Résultat pour %(quiz)s - %(user)s - %(score)s - %(created)s"
-
-msgid "Notifications"
-msgstr "Notifications"
-
-msgid "Results"
-msgstr "Résultats"
 
 msgid "Invitation to complete"
 msgstr "Invitation à compléter"

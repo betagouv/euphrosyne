@@ -12,39 +12,11 @@ def get_nav_items(request: HttpRequest) -> list[NavElementJson]:
         items.append(
             {
                 "title": str(_("Certifications")),
-                "items": [
-                    {
-                        "title": str(_("Certifications")),
-                        "item": {
-                            "href": reverse(
-                                "admin:certification_certification_changelist"
-                            ),
-                            "exactPath": False,
-                            "extraPath": [],
-                        },
-                    },
-                    {
-                        "title": str(_("Notifications")),
-                        "item": {
-                            "href": reverse(
-                                # pylint: disable=line-too-long
-                                "admin:certification_certificationnotification_changelist"
-                            ),
-                            "exactPath": False,
-                            "extraPath": [],
-                        },
-                    },
-                    {
-                        "title": str(_("Results")),
-                        "item": {
-                            "href": reverse(
-                                "admin:certification_quizresult_changelist"
-                            ),
-                            "exactPath": False,
-                            "extraPath": [],
-                        },
-                    },
-                ],
+                "item": {
+                    "href": reverse("admin:certification_certification_changelist"),
+                    "exactPath": False,
+                    "extraPath": [],
+                },
             }
         )
     return items
