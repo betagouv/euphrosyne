@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     "standard",
     "certification",
     "radiation_protection",
+    "log_email",
     "drf_spectacular",
 ] + (["debug_toolbar"] if DEBUG else [])
 

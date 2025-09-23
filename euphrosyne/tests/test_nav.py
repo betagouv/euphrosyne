@@ -10,6 +10,7 @@ from ..nav import get_nav_items
 def test_get_nav_items_for_admin():
     request = RequestFactory().get("/")
     request.user = auth_factories.LabAdminUserFactory()
+    print(get_nav_items(request))
     assert get_nav_items(request) == [
         {
             "title": "Tableau de bord",
@@ -49,20 +50,33 @@ def test_get_nav_items_for_admin():
             },
         },
         {
-            "title": "Certifications",
-            "item": {
-                "href": "/certification/certification/",
-                "exactPath": False,
-                "extraPath": [],
-            },
-        },
-        {
-            "title": "Plans de prévention",
-            "item": {
-                "href": "/radiation_protection/riskpreventionplan/",
-                "exactPath": False,
-                "extraPath": None,
-            },
+            "title": "Administration",
+            "items": [
+                {
+                    "title": "Certifications",
+                    "item": {
+                        "href": "/certification/certification/",
+                        "exactPath": False,
+                        "extraPath": [],
+                    },
+                },
+                {
+                    "title": "Plans de prévention",
+                    "item": {
+                        "href": "/radiation_protection/riskpreventionplan/",
+                        "exactPath": False,
+                        "extraPath": None,
+                    },
+                },
+                {
+                    "title": "Journaux des emails",
+                    "item": {
+                        "href": "/log_email/emaillog/",
+                        "exactPath": False,
+                        "extraPath": [],
+                    },
+                },
+            ],
         },
     ]
 

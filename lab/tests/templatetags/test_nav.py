@@ -46,7 +46,7 @@ def test_nav_items_json_when_admin():
             mock.MagicMock(user=mock.MagicMock(is_lab_admin=True), path="/path")
         )
     )
-    assert len(data["items"]) == 6
+    assert len(data["items"]) == 5
     assert data["items"][0]["title"] == str(_("Dashboard"))
     assert data["items"][0]["item"]["href"] == reverse("admin:index")
     assert data["items"][0]["item"]["iconName"] == "fr-icon-calendar-line"
@@ -80,18 +80,26 @@ def test_nav_items_json_when_admin():
     assert data["items"][3]["item"]["extraPath"] is None
     assert data["items"][3]["item"]["badge"] == 0
 
-    assert data["items"][4]["title"] == str(_("Certifications"))
-    assert data["items"][4]["item"]["href"] == reverse(
+    assert data["items"][4]["title"] == str(_("Administration"))
+    assert len(data["items"][4]["items"]) == 3
+    assert data["items"][4]["items"][0]["title"] == str(_("Certifications"))
+    assert data["items"][4]["items"][0]["item"]["href"] == reverse(
         "admin:certification_certification_changelist"
     )
-    assert data["items"][4]["item"]["exactPath"] is False
-    assert data["items"][4]["item"]["extraPath"] == []
+    assert data["items"][4]["items"][0]["item"]["exactPath"] is False
+    assert data["items"][4]["items"][0]["item"]["extraPath"] == []
 
-    assert data["items"][5]["title"] == str(_("Prevention plans"))
-    assert data["items"][5]["item"]["href"] == reverse(
+    assert data["items"][4]["items"][1]["title"] == str(_("Prevention plans"))
+    assert data["items"][4]["items"][1]["item"]["href"] == reverse(
         "admin:radiation_protection_riskpreventionplan_changelist"
     )
-    assert data["items"][5]["item"]["exactPath"] is False
-    assert data["items"][5]["item"]["extraPath"] is None
+    assert data["items"][4]["items"][1]["item"]["exactPath"] is False
+    assert data["items"][4]["items"][1]["item"]["extraPath"] is None
+    assert data["items"][4]["items"][2]["title"] == str(_("Email logs"))
+    assert data["items"][4]["items"][2]["item"]["href"] == reverse(
+        "admin:log_email_emaillog_changelist"
+    )
+    assert data["items"][4]["items"][2]["item"]["exactPath"] is False
+    assert data["items"][4]["items"][2]["item"]["extraPath"] == []
 
     assert data["currentPath"] == "/path"
