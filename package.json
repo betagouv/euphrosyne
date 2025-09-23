@@ -46,7 +46,7 @@
     "@fullcalendar/list": "^6.1.19",
     "@fullcalendar/react": "^6.1.19",
     "@gouvfr/dsfr": "^1.14.0",
-    "@h5web/app": "^14.0.1",
+    "@h5web/app": "^15.0.0",
     "@sentry/browser": "^10.8.0",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.6",
