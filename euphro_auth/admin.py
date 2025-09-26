@@ -1,5 +1,6 @@
 from typing import Any, Dict, Optional
 
+from django.apps import apps
 from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import ShowFacets
@@ -9,6 +10,7 @@ from django.forms.models import ModelForm
 from django.http import HttpResponse
 from django.http.request import HttpRequest
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
@@ -16,7 +18,7 @@ from django.utils.translation import gettext_lazy as _
 
 from lab.participations.models import Participation
 from lab.permissions import is_lab_admin
-from radiation_protection import certification as radiation_protection
+from lab.runs.models import Run
 
 from .emails import send_invitation_email
 from .forms import UserChangeForm, UserCreationForm
@@ -67,7 +69,7 @@ class ProjectInline(admin.TabularInline):
 
 
 class InvitationCompletedStatusListFilter(admin.SimpleListFilter):
-    title = _("Invitation completed")
+    title = _("invitation completed")
     template = "admin/lab/project/filter.html"
     parameter_name = "invitation_completed"
 
@@ -90,6 +92,56 @@ class InvitationCompletedStatusListFilter(admin.SimpleListFilter):
         return queryset
 
 
+class OnPremiseParticipationDateListFilter(admin.SimpleListFilter):
+    title = _("date of on-site presence")
+    template = "admin/lab/project/filter.html"
+    parameter_name = "on_premise"
+
+    def lookups(self, request, model_admin):
+        return [
+            ("upcoming", _("Upcoming")),
+            ("this month", _("This month")),
+            ("this year", _("This year")),
+            ("last month", _("Last month")),
+            ("last year", _("Last year")),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            run_qs = Run.objects
+            if self.value() == "upcoming":
+                run_qs = run_qs.filter(
+                    start_date__gte=timezone.now(),
+                )
+            elif self.value() == "this month":
+                run_qs = run_qs.filter(
+                    start_date__month=timezone.now().month,
+                    start_date__year=timezone.now().year,
+                )
+            elif self.value() == "last month":
+                run_qs = run_qs.filter(
+                    start_date__month=timezone.now().month - 1,
+                    start_date__year=timezone.now().year,
+                )
+            elif self.value() == "this year":
+                run_qs = run_qs.filter(
+                    start_date__year=timezone.now().year,
+                )
+            elif self.value() == "last year":
+                run_qs = run_qs.filter(
+                    start_date__month=timezone.now().month - 1,
+                    start_date__year=timezone.now().year,
+                )
+
+            project_ids = run_qs.values_list("project_id", flat=True)
+            participation_qs = Participation.objects.filter(
+                on_premises=True, project_id__in=project_ids
+            )
+            queryset = queryset.filter(participation__in=participation_qs).distinct()
+
+        return queryset
+
+
 class UserAdmin(DjangoUserAdmin):
     class Media:
         css = {"all": ("css/admin/user.css",)}
@@ -101,7 +153,10 @@ class UserAdmin(DjangoUserAdmin):
     add_form = UserCreationForm
     form = UserChangeForm
 
-    list_filter = (InvitationCompletedStatusListFilter,)
+    list_filter = (
+        InvitationCompletedStatusListFilter,
+        OnPremiseParticipationDateListFilter,
+    )
     list_per_page = 30
     show_facets = ShowFacets.NEVER
     actions = ("send_invitation_mail_action",)
@@ -129,15 +184,17 @@ class UserAdmin(DjangoUserAdmin):
         return qs.prefetch_related("groups")
 
     def get_list_display(self, request):
-        list_display = (
+        list_display = [
             "email",
             "full_name_display",
             "last_institution_display",
             "invitation_completed_display",
             "is_lab_admin",
-        )
+        ]
         if request.user.is_superuser:
-            return list_display + ("is_superuser_display",)
+            list_display += ["is_superuser_display"]
+        if apps.is_installed("radiation_protection"):
+            list_display += ["has_radiation_certification"]
         return list_display
 
     def get_readonly_fields(self, request: HttpRequest, obj: Optional[User] = None):
@@ -305,7 +362,12 @@ class UserAdmin(DjangoUserAdmin):
 
     @admin.display(description=_("Radiation protection"), boolean=True)
     def has_radiation_certification(self, obj: User) -> bool:
-        return radiation_protection.user_has_active_certification(obj)
+        if apps.is_installed("radiation_protection"):
+            # pylint: disable=import-outside-toplevel
+            from radiation_protection import certification as radiation_protection
+
+            return radiation_protection.user_has_active_certification(obj)
+        return False
 
 
 class UserInvitationAdmin(ModelAdmin):
