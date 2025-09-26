@@ -177,6 +177,6 @@ class ProjectModelTestCase(TestCase):
         ).project
         to_schedule_projects = [ProjectFactory(), RunFactory(start_date=None).project]
         assert Project.objects.only_to_schedule().count() == 2
-        self.assertListEqual(
-            list(Project.objects.only_to_schedule()), to_schedule_projects
+        self.assertSetEqual(
+            set(Project.objects.only_to_schedule()), set(to_schedule_projects)
         )
