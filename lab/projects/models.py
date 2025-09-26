@@ -199,16 +199,22 @@ class Project(TimestampedModel):
         )
         if len(runs_with_start_date):
             if any(
-                run["end_date"] < timezone.now() if run["end_date"] else False
+                run["start_date"] and timezone.now() < run["start_date"]
                 for run in runs_with_start_date
             ):
-                return self.Status.FINISHED
+                return self.Status.SCHEDULED
             if any(
-                run["start_date"] and timezone.now() > run["start_date"]
+                run["start_date"]
+                and run["end_date"]
+                and (
+                    timezone.now() > run["start_date"]
+                    and timezone.now() < run["end_date"]
+                )
                 for run in runs_with_start_date
             ):
                 return self.Status.ONGOING
-            return self.Status.SCHEDULED
+
+            return self.Status.FINISHED
         return self.Status.TO_SCHEDULE
 
     status.fget.short_description = _("Status")  # type: ignore

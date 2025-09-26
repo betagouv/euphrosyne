@@ -22,7 +22,7 @@ class NavItemJson(typing.TypedDict):
 
 class NavFolderJson(typing.TypedDict):
     title: str
-    items: list[NavItemJson]
+    items: list[typing.Union[NavItemJson, "NavFolderJson"]]
 
 
 NavElementJson = typing.Union[NavItemJson, NavFolderJson]

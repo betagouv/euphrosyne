@@ -11,9 +11,9 @@ def get_nav_items(request: HttpRequest) -> list[NavElementJson]:
     if request.user and is_lab_admin(request.user):
         items.append(
             {
-                "title": str(_("Certifications")),
+                "title": str(_("Email logs")),
                 "item": {
-                    "href": reverse("admin:certification_certification_changelist"),
+                    "href": reverse("admin:log_email_emaillog_changelist"),
                     "exactPath": False,
                     "extraPath": [],
                 },

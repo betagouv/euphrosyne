@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-05 16:51+0200\n"
+"POT-Creation-Date: 2025-09-26 16:06+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -15,6 +15,21 @@ msgstr "Le template n'existe pas"
 
 msgid "Quiz certification"
 msgstr "Certification de quiz"
+
+msgid "Certification Activity"
+msgstr "Activité de la certification"
+
+msgid "Results"
+msgstr "Résultats"
+
+msgid "View results"
+msgstr "Voir les résultats"
+
+msgid "Notifications"
+msgstr "Notifications"
+
+msgid "See notifications for this certification"
+msgstr "Voir les notifications pour cette certification"
 
 msgid "Score"
 msgstr "Score"
@@ -72,12 +87,6 @@ msgstr "Résultats des quiz"
 #, python-format
 msgid "Result for %(quiz)s - %(user)s - %(score)s - %(created)s"
 msgstr "Résultat pour %(quiz)s - %(user)s - %(score)s - %(created)s"
-
-msgid "Notifications"
-msgstr "Notifications"
-
-msgid "Results"
-msgstr "Résultats"
 
 msgid "Invitation to complete"
 msgstr "Invitation à compléter"
@@ -264,8 +273,26 @@ msgstr "Projet apparentés"
 msgid "Status"
 msgstr "Statut"
 
-msgid "Invitation completed"
-msgstr "Invitation complétée"
+msgid "invitation completed"
+msgstr "invitation complétée"
+
+msgid "date of on-site presence"
+msgstr "date de présence sur site"
+
+msgid "Upcoming"
+msgstr "À venir"
+
+msgid "This month"
+msgstr "Ce mois-ci"
+
+msgid "This year"
+msgstr "Cette année"
+
+msgid "Last month"
+msgstr "Le mois dernier"
+
+msgid "Last year"
+msgstr "L'année dernière"
 
 msgid "Profile"
 msgstr "Profil"
@@ -297,6 +324,9 @@ msgstr "Nom"
 
 msgid "Last institution"
 msgstr "Dernière institution"
+
+msgid "Invitation completed"
+msgstr "Invitation complétée"
 
 msgid "Password"
 msgstr "Mot de passe"
@@ -443,6 +473,9 @@ msgstr "Euphro tools n'est pas disponible."
 
 msgid "Dashboard"
 msgstr "Tableau de bord"
+
+msgid "Admin"
+msgstr "Administration"
 
 msgid "English"
 msgstr "Anglais"
@@ -1354,6 +1387,9 @@ msgstr "Run(s)"
 msgid "Prevention plans"
 msgstr "Plans de prévention"
 
+msgid "Email logs"
+msgstr "Journaux des emails"
+
 msgid "Only alphanumeric, underscore, hyphen and space characters are allowed"
 msgstr ""
 "Seuls les lettres, chiffres, tirets bas, traits d'union et espaces sont des "
@@ -1404,6 +1440,18 @@ msgstr "Requête d'horodatage"
 msgid "Notebook: %s"
 msgstr "Cahier de labo: %s"
 
+msgid "Latest sent emails"
+msgstr "Derniers emails envoyés"
+
+msgid "Recipient"
+msgstr "Destinataire"
+
+msgid "Subject"
+msgstr "Objet"
+
+msgid "Date"
+msgstr "Date"
+
 msgid ""
 "Your ORCID account isn't connected to an existing account. Please use email/"
 "password to sign in, or register with ORCID first using the link you "
@@ -1415,6 +1463,11 @@ msgstr ""
 
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"
+
+#, fuzzy
+#| msgid "Run Risk Prevention Plans"
+msgid "Latest published risk prevention plans"
+msgstr "Plans de prévention des risques du run"
 
 msgid "Risk Advisor Notification Sent"
 msgstr "Notification envoyée au conseiller en risques"
