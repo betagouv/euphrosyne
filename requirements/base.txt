@@ -24,4 +24,4 @@ reportlab==4.4.4
 sentry-sdk==2.37.1
 social-auth-app-django==5.5.1
 wheel==0.45.1
-whitenoise==6.9.0
+whitenoise==6.11.0
