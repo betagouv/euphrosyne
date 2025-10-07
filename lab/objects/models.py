@@ -182,12 +182,12 @@ def construct_image_url_from_path(
     path: str, storage_base_url: str, storage_token: str | None = None
 ) -> str:
     # pylint: disable=import-outside-toplevel
-    from lab.objects.c2rmf import construct_image_url_from_eros_path
+    from .providers import construct_image_url
 
     if (
         path.startswith("C2RMF") or path.startswith("FZ") or path.startswith("F")
     ) and len(path.split("/")) == 2:
-        return construct_image_url_from_eros_path(path)
+        return construct_image_url("c2rmf", path)
 
     return (
         f"{storage_base_url}{path}?{storage_token}"

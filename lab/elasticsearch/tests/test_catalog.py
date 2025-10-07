@@ -4,7 +4,7 @@ import pytest
 from django.test import TestCase
 from slugify import slugify
 
-from lab.objects.c2rmf import ErosHTTPError
+from lab.objects import ObjectProviderError
 from lab.objects.models import ObjectGroupThumbnail
 from lab.tests import factories
 
@@ -238,7 +238,7 @@ class TestObjectGroupCatalogDocument(TestCase):
 
 
 @pytest.mark.django_db
-@mock.patch("lab.elasticsearch.catalog.fetch_full_objectgroup_from_eros")
+@mock.patch("lab.elasticsearch.catalog.fetch_full_objectgroup")
 def test_build_object_group_calls_eros_if_c2rmf_id(eros_mock: mock.MagicMock):
     object_group = factories.ObjectGroupFactory(
         c2rmf_id="abc",
@@ -251,11 +251,11 @@ def test_build_object_group_calls_eros_if_c2rmf_id(eros_mock: mock.MagicMock):
         is_data_embargoed=True,
     )
 
-    eros_mock.assert_called_once_with(c2rmf_id="abc", object_group=object_group)
+    eros_mock.assert_called_once_with("c2rmf", "abc", object_group)
 
 
 @pytest.mark.django_db
-@mock.patch("lab.elasticsearch.catalog.fetch_full_objectgroup_from_eros")
+@mock.patch("lab.elasticsearch.catalog.fetch_full_objectgroup")
 def test_create_project_page_data_calls_eros_if_c2rmf_id(eros_mock: mock.MagicMock):
     object_group = factories.ObjectGroupFactory(
         c2rmf_id="abc",
@@ -265,18 +265,18 @@ def test_create_project_page_data_calls_eros_if_c2rmf_id(eros_mock: mock.MagicMo
         runs=[factories.RunFactory()], object_groups=[object_group], leader=None
     )
 
-    eros_mock.assert_called_once_with(c2rmf_id="abc", object_group=object_group)
+    eros_mock.assert_called_once_with("c2rmf", "abc", object_group)
 
 
 @pytest.mark.django_db
-@mock.patch("lab.elasticsearch.catalog.fetch_full_objectgroup_from_eros")
+@mock.patch("lab.elasticsearch.catalog.fetch_full_objectgroup")
 def test_fetch_object_group_from_eros_if_eros_fails_returns_og(
     eros_mock: mock.MagicMock,
 ):
     object_group = factories.ObjectGroupFactory(
         c2rmf_id="abc",
     )
-    eros_mock.side_effect = ErosHTTPError
+    eros_mock.side_effect = ObjectProviderError
     assert (
         _fetch_object_group_from_eros(
             c2rmf_id="abc",
