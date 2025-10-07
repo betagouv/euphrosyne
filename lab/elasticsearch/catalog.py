@@ -5,7 +5,7 @@ from slugify import slugify
 
 from lab.methods.dto import method_model_to_dto
 from lab.models import ObjectGroup, ObjectGroupThumbnail, Project
-from lab.objects.c2rmf import ErosHTTPError, fetch_full_objectgroup_from_eros
+from lab.objects import ObjectProviderError, fetch_full_objectgroup
 from lab.participations.models import Participation
 from lab.runs.models import Run
 from lab.thesauri.opentheso import (
@@ -94,12 +94,10 @@ def _create_project_page_data(
             # Fetch object group from EROS
             try:
                 object_group = (
-                    fetch_full_objectgroup_from_eros(
-                        c2rmf_id=object_group.c2rmf_id, object_group=object_group
-                    )
+                    fetch_full_objectgroup("c2rmf", object_group.c2rmf_id, object_group)
                     or object_group
                 )
-            except ErosHTTPError as error:
+            except ObjectProviderError as error:
                 logger.error(
                     "Failed to fetch object group %s from EROS: %s",
                     object_group.id,
@@ -321,11 +319,10 @@ def _fetch_object_group_from_eros(
     c2rmf_id: str, object_group: ObjectGroup
 ) -> ObjectGroup:
     try:
-        object_group_with_eros_information = fetch_full_objectgroup_from_eros(
-            c2rmf_id=c2rmf_id,
-            object_group=object_group,
+        object_group_with_eros_information = fetch_full_objectgroup(
+            "c2rmf", c2rmf_id, object_group
         )
-    except ErosHTTPError as error:
+    except ObjectProviderError as error:
         logger.error("Failed to fetch object group from EROS: %s", error, exc_info=True)
         return object_group
     return object_group_with_eros_information or object_group

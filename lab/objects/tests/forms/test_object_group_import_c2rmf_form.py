@@ -5,8 +5,8 @@ from django.forms import ValidationError
 
 from lab.tests import factories
 
-from ...c2rmf import ErosHTTPError
 from ...forms import ObjectGroupImportC2RMFForm
+from ...providers import ObjectProviderError
 
 
 def test_form_conf():
@@ -18,7 +18,7 @@ def test_form_conf():
 
 
 @pytest.mark.django_db
-@mock.patch("lab.objects.forms.fetch_partial_objectgroup_from_eros")
+@mock.patch("lab.objects.forms.fetch_partial_objectgroup")
 def test_clean_fetch_data(mock_fetch: mock.MagicMock):
     mock_fetch.return_value = {
         "worknbr": "C2RMF00000",
@@ -28,13 +28,13 @@ def test_clean_fetch_data(mock_fetch: mock.MagicMock):
     form.cleaned_data = {"c2rmf_id": "C2RMF00000"}
     cleaned_data = form.clean()
 
-    mock_fetch.assert_called_once_with("C2RMF00000")
+    mock_fetch.assert_called_once_with("c2rmf", "C2RMF00000")
     assert cleaned_data["label"] == "Test"
     assert cleaned_data["object_count"] == 1
 
 
 @pytest.mark.django_db
-@mock.patch("lab.objects.forms.fetch_partial_objectgroup_from_eros")
+@mock.patch("lab.objects.forms.fetch_partial_objectgroup")
 def test_clean_raises_if_fetch_none(mock_fetch: mock.MagicMock):
     mock_fetch.return_value = None
     form = ObjectGroupImportC2RMFForm()
@@ -44,9 +44,9 @@ def test_clean_raises_if_fetch_none(mock_fetch: mock.MagicMock):
 
 
 @pytest.mark.django_db
-@mock.patch("lab.objects.forms.fetch_partial_objectgroup_from_eros")
+@mock.patch("lab.objects.forms.fetch_partial_objectgroup")
 def test_clean_raises_if_fetch_fails(mock_fetch: mock.MagicMock):
-    mock_fetch.side_effect = ErosHTTPError()
+    mock_fetch.side_effect = ObjectProviderError()
     form = ObjectGroupImportC2RMFForm()
     form.cleaned_data = {"c2rmf_id": "C2RMF00000"}
     with pytest.raises(ValidationError):
@@ -67,7 +67,7 @@ def test_clean_set_form_if_obj_exists():
 
 
 @pytest.mark.django_db
-@mock.patch("lab.objects.forms.fetch_partial_objectgroup_from_eros")
+@mock.patch("lab.objects.forms.fetch_partial_objectgroup")
 def test_clean_c2rmf_id_upper(mock_fetch: mock.MagicMock):
     mock_fetch.return_value = {
         "worknbr": "C2RMF00000",

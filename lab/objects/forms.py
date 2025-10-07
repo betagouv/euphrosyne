@@ -8,8 +8,8 @@ from django.utils.translation import gettext_lazy as _
 from lab.widgets import ChoiceTag, TagsInput
 
 from . import widgets
-from .c2rmf import ErosHTTPError, fetch_partial_objectgroup_from_eros
 from .models import Era, Location, ObjectGroup, ObjectGroupThumbnail, Period
+from .providers import ObjectProviderError, fetch_partial_objectgroup
 
 logger = logging.getLogger(__name__)
 
@@ -169,14 +169,14 @@ class ObjectGroupImportC2RMFForm(forms.ModelForm):
             return self.cleaned_data
         # If it does not exist, then fetch data from Eros
         try:
-            eros_data = fetch_partial_objectgroup_from_eros(
-                self.cleaned_data["c2rmf_id"]
+            eros_data = fetch_partial_objectgroup(
+                "c2rmf", self.cleaned_data["c2rmf_id"]
             )
-        except ErosHTTPError as error:
+        except ObjectProviderError as error:
             logger.error(
-                "An error occured when importing data from Eros.\nID: %s\nResponse: %s",
+                "An error occured when importing data from Eros.\nID: %s\nError: %s",
                 self.cleaned_data["c2rmf_id"],
-                error.response,
+                error,
             )
             raise forms.ValidationError(
                 {"c2rmf_id": _("An error occured when importing data from Eros.")}

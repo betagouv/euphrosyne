@@ -20,7 +20,6 @@ from django.utils.translation import gettext_lazy as _
 from lab.models import Project, Run
 from lab.permissions import is_lab_admin
 
-from .c2rmf import fetch_full_objectgroup_from_eros
 from .csv_upload import CSVParseError, parse_csv
 from .forms import (
     ObjectGroupForm,
@@ -28,6 +27,7 @@ from .forms import (
     ObjectGroupThumbnailForm,
 )
 from .models import Object, ObjectGroup, ObjectGroupThumbnail
+from .providers import fetch_full_objectgroup
 
 
 class CSVValidationError(ValidationError):
@@ -301,8 +301,8 @@ class ObjectGroupAdmin(ModelAdmin):
     ) -> Any | None:
         object_group = super().get_object(request, object_id, from_field)
         if object_group and object_group.c2rmf_id:
-            object_group = fetch_full_objectgroup_from_eros(
-                object_group.c2rmf_id, object_group
+            object_group = fetch_full_objectgroup(
+                "c2rmf", object_group.c2rmf_id, object_group
             )
         return object_group
 

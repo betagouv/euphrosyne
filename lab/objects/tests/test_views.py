@@ -27,14 +27,13 @@ class TestObjectImportC2RMFView(TestCase):
             IS_POPUP_VAR: 1,
         }
         self.view.request = RequestFactory().post(self.url, data)
-        with mock.patch(
-            "lab.objects.forms.fetch_partial_objectgroup_from_eros"
-        ) as mock_fn:
+        with mock.patch("lab.objects.forms.fetch_partial_objectgroup") as mock_fn:
             mock_fn.return_value = {
                 "c2rmf_id": "abc",
                 "label": "Rodondendron",
             }
             form = forms.ObjectGroupImportC2RMFForm(data=data)
+            form.is_valid()  # Validate the form within the mock context
             response = self.view.form_valid(form)
 
         assert self.view.object.id
@@ -64,9 +63,7 @@ class TestObjectImportC2RMFView(TestCase):
         }
         self.view.request = RequestFactory().post(self.url, data)
 
-        with mock.patch(
-            "lab.objects.forms.fetch_partial_objectgroup_from_eros"
-        ) as mock_fn:
+        with mock.patch("lab.objects.forms.fetch_partial_objectgroup") as mock_fn:
             mock_fn.return_value = {
                 "c2rmf_id": existing_obj.c2rmf_id,
                 "label": "Rodondendron",
@@ -88,9 +85,7 @@ class TestObjectImportC2RMFView(TestCase):
             IS_POPUP_VAR: 1,
         }
         self.view.request = RequestFactory().post(self.url, data)
-        with mock.patch(
-            "lab.objects.forms.fetch_partial_objectgroup_from_eros"
-        ) as mock_fn:
+        with mock.patch("lab.objects.forms.fetch_partial_objectgroup") as mock_fn:
             mock_fn.return_value = {
                 "c2rmf_id": existing_obj.c2rmf_id,
                 "label": "Rodondendron",

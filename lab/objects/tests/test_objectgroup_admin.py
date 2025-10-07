@@ -187,8 +187,8 @@ class TestObjectErosImport(TestCase):
     def test_fetch_object_from_eros_when_imported(self):
         objectgroup = factories.ObjectGroupFactory(c2rmf_id="123")
         request = RequestFactory().get(reverse(CHANGE_VIEWNAME, args=[objectgroup.id]))
-        with mock.patch(
-            "lab.objects.admin.fetch_full_objectgroup_from_eros"
-        ) as fetch_mock:
+        with mock.patch("lab.objects.admin.fetch_full_objectgroup") as fetch_mock:
             self.admin.get_object(request, objectgroup.id)
-            fetch_mock.assert_called_once_with(objectgroup.c2rmf_id, objectgroup)
+            fetch_mock.assert_called_once_with(
+                "c2rmf", objectgroup.c2rmf_id, objectgroup
+            )

@@ -10,8 +10,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
-from ..objects.c2rmf import ErosHTTPError, fetch_partial_objectgroup_from_eros
-from ..objects.models import ObjectGroup
+from ..objects import ObjectGroup, ObjectProviderError, fetch_partial_objectgroup
 from . import serializers
 
 logger = logging.getLogger(__name__)
@@ -24,12 +23,12 @@ def get_eros_object(request):
     """Fetch object from Eros."""
     c2rmf_id = request.data["query"]
     try:
-        obj = fetch_partial_objectgroup_from_eros(c2rmf_id)
-    except ErosHTTPError as error:
+        obj = fetch_partial_objectgroup("c2rmf", c2rmf_id)
+    except ObjectProviderError as error:
         logger.error(
-            "An error occured when importing data from Eros.\nID: %s\nResponse: %s",
+            "An error occured when importing data from Eros.\nID: %s\nError: %s",
             c2rmf_id,
-            error.response,
+            error,
         )
         obj = None
     if not obj:
