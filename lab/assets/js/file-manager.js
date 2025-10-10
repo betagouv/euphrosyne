@@ -59,7 +59,7 @@ export class FileManager {
     } catch (error) {
       displayMessage(
         window.gettext(
-          "An error has occured while generating the presigned URL. Please contact the support team.",
+          "An error has occurred while generating the presigned URL. Please contact the support team.",
         ),
         "error",
       );

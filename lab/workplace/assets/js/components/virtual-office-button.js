@@ -51,7 +51,7 @@ export default class VirtualOfficeButton extends HTMLElement {
         this.buttonEl.disabled = false;
         utils.displayMessage(
           window.gettext(
-            "An error occured while creating the virtual office. Please contact an administrator or try again later.",
+            "An error occurred while creating the virtual office. Please contact an administrator or try again later.",
           ),
           "error",
         );
@@ -198,7 +198,7 @@ export default class VirtualOfficeButton extends HTMLElement {
       this.buttonEl.innerText = window.gettext("Create virtual office");
       utils.displayMessage(
         window.gettext(
-          "Configuration took too long. Something wrong occured. Please contact an administrator.",
+          "Configuration took too long. Something wrong occurred. Please contact an administrator.",
         ),
         "error",
       );

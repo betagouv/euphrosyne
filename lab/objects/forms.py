@@ -215,14 +215,14 @@ class ObjectGroupImportBase(forms.ModelForm):
             )
         except ObjectProviderError as error:
             logger.error(
-                "An error occured when importing data from %s.\nID: %s\nError: %s",
+                "An error occurred when importing data from %s.\nID: %s\nError: %s",
                 self.provider_name,
                 cleaned_data["provider_object_id"],
                 error,
             )
             raise forms.ValidationError(
                 {
-                    "label": "An error occured when importing data "
+                    "label": "An error occurred when importing data "
                     f"from {self.provider_name.upper()}."
                 }
             )

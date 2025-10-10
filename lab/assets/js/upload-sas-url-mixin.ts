@@ -10,7 +10,7 @@ export class UploadSasUrlMixin {
 
     if (!response) {
       throw new Error(
-        window.gettext("An error occured while requesting upload URL."),
+        window.gettext("An error occurred while requesting upload URL."),
       );
     }
 

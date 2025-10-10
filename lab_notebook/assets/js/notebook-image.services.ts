@@ -19,7 +19,7 @@ export class StorageImageServices {
     if (!response?.ok) {
       console.error(response);
       throw new Error(
-        window.gettext("An error occured while requesting upload URL."),
+        window.gettext("An error occurred while requesting upload URL."),
       );
     }
 

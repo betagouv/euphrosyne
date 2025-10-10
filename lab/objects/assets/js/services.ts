@@ -38,7 +38,7 @@ export async function createObjectGroup(
       throw new Error(
         window.interpolate(
           window.gettext(
-            "An error occured while creating the object group. %s",
+            "An error occurred while creating the object group. %s",
           ),
           [(e as Error).toString()],
         ),

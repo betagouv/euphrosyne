@@ -117,7 +117,7 @@
         displayErrorMessage(
           importFromInputEl,
           window.gettext(
-            "An error occured while retrieving the object. Please contact AGLAE team if the error persists.",
+            "An error occurred while retrieving the object. Please contact AGLAE team if the error persists.",
           ),
         );
       })

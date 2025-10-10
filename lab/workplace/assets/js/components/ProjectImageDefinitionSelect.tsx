@@ -22,8 +22,8 @@ export default function ProjectImageDefinitionSelect({
       window.gettext(
         "Used to determine the image definition used to create the VM.",
       ),
-    "An error ocurred while setting project image definition": window.gettext(
-      "An error ocurred while setting project image definition",
+    "An error occurred while setting project image definition": window.gettext(
+      "An error occurred while setting project image definition",
     ),
   };
 
@@ -74,7 +74,7 @@ export default function ProjectImageDefinitionSelect({
           id={`${projectSlug}-image-definition-select--error`}
           className="fr-error-text"
         >
-          {t["An error ocurred while setting project image definition"]}
+          {t["An error occurred while setting project image definition"]}
         </p>
       )}
       <div className="help">

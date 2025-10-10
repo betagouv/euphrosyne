@@ -50,7 +50,7 @@ export default class VirtualOfficeDeleteButton extends HTMLButtonElement {
     } catch (error) {
       this.disabled = false;
       utils.displayMessage(
-        window.gettext("An error occured while deleting the virtual office."),
+        window.gettext("An error occurred while deleting the virtual office."),
         "error",
       );
       throw error;

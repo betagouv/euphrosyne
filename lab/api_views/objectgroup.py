@@ -26,7 +26,7 @@ def get_object_from_provider(request, provider_name: str):
         obj = fetch_partial_objectgroup(provider_name, external_reference_id)
     except ObjectProviderError as error:
         logger.error(
-            "An error occured when importing data from %s.\nID: %s\nError: %s",
+            "An error occurred when importing data from %s.\nID: %s\nError: %s",
             provider_name,
             external_reference_id,
             error,
@@ -57,7 +57,7 @@ def get_eros_object(request):
         obj = fetch_partial_objectgroup("eros", c2rmf_id)
     except ObjectProviderError as error:
         logger.error(
-            "An error occured when importing data from Eros.\nID: %s\nError: %s",
+            "An error occurred when importing data from Eros.\nID: %s\nError: %s",
             c2rmf_id,
             error,
         )
