@@ -24,7 +24,7 @@ def social_user(
     user_id = strategy.session_get("user_id")
     if user_id:
         user = get_user_model().objects.get(id=user_id)
-    out = social_social_user(backend, uid, user, *args, **kwargs)
+    out = social_social_user(backend, uid, user, *args, **kwargs)  # type: ignore
     if not out.get("user") and not out.get("social"):
         messages.warning(
             strategy.request,

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-26 16:06+0200\n"
+"POT-Creation-Date: 2025-10-09 15:30+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -722,8 +722,12 @@ msgstr ""
 msgid "Object"
 msgstr "Objet"
 
-msgid "This object was imported from EROS."
-msgstr "Cet objet a été importé via EROS."
+msgid "External Reference"
+msgstr "Référence externe"
+
+#, python-format
+msgid "This object was imported from %s."
+msgstr "Cet objet a été importé via %s."
 
 msgid ""
 "Fill up collection and inventory number if you object group is "
@@ -731,6 +735,9 @@ msgid ""
 msgstr ""
 "Remplissez la collection et le numéro d'inventaire si votre groupe d'objets "
 "est indifférencié."
+
+msgid "# in projects"
+msgstr "# dans les projets"
 
 msgid "One object"
 msgstr "Objet unique"
@@ -751,11 +758,8 @@ msgstr "Commencez à écrire pour rechercher un lieu"
 msgid "Start typing to search for a period"
 msgstr "Commencez à écrire pour rechercher une période"
 
-msgid "An error occured when importing data from Eros."
-msgstr "Une erreur est survenue lors de l'import via Eros."
-
-msgid "This ID was not found in Eros."
-msgstr "Ce numéro n'a pas été trouvé dans Eros."
+msgid "Label"
+msgstr "Libellé"
 
 msgid "Latitude"
 msgstr "Latitude"
@@ -768,12 +772,6 @@ msgstr "Image"
 
 msgid "Copyright"
 msgstr "Mention / droit d'auteur"
-
-msgid "C2RMF ID"
-msgstr "Numéro C2RMF"
-
-msgid "Label"
-msgstr "Libellé"
 
 msgid "Number of objects"
 msgstr "Nombre d'objets"
@@ -809,14 +807,36 @@ msgstr "Objet(s) / Échantillon(s)"
 msgid "Inventory"
 msgstr "Inventaire"
 
+msgid "Object Group"
+msgstr "Lot d'objets"
+
+msgid "Provider Name"
+msgstr "Nom du fournisseur"
+
+msgid "Provider identifier (e.g., 'eros', 'pop')"
+msgstr "Identifiant du fournisseur (par exemple, 'eros', 'pop')"
+
+msgid "Provider Object ID"
+msgstr "Identifiant de l'objet du fournisseur"
+
+msgid "Unique identifier in the provider's system"
+msgstr "Identifiant unique dans le système du fournisseur"
+
+msgid "External Object Reference"
+msgstr "Référence externe"
+
+msgid "External Object References"
+msgstr "Références externes"
+
 msgid "Image transformation"
 msgstr "Redimensionnement de l'image"
 
 msgid "This object has already been added to the run."
-msgstr "Cet object a déjà été ajouté à ce run."
+msgstr "Cet objet a déjà été ajouté à ce run."
 
-msgid "EROS import"
-msgstr "Import EROS"
+#, python-format
+msgid "%s import"
+msgstr "Import %s"
 
 msgid "On premises"
 msgstr "Sur place"
@@ -1247,12 +1267,13 @@ msgstr "Créer un nouveau run"
 msgid "Schedule run"
 msgstr "Planifier le run"
 
+#, python-format
 msgid ""
-"Use the search field to import an object from Eros. The name of the object "
-"will be displayed in the field after."
+"Use the search field to import an object from %(provider_name)s. The name of "
+"the object will be displayed in the field after."
 msgstr ""
-"Utilisez le champs de recherche pour importer un object à partir d'Eros. Le "
-"nom de l'objet sera affiché dans le champs suivant."
+"Utilisez le champs de recherche pour importer un object à partir de "
+"%(provider_name)s. Le nom de l'objet sera affiché dans le champs suivant."
 
 msgid "Documents"
 msgstr "Documents"
@@ -1342,8 +1363,8 @@ msgstr "Ajouter un autre %(model)s"
 msgid "Add a new object or object group"
 msgstr "Créer un objet ou groupe d'objets"
 
-msgid "Import with C2RMF ID"
-msgstr "Importer avec un numéro C2RMF"
+msgid "Import with Eros ID"
+msgstr "Importer avec un numéro Eros"
 
 #, python-format
 msgid "Delete selected %(model)s"

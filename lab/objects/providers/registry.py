@@ -13,7 +13,7 @@ class ProviderRegistry:
         """Register a provider class with a given name.
 
         Args:
-            name: The provider name (e.g., 'c2rmf', 'pop')
+            name: The provider name (e.g., 'eros', 'pop')
             provider_class: The provider class implementing ObjectProvider
         """
         cls._providers[name] = provider_class

@@ -121,10 +121,25 @@ class _RunObjectGroupObjectGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ObjectGroup
-        fields = ("label", "id", "object_count", "dating", "materials", "c2rmf_id")
+        fields = (
+            "label",
+            "id",
+            "object_count",
+            "dating",
+            "materials",
+            "c2rmf_id",
+        )
 
     def get_dating(self, obj: ObjectGroup):
         return obj.dating_era.label if obj.dating_era else ""
+
+    def get_c2rmf_id(self, obj: ObjectGroup):
+        if (
+            hasattr(obj, "external_reference")
+            and obj.external_reference.provider_name == "eros"
+        ):
+            return obj.external_reference.provider_object_id
+        return None
 
 
 class RunObjectGroupSerializer(serializers.ModelSerializer):

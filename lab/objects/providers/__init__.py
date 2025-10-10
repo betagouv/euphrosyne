@@ -1,7 +1,7 @@
 """Art object providers package."""
 
 # Import providers to register them
-from . import c2rmf  # noqa: F401
+from . import eros  # noqa: F401
 
 # Export public API
 from .api import (  # noqa: F401

@@ -1,6 +1,6 @@
 """Unified API for art object providers."""
 
-from typing import Any
+from lab.objects.providers.base import PartialObject
 
 from ..models import ObjectGroup
 from .registry import registry
@@ -8,11 +8,11 @@ from .registry import registry
 
 def fetch_partial_objectgroup(
     provider_name: str, object_id: str
-) -> dict[str, Any] | None:
+) -> PartialObject | None:
     """Fetch object data with minimum information to save it to DB.
 
     Args:
-        provider_name: Name of the provider (e.g., 'c2rmf', 'pop')
+        provider_name: Name of the provider (e.g., 'eros', 'pop')
         object_id: The unique identifier for the object in the provider system
 
     Returns:
@@ -32,7 +32,7 @@ def fetch_full_objectgroup(
     """Fetch object data with full information to display it.
 
     Args:
-        provider_name: Name of the provider (e.g., 'c2rmf', 'pop')
+        provider_name: Name of the provider (e.g., 'eros', 'pop')
         object_id: The unique identifier for the object in the provider system
         object_group: Optional existing ObjectGroup instance to update
             (but does not save to DB)
@@ -52,7 +52,7 @@ def construct_image_url(provider_name: str, path: str) -> str:
     """Construct image URL from provider-specific path.
 
     Args:
-        provider_name: Name of the provider (e.g., 'c2rmf', 'pop')
+        provider_name: Name of the provider (e.g., 'eros', 'pop')
         path: Provider-specific path to the image
 
     Returns:

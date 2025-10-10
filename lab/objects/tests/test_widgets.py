@@ -7,4 +7,4 @@ def test_importfrominput_widget():
 
     assert widget.field_id_mapping == {"label": "label-id"}
     assert context["widget"]["field_id_mapping"] == (("label", "label-id"),)
-    assert context["widget"]["attrs"]["import_url_name"] == "https://url"
+    assert context["widget"]["attrs"]["import_url"] == "https://url"

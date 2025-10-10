@@ -3,7 +3,7 @@ Objects package - Art object data management and provider API.
 
 This package provides:
 - Django models for art objects (ObjectGroup, Object, etc.)
-- Provider API for fetching data from external sources (C2RMF EROS, POP, etc.)
+- Provider API for fetching data from external sources (EROS, POP, etc.)
 """
 
 # Import providers to register them

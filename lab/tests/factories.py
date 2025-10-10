@@ -15,7 +15,7 @@ from ..models import (
     Project,
     Run,
 )
-from ..objects.models import Location
+from ..objects.models import ExternalObjectReference, Location
 
 NOW = datetime.now(tz=timezone.utc)
 
@@ -158,6 +158,15 @@ class ObjectGroupFactory(factory.django.DjangoModelFactory):
     @factory.post_generation
     def objects(self, *args, **kwargs):
         return ObjectFactory.create_batch(3, group_id=self.id)
+
+
+class ExternalObjectReferenceFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ExternalObjectReference
+
+    object_group = factory.SubFactory(ObjectGroupFactory)
+    provider_name = factory.Faker("word")
+    provider_object_id = factory.Faker("uuid4")
 
 
 class LocationFactory(factory.django.DjangoModelFactory):

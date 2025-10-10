@@ -90,20 +90,13 @@ def _create_project_page_data(
         discovery_place_label: str | None = None
         dating_era_label: str | None = None
         dating_period_label: str | None = None
-        if object_group.c2rmf_id and not skip_eros:
-            # Fetch object group from EROS
-            try:
-                object_group = (
-                    fetch_full_objectgroup("c2rmf", object_group.c2rmf_id, object_group)
-                    or object_group
-                )
-            except ObjectProviderError as error:
-                logger.error(
-                    "Failed to fetch object group %s from EROS: %s",
-                    object_group.id,
-                    error,
-                    exc_info=True,
-                )
+
+        # Fetch from external provider
+        if object_group.is_from_provider("eros") and not skip_eros:
+            # Fetch object group from external source
+            object_group = _fetch_object_group_from_provider(object_group=object_group)
+
+        # Fetch from local database
         else:
             # Fetch thesauri information for non-EROS object groups
             if object_group.dating_period:
@@ -113,20 +106,20 @@ def _create_project_page_data(
 
             if object_group.discovery_place_location:
                 discovery_place_label = object_group.discovery_place_location.label
+        object_group_data = {
+            "id": object_group.id,
+            "c2rmf_id": object_group.c2rmf_id,
+            "label": object_group.label,
+            "materials": object_group.materials,
+            "discovery_place_label": discovery_place_label,
+            "collection": object_group.collection,
+            "inventory": object_group.inventory,
+            "dating_period_label": dating_period_label,
+            "dating_era_label": dating_era_label,
+        }
+
         page_data.add_object_group(
-            object_group=ObjectGroupDoc(
-                **{
-                    "id": object_group.id,
-                    "c2rmf_id": object_group.c2rmf_id,
-                    "label": object_group.label,
-                    "materials": object_group.materials,
-                    "discovery_place_label": discovery_place_label,
-                    "collection": object_group.collection,
-                    "inventory": object_group.inventory,
-                    "dating_period_label": dating_period_label,
-                    "dating_era_label": dating_era_label,
-                }
-            ),
+            object_group=ObjectGroupDoc(**object_group_data),
             objects=list(
                 object_group.object_set.values("label", "inventory", "collection")
             ),
@@ -177,9 +170,6 @@ def build_project_catalog_document(
 
     is_data_embargoed = all(run.is_data_embargoed for run in runs)
 
-    if project.slug == "2025-itineris":
-        print(is_data_embargoed)
-
     catalog_item = CatalogItem(
         meta={"id": _id},
         category="project",
@@ -214,11 +204,9 @@ def build_object_group_catalog_document(  # noqa: C901
     location_label: str | None = None
     locations = []
 
-    if object_group.c2rmf_id and not skip_eros:
+    if object_group.is_from_provider("eros") and not skip_eros:
         # Fetch object group from EROS
-        object_group = _fetch_object_group_from_eros(
-            c2rmf_id=object_group.c2rmf_id, object_group=object_group
-        )
+        object_group = _fetch_object_group_from_provider(object_group=object_group)
 
     if (
         object_group.discovery_place_location
@@ -280,7 +268,11 @@ def build_object_group_catalog_document(  # noqa: C901
         created=object_group.created,
         materials=object_group.materials,
         object_page_data=page_data,
-        c2rmf_id=object_group.c2rmf_id,
+        c2rmf_id=(
+            object_group.external_reference.provider_object_id
+            if object_group.is_from_provider("eros")
+            else None
+        ),
         collection=object_group.collection,
         inventory_number=object_group.inventory,
         inventory_numbers=[object_group.object_set.values_list("inventory", flat=True)],
@@ -315,14 +307,23 @@ def build_object_group_catalog_document(  # noqa: C901
     return catalog_item
 
 
-def _fetch_object_group_from_eros(
-    c2rmf_id: str, object_group: ObjectGroup
-) -> ObjectGroup:
+def _fetch_object_group_from_provider(object_group: ObjectGroup) -> ObjectGroup:
+    if not object_group.is_external:
+        return object_group
     try:
         object_group_with_eros_information = fetch_full_objectgroup(
-            "c2rmf", c2rmf_id, object_group
+            object_group.external_reference.provider_name,
+            object_group.external_reference.provider_object_id,
+            object_group,
         )
     except ObjectProviderError as error:
-        logger.error("Failed to fetch object group from EROS: %s", error, exc_info=True)
+        logger.error(
+            "Failed to fetch object group %s from provider %s with ID %s : %s",
+            object_group.label,
+            object_group.external_reference.provider_name,
+            object_group.external_reference.provider_object_id,
+            error,
+            exc_info=True,
+        )
         return object_group
     return object_group_with_eros_information or object_group

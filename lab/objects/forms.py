@@ -3,12 +3,21 @@ import logging
 from typing import Any
 
 from django import forms
+from django.forms import modelform_factory
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from lab.widgets import ChoiceTag, TagsInput
 
 from . import widgets
-from .models import Era, Location, ObjectGroup, ObjectGroupThumbnail, Period
+from .models import (
+    Era,
+    ExternalObjectReference,
+    Location,
+    ObjectGroup,
+    ObjectGroupThumbnail,
+    Period,
+)
 from .providers import ObjectProviderError, fetch_partial_objectgroup
 
 logger = logging.getLogger(__name__)
@@ -136,23 +145,47 @@ class ObjectGroupForm(forms.ModelForm):
         return super().is_multipart()
 
 
-class ObjectGroupImportC2RMFForm(forms.ModelForm):
+class ObjectGroupImportBase(forms.ModelForm):
+    """Base class providing common functionality for importing object groups
+    from external providers.
+    Must define:
+    provider_name: str - Provider identifier (e.g., 'c2rmf', 'pop')
+
+    """
+
+    provider_name: str
+
     class Meta:
-        model = ObjectGroup
-        fields = ("c2rmf_id", "label", "object_count")
+        model = ExternalObjectReference
+        fields = (
+            "label",
+            "provider_object_id",
+        )
         widgets = {
-            "object_count": forms.HiddenInput(),
-            "c2rmf_id": widgets.ImportFromInput(
-                "api:objectgroup-c2rmf-fetch", {"label": "id_label"}
-            ),
+            "label": forms.TextInput(attrs={"readonly": "readonly"}),
         }
 
+    label = forms.CharField(
+        label=_("Label"), max_length=255, disabled=True, required=False
+    )
+
     def __init__(self, *args, **kwargs):
+        if (
+            not hasattr(self, "provider_name")
+            or getattr(self, "provider_name", None) is None
+        ):
+            raise AttributeError(
+                f"{self.__class__.__name__} is missing "
+                "required property 'provider_name'"
+            )
         super().__init__(*args, **kwargs)
-        self.fields["c2rmf_id"].widget.attrs["placeholder"] = "C2RMF00000"
-        self.fields["object_count"].initial = 1
-        self.fields["label"].disabled = True
-        self.fields["label"].required = False
+        self.fields["provider_object_id"].widget = widgets.ImportFromInput(
+            reverse(
+                "api:objectgroup-provider-fetch",
+                kwargs={"provider_name": self.provider_name},
+            ),
+            {"label": "id_label"},
+        )
 
     def _post_clean(self):
         # Skip _post_clean if we already have an existing instance
@@ -160,47 +193,94 @@ class ObjectGroupImportC2RMFForm(forms.ModelForm):
             super()._post_clean()
 
     def clean(self) -> dict[str, Any]:
-        # First, check if objectgroup with this c2rmf id exists.
-        instance = ObjectGroup.objects.filter(
-            c2rmf_id=self.cleaned_data["c2rmf_id"]
-        ).first()
+        """Fetch object data from provider and validate."""
+        # Access form attributes (cleaned_data, instance) via self
+        cleaned_data = getattr(self, "cleaned_data", {})
+
+        object_id = cleaned_data.get("provider_object_id")
+
+        if not object_id:
+            return cleaned_data
+
+        # First, check if objectgroup with this ID exists
+        filter_kwargs = {"provider_object_id": object_id}
+        instance = ExternalObjectReference.objects.filter(**filter_kwargs).first()
         if instance:
-            self.instance = instance
-            return self.cleaned_data
-        # If it does not exist, then fetch data from Eros
+            setattr(self, "instance", instance)
+            return cleaned_data
+
         try:
-            eros_data = fetch_partial_objectgroup(
-                "c2rmf", self.cleaned_data["c2rmf_id"]
+            provider_data = fetch_partial_objectgroup(
+                self.provider_name, cleaned_data["provider_object_id"]
             )
         except ObjectProviderError as error:
             logger.error(
-                "An error occured when importing data from Eros.\nID: %s\nError: %s",
-                self.cleaned_data["c2rmf_id"],
+                "An error occured when importing data from %s.\nID: %s\nError: %s",
+                self.provider_name,
+                cleaned_data["provider_object_id"],
                 error,
             )
             raise forms.ValidationError(
-                {"c2rmf_id": _("An error occured when importing data from Eros.")}
+                {
+                    "label": "An error occured when importing data "
+                    f"from {self.provider_name.upper()}."
+                }
             )
-        if not eros_data:
+
+        if not provider_data:
             raise forms.ValidationError(
-                {"c2rmf_id": _("This ID was not found in Eros.")}
+                {"label": f"This ID was not found in {self.provider_name.upper()}."}
             )
+
         data = {
-            **self.cleaned_data,
-            **eros_data,
-            "object_count": 1,
+            **cleaned_data,
+            "object_group": provider_data,
         }
         return data
 
-    def clean_c2rmf_id(self):
-        return self.cleaned_data["c2rmf_id"].upper()
+    def save(self, commit=True):
+        if not self.instance.id:
+            self.instance.provider_name = self.provider_name
+            object_group = ObjectGroup.objects.create(
+                **self.cleaned_data["object_group"], object_count=1
+            )
+            if object_group:
+                self.instance.object_group = object_group
+        return super().save(commit)
 
 
-class ObjectGroupImportC2RMFReadonlyForm(forms.ModelForm):
+class _C2RMFObjectImportForm(ObjectGroupImportBase):
+    def clean_provider_object_id(self):
+        return self.cleaned_data["provider_object_id"].upper()
+
+
+def provider_objectimport_form_factory(provider_name: str, form: type[forms.ModelForm]):
+
+    BaseForm: type[forms.ModelForm] = (  # pylint: disable=invalid-name
+        form or ObjectGroupImportBase
+    )
+
+    class ProviderImportForm(BaseForm):  # type: ignore
+        def __init__(self, *args, **kwargs):
+            self.provider_name = provider_name
+
+            super().__init__(*args, **kwargs)
+
+    return modelform_factory(
+        ExternalObjectReference,
+        ProviderImportForm,
+    )
+
+
+ObjectGroupImportErosForm = provider_objectimport_form_factory(
+    "eros", _C2RMFObjectImportForm
+)
+
+
+class ObjectGroupImportExternalReadonlyForm(forms.ModelForm):
     class Meta:
         model = ObjectGroup
         fields = (
-            "c2rmf_id",
             "label",
             "object_count",
             "dating_era",

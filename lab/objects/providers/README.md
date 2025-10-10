@@ -7,7 +7,7 @@ This package provides an abstraction layer for importing art objects from differ
 - **Base Class**: `ObjectProvider` - Abstract base class defining the interface
 - **Registry**: Centralized provider registration and discovery
 - **API**: Unified functions for accessing any provider
-- **Providers**: Implementation for specific databases (C2RMF, POP, etc.)
+- **Providers**: Implementation for specific databases (Eros, POP, etc.)
 
 ## Usage
 
@@ -23,18 +23,18 @@ from lab.objects.providers import (
 
 # List all available providers
 providers = list_available_providers()
-# ['c2rmf', 'pop']
+# ['eros', 'pop']
 
 # Fetch minimal data for DB storage
-partial_data = fetch_partial_objectgroup('c2rmf', 'C2RMF65980')
-# {'c2rmf_id': 'C2RMF65980', 'label': 'Majolique'}
+partial_data = fetch_partial_objectgroup('eros', 'C2RMF65980')
+# {'label': 'Majolique'}
 
 # Fetch full object data
-full_object = fetch_full_objectgroup('c2rmf', 'C2RMF65980')
+full_object = fetch_full_objectgroup('eros', 'C2RMF65980')
 # Returns ObjectGroup instance with all metadata
 
 # Construct image URL
-image_url = construct_image_url('c2rmf', 'C2RMF65980/12345')
+image_url = construct_image_url('eros', 'C2RMF65980/12345')
 # Returns full IIIF image URL with authentication
 ```
 
@@ -47,7 +47,7 @@ from .base import ObjectProvider
 from .registry import registry
 
 class MyProvider(ObjectProvider):
-    def fetch_partial_data(self, object_id: str) -> dict[str, Any] | None:
+    def fetch_partial_data(self, object_id: str) -> PartialObject | None:
         # Implement fetching logic
         pass
 
@@ -82,7 +82,7 @@ All providers use a common error handling pattern:
 from lab.objects.providers.base import ObjectProviderError
 
 try:
-    data = fetch_partial_objectgroup('c2rmf', 'invalid_id')
+    data = fetch_partial_objectgroup('eros', 'invalid_id')
 except ObjectProviderError as e:
     # Handle provider-specific errors
     pass
