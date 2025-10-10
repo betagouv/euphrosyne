@@ -148,7 +148,7 @@ export async function addMeasuringPointImage(
   if (!response.ok) {
     const action = create ? "creating" : "modifying";
     throw new Error(
-      `An error occured while ${action} measuring poitn image. Response: ${response}`,
+      `An error occurred while ${action} measuring poitn image. Response: ${response}`,
     );
   }
 

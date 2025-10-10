@@ -105,7 +105,7 @@ export abstract class TypeAheadList extends HTMLDivElement {
   displayErrorBanner() {
     const banner = document.createElement("div");
     banner.textContent = window.gettext(
-      "An error occured while fetching results",
+      "An error occurred while fetching results",
     );
     this.cleanList();
     this.appendChild(banner);

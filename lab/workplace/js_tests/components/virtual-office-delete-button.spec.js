@@ -48,7 +48,7 @@ describe("Test VirtualOfficeDeleteButton", () => {
 
     expect(hadError).toBe(true);
     expect(utils.displayMessage).toHaveBeenLastCalledWith(
-      "An error occured while deleting the virtual office.",
+      "An error occurred while deleting the virtual office.",
       "error",
     );
   });

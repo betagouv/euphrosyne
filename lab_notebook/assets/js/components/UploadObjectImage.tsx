@@ -13,8 +13,8 @@ export default function UploadObjectImage({
 }: IUploadObjectImageProps) {
   const t = {
     notAnImageError: "Uploaded file must be a valid image.",
-    sasUrlError: "An error occured while requesting upload URL.",
-    blobUploadError: "An error occured while uploading the file.",
+    sasUrlError: "An error occurred while requesting upload URL.",
+    blobUploadError: "An error occurred while uploading the file.",
     uploadImage: "Upload an image",
     supportedExtensions: "Allowed extensions: png, jpg, jpeg, webp.",
   };

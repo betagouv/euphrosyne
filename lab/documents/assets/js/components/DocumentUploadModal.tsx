@@ -30,9 +30,9 @@ export default function DocumentUploadModal({
   onUploadError,
 }: DocumentUploadModalProps) {
   const t = {
-    "An error has occured while generating the presigned URL. Please contact the support team.":
+    "An error has occurred while generating the presigned URL. Please contact the support team.":
       window.gettext(
-        "An error has occured while generating the presigned URL. Please contact the support team.",
+        "An error has occurred while generating the presigned URL. Please contact the support team.",
       ),
     "File %s has been uploaded.": window.gettext("File %s has been uploaded."),
     Close: window.gettext("Close"),
@@ -60,7 +60,7 @@ export default function DocumentUploadModal({
       console.error("error uploading...", error);
       displayMessage(
         t[
-          "An error has occured while generating the presigned URL. Please contact the support team."
+          "An error has occurred while generating the presigned URL. Please contact the support team."
         ],
         "error",
       );

@@ -77,7 +77,7 @@ msgstr "Annuler"
 msgid "No results"
 msgstr "Aucun résultat"
 
-msgid "An error occured while fetching results"
+msgid "An error occurred while fetching results"
 msgstr "Une erreur s'est produite lors la recherche"
 
 msgid "No results found. You can register a new institution using"
@@ -132,7 +132,7 @@ msgid "Size"
 msgstr "Taille"
 
 msgid ""
-"An error has occured while generating the presigned URL. Please contact the "
+"An error has occurred while generating the presigned URL. Please contact the "
 "support team."
 msgstr ""
 "Une erreur s'est produite lors de la génération de l'URL présignée. Veuillez "
@@ -146,7 +146,7 @@ msgstr "Le fichier %s a été téléversé."
 msgid "File %s could not be uploaded."
 msgstr "Le fichier %s n'a pas pu être sauvegardé."
 
-msgid "An error occured while requesting upload URL."
+msgid "An error occurred while requesting upload URL."
 msgstr "Une erreur s'est produite lors de la demande d'URL de téléversement."
 
 msgid "Didn't receive upload URL from euphrosyne tools."
@@ -222,7 +222,7 @@ msgstr ""
 "Lancez la recherche sur un ID valide avant de soumettre le formulaire. "
 
 #, javascript-format
-msgid "An error occured while creating the object group. %s"
+msgid "An error occurred while creating the object group. %s"
 msgstr "Une erreur s'est produite lors de la création de l'objet. %s"
 
 #, javascript-format
@@ -236,7 +236,7 @@ msgid "No results found."
 msgstr "Aucun résultat trouvé."
 
 msgid ""
-"An error occured while retrieving the object. Please contact AGLAE team if "
+"An error occurred while retrieving the object. Please contact AGLAE team if "
 "the error persists."
 msgstr ""
 "Une erreur s'est produite lors de la recherche de l'object sur Eros. Si "
@@ -252,7 +252,7 @@ msgid "Used to determine the image definition used to create the VM."
 msgstr ""
 "Utilisé pour déterminer la définition d'image utilisée pour créer la VM."
 
-msgid "An error ocurred while setting project image definition"
+msgid "An error occurred while setting project image definition"
 msgstr ""
 "Une erreur s'est produite en paramétrant la définition d'image du projet."
 
@@ -269,7 +269,7 @@ msgid "Create virtual office"
 msgstr "Créer le bureau virtuel"
 
 msgid ""
-"An error occured while creating the virtual office. Please contact an "
+"An error occurred while creating the virtual office. Please contact an "
 "administrator or try again later."
 msgstr ""
 "Une erreur s'est produite lors de la création du bureau distant. Veuillez "
@@ -300,7 +300,7 @@ msgstr ""
 "Accéder au bureau virtuel."
 
 msgid ""
-"Configuration took too long. Something wrong occured. Please contact an "
+"Configuration took too long. Something wrong occurred. Please contact an "
 "administrator."
 msgstr ""
 "La configuration met trop de temps. Nous n'avons pas réussi à créer le "
@@ -315,7 +315,7 @@ msgstr ""
 msgid "Delete virtual office ?"
 msgstr "Supprimer le bureau virtuel ?"
 
-msgid "An error occured while deleting the virtual office."
+msgid "An error occurred while deleting the virtual office."
 msgstr "Une erreur s'est produite lors de la suppression du bureau distant."
 
 msgid "The virtual office has been deleted."
@@ -415,11 +415,11 @@ msgstr "Ajouter un nouveau groupe d'objets ou un objet"
 msgid "Object name / reference"
 msgstr "Nom / référence de l'objet"
 
-msgid "An error occured while creating the object group / object."
+msgid "An error occurred while creating the object group / object."
 msgstr ""
 "Une erreur s'est produite lors de la création du lot d'objets / de l'objet."
 
-msgid "An error occured while adding the object group / object to the run."
+msgid "An error occurred while adding the object group / object to the run."
 msgstr ""
 "Une erreur s'est produite lors de l'ajout du groupe d'objets / objet au run."
 
@@ -428,7 +428,7 @@ msgstr ""
 "Un groupe d'objets / objet avec cette étiquette existe déjà dans ce run."
 
 msgid ""
-"An error occured while adding the object group / object to the measuring "
+"An error occurred while adding the object group / object to the measuring "
 "point."
 msgstr ""
 "Une erreur s'est produite lors de l'ajout du groupe d'objets / objet au "

@@ -9,7 +9,7 @@ async function fetchVMConnectionLink(projectSlug, fetchFn = jwtFetch) {
   } else if (response.status === 404) {
     return null;
   }
-  throw new Error(`An error occured while fetching project ${projectSlug} VM`);
+  throw new Error(`An error occurred while fetching project ${projectSlug} VM`);
 }
 
 async function fetchVMProvisioningState(projectSlug, fetchFn = jwtFetch) {
@@ -22,7 +22,7 @@ async function fetchVMProvisioningState(projectSlug, fetchFn = jwtFetch) {
     return null;
   }
   throw new Error(
-    `An error occured while fetching project ${projectSlug} vm provisioning state`,
+    `An error occurred while fetching project ${projectSlug} vm provisioning state`,
   );
 }
 
@@ -36,7 +36,7 @@ async function fetchDeploymentStatus(projectSlug, fetchFn = jwtFetch) {
     return null;
   }
   throw new Error(
-    `An error occured while fetching project ${projectSlug} deployment status`,
+    `An error occurred while fetching project ${projectSlug} deployment status`,
   );
 }
 

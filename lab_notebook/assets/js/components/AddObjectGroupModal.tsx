@@ -22,16 +22,16 @@ export default function AddObjectGroupModal({
     name: window.gettext("Object name / reference"),
     save: window.gettext("Save"),
     createObjectError: window.gettext(
-      "An error occured while creating the object group / object.",
+      "An error occurred while creating the object group / object.",
     ),
     addObjectErrorToRun: window.gettext(
-      "An error occured while adding the object group / object to the run.",
+      "An error occurred while adding the object group / object to the run.",
     ),
     objectGroupAlreadyExistError: window.gettext(
       "An object group / object with this label already exists in this run.",
     ),
     addObjectErrorToPoint: window.gettext(
-      "An error occured while adding the object group / object to the measuring point.",
+      "An error occurred while adding the object group / object to the measuring point.",
     ),
   };
 
