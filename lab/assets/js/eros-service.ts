@@ -41,24 +41,24 @@ interface ErosObject {
 }
 
 export function constructFromErosPath(path: string, token?: string) {
-  const [c2rmfId, imageId] = path.split("/");
+  const [erosId, imageId] = path.split("/");
   let imageCategory: string;
-  if (c2rmfId.startsWith("C2RMF")) {
-    imageCategory = `pyr-${c2rmfId.substring(0, 6)}`;
-  } else if (c2rmfId.startsWith("F")) {
-    imageCategory = `pyr-${c2rmfId.substring(0, 2)}`;
+  if (erosId.startsWith("C2RMF")) {
+    imageCategory = `pyr-${erosId.substring(0, 6)}`;
+  } else if (erosId.startsWith("F")) {
+    imageCategory = `pyr-${erosId.substring(0, 2)}`;
   } else {
     imageCategory = `pyr-FZ`;
   }
-  let url = `${EROS_BASE_URL}/iiif/${imageCategory}/${c2rmfId}/${imageId}.tif/full/500,/0/default.jpg`;
+  let url = `${EROS_BASE_URL}/iiif/${imageCategory}/${erosId}/${imageId}.tif/full/500,/0/default.jpg`;
   if (token) {
     url = `${url}?token=${token}`;
   }
   return url;
 }
 
-export async function getImagesURLForObject(c2rmfId: string) {
-  const objectDetailsURL = `${EROS_BASE_URL}/rails/oeuvres/${c2rmfId}.json`;
+export async function getImagesURLForObject(erosId: string) {
+  const objectDetailsURL = `${EROS_BASE_URL}/rails/oeuvres/${erosId}.json`;
   let fetchFailed = false,
     objectResponse: Response | undefined = undefined;
   const token = await getToken();
@@ -70,7 +70,7 @@ export async function getImagesURLForObject(c2rmfId: string) {
   }
   if (fetchFailed || (objectResponse && !objectResponse.ok)) {
     console.warn(
-      `Failed to fetch object details with id ${c2rmfId}.\n
+      `Failed to fetch object details with id ${erosId}.\n
         URL: ${objectDetailsURL}\n`,
     );
     if (objectResponse && !objectResponse.ok) {
@@ -83,11 +83,11 @@ export async function getImagesURLForObject(c2rmfId: string) {
   if (objectResponse) {
     const objectDetails = (await objectResponse.json()) as ErosObject;
     if (!objectDetails.images || objectDetails.images.length === 0) {
-      console.warn(`No images found for object with id ${c2rmfId}`);
+      console.warn(`No images found for object with id ${erosId}`);
       return [];
     }
     return objectDetails.images.map((image) =>
-      constructFromErosPath(`${c2rmfId}/${image.filmnbr}`, token),
+      constructFromErosPath(`${erosId}/${image.filmnbr}`, token),
     );
   }
   return null;

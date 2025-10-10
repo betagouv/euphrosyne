@@ -11,6 +11,8 @@ from ..models import ObjectGroup
 from .base import ObjectProvider
 from .registry import registry
 
+EROS_BASE_URL = "http://eros.c2rmf.fr"
+
 
 class ErosImage(typing.TypedDict):
     """EROS image data structure."""
@@ -55,31 +57,31 @@ class ErosData(typing.TypedDict):
     images: typing.NotRequired[list[ErosImage]]
 
 
-class C2RMFProvider(ObjectProvider):
+class ErosProvider(ObjectProvider):
     """C2RMF EROS provider implementation."""
 
     @lru_cache
-    def _fetch_raw_data(self, c2rmf_id: str) -> ErosData | None:
+    def _fetch_raw_data(self, eros_id: str) -> ErosData | None:
         """Fetch raw object data from EROS."""
         token = os.environ["EROS_HTTP_TOKEN"]
         try:
             request = requests.get(
-                f"http://eros.c2rmf.fr/rails/oeuvres/{c2rmf_id}.json?token={token}",
+                f"{EROS_BASE_URL}/rails/oeuvres/{eros_id}.json?token={token}",
                 timeout=5,
             )
             request.raise_for_status()
         except (requests.HTTPError, requests.ConnectionError) as error:
-            self._handle_http_error(error, c2rmf_id)
+            self._handle_http_error(error, eros_id)
 
         if request.status_code == 200:
             return request.json()
         return None
 
-    def fetch_partial_data(self, object_id: str) -> dict[str, typing.Any] | None:
+    def fetch_partial_data(self, object_id: str):
         """Fetch object data with minimum information to save it to DB."""
         data = self._fetch_raw_data(object_id)
         if data:
-            return {"c2rmf_id": object_id, "label": data["title"]}
+            return {"label": data["title"]}
         return None
 
     def fetch_full_object(
@@ -92,7 +94,6 @@ class C2RMFProvider(ObjectProvider):
             return object_group
 
         updated_og.object_count = 1
-        updated_og.c2rmf_id = object_id
         updated_og.label = data["title"]
         if data.get("dtfrom") or data.get("period"):
             dating_label = data.get("dtfrom") or data["period"]
@@ -107,11 +108,11 @@ class C2RMFProvider(ObjectProvider):
         # pylint: disable=import-outside-toplevel
         from euphro_auth.jwt.tokens import EuphroToolsAPIToken
 
-        c2rmf_id, image_id = path.split("/")
-        if c2rmf_id.startswith("C2RMF"):
-            image_category = f"pyr-{c2rmf_id[:6]}"
-        elif c2rmf_id.startswith("F"):
-            image_category = f"pyr-{c2rmf_id[:2]}"
+        eros_id, image_id = path.split("/")
+        if eros_id.startswith("C2RMF"):
+            image_category = f"pyr-{eros_id[:6]}"
+        elif eros_id.startswith("F"):
+            image_category = f"pyr-{eros_id[:2]}"
         else:
             image_category = "pyr-FZ"
 
@@ -119,7 +120,7 @@ class C2RMFProvider(ObjectProvider):
             settings.EROS_BASE_IMAGE_URL or f"{settings.EUPHROSYNE_TOOLS_API_URL}/eros"
         )
 
-        url = f"{eros_base_url}/iiif/{image_category}/{c2rmf_id}/{image_id}.tif/full/500,/0/default.jpg"  # pylint: disable=line-too-long
+        url = f"{eros_base_url}/iiif/{image_category}/{eros_id}/{image_id}.tif/full/500,/0/default.jpg"  # pylint: disable=line-too-long
 
         # Add token to the URL if using EROS direct URL. Else we use the EuphroTools API
         # proxy which includes the token in the request headers.
@@ -130,5 +131,5 @@ class C2RMFProvider(ObjectProvider):
         return f"{url}?token={token}"
 
 
-# Register the C2RMF provider
-registry.register("c2rmf", C2RMFProvider)
+# Register the EROS provider
+registry.register("eros", ErosProvider)

@@ -10,7 +10,7 @@ from lab.tests import factories
 
 from ..catalog import (
     _create_project_page_data,
-    _fetch_object_group_from_eros,
+    _fetch_object_group_from_provider,
     _get_thumbnail_from_object_groups,
     build_object_group_catalog_document,
     build_project_catalog_document,
@@ -240,9 +240,10 @@ class TestObjectGroupCatalogDocument(TestCase):
 @pytest.mark.django_db
 @mock.patch("lab.elasticsearch.catalog.fetch_full_objectgroup")
 def test_build_object_group_calls_eros_if_c2rmf_id(eros_mock: mock.MagicMock):
-    object_group = factories.ObjectGroupFactory(
-        c2rmf_id="abc",
-    )
+    object_group = factories.ExternalObjectReferenceFactory(
+        provider_name="eros",
+        provider_object_id="abc",
+    ).object_group
     eros_mock.return_value = object_group
     build_object_group_catalog_document(
         object_group=object_group,
@@ -251,21 +252,22 @@ def test_build_object_group_calls_eros_if_c2rmf_id(eros_mock: mock.MagicMock):
         is_data_embargoed=True,
     )
 
-    eros_mock.assert_called_once_with("c2rmf", "abc", object_group)
+    eros_mock.assert_called_once_with("eros", "abc", object_group)
 
 
 @pytest.mark.django_db
 @mock.patch("lab.elasticsearch.catalog.fetch_full_objectgroup")
 def test_create_project_page_data_calls_eros_if_c2rmf_id(eros_mock: mock.MagicMock):
-    object_group = factories.ObjectGroupFactory(
-        c2rmf_id="abc",
-    )
+    object_group = factories.ExternalObjectReferenceFactory(
+        provider_name="eros",
+        provider_object_id="abc",
+    ).object_group
     eros_mock.return_value = object_group
     _create_project_page_data(
         runs=[factories.RunFactory()], object_groups=[object_group], leader=None
     )
 
-    eros_mock.assert_called_once_with("c2rmf", "abc", object_group)
+    eros_mock.assert_called_once_with("eros", "abc", object_group)
 
 
 @pytest.mark.django_db
@@ -273,13 +275,14 @@ def test_create_project_page_data_calls_eros_if_c2rmf_id(eros_mock: mock.MagicMo
 def test_fetch_object_group_from_eros_if_eros_fails_returns_og(
     eros_mock: mock.MagicMock,
 ):
-    object_group = factories.ObjectGroupFactory(
-        c2rmf_id="abc",
-    )
+    object_group = factories.ExternalObjectReferenceFactory(
+        provider_name="eros",
+        provider_object_id="abc",
+    ).object_group
+
     eros_mock.side_effect = ObjectProviderError
     assert (
-        _fetch_object_group_from_eros(
-            c2rmf_id="abc",
+        _fetch_object_group_from_provider(
             object_group=object_group,
         )
         == object_group

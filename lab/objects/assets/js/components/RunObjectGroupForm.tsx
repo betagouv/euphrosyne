@@ -27,7 +27,7 @@ export default function RunObjectGroupForm({
     "Import object from same project": window.gettext(
       "Import object from same project",
     ),
-    "Import with C2RMF ID": window.gettext("Import with C2RMF ID"),
+    "Import with EROS ID": window.gettext("Import with EROS ID"),
     "An error occurred.": window.gettext("An error occurred."),
   };
 
@@ -112,11 +112,11 @@ export default function RunObjectGroupForm({
           </li>
           <li>
             <a
-              href={`/lab/objectgroup/c2rmf_import?_to_field=id&_popup=1&run=${run.id}`}
+              href={`/lab/objectgroup/eros_import?_to_field=id&_popup=1&run=${run.id}`}
               className="related-widget-wrapper-link fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-download-line"
               data-popup="yes"
             >
-              {t["Import with C2RMF ID"]}
+              {t["Import with EROS ID"]}
             </a>
           </li>
         </ul>

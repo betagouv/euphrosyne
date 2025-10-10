@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-28 11:28+0200\n"
+"POT-Creation-Date: 2025-10-09 15:28+0200\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -195,8 +195,8 @@ msgstr "Ajouter un groupe d'objets ou un objet"
 msgid "Import object from same project"
 msgstr "Importer un objet du même projet"
 
-msgid "Import with C2RMF ID"
-msgstr "Importer avec un numéro C2RMF"
+msgid "Import with EROS ID"
+msgstr "Importer avec un numéro EROS"
 
 msgid "An error occurred."
 msgstr "Une erreur s'est produite."
@@ -217,15 +217,13 @@ msgstr "Sélectionner un objet"
 msgid "Add object to run"
 msgstr "Ajouter l'objet au run"
 
-msgid "Search for a valid C2RMF ID before submitting the form."
+msgid "Search for a valid ID before submitting the form."
 msgstr ""
-"Lancez la recherche sur un numéro C2RMF valide avant de soumettre le "
-"formulaire. "
+"Lancez la recherche sur un ID valide avant de soumettre le formulaire. "
 
-#, fuzzy, javascript-format
-#| msgid "An error occured while creating the object group. %s"
+#, javascript-format
 msgid "An error occured while creating the object group. %s"
-msgstr "Une erreur s'est produite lors de la création du lot d'objet. %S"
+msgstr "Une erreur s'est produite lors de la création de l'objet. %s"
 
 #, javascript-format
 msgid "Characters left: %s"

@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from lab.documents.views import ProjectDocumentsView
 from lab.hdf5.views import HDF5View
-from lab.objects.views import ObjectImportC2RMFView
+from lab.objects.views import ObjectImportErosView
 from lab.projects.views import ChangeLeaderView
 from lab.workplace.views import WorkplaceView
 
@@ -42,11 +42,11 @@ class AdminSite(admin.AdminSite):
                 name="lab_project_workplace",
             ),
             path(
-                "lab/objectgroup/c2rmf_import",
+                "lab/objectgroup/eros_import",
                 self.admin_view(
-                    ObjectImportC2RMFView.as_view()  # type: ignore[type-var]
+                    ObjectImportErosView.as_view()  # type: ignore[type-var]
                 ),
-                name="lab_objectgroup_c2rmfimport",
+                name="lab_objectgroup_erosimport",
             ),
             path("", include("lab_notebook.urls")),
         ]

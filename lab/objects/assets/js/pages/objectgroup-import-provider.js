@@ -1,15 +1,15 @@
 function onFormSubmit(event) {
-  const labeInput = document.querySelector("input[name='label']"),
-    c2rmfIdInput = document.querySelector(".import-from-input input");
-  if (!labeInput.value) {
-    c2rmfIdInput.setCustomValidity(
-      window.gettext("Search for a valid C2RMF ID before submitting the form."),
+  const labelInput = document.querySelector("input[name='label']"),
+    erosIdInput = document.querySelector(".import-from-input input");
+  if (!labelInput.value) {
+    erosIdInput.setCustomValidity(
+      window.gettext("Search for a valid ID before submitting the form."),
     );
     event.target.reportValidity();
     event.preventDefault();
     return false;
   }
-  c2rmfIdInput.setCustomValidity("");
+  erosIdInput.setCustomValidity("");
 }
 
 document.addEventListener("DOMContentLoaded", function () {

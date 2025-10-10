@@ -55,12 +55,6 @@ class ObjectGroupThumbnail(models.Model):
 
 
 class ObjectGroup(TimestampedModel):
-    c2rmf_id = models.CharField(
-        _("C2RMF ID"),
-        max_length=255,
-        null=True,
-        unique=True,
-    )
     label = models.CharField(
         _("Label"),
         max_length=255,
@@ -104,6 +98,7 @@ class ObjectGroup(TimestampedModel):
         max_length=255,
         blank=True,
     )
+    external_reference: "ExternalObjectReference"
 
     @property
     def discovery_place(self) -> str:
@@ -127,6 +122,27 @@ class ObjectGroup(TimestampedModel):
         verbose_name = _("Object / Sample")
         verbose_name_plural = _("Object(s) / Sample(s")
 
+    @property
+    def c2rmf_id(self) -> str | None:
+        # DEPRECATED. This is kept for backward compatibility but should
+        # not be used in new code. Use is_from_provider("eros") and
+        # external_reference.provider_object_id instead.
+        if hasattr(self, "external_reference") and self.external_reference:
+            if self.external_reference.provider_name == "eros":
+                return self.external_reference.provider_object_id
+        return None
+
+    @property
+    def is_external(self) -> bool:
+        return (
+            hasattr(self, "external_reference") and self.external_reference is not None
+        )
+
+    def is_from_provider(self, provider_name: str) -> bool:
+        return (
+            self.is_external and self.external_reference.provider_name == provider_name
+        )
+
 
 class Object(models.Model):
     group = models.ForeignKey(ObjectGroup, on_delete=models.CASCADE)
@@ -141,6 +157,40 @@ class Object(models.Model):
         max_length=255,
         blank=True,
     )
+
+
+class ExternalObjectReference(TimestampedModel):
+    """Links an ObjectGroup to an external provider's object data."""
+
+    object_group = models.OneToOneField(
+        ObjectGroup,
+        on_delete=models.CASCADE,
+        related_name="external_reference",
+        verbose_name=_("Object Group"),
+    )
+    provider_name = models.CharField(
+        _("Provider Name"),
+        max_length=50,
+        help_text=_("Provider identifier (e.g., 'eros', 'pop')"),
+    )
+    provider_object_id = models.CharField(
+        _("Provider Object ID"),
+        max_length=255,
+        help_text=_("Unique identifier in the provider's system"),
+    )
+
+    class Meta:
+        verbose_name = _("External Object Reference")
+        verbose_name_plural = _("External Object References")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["provider_name", "provider_object_id"],
+                name="unique_provider_object",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.provider_name} - {self.provider_object_id}"
 
 
 class RunObjectGroup(TimestampedModel):
@@ -187,7 +237,7 @@ def construct_image_url_from_path(
     if (
         path.startswith("C2RMF") or path.startswith("FZ") or path.startswith("F")
     ) and len(path.split("/")) == 2:
-        return construct_image_url("c2rmf", path)
+        return construct_image_url("eros", path)
 
     return (
         f"{storage_base_url}{path}?{storage_token}"

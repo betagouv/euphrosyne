@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<div class="import-from-input fr-input-group" data-fetch-url="{% url widget.attrs.import_url_name  %}" {% for key, field_id in widget.field_id_mapping %}data-import-{{key}}={{field_id}}{% endfor %}>
+<div class="import-from-input fr-input-group" data-fetch-url="{{ widget.attrs.import_url }}" {% for key, field_id in widget.field_id_mapping %}data-import-{{key}}={{field_id}}{% endfor %}>
     <div class="fr-search-bar" role="search">
         <input class="fr-input" type="search" id="import-input-{{ widget.name }}" name="{{ widget.name }}" {% if widget.value != None %} value="{{ widget.value }}"{% endif %} {% include "django/forms/widgets/attrs.html" %}>
         <button class="fr-btn" title="{% translate "Search" %}" type="button">

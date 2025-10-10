@@ -20,26 +20,26 @@ class ImportFromInput(widgets.TextInput):
 
     def __init__(
         self,
-        import_url_name: str,
+        import_url: str,
         field_id_mapping: dict[str, str],
         attrs: dict | None = None,
     ):
         """
         Parameters
         ----------
-        import_url_name :
-            Name of the URL to use for fetching data. Must be a valid Django URL name.
+        import_url :
+            URL to use for fetching data. Must be a valid Django URL name.
         field_id_mapping :
             Dict where keys are the property names from the response and values the
             related HTML ID of the elements to complete in the form after fetching
-            data from `import_url_name`.
+            data from `import_url`.
             Example: { "label": "label-id" }
         """
         self.field_id_mapping = field_id_mapping
         super().__init__(
             {
                 **(attrs or {}),
-                "import_url_name": import_url_name,
+                "import_url": import_url,
             }
         )
 

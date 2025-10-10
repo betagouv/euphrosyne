@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import IS_POPUP_VAR  # type: ignore[attr-defined]
 from django.core.files.uploadedfile import UploadedFile
-from django.db.models import QuerySet
+from django.db.models import Count, QuerySet
 from django.forms import BaseInlineFormSet, ModelForm, ValidationError
 from django.forms.utils import ErrorList
 from django.http import HttpResponse, HttpResponseRedirect, QueryDict
@@ -23,10 +23,10 @@ from lab.permissions import is_lab_admin
 from .csv_upload import CSVParseError, parse_csv
 from .forms import (
     ObjectGroupForm,
-    ObjectGroupImportC2RMFReadonlyForm,
+    ObjectGroupImportExternalReadonlyForm,
     ObjectGroupThumbnailForm,
 )
-from .models import Object, ObjectGroup, ObjectGroupThumbnail
+from .models import ExternalObjectReference, Object, ObjectGroup, ObjectGroupThumbnail
 from .providers import fetch_full_objectgroup
 
 
@@ -226,11 +226,47 @@ class ObjectInline(admin.TabularInline):
         return super().get_max_num(request, obj=obj, **kwargs)
 
 
+class ExternalReferenceInline(admin.TabularInline):
+    model = ExternalObjectReference
+    verbose_name = _("External Reference")
+    readonly_fields = ("provider_name", "provider_object_id")
+
+    def has_add_permission(
+        self, request: HttpRequest, obj: Optional[ObjectGroup] = None
+    ) -> bool:
+        return False
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: Optional[ObjectGroup] = None
+    ) -> bool:
+        return False
+
+    def has_view_permission(
+        self, request: HttpRequest, obj: Optional[ObjectGroup] = None
+    ) -> bool:
+        return True
+
+
+class AnnotatedObjectGroup(ObjectGroup):
+    """ObjectGroup class with extra annotations defined in
+    ObjectGroupAdmin.get_queryset."""
+
+    runs_project_count: int
+
+    class Meta:
+        proxy = True
+
+
 @admin.register(ObjectGroup)
 class ObjectGroupAdmin(ModelAdmin):
     inlines = (ObjectInline, ObjectGroupThumbnailInline)
     form = ObjectGroupForm
-    list_display = ("label", "project_num", "c2rmf_id")
+    list_display = (
+        "label",
+        "project_num",
+        "provider_name",
+        "provider_object_id",
+    )
 
     class Media:
         js = ("pages/objectgroup.js",)
@@ -240,7 +276,7 @@ class ObjectGroupAdmin(ModelAdmin):
         return request.user.is_staff
 
     def has_view_permission(
-        self, request: HttpRequest, obj: ObjectGroup | None = None
+        self, request: HttpRequest, obj: AnnotatedObjectGroup | None = None
     ) -> bool:
         # We must implement this to use has_change_permission to make
         # page readonly. Otherwise will throw 403 error when viewing the page
@@ -250,10 +286,10 @@ class ObjectGroupAdmin(ModelAdmin):
         )
 
     def has_change_permission(
-        self, request: HttpRequest, obj: ObjectGroup | None = None
+        self, request: HttpRequest, obj: AnnotatedObjectGroup | None = None
     ) -> bool:
         # If obj was imported from Eros, make page readonly
-        if obj and obj.c2rmf_id:
+        if obj and obj.is_external:
             return False
         return is_lab_admin(request.user) or bool(
             obj and obj.runs.filter(project__members=request.user.id).exists()
@@ -262,20 +298,25 @@ class ObjectGroupAdmin(ModelAdmin):
     def get_form(
         self,
         request: HttpRequest,
-        obj: Optional[ObjectGroup] = None,
+        obj: Optional[AnnotatedObjectGroup] = None,
         change: bool = False,
         **kwargs: Any,
     ):
-        if obj and obj.c2rmf_id:
-            # After EROS import, readonly
-            return ObjectGroupImportC2RMFReadonlyForm
+        if obj and obj.is_external:
+            # After external provider import, readonly
+            return ObjectGroupImportExternalReadonlyForm
         # Manual creation / edition
         return super().get_form(request, obj, change, **kwargs)
 
-    def get_fieldsets(self, request: HttpRequest, obj: Optional[ObjectGroup] = None):
+    def get_fieldsets(
+        self, request: HttpRequest, obj: Optional[AnnotatedObjectGroup] = None
+    ):
         description = ""
-        if obj and obj.c2rmf_id:
-            description = str(_("This object was imported from EROS."))
+        if obj and obj.is_external:
+            description = str(
+                _("This object was imported from %s.")
+                % obj.external_reference.provider_name
+            )
         else:
             description = str(
                 _(
@@ -291,18 +332,30 @@ class ObjectGroupAdmin(ModelAdmin):
         ]
         return fieldsets
 
-    def get_inlines(self, request: HttpRequest, obj: ObjectGroup | None):
+    def get_inlines(self, request: HttpRequest, obj: AnnotatedObjectGroup | None):
         if "run" not in request.GET and is_lab_admin(request.user):
-            return (ObjectInline, ProjectInline)
-        return (ObjectInline, ObjectGroupThumbnailInline)
+            return [ObjectInline, ProjectInline, ExternalReferenceInline]
+        inlines = [ObjectInline, ObjectGroupThumbnailInline]
+        if obj and obj.is_external:
+            inlines = inlines + [ExternalReferenceInline]
+        return inlines
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(runs_project_count=Count("runs__project", distinct=True))
+        )
 
     def get_object(
         self, request: HttpRequest, object_id: str, from_field=None
     ) -> Any | None:
         object_group = super().get_object(request, object_id, from_field)
-        if object_group and object_group.c2rmf_id:
+        if object_group and object_group.is_external:
             object_group = fetch_full_objectgroup(
-                "c2rmf", object_group.c2rmf_id, object_group
+                object_group.external_reference.provider_name,
+                object_group.external_reference.provider_object_id,
+                object_group,
             )
         return object_group
 
@@ -314,7 +367,7 @@ class ObjectGroupAdmin(ModelAdmin):
         return object_group
 
     def save_model(
-        self, request: Any, obj: ObjectGroup, form: ModelForm, change: bool
+        self, request: Any, obj: AnnotatedObjectGroup, form: ModelForm, change: bool
     ) -> None:
         super().save_model(request, obj, form, change)
         if not change and request.POST.get(IS_POPUP_VAR) and "run" in request.GET:
@@ -331,7 +384,7 @@ class ObjectGroupAdmin(ModelAdmin):
         form_url: str = "",
         extra_context: dict[str, bool] | None = None,
     ) -> Any:
-        obj: ObjectGroup | None = (
+        obj: AnnotatedObjectGroup | None = (
             self.get_object(request, object_id=object_id) if object_id else None
         )
         are_objects_differentiated = self.get_are_objects_differentiated(request, obj)
@@ -361,7 +414,7 @@ class ObjectGroupAdmin(ModelAdmin):
     def response_add(
         self,
         request: HttpRequest,
-        obj: ObjectGroup,
+        obj: AnnotatedObjectGroup,
         post_url_continue: str | None = None,
     ) -> TemplateResponse:
         response: TemplateResponse = super().response_add(  # type: ignore[assignment]
@@ -384,20 +437,38 @@ class ObjectGroupAdmin(ModelAdmin):
             )
         return response
 
-    def response_change(self, request: HttpRequest, obj: ObjectGroup) -> HttpResponse:
+    def response_change(
+        self, request: HttpRequest, obj: AnnotatedObjectGroup
+    ) -> HttpResponse:
         response = super().response_change(request, obj)
         if "next" in request.GET:
             return HttpResponseRedirect(request.GET["next"])
         return response
 
-    @admin.display
-    def project_num(self, obj: ObjectGroup) -> int:
-        run_ids = obj.runs.values_list("id", flat=True)
-        return Project.objects.filter(runs__id__in=run_ids).distinct().count()
+    @admin.display(description=_("# in projects"), ordering="runs_project_count")
+    def project_num(self, obj: AnnotatedObjectGroup) -> int:
+        return obj.runs_project_count
+
+    @admin.display(
+        description="provider_name", ordering="external_reference__provider_name"
+    )
+    def provider_name(self, obj: AnnotatedObjectGroup) -> str | None:
+        if obj.is_external:
+            return obj.external_reference.provider_name
+        return None
+
+    @admin.display(
+        description="provider_object_id",
+        ordering="external_reference__provider_object_id",
+    )
+    def provider_object_id(self, obj: AnnotatedObjectGroup) -> str | None:
+        if obj.is_external:
+            return obj.external_reference.provider_object_id
+        return None
 
     @staticmethod
     def get_are_objects_differentiated(
-        request: HttpRequest, obj: ObjectGroup | None = None
+        request: HttpRequest, obj: AnnotatedObjectGroup | None = None
     ):
         if obj:
             return obj.object_set.exists()

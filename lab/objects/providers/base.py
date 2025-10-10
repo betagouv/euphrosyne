@@ -1,10 +1,16 @@
 import logging
+import typing
 from abc import ABC, abstractmethod
-from typing import Any
 
 import requests
 
 from ..models import ObjectGroup
+
+
+class PartialObject(typing.TypedDict):
+    """Partial object data structure."""
+
+    label: str
 
 
 class ObjectProviderError(requests.RequestException):
@@ -18,7 +24,7 @@ class ObjectProvider(ABC):
         self.logger = logging.getLogger(self.__class__.__name__)
 
     @abstractmethod
-    def fetch_partial_data(self, object_id: str) -> dict[str, Any] | None:
+    def fetch_partial_data(self, object_id: str) -> PartialObject | None:
         """Fetch object data with minimum information to save it to DB.
 
         Args:

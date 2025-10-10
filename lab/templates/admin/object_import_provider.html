@@ -7,7 +7,8 @@
     <link rel="stylesheet" type="text/css" href="{% static "css/admin/objectgroup.css" %}">
 {% endblock %}
 {% block extrahead %}
-    <script src="{% static 'pages/objectgroup-import-c2rmf.js' %}"></script>
+    <script src="{% url 'javascript-catalog' %}"></script>
+    <script src="{% static 'pages/objectgroup-import-provider.js' %}"></script>
     {{ form.media }}
 {% endblock %}
 
@@ -27,7 +28,7 @@
             {% csrf_token %}
             {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
             <fieldset class="module aligned">
-                <div class="description fr-pl-0">{% translate "Use the search field to import an object from Eros. The name of the object will be displayed in the field after." %}</div>
+                <div class="description fr-pl-0">{% blocktranslate %}Use the search field to import an object from {{ provider_name }}. The name of the object will be displayed in the field after.{% endblocktranslate %}</div>
                 <div class="form-row">
                 {{ form }}
                 </div>
