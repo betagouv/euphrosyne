@@ -2,6 +2,7 @@
 
 # Import providers to register them
 from . import eros  # noqa: F401
+from . import pop  # noqa: F401
 
 # Export public API
 from .api import (  # noqa: F401

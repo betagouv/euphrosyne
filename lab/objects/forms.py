@@ -145,7 +145,7 @@ class ObjectGroupForm(forms.ModelForm):
         return super().is_multipart()
 
 
-class ObjectGroupImportBase(forms.ModelForm):
+class ObjectGroupImportBaseForm(forms.ModelForm):
     """Base class providing common functionality for importing object groups
     from external providers.
     Must define:
@@ -158,15 +158,19 @@ class ObjectGroupImportBase(forms.ModelForm):
     class Meta:
         model = ExternalObjectReference
         fields = (
-            "label",
             "provider_object_id",
+            "label",
         )
         widgets = {
             "label": forms.TextInput(attrs={"readonly": "readonly"}),
         }
 
     label = forms.CharField(
-        label=_("Label"), max_length=255, disabled=True, required=False
+        label=_("Object label result"),
+        max_length=255,
+        disabled=True,
+        required=False,
+        help_text=_("Label fetched from provider database"),
     )
 
     def __init__(self, *args, **kwargs):
@@ -185,6 +189,9 @@ class ObjectGroupImportBase(forms.ModelForm):
                 kwargs={"provider_name": self.provider_name},
             ),
             {"label": "id_label"},
+        )
+        self.fields["label"].widget.attrs["class"] = (
+            self.fields["label"].widget.attrs.get("class", "") + " fr-mb-2w"
         )
 
     def _post_clean(self):
@@ -238,6 +245,9 @@ class ObjectGroupImportBase(forms.ModelForm):
         }
         return data
 
+    def clean_provider_object_id(self):
+        return self.cleaned_data["provider_object_id"].upper()
+
     def save(self, commit=True):
         if not self.instance.id:
             self.instance.provider_name = self.provider_name
@@ -249,15 +259,12 @@ class ObjectGroupImportBase(forms.ModelForm):
         return super().save(commit)
 
 
-class _C2RMFObjectImportForm(ObjectGroupImportBase):
-    def clean_provider_object_id(self):
-        return self.cleaned_data["provider_object_id"].upper()
-
-
-def provider_objectimport_form_factory(provider_name: str, form: type[forms.ModelForm]):
+def provider_objectimport_form_factory(
+    provider_name: str, form: type[forms.ModelForm] | None = None
+):
 
     BaseForm: type[forms.ModelForm] = (  # pylint: disable=invalid-name
-        form or ObjectGroupImportBase
+        form or ObjectGroupImportBaseForm
     )
 
     class ProviderImportForm(BaseForm):  # type: ignore
@@ -272,8 +279,19 @@ def provider_objectimport_form_factory(provider_name: str, form: type[forms.Mode
     )
 
 
-ObjectGroupImportErosForm = provider_objectimport_form_factory(
-    "eros", _C2RMFObjectImportForm
+ObjectGroupImportErosForm = provider_objectimport_form_factory("eros")
+
+
+class _POPImportForm(ObjectGroupImportBaseForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["provider_object_id"].help_text = _("POP Reference")
+        self.fields["provider_object_id"].widget.attrs["placeholder"] = "50350100588"
+
+
+ObjectGroupImportPOPForm = provider_objectimport_form_factory(
+    "pop", form=_POPImportForm
 )
 
 
