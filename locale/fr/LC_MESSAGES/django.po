@@ -1281,7 +1281,7 @@ msgid ""
 "Use the search field to import an object from %(provider_name)s. The name of "
 "the object will be displayed in the field after."
 msgstr ""
-"Utilisez le champ de recherche pour importer un object à partir de "
+"Utilisez le champ de recherche pour importer un objet à partir de "
 "%(provider_name)s. Le nom de l'objet sera affiché dans le champ suivant."
 
 msgid "Documents"
