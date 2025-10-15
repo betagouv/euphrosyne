@@ -28,6 +28,7 @@ export default function RunObjectGroupForm({
       "Import object from same project",
     ),
     "Import with EROS ID": window.gettext("Import with EROS ID"),
+    "Import with POP Reference": window.gettext("Import with POP Reference"),
     "An error occurred.": window.gettext("An error occurred."),
   };
 
@@ -117,6 +118,15 @@ export default function RunObjectGroupForm({
               data-popup="yes"
             >
               {t["Import with EROS ID"]}
+            </a>
+          </li>
+          <li>
+            <a
+              href={`/lab/objectgroup/pop_import?_to_field=id&_popup=1&run=${run.id}`}
+              className="related-widget-wrapper-link fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-download-line"
+              data-popup="yes"
+            >
+              {t["Import with POP Reference"]}
             </a>
           </li>
         </ul>

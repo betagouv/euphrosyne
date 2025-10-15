@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from lab.documents.views import ProjectDocumentsView
 from lab.hdf5.views import HDF5View
-from lab.objects.views import ObjectImportErosView
+from lab.objects.views import ObjectImportErosView, ObjectImportPOPView
 from lab.projects.views import ChangeLeaderView
 from lab.workplace.views import WorkplaceView
 
@@ -47,6 +47,13 @@ class AdminSite(admin.AdminSite):
                     ObjectImportErosView.as_view()  # type: ignore[type-var]
                 ),
                 name="lab_objectgroup_erosimport",
+            ),
+            path(
+                "lab/objectgroup/pop_import",
+                self.admin_view(
+                    ObjectImportPOPView.as_view()  # type: ignore[type-var]
+                ),
+                name="lab_objectgroup_popimport",
             ),
             path("", include("lab_notebook.urls")),
         ]

@@ -13,11 +13,11 @@ from shared.view_mixins import StaffUserRequiredMixin
 from . import forms
 
 
-def object_import_view_factory(form_class: type[forms.ObjectGroupImportBase]):
+def object_import_view_factory(form_class: type[forms.ObjectGroupImportBaseForm]):
     class ObjectImportView(StaffUserRequiredMixin, CreateView):
         template_name = "admin/object_import_provider.html"
 
-        form_class: type[forms.ObjectGroupImportBase]
+        form_class: type[forms.ObjectGroupImportBaseForm]
 
         def __init__(self, **kwargs):
             self.form_class = form_class
@@ -77,3 +77,5 @@ def object_import_view_factory(form_class: type[forms.ObjectGroupImportBase]):
 
 
 ObjectImportErosView = object_import_view_factory(forms.ObjectGroupImportErosForm)
+
+ObjectImportPOPView = object_import_view_factory(forms.ObjectGroupImportPOPForm)

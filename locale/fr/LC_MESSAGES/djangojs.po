@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-09 15:28+0200\n"
+"POT-Creation-Date: 2025-10-15 11:04+0200\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -197,6 +197,9 @@ msgstr "Importer un objet du même projet"
 
 msgid "Import with EROS ID"
 msgstr "Importer avec un numéro EROS"
+
+msgid "Import with POP Reference"
+msgstr "Importer avec une référence POP"
 
 msgid "An error occurred."
 msgstr "Une erreur s'est produite."
