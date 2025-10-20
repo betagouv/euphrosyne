@@ -1,4 +1,5 @@
-import { getToken } from "../../../shared/js/jwt";
+import { getToken } from "../../../../shared/js/jwt";
+import { ExternalImageProvider } from "./types";
 
 export const EROS_BASE_URL = `${process.env.EUPHROSYNE_TOOLS_API_URL}/eros`;
 
@@ -40,7 +41,7 @@ interface ErosObject {
   images: ErosImage[] | null;
 }
 
-export function constructFromErosPath(path: string, token?: string) {
+function constructFromPath(path: string, token?: string) {
   const [erosId, imageId] = path.split("/");
   let imageCategory: string;
   if (erosId.startsWith("C2RMF")) {
@@ -57,8 +58,8 @@ export function constructFromErosPath(path: string, token?: string) {
   return url;
 }
 
-export async function getImagesURLForObject(erosId: string) {
-  const objectDetailsURL = `${EROS_BASE_URL}/rails/oeuvres/${erosId}.json`;
+async function getImagesURLForObject(providerObjectId: string) {
+  const objectDetailsURL = `${EROS_BASE_URL}/rails/oeuvres/${providerObjectId}.json`;
   let fetchFailed = false,
     objectResponse: Response | undefined = undefined;
   const token = await getToken();
@@ -70,7 +71,7 @@ export async function getImagesURLForObject(erosId: string) {
   }
   if (fetchFailed || (objectResponse && !objectResponse.ok)) {
     console.warn(
-      `Failed to fetch object details with id ${erosId}.\n
+      `Failed to fetch object details with id ${providerObjectId}.\n
         URL: ${objectDetailsURL}\n`,
     );
     if (objectResponse && !objectResponse.ok) {
@@ -83,12 +84,19 @@ export async function getImagesURLForObject(erosId: string) {
   if (objectResponse) {
     const objectDetails = (await objectResponse.json()) as ErosObject;
     if (!objectDetails.images || objectDetails.images.length === 0) {
-      console.warn(`No images found for object with id ${erosId}`);
+      console.warn(`No images found for object with id ${providerObjectId}`);
       return [];
     }
     return objectDetails.images.map((image) =>
-      constructFromErosPath(`${erosId}/${image.filmnbr}`, token),
+      constructFromPath(`${providerObjectId}/${image.filmnbr}`, token),
     );
   }
-  return null;
+  return [];
 }
+
+export const erosImageService: ExternalImageProvider = {
+  getImagesURL: (providerObjectId: string) =>
+    getImagesURLForObject(providerObjectId),
+  constructFromPath: (path: string, token?: string) =>
+    constructFromPath(path, token),
+};

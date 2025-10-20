@@ -11,11 +11,11 @@ import UploadObjectImage from "./UploadObjectImage";
 import ImageLoading from "./ImageLoading";
 import ImageWithPlaceholder from "../ImageWithPlaceholder";
 import { ProjectImageServices } from "../../../../lab/documents/assets/js/project-image-service";
-import { getImagesURLForObject } from "../../../../lab/assets/js/eros-service";
 import { constructImageStorageUrl } from "../utils";
 import { getToken } from "../../../../shared/js/jwt";
 import { EuphrosyneToolsClientContext } from "../../../../shared/js/EuphrosyneToolsClient.context";
 import { css } from "@emotion/react";
+import { getExternalImageService } from "../../../../lab/assets/js/external_image/registry";
 
 const baseImageStyle = css({
   objectFit: "contain",
@@ -53,8 +53,15 @@ export default function AddImageToObject({
     noRunObjectImage: window.gettext(
       "No image has been linked to this object yet. Select an image below or upload one to add one.",
     ),
-    erosImages: window.gettext("Images from EROS"),
-    noErosImages: window.gettext("No images found in EROS for this object."),
+    providerImages: window.interpolate(window.gettext("Images from %s"), [
+      objectGroup.externalReference
+        ? objectGroup.externalReference.providerName.toUpperCase()
+        : "",
+    ]),
+    noProviderImages: window.interpolate(
+      window.gettext("No images found in %s for this object."),
+      [objectGroup.externalReference?.providerName.toUpperCase() || ""],
+    ),
   };
 
   const { projectSlug, imageStorage } = useContext(NotebookContext);
@@ -75,11 +82,11 @@ export default function AddImageToObject({
   const [runObjectImages, setRunObjectImages] = useState<
     IRunObjectImageWithUrl[] | null
   >();
-  const [erosImages, setErosImages] = useState<string[]>([]);
+  const [providerImages, setProviderImages] = useState<string[]>([]);
 
   const [fetchingRunObjectImages, setFetchingRunObjectImages] = useState(true);
   const [fetchingObjectImages, setFetchingObjectImages] = useState(true);
-  const [fetchingErosImages, setFetchingErosImages] = useState(true);
+  const [fetchingProviderImages, setFetchingProviderImages] = useState(true);
 
   const onUpload = (url: string) => {
     // Refetch images
@@ -136,17 +143,19 @@ export default function AddImageToObject({
     }
   }, [imageStorage, runObjectGroup.id]);
 
-  // FETCH EROS IMAGES
+  // FETCH PROVIDER IMAGES
+
   useEffect(() => {
-    if (!objectGroup.c2rmfId && erosImages?.length > 0) setErosImages([]);
-    if (objectGroup.c2rmfId) {
-      setFetchingErosImages(true);
-      getImagesURLForObject(objectGroup.c2rmfId).then((images) => {
-        if (images) setErosImages(images);
-        setFetchingErosImages(false);
-      });
+    if (objectGroup.externalReference) {
+      setFetchingProviderImages(true);
+      getExternalImageService(objectGroup.externalReference.providerName)
+        .getImagesURL(objectGroup.externalReference.providerObjectId)
+        .then((images) => {
+          if (images) setProviderImages(images);
+          setFetchingProviderImages(false);
+        });
     }
-  }, [objectGroup.c2rmfId]);
+  }, [objectGroup.externalReference]);
 
   return (
     <div>
@@ -168,14 +177,14 @@ export default function AddImageToObject({
         noImageText={t.noObjectImage}
       />
 
-      {objectGroup.c2rmfId && (
+      {objectGroup.externalReference && (
         <ObjectImageGallery
-          title={t.erosImages}
-          images={erosImages.map((url) => ({ url }))}
+          title={t.providerImages}
+          images={providerImages.map((url) => ({ url }))}
           selectedImage={selectedObjectImage}
           onImageSelect={onImageSelect}
-          loading={fetchingErosImages}
-          noImageText={t.noErosImages}
+          loading={fetchingProviderImages}
+          noImageText={t.noProviderImages}
         />
       )}
 

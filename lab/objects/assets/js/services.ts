@@ -1,5 +1,11 @@
 import { getCSRFToken } from "../../../assets/js/utils";
-import { RunObjectGroup, ObjectGroup } from "./types";
+import { RunObjectGroup, ObjectGroup, ExternalObjectProvider } from "./types";
+
+interface ExternalObjectReference {
+  id: number;
+  provider_name: ExternalObjectProvider;
+  provider_object_id: string;
+}
 
 interface ObjectGroupResponseElement {
   id: number;
@@ -7,7 +13,8 @@ interface ObjectGroupResponseElement {
   object_count: number;
   dating: string; // this is linked to Django ObjectGroup.dating_era
   materials: string[];
-  c2rmf_id: string;
+  c2rmf_id: string; // deprecated
+  external_reference: ExternalObjectReference | null;
 }
 
 interface RunObjectGroupsResponseElement {
@@ -62,7 +69,14 @@ export async function fetchRunObjectGroups(
       objectCount: ro.objectgroup.object_count,
       dating: ro.objectgroup.dating,
       materials: ro.objectgroup.materials,
-      c2rmfId: ro.objectgroup.c2rmf_id,
+      externalReference: ro.objectgroup.external_reference
+        ? {
+            id: ro.objectgroup.external_reference.id.toString(),
+            providerName: ro.objectgroup.external_reference.provider_name,
+            providerObjectId:
+              ro.objectgroup.external_reference.provider_object_id,
+          }
+        : null,
     },
   }));
 }
@@ -82,7 +96,13 @@ export async function fetchAvailableObjectGroups(
     objectCount: objectgroup.object_count,
     dating: objectgroup.dating,
     materials: objectgroup.materials,
-    c2rmfId: objectgroup.c2rmf_id,
+    externalReference: objectgroup.external_reference
+      ? {
+          id: objectgroup.external_reference.id.toString(),
+          providerName: objectgroup.external_reference.provider_name,
+          providerObjectId: objectgroup.external_reference.provider_object_id,
+        }
+      : null,
   }));
 }
 

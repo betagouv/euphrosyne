@@ -57,6 +57,16 @@ class ObjectProvider(ABC):
         """
 
     @abstractmethod
+    def fetch_object_image_urls(self, object_id: str) -> list[str]:
+        """Fetch list of image URLs for the given object ID.
+
+        Args:
+            object_id: The unique identifier for the object in the provider system
+        Returns:
+            List of image URLs, or empty list if not found
+        """
+
+    @abstractmethod
     def construct_image_url(self, path: str) -> str:
         """Construct image URL from provider-specific path.
 

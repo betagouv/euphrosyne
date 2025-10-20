@@ -48,6 +48,19 @@ def fetch_full_objectgroup(
     return provider.fetch_full_object(object_id, object_group)
 
 
+def fetch_object_image_urls(provider_name: str, object_id: str) -> list[str]:
+    """Fetch list of image URLs for the given object ID.
+
+    Args:
+        provider_name: Name of the provider (e.g., 'eros', 'pop')
+        object_id: The unique identifier for the object in the provider system
+    Returns:
+        List of image URLs, or empty list if not found
+    """
+    provider = registry.get_provider(provider_name)
+    return provider.fetch_object_image_urls(object_id)
+
+
 def construct_image_url(provider_name: str, path: str) -> str:
     """Construct image URL from provider-specific path.
 
