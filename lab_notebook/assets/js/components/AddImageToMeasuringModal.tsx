@@ -24,7 +24,11 @@ import {
   deleteMeasuringPointImage,
 } from "../../../../lab/assets/js/measuring-point.services";
 import { NotebookContext } from "../Notebook.context";
-import { constructImageStorageUrl, extractPath } from "../utils";
+import {
+  constructImageStorageUrl,
+  extractPath,
+  extractProviderFromPath,
+} from "../utils";
 import { getToken } from "../../../../shared/js/jwt";
 
 type StepNumber = 1 | 11 | 12 | 21;
@@ -132,7 +136,10 @@ export default function AddImageToMeasuringModal({
   // Adding image & transformation to DB
   const addImageToRunObjectGroup = async () => {
     if (runObjectGroup && selectedObjectImage) {
-      const path = extractPath(new URL(selectedObjectImage.url).pathname);
+      const path = extractPath(
+        new URL(selectedObjectImage.url).pathname,
+        selectedObjectImage.provider,
+      );
       const savedImage = await new RunObjectGroupImageServices(
         runObjectGroup?.id,
       ).addRunObjectGroupImage({
@@ -142,6 +149,7 @@ export default function AddImageToMeasuringModal({
       onRunObjectImageSelect({
         ...savedImage,
         url: selectedObjectImage.url,
+        provider: selectedObjectImage.provider,
       });
     }
   };
@@ -356,6 +364,7 @@ export default function AddImageToMeasuringModal({
               imageStorage.token,
               token,
             ),
+            provider: extractProviderFromPath(runObjectGroupImage.path),
           });
           setCurrentStep(21);
         });

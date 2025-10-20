@@ -5,6 +5,7 @@ from .api_views.objectgroup import (
     ObjectGroupCreateView,
     get_eros_object,
     get_object_from_provider,
+    get_object_images_from_provider,
 )
 from .api_views.project import ProjectList, UpcomingProjectList
 from .api_views.run import RunMethodsView
@@ -68,6 +69,11 @@ urlpatterns = [
         "objectgroup/provider/<str:provider_name>/fetch",
         get_object_from_provider,
         name="objectgroup-provider-fetch",
+    ),
+    path(
+        "objectgroup/provider/<str:provider_name>/images",
+        get_object_images_from_provider,
+        name="objectgroup-provider-images",
     ),
     path(
         "objectgroups",

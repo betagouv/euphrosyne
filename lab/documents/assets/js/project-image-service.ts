@@ -34,6 +34,7 @@ export class ProjectImageServices extends UploadSasUrlMixin {
       return images.images.map((image) => ({
         url: sasToken ? image + "?" + sasToken : image, // assume there is no query string in the image url
         transform: undefined,
+        provider: "euphrosyne",
       }));
     }
     return [];

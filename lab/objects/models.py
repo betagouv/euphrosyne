@@ -239,6 +239,9 @@ def construct_image_url_from_path(
     ) and len(path.split("/")) == 2:
         return construct_image_url("eros", path)
 
+    if path.startswith("joconde") or path.startswith("palissy"):
+        return construct_image_url("pop", path)
+
     return (
         f"{storage_base_url}{path}?{storage_token}"
         if storage_token

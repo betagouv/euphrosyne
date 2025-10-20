@@ -8,6 +8,7 @@ from . import pop  # noqa: F401
 from .api import (  # noqa: F401
     construct_image_url,
     fetch_full_objectgroup,
+    fetch_object_image_urls,
     fetch_partial_objectgroup,
     list_available_providers,
 )

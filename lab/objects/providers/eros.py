@@ -103,6 +103,16 @@ class ErosProvider(ObjectProvider):
         updated_og.materials = (data.get("support") or "").split(" / ")
         return updated_og
 
+    def fetch_object_image_urls(self, object_id: str) -> list[str]:
+        """Fetch list of image URLs for the given object ID."""
+        data = self._fetch_raw_data(object_id)
+        if not data or "images" not in data:
+            return []
+        return [
+            self.construct_image_url(f"{object_id}/{image['filmnbr']}")
+            for image in data["images"]
+        ]
+
     def construct_image_url(self, path: str) -> str:
         """Construct image URL from C2RMF path."""
         # pylint: disable=import-outside-toplevel

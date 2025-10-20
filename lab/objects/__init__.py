@@ -23,6 +23,7 @@ from .providers import (  # noqa: F401
     ObjectProviderError,
     construct_image_url,
     fetch_full_objectgroup,
+    fetch_object_image_urls,
     fetch_partial_objectgroup,
     list_available_providers,
 )

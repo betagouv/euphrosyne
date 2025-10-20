@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-15 11:04+0200\n"
+"POT-Creation-Date: 2025-10-20 12:04+0200\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -397,11 +397,13 @@ msgstr ""
 "Aucune image n'a encore été liée à cet objet. Sélectionnez une image ci-"
 "dessous ou téléversez-en une pour l'ajouter."
 
-msgid "Images from EROS"
-msgstr "Images d'EROS"
+#, javascript-format
+msgid "Images from %s"
+msgstr "Images de %s"
 
-msgid "No images found in EROS for this object."
-msgstr "Pas d'image trouvée dans EROS pour cet objet."
+#, javascript-format
+msgid "No images found in %s for this object."
+msgstr "Pas d'image trouvée dans %s pour cet objet."
 
 msgid ""
 "Move and zoom the image to select the measurement point or zone. Switch "

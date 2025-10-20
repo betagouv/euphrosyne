@@ -1,5 +1,10 @@
+import { ExternalObjectProvider } from "../../../lab/objects/assets/js/types";
+
+export type ImageProvider = "euphrosyne" | ExternalObjectProvider;
+
 export interface IImagewithUrl {
   url: string;
+  provider: ImageProvider;
   transform?: IImageTransform | null;
 }
 

@@ -4,7 +4,7 @@ from django.utils import timezone
 from rest_framework import reverse, serializers
 
 from ..models import Project, Run
-from ..objects.models import ObjectGroup, RunObjetGroupImage
+from ..objects.models import ExternalObjectReference, ObjectGroup, RunObjetGroupImage
 
 
 class ProjectRunObjectGroupSerializer(serializers.ModelSerializer):
@@ -116,8 +116,15 @@ class RunMethodsSerializer(serializers.ModelSerializer):
         )
 
 
+class _RunObjectGroupExternalObjectReferenceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExternalObjectReference
+        fields = ("id", "provider_name", "provider_object_id")
+
+
 class _RunObjectGroupObjectGroupSerializer(serializers.ModelSerializer):
     dating = serializers.SerializerMethodField()
+    external_reference = _RunObjectGroupExternalObjectReferenceSerializer()
 
     class Meta:
         model = ObjectGroup
@@ -127,7 +134,8 @@ class _RunObjectGroupObjectGroupSerializer(serializers.ModelSerializer):
             "object_count",
             "dating",
             "materials",
-            "c2rmf_id",
+            "c2rmf_id",  # deprecated
+            "external_reference",
         )
 
     def get_dating(self, obj: ObjectGroup):
@@ -192,3 +200,13 @@ class RunObjectGroupImageSerializer(serializers.ModelSerializer):
                 "Image transform must have width and height set to a non-zero value"
             )
         return value
+
+
+class GetObjectImageFromProviderResponseSerializer(serializers.Serializer):
+    images = serializers.ListField(child=serializers.CharField(), allow_empty=True)
+
+    def create(self, validated_data):
+        raise NotImplementedError("This serializer is read-only")
+
+    def update(self, instance, validated_data):
+        raise NotImplementedError("This serializer is read-only")

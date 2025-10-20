@@ -25,6 +25,8 @@ class POPDatabases(enum.StrEnum):
 SEARCHED_DATABASES = ",".join([POPDatabases.JOCONDE.value, POPDatabases.PALISSY.value])
 POP_BASE_URL = f"https://api.pop.culture.gouv.fr/search/{SEARCHED_DATABASES}/_msearch"
 
+POP_IMAGE_URL = "https://pop-perf-assets.s3.gra.io.cloud.ovh.net"
+
 
 class ObjectData(typing.TypedDict):
     POP_COORDONNEES: dict
@@ -182,8 +184,15 @@ class POPProvider(ObjectProvider):
         updated_og.materials = data.get("TECH", [])
         return updated_og
 
-    def construct_image_url(self, path):
-        raise NotImplementedError("POP provider does not support image URLs yet.")
+    def fetch_object_image_urls(self, object_id: str) -> list[str]:
+        """Fetch list of image URLs for the given object ID."""
+        data = self._fetch_raw_data(object_id)
+        if not data or "IMG" not in data:
+            return []
+        return [self.construct_image_url(img) for img in data["IMG"]]
+
+    def construct_image_url(self, path: str) -> str:
+        return f"{POP_IMAGE_URL}/{path}"
 
 
 registry.register("pop", POPProvider)
