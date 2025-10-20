@@ -214,9 +214,6 @@ ul li {
   justify-content: end;
 }
 
-.fr-header .fr-btns-group {
-  align-items: baseline;
-}
 
 /* purgecss ignore */
 #toolbar input#searchbar {

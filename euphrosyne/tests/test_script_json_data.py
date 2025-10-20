@@ -21,12 +21,11 @@ class TestScriptJsonData(TestCase):
         assert '{"project": null, "backLink": null}' in html
 
         assert '<script id="nav-items-data" type="application/json">' in html
-        # pylint: disable=line-too-long
         assert '{"currentPath": "/lab/project/", "items":' in html
 
         assert '<script id="user-data" type="application/json">' in html
         assert (
-            f""""fullName": "{user.get_full_name()}",\n      "isLabAdmin": false\n"""
+            f""""fullName": "{user.get_full_name()}",\n      "isLabAdmin": false,\n      "id": {user.id},\n      "accountURL": "{reverse('admin:euphro_auth_user_change', args=[user.id])}"\n"""  # pylint: disable=line-too-long
             in html
         )
 

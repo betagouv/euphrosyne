@@ -1,4 +1,4 @@
-{% load i18n static nav %}<!DOCTYPE html>
+{% load i18n static nav admin_urls %}<!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
 <head>
@@ -83,9 +83,11 @@
     </div>
     {% block footer %}{% endblock %}
   </div>
-  {% if not request.user.is_authenticated %}
-  {% include "footer.html" %}
+
+  {% if not is_popup %}
+    {% include "footer.html" %}
   {% endif %}
+
 <!-- END Container -->
 {%if not is_popup and user.is_authenticated %}
   <script id="top-header-data" type="application/json">
@@ -105,7 +107,9 @@
   <script id="user-data" type="application/json">
     {
       "fullName": "{{ user.get_full_name }}",
-      "isLabAdmin": {{ user.is_lab_admin|yesno:"true,false" }}
+      "isLabAdmin": {{ user.is_lab_admin|yesno:"true,false" }},
+      "id": {{ user.id }},
+      "accountURL": "{% url 'admin:euphro_auth_user_change' user.id %}"
     }
   </script>
 {% endif %}
