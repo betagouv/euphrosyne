@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-15 11:05+0200\n"
+"POT-Creation-Date: 2025-10-20 15:22+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -695,9 +695,6 @@ msgstr "choix de filtres {} / {}"
 
 msgid "Projects"
 msgstr "Projets"
-
-msgid "Account"
-msgstr "Compte"
 
 msgid "Preview"
 msgstr "Aperçu"

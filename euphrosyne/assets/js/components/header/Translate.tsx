@@ -35,7 +35,7 @@ export default function Translate() {
     <nav role="navigation" className="fr-translate fr-nav">
       <div className="fr-nav__item">
         <button
-          className="fr-translate__btn fr-btn fr-btn--tertiary"
+          className="fr-translate__btn fr-btn fr-btn--tertiary-no-outline"
           aria-controls="translate-collaspse"
           aria-expanded="false"
           title={t["Select a language"]}

@@ -25,12 +25,19 @@ interface HeaderData {
 interface UserData {
   fullName: string;
   isLabAdmin: boolean;
+  id: number;
+  accountURL: string;
 }
 
 function getUserData(): UserData {
   const data = getTemplateJSONData<UserData>("user-data");
   if (!data) {
-    return { fullName: window.gettext("User"), isLabAdmin: false };
+    return {
+      fullName: window.gettext("User"),
+      isLabAdmin: false,
+      id: 0,
+      accountURL: "#",
+    };
   }
   return data;
 }

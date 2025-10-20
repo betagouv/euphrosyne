@@ -18,7 +18,7 @@ def test_nav_items_json_when_user():
             )
         )
     )
-    assert len(data["items"]) == 2
+    assert len(data["items"]) == 1
 
     assert data["items"][0]["title"] == _("Projects")
     assert data["items"][0]["item"]["href"] == reverse("admin:lab_project_changelist")
@@ -27,14 +27,6 @@ def test_nav_items_json_when_user():
         reverse("admin:lab_run_changelist")
     ]
     assert data["items"][0]["item"]["exactPath"] is False
-
-    assert data["items"][1]["title"] == str(_("Account"))
-    assert data["items"][1]["item"]["href"] == reverse(
-        "admin:euphro_auth_user_change", args=[1]
-    )
-    assert data["items"][1]["item"]["iconName"] == "fr-icon-user-line"
-    assert data["items"][1]["item"]["extraPath"] == []
-    assert data["items"][1]["item"]["exactPath"] is False
 
     assert data["currentPath"] == "/path"
 

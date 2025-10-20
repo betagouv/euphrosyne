@@ -68,18 +68,4 @@ def get_nav_items(request: HttpRequest) -> list[NavElementJson]:
                     },
                 }
             )
-        else:  # non-admin user
-            items.append(
-                {
-                    "title": str(_("Account")),
-                    "item": {
-                        "href": reverse(
-                            "admin:euphro_auth_user_change", args=[request.user.id]
-                        ),
-                        "iconName": "fr-icon-user-line",
-                        "exactPath": False,
-                        "extraPath": [],
-                    },
-                }
-            )
     return items

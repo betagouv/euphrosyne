@@ -95,13 +95,4 @@ def test_get_nav_items_for_staff():
                 "exactPath": False,
             },
         },
-        {
-            "title": "Compte",
-            "item": {
-                "href": f"/euphro_auth/user/{request.user.id}/change/",
-                "iconName": "fr-icon-user-line",
-                "exactPath": False,
-                "extraPath": [],
-            },
-        },
     ]

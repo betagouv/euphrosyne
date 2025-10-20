@@ -9,6 +9,8 @@ import { getCSRFToken } from "../../../../../lab/assets/js/utils";
 interface User {
   fullName: string;
   isLabAdmin: boolean;
+  id: number;
+  accountURL: string;
 }
 
 interface HeaderProps {
@@ -60,20 +62,13 @@ export default function Header({
                 <li>
                   <Translate />
                 </li>
-                <li
-                  css={css`
-                    flex-direction: column;
-                    margin-left: 8px;
-                  `}
-                  className="fr-displayed-lg"
-                >
-                  <p>{currentUser.fullName}</p>
-                  {currentUser.isLabAdmin && (
-                    <>
-                      <br />
-                      <p className="fr-text--sm">{t["Admin"]}</p>
-                    </>
-                  )}
+                <li>
+                  <a
+                    href={currentUser.accountURL}
+                    className="fr-icon-account-line fr-btn"
+                  >
+                    {currentUser.fullName}
+                  </a>
                 </li>
                 <li>
                   <form method="post" action="/logout/?next=/login">
