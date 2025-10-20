@@ -11,7 +11,7 @@ import UploadObjectImage from "./UploadObjectImage";
 import ImageLoading from "./ImageLoading";
 import ImageWithPlaceholder from "../ImageWithPlaceholder";
 import { ProjectImageServices } from "../../../../lab/documents/assets/js/project-image-service";
-import { constructImageStorageUrl } from "../utils";
+import { constructImageStorageUrl, extractProviderFromPath } from "../utils";
 import { getToken } from "../../../../shared/js/jwt";
 import { EuphrosyneToolsClientContext } from "../../../../shared/js/EuphrosyneToolsClient.context";
 import { css } from "@emotion/react";
@@ -134,6 +134,7 @@ export default function AddImageToObject({
                 token,
                 euphrosyneToken,
               ),
+              provider: extractProviderFromPath(i.path),
             })),
           );
         })
@@ -180,7 +181,10 @@ export default function AddImageToObject({
       {objectGroup.externalReference && (
         <ObjectImageGallery
           title={t.providerImages}
-          images={providerImages.map((url) => ({ url }))}
+          images={providerImages.map((url) => ({
+            url,
+            provider: objectGroup.externalReference!.providerName,
+          }))}
           selectedImage={selectedObjectImage}
           onImageSelect={onImageSelect}
           loading={fetchingProviderImages}
