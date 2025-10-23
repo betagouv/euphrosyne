@@ -1,11 +1,11 @@
 import logging
 import typing
-from datetime import timedelta
+from datetime import datetime, timedelta
 from functools import lru_cache
 
 from django.utils import timezone
 
-from certification.certifications.models import Certification
+from certification.certifications.models import Certification, QuizResult
 from certification.notifications.models import (
     CertificationNotification,
     NotificationType,
@@ -64,4 +64,13 @@ def create_invitation_notification(
             certification=get_radioprotection_certification(),
             type_of=NotificationType.INVITATION_TO_COMPLETE,
         )
+    return None
+
+
+def get_user_passed_certification_date(user: "User") -> datetime | None:
+    """Get the date when the user last passed the radiation protection certification."""
+    certification = get_radioprotection_certification()
+    result = QuizResult.objects.filter_valid_results_for_user(user, certification)
+    if result:
+        return result.first().created
     return None

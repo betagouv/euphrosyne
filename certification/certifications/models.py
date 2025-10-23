@@ -38,24 +38,6 @@ class QuizCertificationQuerySet(models.QuerySet):
         quizzes = self._get_next_quizzes_for_user(certification, user)
         return quizzes[random.randint(0, len(quizzes) - 1)] if quizzes else None
 
-    def has_valid_certification_for_user(
-        self, user: User, certification: "Certification"
-    ):
-        base_qs_args = {
-            "certification": certification,
-            "quizresult__user": user,
-            "quizresult__is_passed": True,
-        }
-        if certification.num_days_valid:
-            return self.filter(
-                **base_qs_args,
-                quizresult__created__gte=timezone.now()
-                - timedelta(days=certification.num_days_valid),
-            ).exists()
-        return self.filter(
-            **base_qs_args,
-        ).exists()
-
 
 class QuizCertificationManager(models.Manager):
     def get_queryset(self):
@@ -65,13 +47,6 @@ class QuizCertificationManager(models.Manager):
         self, certification: "Certification", user: User
     ):
         return self.get_queryset().get_random_next_quizz_for_user(
-            certification=certification, user=user
-        )
-
-    def has_valid_certification_for_user(
-        self, user: User, certification: "Certification"
-    ):
-        return self.get_queryset().has_valid_certification_for_user(
             certification=certification, user=user
         )
 
@@ -142,12 +117,38 @@ class Certification(models.Model):
 
     def user_has_valid_participation(self, user: User) -> bool:
         if self.type_of == CertificationType.QUIZ:
-            return QuizCertification.objects.has_valid_certification_for_user(
+            return QuizResult.objects.filter_valid_results_for_user(
                 user=user, certification=self
-            )
+            ).exists()
         raise NotImplementedError(
             gettext("Certification type %(type)s not implemented.")
             % {"type": self.type_of}
+        )
+
+
+class QuizResultQuerySet(models.QuerySet):
+    def filter_valid_results_for_user(self, user: User, certification: "Certification"):
+        base_qs_args = {
+            "user": user,
+            "quiz__certification": certification,
+            "is_passed": True,
+        }
+        qs = self.filter(**base_qs_args)
+        if certification.num_days_valid:
+            qs = qs.filter(
+                created__gte=timezone.now()
+                - timedelta(days=certification.num_days_valid),
+            )
+        return qs.order_by("-created")
+
+
+class QuizResultManager(models.Manager):
+    def get_queryset(self):
+        return QuizResultQuerySet(self.model, using=self._db)
+
+    def filter_valid_results_for_user(self, user: User, certification: "Certification"):
+        return self.get_queryset().filter_valid_results_for_user(
+            user=user, certification=certification
         )
 
 
@@ -159,6 +160,8 @@ class QuizResult(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    objects = QuizResultManager()
 
     class Meta:
         verbose_name = _("Quiz result")

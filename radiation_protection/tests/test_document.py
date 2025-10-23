@@ -14,6 +14,7 @@ from certification.certifications.tests.factories import QuizCertificationFactor
 from euphro_auth.tests import factories as auth_factories
 from lab.runs.models import Run
 from lab.tests import factories as lab_factories
+from radiation_protection.certification import get_radioprotection_certification
 from radiation_protection.document import (
     _fill_radiation_protection_document,
     _prepare_variables,
@@ -54,7 +55,7 @@ def mock_document_fixture():
 def quiz_result_fixture():
     """Create a quiz result for testing."""
     user = auth_factories.StaffUserFactory()
-    quiz = QuizCertificationFactory(certification__name="radiation_protection")
+    quiz = QuizCertificationFactory(certification=get_radioprotection_certification())
     return QuizResult.objects.create(
         user=user,
         quiz=quiz,
@@ -86,10 +87,7 @@ def test_replace_text_in_paragraph():
 @pytest.mark.django_db
 def test_prepare_variables_with_run(quiz_result: QuizResult, next_user_run: Run):
     """Test preparing variables when run is available."""
-    now = timezone.now()
-    with mock.patch("radiation_protection.document.timezone.now") as mock_now:
-        mock_now.return_value = now
-        variables = _prepare_variables(quiz_result.user, next_user_run)
+    variables = _prepare_variables(quiz_result.user, next_user_run)
 
     assert variables["user_name"] == quiz_result.user.get_full_name()  # type: ignore # pylint: disable=line-too-long
     assert variables["admin_name"] == next_user_run.project.admin.get_full_name()  # type: ignore # pylint: disable=line-too-long
@@ -99,22 +97,35 @@ def test_prepare_variables_with_run(quiz_result: QuizResult, next_user_run: Run)
     assert variables["run_date_end"] == next_user_run.end_date.strftime(  # type: ignore # pylint: disable=line-too-long
         "%d/%m/%Y"
     )
-    assert variables["certification_date"] == now.strftime("%d/%m/%Y")  # type: ignore # pylint: disable=line-too-long
+    assert variables["certification_date"] == quiz_result.created.strftime("%d/%m/%Y")
 
 
 @pytest.mark.django_db
 def test_prepare_variables_without_run(quiz_result: QuizResult):
     """Test preparing variables when no run is available."""
-    now = timezone.now()
-    with mock.patch("radiation_protection.document.timezone.now") as mock_now:
-        mock_now.return_value = now
+    variables = _prepare_variables(quiz_result.user, None)
+
+    assert variables["user_name"] == quiz_result.user.get_full_name()  # type: ignore
+    assert variables["admin_name"] == ""
+    assert variables["run_date_start"] == ""
+    assert variables["run_date_end"] == ""
+    assert variables["certification_date"] == quiz_result.created.strftime("%d/%m/%Y")
+
+
+@pytest.mark.django_db
+def test_prepare_variables_without_passed_quiz_result(quiz_result: QuizResult):
+    """Test preparing variables when no run is available."""
+    with mock.patch(
+        "radiation_protection.document.get_user_passed_certification_date"
+    ) as mock_date:
+        mock_date.return_value = None
         variables = _prepare_variables(quiz_result.user, None)
 
     assert variables["user_name"] == quiz_result.user.get_full_name()  # type: ignore
     assert variables["admin_name"] == ""
     assert variables["run_date_start"] == ""
     assert variables["run_date_end"] == ""
-    assert variables["certification_date"] == now.strftime("%d/%m/%Y")  # type: ignore # pylint: disable=line-too-long
+    assert variables["certification_date"] == ""
 
 
 def test_replace_variables_in_document(mock_document: "DocumentObject"):

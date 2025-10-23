@@ -18,6 +18,7 @@ from radiation_protection.certification import (
     check_radio_protection_certification,
     create_invitation_notification,
     get_radioprotection_certification,
+    get_user_passed_certification_date,
     user_has_active_certification,
 )
 from radiation_protection.constants import (
@@ -154,3 +155,34 @@ def test_check_radio_protection_certification_when_no_valid_result(
             assert create_invitation_notification_mock.called == (
                 not has_active_certification
             )
+
+
+@pytest.mark.django_db
+def test_get_user_passed_certification_date(
+    certification: Certification, quiz: QuizCertification
+):
+    user = StaffUserFactory()
+    past_date = timezone.now() - timedelta(days=10)
+
+    # No result
+    with mock.patch(
+        "radiation_protection.certification.get_radioprotection_certification",
+        return_value=certification,
+    ):
+        assert get_user_passed_certification_date(user) is None
+
+        # Result not passed
+        QuizResult.objects.create(user=user, quiz=quiz, is_passed=False, score=85)
+        assert get_user_passed_certification_date(user) is None
+
+        # Result passed
+        result = QuizResult.objects.create(
+            user=user,
+            quiz=quiz,
+            is_passed=True,
+            score=95,
+        )
+        result.created = past_date
+        result.save()
+
+        assert get_user_passed_certification_date(user) == past_date

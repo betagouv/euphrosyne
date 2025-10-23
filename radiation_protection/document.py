@@ -6,14 +6,15 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.core import mail
 from django.template.loader import render_to_string
-from django.utils import timezone
 from django.utils.html import strip_tags
 from docx import Document
 from docx.text.paragraph import Paragraph
 
 from euphro_auth.models import User
 from lab.runs.models import Run
-from radiation_protection.models import RiskPreventionPlan
+
+from .certification import get_user_passed_certification_date
+from .models import RiskPreventionPlan
 
 if TYPE_CHECKING:
     from docx.document import Document as DocumentObject
@@ -56,8 +57,20 @@ def replace_text_in_paragraph(paragraph: Paragraph, key: str, value: str) -> Non
 
 def _prepare_variables(user: User, next_user_run: Run | None) -> dict[str, str]:
     """Prepare variables for document template replacement."""
+    passed_certification_date = get_user_passed_certification_date(user)
+    if not passed_certification_date:
+        logger.warning(
+            "User %s does not have a passed radiation protection certification. %s",
+            user.email,
+            f"Run: {next_user_run.label}" if next_user_run else "",
+        )
+
     variables: dict[str, str] = {
-        "certification_date": timezone.now().strftime("%d/%m/%Y"),
+        "certification_date": (
+            passed_certification_date.strftime("%d/%m/%Y")
+            if passed_certification_date
+            else ""
+        ),
         "user_name": user.get_full_name(),
         "admin_name": "",
         "run_date_start": "",
