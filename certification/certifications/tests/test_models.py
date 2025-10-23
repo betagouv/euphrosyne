@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from lab.tests.factories import StaffUserFactory
 
-from ..models import QuizCertification
+from ..models import QuizCertification, QuizResult
 from .factories import (
     CertificationOfTypeQuizFactory,
     QuizCertificationFactory,
@@ -65,13 +65,33 @@ class TestQuizCertificationQuerySet(TestCase):
             )
         ) == [q1, q3]
 
+
+class QuizResultQuerySetTests(TestCase):
+    def test_filter_valid_results_for_user(self):
+        user = StaffUserFactory()
+        certification = CertificationOfTypeQuizFactory(num_days_valid=10)
+        q1 = QuizCertificationFactory(certification=certification, passing_score=100)
+
+        qr = QuizResultFactory(
+            user=user,
+            quiz=q1,
+            score=100,
+            is_passed=True,
+        )
+
+        valid_results = QuizResult.objects.filter_valid_results_for_user(
+            user=user, certification=certification
+        )
+
+        assert list(valid_results) == [qr]
+
     def test_has_valid_certification_for_user_when_no_result(self):
         certification = CertificationOfTypeQuizFactory(num_days_valid=None)
         QuizCertificationFactory(certification=certification, passing_score=100)
 
         user = StaffUserFactory()
 
-        assert not QuizCertification.objects.has_valid_certification_for_user(
+        assert not QuizResult.objects.filter_valid_results_for_user(
             user=user, certification=certification
         )
 
@@ -83,11 +103,7 @@ class TestQuizCertificationQuerySet(TestCase):
 
         QuizResultFactory(user=user, quiz=q1, score=100, is_passed=True)
 
-        QuizCertification.objects.has_valid_certification_for_user(
-            user=user, certification=certification
-        )
-
-        assert QuizCertification.objects.has_valid_certification_for_user(
+        assert QuizResult.objects.filter_valid_results_for_user(
             user=user, certification=certification
         )
 
@@ -99,11 +115,7 @@ class TestQuizCertificationQuerySet(TestCase):
 
         QuizResultFactory(user=user, quiz=q1, score=100, is_passed=False)
 
-        QuizCertification.objects.has_valid_certification_for_user(
-            user=user, certification=certification
-        )
-
-        assert not QuizCertification.objects.has_valid_certification_for_user(
+        assert not QuizResult.objects.filter_valid_results_for_user(
             user=user, certification=certification
         )
 
@@ -122,6 +134,6 @@ class TestQuizCertificationQuerySet(TestCase):
         qr.created = timezone.now() - timedelta(days=11)
         qr.save()
 
-        assert not QuizCertification.objects.has_valid_certification_for_user(
+        assert not QuizResult.objects.filter_valid_results_for_user(
             user=user, certification=certification
         )
