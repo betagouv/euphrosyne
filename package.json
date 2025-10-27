@@ -39,7 +39,7 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "@azure/storage-blob": "^12.28.0",
+    "@azure/storage-blob": "^12.29.1",
     "@emotion/react": "^11.14.0",
     "@fullcalendar/core": "^6.1.8",
     "@fullcalendar/daygrid": "^6.1.19",
