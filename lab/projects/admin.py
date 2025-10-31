@@ -1,3 +1,4 @@
+import json
 from typing import Any, Optional
 
 from django.contrib import admin, messages
@@ -230,8 +231,6 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
             ):
                 admin_inlines += [
                     inlines.LeaderParticipationInline,
-                    inlines.OnPremisesParticipationInline,
-                    inlines.RemoteParticipationInline,
                 ]
             admin_inlines += [inlines.BeamTimeRequestInline]  # type: ignore[list-item]
         return admin_inlines
@@ -282,6 +281,9 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                 "show_save": True,
                 "show_save_as_new": False,
                 "show_save_and_add_another": False,
+                "json_data": json.dumps(
+                    {"projectId": object_id} if object_id else None
+                ),
             },
         )
         if (
