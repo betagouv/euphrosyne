@@ -178,20 +178,6 @@ class BaseParticipationForm(ModelForm, InstitutionFormMixin):
         labels = {"institution": _("Institution")}
 
 
-class OnPremisesParticipationForm(BaseParticipationForm):
-    has_radiation_protection_certification = forms.BooleanField(
-        required=False,
-        label="",
-        widget=widgets.ParticipationCertificationWidget(),
-    )
-
-    class Meta:
-        model = models.Participation
-        fields = ("user", "institution")
-        widgets = {"institution": widgets.InstitutionAutoCompleteWidget()}
-        labels = {"institution": _("Institution")}
-
-
 class ReadonlyLeaderParticipationForm(BaseParticipationForm):
     """To display in read-only mode the leader participation
     in the admin interface for non-admin users.

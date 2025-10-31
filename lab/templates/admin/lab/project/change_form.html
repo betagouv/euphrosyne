@@ -57,6 +57,7 @@
                     </div>
                 {% endif %}
                 {% endfor %}
+
                 </div>
                     {% for inline_admin_formset in inline_admin_formsets %}
                         {% if inline_admin_formset.opts.opts.label != "lab.BeamTimeRequest" %}
@@ -70,6 +71,11 @@
                         {% endif %}
                     {% endfor %}
                 {% endblock %}
+
+                <fieldset>
+                    <div id="project-participations-form"></div>
+                </fieldset>
+
             
             {% block after_related_objects %}{% endblock %}
             
@@ -94,4 +100,12 @@
 
     {# On-change-tab modal #}
     {% include "admin/lab/project/on_change_modal.html" %}
+{% endblock %}
+
+
+{% block footer %}
+{{ block.super }}
+<script id="project-changeform-data" type="application/json">
+    {{ json_data|safe }}
+</script>
 {% endblock %}

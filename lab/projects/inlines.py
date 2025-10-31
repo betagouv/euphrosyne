@@ -4,7 +4,6 @@ from typing import Any, Mapping, Optional
 from django.contrib import admin
 from django.db import transaction
 from django.db.models.query import QuerySet
-from django.forms import ModelForm
 from django.forms.models import BaseInlineFormSet, inlineformset_factory
 from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
@@ -15,10 +14,8 @@ from lab.permissions import is_lab_admin
 from radiation_protection import certification as radiation_protection
 
 from .forms import (
-    BaseParticipationForm,
     BeamTimeRequestForm,
     LeaderParticipationForm,
-    OnPremisesParticipationForm,
     ReadonlyLeaderParticipationForm,
 )
 from .models import BeamTimeRequest, Project
@@ -119,84 +116,6 @@ class LeaderParticipationFormSet(OnPremisesParticipationFormSet):
                 )
             )
         return saved_instance
-
-
-class MemberParticipationInline(LabPermissionMixin, admin.TabularInline):
-    model = Participation
-    verbose_name = _("Project member")
-    verbose_name_plural = _("Project members")
-
-    template = "admin/edit_inline/tabular_participation_in_project.html"
-
-    lab_permissions = LabPermission(
-        add_permission=LabRole.PROJECT_LEADER,
-        change_permission=LabRole.PROJECT_LEADER,
-        view_permission=LabRole.PROJECT_MEMBER,
-        delete_permission=LabRole.PROJECT_LEADER,
-    )
-
-    def get_related_project(  # type: ignore[override]
-        self, obj: Project | None = None
-    ) -> Project | None:
-        return obj
-
-    def get_formset(
-        self,
-        request: HttpRequest,
-        obj: Optional[Project] = None,
-        form: type[ModelForm] | None = None,
-        formset: type[BaseInlineFormSet] | None = None,
-        **kwargs: Mapping[str, Any],
-    ):
-        if form is None:
-            form = BaseParticipationForm
-
-        if formset is None:
-            formset = ParticipationFormSet
-
-        formset = inlineformset_factory(
-            Project,
-            Participation,
-            form=form,
-            extra=0,
-            min_num=0,
-            max_num=1000,
-            can_delete=bool(obj),
-            formset=formset,
-        )
-        return formset
-
-
-class OnPremisesParticipationInline(MemberParticipationInline):
-    verbose_name = _("on premises member")
-    verbose_name_plural = _("on premises members")
-
-    def get_queryset(self, request: HttpRequest) -> QuerySet[Participation]:
-        return super().get_queryset(request).filter(is_leader=False, on_premises=True)
-
-    def get_formset(
-        self,
-        request: HttpRequest,
-        obj: Project | None = None,
-        form: type[ModelForm] | None = None,
-        formset: type[BaseInlineFormSet] | None = None,
-        **kwargs: Mapping[str, Any],
-    ):
-        return super().get_formset(
-            request,
-            obj,
-            form=OnPremisesParticipationForm,
-            formset=OnPremisesParticipationFormSet,
-            **kwargs,
-        )
-
-
-class RemoteParticipationInline(MemberParticipationInline):
-    verbose_name = _("remote member")
-    verbose_name_plural = _("remote members")
-
-    def get_queryset(self, request: HttpRequest) -> QuerySet[Participation]:
-        return super().get_queryset(request).filter(is_leader=False, on_premises=False)
 
 
 class LeaderParticipationInline(LabPermissionMixin, admin.TabularInline):

@@ -1,10 +1,22 @@
+import { createElement } from "react";
+import ProjectParticipationsSection from "../participation/components/ProjectParticipationsSection";
 import {
   tabClickHandler,
   handleModalClose,
   handleModalConfirm,
 } from "../project/tabs.js";
+import { renderComponent } from "../../../../euphrosyne/assets/js/react";
+import { getTemplateJSONData } from "../../../../shared/js/utils";
+
+interface ProjectPageData {
+  projectId: number;
+}
 
 document.addEventListener("DOMContentLoaded", () => {
+  const projectPageData = getTemplateJSONData<ProjectPageData>(
+    "project-changeform-data",
+  );
+
   const form = Array.from(document.forms).filter(
     (f) => f.id == "project_form",
   )[0];
@@ -28,8 +40,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   onCloseModal
     ?.querySelector('[aria-controls="fr-modal-prdformclose-cancel"]')
-    .addEventListener("click", () => handleModalClose(onCloseModal));
+    ?.addEventListener("click", () => handleModalClose(onCloseModal));
   onCloseModal
     ?.querySelector('[aria-controls="fr-modal-prdformclose-confirm"]')
-    .addEventListener("click", () => handleModalConfirm(onCloseModal));
+    ?.addEventListener("click", () => handleModalConfirm(onCloseModal));
+
+  if (projectPageData && projectPageData.projectId) {
+    renderComponent(
+      "project-participations-form",
+      createElement(ProjectParticipationsSection, {
+        projectId: projectPageData.projectId,
+      }),
+    );
+  }
 });

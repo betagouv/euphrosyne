@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-20 15:22+0200\n"
+"POT-Creation-Date: 2025-10-31 15:27+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -636,6 +636,9 @@ msgstr "Merci de corriger les erreurs ci-dessous"
 msgid "Project"
 msgstr "Projet"
 
+msgid "This user is already a participant in the project."
+msgstr "Cet utilisateur est déjà un participant du projet."
+
 msgid "Upload documents"
 msgstr "Téléverser des documents"
 
@@ -856,6 +859,9 @@ msgstr "nom"
 msgid "country"
 msgstr "pays"
 
+msgid "function"
+msgstr "fonction"
+
 msgid "Leader"
 msgstr "Chef de projet"
 
@@ -930,24 +936,6 @@ msgstr "Aucun chef de projet"
 
 msgid "User"
 msgstr "Utilisateur"
-
-msgid "Project member"
-msgstr "Membre du projet"
-
-msgid "Project members"
-msgstr "Membres du projet"
-
-msgid "on premises member"
-msgstr "membre sur place"
-
-msgid "on premises members"
-msgstr "membres sur place"
-
-msgid "remote member"
-msgstr "membre à distance"
-
-msgid "remote members"
-msgstr "membres à distance"
 
 msgid "project leader"
 msgstr "chef de projet"
