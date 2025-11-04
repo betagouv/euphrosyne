@@ -7,11 +7,13 @@ from django.utils import timezone
 from euphro_auth.tests import factories as auth_factories
 from lab.api_views.project import (
     IsLabAdminUser,
+    ProjectLeaderParticipationRetrieveCreateUpdateGroupView,
     ProjectList,
     ProjectSerializer,
     UpcomingProjectList,
     UpcomingProjectSerializer,
 )
+from lab.api_views.serializers import OnPremisesParticipationSerializer
 from lab.models import Project
 
 from .. import factories
@@ -190,3 +192,80 @@ class TestUpcomingProjectListView(TestCase):
                 self.next_projects[3].name,
             ]
         ) == set(project["name"] for project in response.json())
+
+
+class TestProjectLeaderParticipationRetrieveCreateUpdateGroupView(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.admin_user = auth_factories.LabAdminUserFactory()
+        self.client.force_login(self.admin_user)
+        self.project = factories.ProjectWithLeaderFactory()
+        self.api_url = reverse(
+            "api:project-leader-participation-retrieve-create-update",
+            kwargs={"project_id": self.project.id},
+        )
+
+    def test_view_config(self):
+        """Test that the view has correct configuration."""
+        view = ProjectLeaderParticipationRetrieveCreateUpdateGroupView()
+        assert view.serializer_class == OnPremisesParticipationSerializer
+
+    @mock.patch(
+        "lab.api_views.serializers.send_project_invitation_email", new=mock.MagicMock()
+    )
+    @mock.patch("lab.api_views.serializers.send_invitation_email", new=mock.MagicMock())
+    def test_create_leader_participation(
+        self,
+    ):
+        """Test creating a leader participation via API."""
+        project = factories.ProjectFactory()
+        api_url = reverse(
+            "api:project-leader-participation-retrieve-create-update",
+            kwargs={"project_id": project.id},
+        )
+
+        data = {
+            "user": {"email": "leader@test.test"},
+            "institution": {"name": "Test Institution", "country": "France"},
+            "employer": {
+                "first_name": "John",
+                "last_name": "Doe",
+                "email": "john.doe@test.test",
+                "function": "Manager",
+            },
+        }
+
+        response = self.client.post(api_url, data, content_type="application/json")
+        assert response.status_code == 201
+
+        project.refresh_from_db()
+        assert project.leader is not None
+        assert project.leader.user.email == "leader@test.test"
+        assert project.leader.is_leader is True
+        assert project.leader.on_premises is True
+
+    def test_retrieve_leader_participation(self):
+        """Test retrieving the leader participation via API."""
+        response = self.client.get(self.api_url)
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["user"]["email"] == self.project.leader.user.email
+        # Verify this is actually the leader participation
+        assert data["id"] == self.project.leader.id
+
+    @mock.patch("lab.api_views.serializers.send_project_invitation_email")
+    def test_update_leader_participation(self, _):
+        """Test updating the leader participation via API."""
+        data = {
+            "user": {"email": "newleader@test.test"},
+        }
+
+        response = self.client.patch(
+            self.api_url, data, content_type="application/json"
+        )
+        assert response.status_code == 200
+
+        self.project.leader.refresh_from_db()
+        assert self.project.leader.user.email == "newleader@test.test"
+        assert self.project.leader.is_leader is True

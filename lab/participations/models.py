@@ -20,6 +20,7 @@ class Participation(TimestampedModel):
     institution = models.ForeignKey(
         "lab.Institution", on_delete=models.SET_NULL, null=True
     )
+    employer = models.ForeignKey("lab.Employer", on_delete=models.SET_NULL, null=True)
 
     on_premises = models.BooleanField(
         verbose_name=_("On premises"),
@@ -62,7 +63,8 @@ class Institution(models.Model):
     class Meta:
         constraints = [
             UniqueConstraint(
-                fields=["name", "country"], name="unique_name_country_per_institution"
+                fields=["name", "country", "ror_id"],
+                name="unique_name_country_rorid_per_institution",
             ),
         ]
 
@@ -70,3 +72,13 @@ class Institution(models.Model):
         if self.country:
             return f"{self.name}, {self.country}"
         return self.name
+
+
+class Employer(models.Model):
+    email = models.EmailField(_("email address"), blank=False)
+    first_name = models.CharField(_("first name"), max_length=150, blank=False)
+    last_name = models.CharField(_("last name"), max_length=150, blank=False)
+    function = models.CharField(_("function"), max_length=150, blank=False)
+
+    def __str__(self) -> str:
+        return f"{self.first_name} {self.last_name}"

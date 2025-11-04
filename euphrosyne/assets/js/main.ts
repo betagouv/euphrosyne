@@ -22,14 +22,15 @@ interface HeaderData {
   backLink: BackLink | null;
 }
 
-interface UserData {
+export interface UserData {
   fullName: string;
   isLabAdmin: boolean;
   id: number;
   accountURL: string;
+  email: string;
 }
 
-function getUserData(): UserData {
+export function getUserData(): UserData {
   const data = getTemplateJSONData<UserData>("user-data");
   if (!data) {
     return {
@@ -37,6 +38,7 @@ function getUserData(): UserData {
       isLabAdmin: false,
       id: 0,
       accountURL: "#",
+      email: "",
     };
   }
   return data;

@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
@@ -13,3 +14,12 @@ urlpatterns = [
     path("standard/", include("standard.api.urls")),
     path("feedback/", include("feedback.api_urls"), name="feedback"),
 ]
+
+if apps.is_installed("radiation_protection"):
+    urlpatterns.append(
+        path(
+            "radiation-protection/",
+            include("radiation_protection.api_urls"),
+            name="radiation_protection",
+        )
+    )

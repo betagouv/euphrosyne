@@ -1,7 +1,16 @@
 import datetime
 
+from django.apps import apps
+from django.contrib.auth import get_user_model
 from django.utils import timezone
-from rest_framework import reverse, serializers
+from django.utils.translation import gettext_lazy as _
+from rest_framework import reverse, serializers, validators
+from rest_framework.fields import empty
+
+from euphro_auth.emails import send_invitation_email
+from euphro_auth.models import User
+from lab.emails import send_project_invitation_email
+from lab.participations.models import Employer, Institution, Participation
 
 from ..models import Project, Run
 from ..objects.models import ExternalObjectReference, ObjectGroup, RunObjetGroupImage
@@ -210,3 +219,175 @@ class GetObjectImageFromProviderResponseSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         raise NotImplementedError("This serializer is read-only")
+
+
+class _EmployerParticipationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employer
+        fields = ("email", "first_name", "last_name", "function")
+
+
+class _UserParticipationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ("email", "id", "first_name", "last_name")
+        read_only_fields = ("id", "first_name", "last_name")
+
+    def build_standard_field(self, field_name, model_field):
+        # We remove the UniqueValidator on email because we use get_or_create.
+        field_class, field_kwargs = super().build_standard_field(
+            field_name, model_field
+        )
+        if field_name == "email":
+            field_kwargs["validators"] = list(
+                filter(
+                    lambda f: not isinstance(f, validators.UniqueValidator),
+                    field_kwargs.get("validators", []),
+                )
+            )
+        return field_class, field_kwargs
+
+
+class _InstitutionParticipationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Institution
+        fields = ("id", "name", "ror_id", "country")
+
+    def get_validators(self):
+        # We remove the UniqueTogetherValidator on email because we use get_or_create.
+        vals = super().get_validators()
+        vals = list(
+            filter(
+                lambda x: not isinstance(x, validators.UniqueTogetherValidator), vals
+            )
+        )
+        return vals
+
+
+class ProjectUserUniqueValidator:
+    requires_context = True
+
+    def __call__(self, value, serializer_field):
+        project = serializer_field.context.get("project")
+        if not project:
+            raise ValueError("ProjectUserUniqueValidator requires 'project' in context")
+        user_email = value.get("email")
+        if not user_email:
+            raise ValueError(
+                "ProjectUserUniqueValidator requires 'email' in the user data"
+            )
+        if (
+            serializer_field.root.instance
+            and serializer_field.root.instance.user.email == user_email
+        ):
+            # If the user email is the same
+            # and we're in partial update mode, we can skip the check
+            return
+        if Participation.objects.filter(
+            project=project,
+            user__email=user_email,
+        ).exists():
+            raise serializers.ValidationError(
+                _("This user is already a participant in the project.")
+            )
+
+
+class ParticipationSerializer(serializers.ModelSerializer):
+    user = _UserParticipationSerializer(validators=[ProjectUserUniqueValidator()])
+    institution = _InstitutionParticipationSerializer()
+
+    class Meta:
+        model = Participation
+        fields = ("id", "user", "institution", "on_premises")
+        # We set on_premises in the views, so make it read-only here
+        read_only_fields = ("id", "on_premises")
+
+    def create(self, validated_data):
+        institution_data = validated_data.pop("institution")
+        institution, _ = Institution.objects.get_or_create(
+            name=institution_data["name"],
+            ror_id=institution_data.get("ror_id"),
+            country=institution_data.get("country"),
+        )
+
+        user_data = validated_data.pop("user")
+        user = self._handle_user_data(user_data)
+
+        instance = super().create(
+            {**validated_data, "institution": institution, "user": user}
+        )
+
+        send_project_invitation_email(user.email, instance.project)
+
+        return instance
+
+    def update(self, instance, validated_data):
+        institution_data = validated_data.pop("institution", None)
+        if institution_data:
+            institution, _ = Institution.objects.get_or_create(
+                name=institution_data["name"],
+                ror_id=institution_data.get("ror_id"),
+                country=institution_data.get("country"),
+            )
+            validated_data["institution"] = institution
+        return super().update(instance, validated_data)
+
+    def _handle_user_data(self, user_data: dict) -> User:
+        user, created = get_user_model().objects.get_or_create(email=user_data["email"])
+        if created:
+            send_invitation_email(user)
+        return user
+
+
+class OnPremisesParticipationSerializer(ParticipationSerializer):
+    employer = _EmployerParticipationSerializer()
+
+    def __init__(self, instance=None, data=empty, **kwargs):
+        self.Meta.fields = [*self.Meta.fields, "employer"]
+        super().__init__(instance, data, **kwargs)
+
+    def create(self, validated_data):
+        employer = None
+        employer_data = validated_data.pop("employer", None)
+        if employer_data:
+            employer = Employer.objects.create(**employer_data)
+        instance = super().create({**validated_data, "employer": employer})
+
+        self._handle_user_change(instance)
+
+        return instance
+
+    def update(self, instance: Participation, validated_data: dict):
+        user_data = validated_data.pop("user", None)
+        user_has_changed = False
+        if user_data:
+            if instance.user.email != user_data.get("email", instance.user.email):
+                user_has_changed = True
+            user = self._handle_user_data(user_data)
+            validated_data["user"] = user
+
+        employer_data = validated_data.pop("employer", None)
+        if employer_data:
+            employer_instance = instance.employer
+            if employer_instance:
+                Employer.objects.filter(id=employer_instance.id).update(**employer_data)
+            else:
+                employer = Employer.objects.create(**employer_data)
+                instance.employer = employer
+                instance.save()
+        instance = super().update(instance, validated_data)
+        if user_has_changed:
+            send_project_invitation_email(instance.user.email, instance.project)
+            self._handle_user_change(instance)
+        return instance
+
+    def _handle_user_change(self, instance: Participation | None = None):
+        if apps.is_installed("radiation_protection") and instance:
+            # pylint: disable=import-outside-toplevel
+            from radiation_protection.certification import (
+                check_radio_protection_certification,
+            )
+
+            check_radio_protection_certification(
+                instance.user,
+            )

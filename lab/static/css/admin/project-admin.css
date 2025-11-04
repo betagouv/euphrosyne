@@ -70,8 +70,8 @@ fieldset textarea.vLargeTextField {
   width: 100%;
 }
 
-#project_form input {
-  max-width: 35rem;
+#project_form input, .autocomplete-input, .form-multiline {
+  max-width: 36rem;
 }
 
 .two-boxes-inline-container {
@@ -161,4 +161,29 @@ input#id_institution__country {
 }
 .field-institution .autocomplete-input__country {
   width: 40%;
+}
+
+.form-multiline {
+  display: flex;
+}
+
+.form-multiline > div {
+  flex-grow: 1;
+}
+
+.form-multiline > div:last-of-type {
+  margin-left: 10px;
+}
+
+.form-multiline .fieldBox:last-of-type {
+  margin-right: 0;
+}
+
+.model-project.changeform .fieldBox {
+  max-width: 18rem;
+  width: 100%;
+}
+
+.field-employer_first_name.field-employer_last_name, .field-employer_email {
+  border-bottom: none;
 }

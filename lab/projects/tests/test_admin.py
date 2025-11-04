@@ -11,9 +11,10 @@ from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 
-from euphro_auth.tests.factories import LabAdminUserFactory, StaffUserFactory
+from euphro_auth.tests.factories import LabAdminUserFactory
 from lab.models import Institution
 from lab.tests.factories import (
+    EmployerFactory,
     InstitutionFactory,
     ParticipationFactory,
     ProjectFactory,
@@ -25,9 +26,6 @@ from ..admin import ProjectAdmin, ProjectChangeList
 from ..admin_filters import ProjectStatusListFilter
 from ..inlines import (
     BeamTimeRequestInline,
-    LeaderParticipationInline,
-    OnPremisesParticipationInline,
-    RemoteParticipationInline,
 )
 from ..models import Project
 
@@ -100,14 +98,6 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         assert "other project 1" in response.content.decode()
         assert "other project 2" in response.content.decode()
 
-    def test_participation_inlines_are_present_in_changeview(self):
-        inlines = self.project_admin.get_inlines(
-            self.change_request, self.change_project
-        )
-        assert LeaderParticipationInline in inlines
-        assert OnPremisesParticipationInline in inlines
-        assert RemoteParticipationInline in inlines
-
     def test_add_project_form_has_confidential_checkbox(self):
         response = self.client.get(self.add_view_url)
         assert '<input type="checkbox" name="confidential"' in response.content.decode()
@@ -121,70 +111,6 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
     def test_add_project_has_not_cgu_checkbox(self):
         fieldsets = self.project_admin.get_fieldsets(self.add_request)
         assert len(fieldsets) == 1
-
-    def test_participation_inlines(self):
-        project = ProjectFactory()
-        on_premises_user = StaffUserFactory(email="aneweuser@mail.com")
-        remote_user = StaffUserFactory(email="remote@mail.com")
-
-        participation_data = {
-            "name": project.name,
-            "participation_set-TOTAL_FORMS": "1",
-            "participation_set-INITIAL_FORMS": "0",
-            "participation_set-MIN_NUM_FORMS": "1",
-            "participation_set-MAX_NUM_FORMS": "1000",
-            "participation_set-0-id": "",
-            "participation_set-0-project": project.id,
-            "participation_set-0-user": self.project_participant_user.email,
-            "participation_set-0-institution__name": "Louvre",
-            "participation_set-0-institution__country": "France",
-            "participation_set-2-TOTAL_FORMS": "1",
-            "participation_set-2-INITIAL_FORMS": "0",
-            "participation_set-2-MIN_NUM_FORMS": "0",
-            "participation_set-2-MAX_NUM_FORMS": "1000",
-            "participation_set-2-0-id": "",
-            "participation_set-2-0-project": project.id,
-            "participation_set-2-0-user": on_premises_user.email,
-            "participation_set-2-0-institution__name": "C2RMF",
-            "participation_set-2-0-institution__country": "France",
-            "participation_set-3-TOTAL_FORMS": "1",
-            "participation_set-3-INITIAL_FORMS": "0",
-            "participation_set-3-MIN_NUM_FORMS": "0",
-            "participation_set-3-MAX_NUM_FORMS": "1000",
-            "participation_set-3-0-id": "",
-            "participation_set-3-0-project": project.id,
-            "participation_set-3-0-user": remote_user.email,
-            "participation_set-3-0-institution__name": "LMRH",
-            "participation_set-3-0-institution__country": "France",
-            # beamtime is mandatory
-            "beamtimerequest-TOTAL_FORMS": "1",
-            "beamtimerequest-INITIAL_FORMS": "0",
-            "beamtimerequest-MIN_NUM_FORMS": "0",
-            "beamtimerequest-MAX_NUM_FORMS": "1",
-            "beamtimerequest-0-request_type": "C2RMF",
-            "beamtimerequest-0-request_id": "",
-            "beamtimerequest-0-form_type": "",
-            "beamtimerequest-0-problem_statement": "problem statement",
-            "beamtimerequest-0-id": "",
-            "beamtimerequest-0-project": project.id,
-        }
-        response = self.client.post(
-            reverse("admin:lab_project_change", args=[project.id]),
-            data=participation_data,
-        )
-
-        assert response.status_code == 302
-        project.refresh_from_db()
-        assert project.leader.user == self.project_participant_user
-        assert project.participation_set.count() == 3
-        assert (
-            project.participation_set.get(on_premises=True, is_leader=False).user
-            == on_premises_user
-        )
-        assert (
-            project.participation_set.get(on_premises=False, is_leader=False).user
-            == remote_user
-        )
 
     @patch("lab.projects.admin.rename_project_directory")
     def test_change_project_name_calls_hook(self, rename_project_dir_mock):
@@ -221,18 +147,6 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
         self.change_request.user = self.project_leader
         self.add_request.user = self.project_leader
 
-    def test_participation_inline_is_present_in_changeview(self):
-        inlines = self.project_admin.get_inlines(
-            self.change_request, self.change_project
-        )
-        assert LeaderParticipationInline in inlines
-        assert OnPremisesParticipationInline in inlines
-        assert RemoteParticipationInline in inlines
-
-    def test_leader_participation_inline_absent_in_create_changeview(self):
-        inlines = self.project_admin.get_inlines(self.add_request)
-        assert LeaderParticipationInline not in inlines
-
     def test_create_project(self):
         response = self.client.post(
             self.add_view_url,
@@ -242,6 +156,10 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
                 "comments": "some comments",
                 "institution__name": "Louvre",
                 "institution__country": "France",
+                "employer_first_name": "John",
+                "employer_last_name": "Doe",
+                "employer_email": "john.doe@example.com",
+                "employer_function": "Manager",
             },
         )
         assert response.status_code == 302
@@ -280,6 +198,10 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
                 "institution__name": "C3",
                 "institution__country": "France",
                 "institution__ror_id": "https://ror.org/123456789",
+                "employer_first_name": "John",
+                "employer_last_name": "Doe",
+                "employer_email": "john.doe@example.com",
+                "employer_function": "Manager",
             },
         )
         assert response.status_code == 302
@@ -288,6 +210,75 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
         assert project.leader.user_id == self.project_leader.id
         assert project.leader.institution.name == "C3"
         assert project.leader.on_premises
+
+    def test_create_project_creates_employer(self):
+        response = self.client.post(
+            self.add_view_url,
+            data={
+                "name": "some project name",
+                "has_accepted_cgu": True,
+                "comments": "some comments",
+                "institution__name": "C3",
+                "institution__country": "France",
+                "employer_first_name": "John",
+                "employer_last_name": "Doe",
+                "employer_email": "john.doe@example.com",
+                "employer_function": "Manager",
+            },
+        )
+        assert response.status_code == 302
+        project = Project.objects.get(name="some project name")
+        assert project.leader.employer is not None
+        assert project.leader.employer.first_name == "John"
+        assert project.leader.employer.last_name == "Doe"
+        assert project.leader.employer.email == "john.doe@example.com"
+        assert project.leader.employer.function == "Manager"
+
+    def test_create_project_employer_fields_are_required(self):
+        response = self.client.post(
+            self.add_view_url,
+            data={
+                "name": "some project name",
+                "has_accepted_cgu": True,
+                "comments": "some comments",
+                "institution__name": "C3",
+                "institution__country": "France",
+            },
+        )
+        assert response.status_code == 200
+        assert not Project.objects.filter(name="some project name").exists()
+
+    def test_add_project_form_prefills_employer_from_last_participation(self):
+        """Prefill employer fields with the last participation's employer data."""
+        employer = EmployerFactory(
+            first_name="Jane",
+            last_name="Smith",
+            email="jane.smith@example.com",
+            function="Director",
+        )
+        ParticipationFactory(
+            user=self.project_leader,
+            institution=self.base_institution,
+            employer=employer,
+        )
+        response = self.client.get(self.add_view_url)
+        content = response.content.decode()
+        assert 'value="Jane"' in content
+        assert 'value="Smith"' in content
+        assert 'value="jane.smith@example.com"' in content
+        assert 'value="Director"' in content
+
+    def test_add_project_form_has_employer_fields(self):
+        fieldsets = self.project_admin.get_fieldsets(self.add_request)
+        employer_fieldset_found = False
+        for __, fieldset_data in fieldsets:
+            if "employer_first_name" in str(fieldset_data.get("fields", [])):
+                employer_fieldset_found = True
+                assert "employer_last_name" in str(fieldset_data["fields"])
+                assert "employer_email" in str(fieldset_data["fields"])
+                assert "employer_function" in str(fieldset_data["fields"])
+                break
+        assert employer_fieldset_found
 
     def test_create_project_use_existing_institution(self):
         i, _ = Institution.objects.get_or_create(
@@ -302,6 +293,10 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
                 "institution__name": "C2",
                 "institution__country": "France",
                 "institution__ror_id": "https://ror.org/123456789",
+                "employer_first_name": "John",
+                "employer_last_name": "Doe",
+                "employer_email": "john.doe@example.com",
+                "employer_function": "Manager",
             },
         )
         assert response.status_code == 302
@@ -338,7 +333,13 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
 
     def test_add_project_has_cgu_checkbox(self):
         fieldsets = self.project_admin.get_fieldsets(self.add_request)
-        assert "has_accepted_cgu" in fieldsets[2][1]["fields"]
+        # Find the fieldset containing has_accepted_cgu
+        has_cgu_field = False
+        for __, fieldset_data in fieldsets:
+            if "has_accepted_cgu" in str(fieldset_data.get("fields", [])):
+                has_cgu_field = True
+                break
+        assert has_cgu_field
 
     @patch("lab.projects.admin.rename_project_directory")
     def test_change_project_name_not_call_hook(self, rename_project_dir_mock):
@@ -426,6 +427,10 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
                 "comments": "some comments",
                 "institution__name": "Louvre",
                 "institution__country": "France",
+                "employer_first_name": "John",
+                "employer_last_name": "Doe",
+                "employer_email": "john.doe@example.com",
+                "employer_function": "Manager",
             },
         )
         assert response.status_code == 302
@@ -438,10 +443,18 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
         request = self.request_factory.post(self.add_view_url)
         request.user = self.project_member
         project = MagicMock(name="Projet Notre Dame")
+        form = MagicMock()
+        form.cleaned_data = {
+            "institution": self.base_institution,
+            "employer_first_name": "John",
+            "employer_last_name": "Doe",
+            "employer_email": "john.doe@example.com",
+            "employer_function": "Manager",
+        }
         ProjectAdmin(Project, admin_site=AdminSite()).save_model(
             request,
             project,
-            form=MagicMock(),
+            form=form,
             change=False,
         )
         init_project_dir_mock.assert_called_once_with(project.name)
@@ -464,6 +477,15 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
             self.change_request, self.change_project
         )
         assert BeamTimeRequestInline in inlines
+
+    def test_leader_participation_inline_not_present_in_changeview(self):
+        """LeaderParticipationInline should no longer be in inlines."""
+        inlines = self.project_admin.get_inlines(
+            self.change_request, self.change_project
+        )
+        # Check that no inline class name contains "LeaderParticipation"
+        inline_names = [inline.__name__ for inline in inlines]
+        assert not any("LeaderParticipation" in name for name in inline_names)
 
 
 class TestProjectChangeList(TestCase):

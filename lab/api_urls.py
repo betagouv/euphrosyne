@@ -7,7 +7,14 @@ from .api_views.objectgroup import (
     get_object_from_provider,
     get_object_images_from_provider,
 )
-from .api_views.project import ProjectList, UpcomingProjectList
+from .api_views.project import (
+    ProjectLeaderParticipationRetrieveCreateUpdateGroupView,
+    ProjectList,
+    ProjectOnPremisesParticipationListCreateGroupView,
+    ProjectParticipationRetrieveUpdateDestroyGroupView,
+    ProjectRemoteParticipationListCreateGroupView,
+    UpcomingProjectList,
+)
 from .api_views.run import RunMethodsView
 from .api_views.run_objectgroup import (
     RunObjectGroupAvailableListView,
@@ -33,6 +40,26 @@ urlpatterns = [
         "projects/",
         ProjectList.as_view(),
         name="project-list",
+    ),
+    path(
+        "projects/<int:project_id>/participations/leader",
+        ProjectLeaderParticipationRetrieveCreateUpdateGroupView.as_view(),
+        name="project-leader-participation-retrieve-create-update",
+    ),
+    path(
+        "projects/<int:project_id>/participations/on-premises",
+        ProjectOnPremisesParticipationListCreateGroupView.as_view(),
+        name="project-on-premises-participation-list-create",
+    ),
+    path(
+        "projects/<int:project_id>/participations/remote",
+        ProjectRemoteParticipationListCreateGroupView.as_view(),
+        name="project-remote-participation-list-create",
+    ),
+    path(
+        "projects/<int:project_id>/participations/<int:pk>",
+        ProjectParticipationRetrieveUpdateDestroyGroupView.as_view(),
+        name="project-remote-participation-retrieve-update-destroy",
     ),
     path(
         "projects/upcoming",

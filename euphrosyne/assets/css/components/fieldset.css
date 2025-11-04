@@ -1,5 +1,6 @@
 .module h2 {
-  font-size: 20px;
+  font-size: 1.75rem;
+  font-weight: 700;
   background-color: unset;
   color: var(--text-title-grey);
 }

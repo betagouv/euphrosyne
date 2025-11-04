@@ -27,7 +27,6 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    console.log(document.querySelectorAll(`${baseSelector}`));
     // Add event listeners to institution input elements
     document.querySelectorAll(`${baseSelector}`).forEach((el) => {
       el.querySelector(`${baseSelector}__name`).addEventListener(
