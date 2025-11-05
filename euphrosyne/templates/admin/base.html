@@ -109,7 +109,8 @@
       "fullName": "{{ user.get_full_name }}",
       "isLabAdmin": {{ user.is_lab_admin|yesno:"true,false" }},
       "id": {{ user.id }},
-      "accountURL": "{% url 'admin:euphro_auth_user_change' user.id %}"
+      "accountURL": "{% url 'admin:euphro_auth_user_change' user.id %}",
+      "email": "{{ user.email }}"
     }
   </script>
 {% endif %}

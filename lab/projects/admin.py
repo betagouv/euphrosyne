@@ -1,3 +1,4 @@
+import json
 from typing import Any, Optional
 
 from django.contrib import admin, messages
@@ -18,7 +19,8 @@ from euphro_tools.hooks import (
     rename_project_directory,
 )
 from lab.admin.mixins import LabPermission, LabPermissionMixin, LabRole
-from lab.permissions import is_lab_admin, is_project_leader
+from lab.participations.models import Employer
+from lab.permissions import is_lab_admin
 
 from . import admin_filters, inlines
 from .forms import (
@@ -170,6 +172,21 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                 (
                     "",
                     {
+                        "fields": [
+                            (  # type: ignore
+                                "employer_first_name",
+                                "employer_last_name",
+                            ),
+                            "employer_email",
+                            "employer_function",
+                        ],
+                        # pylint: disable=line-too-long
+                        "description": str(_("Employer information")),  # type: ignore
+                    },
+                ),
+                (
+                    "",
+                    {
                         "fields": ["has_accepted_cgu"],
                         "description": "<p><strong>%s</strong></p>"  # type: ignore
                         % str(
@@ -223,18 +240,9 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         return ProjectChangeList
 
     def get_inlines(self, request: HttpRequest, obj: Optional[Project] = None):
-        admin_inlines = []
         if obj:
-            if is_lab_admin(request.user) or is_project_leader(
-                request.user, obj  # type: ignore[arg-type]
-            ):
-                admin_inlines += [
-                    inlines.LeaderParticipationInline,
-                    inlines.OnPremisesParticipationInline,
-                    inlines.RemoteParticipationInline,
-                ]
-            admin_inlines += [inlines.BeamTimeRequestInline]  # type: ignore[list-item]
-        return admin_inlines
+            return [inlines.BeamTimeRequestInline]  # type: ignore[list-item]
+        return []
 
     def save_model(
         self,
@@ -262,6 +270,12 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         obj.save()
         if not change:
             if not is_lab_admin(request.user):
+                employer = Employer.objects.create(
+                    first_name=form.cleaned_data["employer_first_name"],
+                    last_name=form.cleaned_data["employer_last_name"],
+                    email=form.cleaned_data["employer_email"],
+                    function=form.cleaned_data["employer_function"],
+                )
                 obj.participation_set.create(
                     user=request.user,  # type: ignore[misc]
                     institution=form.cleaned_data[
@@ -269,6 +283,7 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                     ],  # institution is set in form, throw error otherwise
                     is_leader=True,
                     on_premises=True,
+                    employer=employer,
                 )
             initialize_project_directory(obj.name)
 
@@ -282,6 +297,9 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                 "show_save": True,
                 "show_save_as_new": False,
                 "show_save_and_add_another": False,
+                "json_data": json.dumps(
+                    {"projectId": object_id} if object_id else None
+                ),
             },
         )
         if (
@@ -296,6 +314,17 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                 view.context_data["adminform"].fields[
                     "institution"
                 ].widget.instance = last_participation.institution
+                if last_participation.employer:
+                    for field in [
+                        "first_name",
+                        "last_name",
+                        "email",
+                        "function",
+                    ]:
+                        view.context_data["adminform"].fields[
+                            f"employer_{field}"
+                        ].initial = getattr(last_participation.employer, field)
+
         return view
 
     def changelist_view(

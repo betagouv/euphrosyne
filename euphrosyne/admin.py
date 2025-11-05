@@ -10,7 +10,6 @@ from django.utils.translation import gettext_lazy as _
 from lab.documents.views import ProjectDocumentsView
 from lab.hdf5.views import HDF5View
 from lab.objects.views import ObjectImportErosView, ObjectImportPOPView
-from lab.projects.views import ChangeLeaderView
 from lab.workplace.views import WorkplaceView
 
 
@@ -24,11 +23,6 @@ class AdminSite(admin.AdminSite):
 
     def get_urls(self) -> List[URLResolver]:  # type: ignore[override]
         urls = [
-            path(
-                "lab/project/<project_id>/leader/change",
-                self.admin_view(ChangeLeaderView.as_view()),  # type: ignore[type-var]
-                name="lab_project_leader_participation_change",
-            ),
             path(
                 "lab/project/<project_id>/documents",
                 self.admin_view(

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-20 15:22+0200\n"
+"POT-Creation-Date: 2025-11-05 15:24+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -636,6 +636,9 @@ msgstr "Merci de corriger les erreurs ci-dessous"
 msgid "Project"
 msgstr "Projet"
 
+msgid "This user is already a participant in the project."
+msgstr "Cet utilisateur est déjà un participant du projet."
+
 msgid "Upload documents"
 msgstr "Téléverser des documents"
 
@@ -648,12 +651,10 @@ msgstr ""
 msgid "[Euphrosyne] Invitation to join project %s"
 msgstr "[Euphrosyne] Invitation à rejoindre le projet %s"
 
-#, fuzzy, python-format
-#| msgid "[Euphrosyne] Alert: Long lasting VMs in project %s"
+#, python-format
 msgid "[Euphrosyne] Alert: Long lasting VMs in project %s"
 msgstr ""
-"[Euphrosyne] Alerte : VMs du projet {project.name} en cours depuis un "
-"certain temps"
+"[Euphrosyne] Alerte : VMs du projet %s en cours depuis un certain temps"
 
 #, python-format
 msgid ""
@@ -856,6 +857,9 @@ msgstr "nom"
 msgid "country"
 msgstr "pays"
 
+msgid "function"
+msgstr "fonction"
+
 msgid "Leader"
 msgstr "Chef de projet"
 
@@ -882,6 +886,9 @@ msgstr "Créer un nouveau projet"
 
 msgid "Project leader institution"
 msgstr "Institution du chef de projet"
+
+msgid "Employer information"
+msgstr "Informations sur l'employeur"
 
 msgid ""
 "To create a project on Euphrosyne, you are required to acknowledge and agree "
@@ -925,32 +932,8 @@ msgstr "Ce champ doit faire moins de 560 caractères."
 msgid "I have read and accepted the general conditions of Euphrosyne."
 msgstr "J'ai lu et accepté les conditions générales d'Euphrosyne."
 
-msgid "No leader"
-msgstr "Aucun chef de projet"
-
-msgid "User"
-msgstr "Utilisateur"
-
-msgid "Project member"
-msgstr "Membre du projet"
-
-msgid "Project members"
-msgstr "Membres du projet"
-
-msgid "on premises member"
-msgstr "membre sur place"
-
-msgid "on premises members"
-msgstr "membres sur place"
-
-msgid "remote member"
-msgstr "membre à distance"
-
-msgid "remote members"
-msgstr "membres à distance"
-
-msgid "project leader"
-msgstr "chef de projet"
+msgid "Function"
+msgstr "Fonction"
 
 msgid "Scheduled"
 msgstr "Planifié"
@@ -1029,9 +1012,6 @@ msgstr "Description de la problématique étudiée par analyse de faisceau"
 
 msgid "Form type"
 msgstr "Type du formulaire"
-
-msgid "Change leader"
-msgstr "Modification du chef de projet"
 
 msgid "Experimental conditions"
 msgstr "Conditions expérimentales"
@@ -1284,10 +1264,8 @@ msgstr ""
 msgid "Documents"
 msgstr "Documents"
 
-#, fuzzy
-#| msgid "Hello"
 msgid "Hello,"
-msgstr "Bonjour"
+msgstr "Bonjour,"
 
 #, python-format
 msgid ""
@@ -1491,10 +1469,8 @@ msgstr ""
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"
 
-#, fuzzy
-#| msgid "Run Risk Prevention Plans"
 msgid "Latest published risk prevention plans"
-msgstr "Plans de prévention des risques du run"
+msgstr "Derniers plans de prévention des risques publiés"
 
 msgid "Risk Advisor Notification Sent"
 msgstr "Notification envoyée au conseiller en risques"

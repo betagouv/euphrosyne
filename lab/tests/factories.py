@@ -16,6 +16,7 @@ from ..models import (
     Run,
 )
 from ..objects.models import ExternalObjectReference, Location
+from ..participations.models import Employer
 
 NOW = datetime.now(tz=timezone.utc)
 
@@ -184,3 +185,13 @@ class InstitutionFactory(factory.django.DjangoModelFactory):
 
     name = factory.Faker("company")
     country = factory.Faker("country")
+
+
+class EmployerFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Employer
+
+    email = factory.Faker("email")
+    first_name = factory.Faker("first_name")
+    last_name = factory.Faker("last_name")
+    function = factory.Faker("job")

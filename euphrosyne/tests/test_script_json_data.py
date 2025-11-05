@@ -25,7 +25,7 @@ class TestScriptJsonData(TestCase):
 
         assert '<script id="user-data" type="application/json">' in html
         assert (
-            f""""fullName": "{user.get_full_name()}",\n      "isLabAdmin": false,\n      "id": {user.id},\n      "accountURL": "{reverse('admin:euphro_auth_user_change', args=[user.id])}"\n"""  # pylint: disable=line-too-long
+            f""""fullName": "{user.get_full_name()}",\n      "isLabAdmin": false,\n      "id": {user.id},\n      "accountURL": "{reverse('admin:euphro_auth_user_change', args=[user.id])}",\n      "email": "{user.email}"\n"""  # pylint: disable=line-too-long
             in html
         )
 

@@ -7,7 +7,6 @@ import { getCSRFToken } from "../../lab/assets/js/utils.js";
 import { jwtDecode } from "jwt-decode";
 
 export async function jwtFetch(input, init = {}, contentType) {
-  console.log(contentType);
   // Same as fetch, but tries to refresh token if status is 401
   let attemps = 0,
     response;

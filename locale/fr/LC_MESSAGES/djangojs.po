@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-20 12:04+0200\n"
+"POT-Creation-Date: 2025-11-05 15:13+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -146,6 +146,79 @@ msgstr "Le fichier %s a été téléversé."
 msgid "File %s could not be uploaded."
 msgstr "Le fichier %s n'a pas pu être sauvegardé."
 
+msgid "Institution"
+msgstr "Institution"
+
+msgid "Country"
+msgstr "Pays"
+
+msgid "Save member information"
+msgstr "Enregistrer les informations"
+
+msgid "Researcher information"
+msgstr "Informations sur le chercheur"
+
+msgid "First name"
+msgstr "Prénom"
+
+msgid "Last name"
+msgstr "Nom de famille"
+
+msgid "Employer information"
+msgstr "Informations sur l'employeur"
+
+msgid "Function"
+msgstr "Fonction"
+
+msgid "Associated ROR page"
+msgstr "Page ROR associée"
+
+msgid ""
+"Email cannot be edited after creation. Delete this participation and invite "
+"a new member."
+msgstr ""
+"L'email ne peut pas être modifié après la création. Supprimez cette "
+"participation et invitez un nouveau membre."
+
+msgid "Add member to the project"
+msgstr "Ajouter un membre au projet"
+
+msgid "Edit project member"
+msgstr "Modifier un membre du projet"
+
+msgid "Close"
+msgstr "Fermer"
+
+msgid "Delete participation"
+msgstr "Supprimer la participation"
+
+msgid "Add member"
+msgstr "Ajouter un membre"
+
+msgid "Project leader"
+msgstr "Chef de projet"
+
+msgid "Remote participations"
+msgstr "Participations à distance"
+
+msgid "On-site participations"
+msgstr "Participations sur site"
+
+msgid "Add project leader"
+msgstr "Ajouter un chef de projet"
+
+msgid "No remote participations for this project."
+msgstr "Pas de participation à distance dans ce projet."
+
+msgid "No on-site participations for this project."
+msgstr "Pas de participation sur site dans ce projet."
+
+msgid "No project leader assigned."
+msgstr "Aucun chef de projet assigné"
+
+msgid "Missing radiation protection certification"
+msgstr "Certification de protection contre les radiations manquante"
+
 msgid "An error occurred while requesting upload URL."
 msgstr "Une erreur s'est produite lors de la demande d'URL de téléversement."
 
@@ -163,9 +236,6 @@ msgstr "Images"
 
 msgid "No images yet"
 msgstr "Aucune image"
-
-msgid "Close"
-msgstr "Fermer"
 
 msgid "Add files"
 msgstr "Ajouter des fichiers"
@@ -378,10 +448,8 @@ msgstr "Supprimer"
 msgid "Images of object %s used in this run"
 msgstr "Images de l'objet %s utilisées dans ce run"
 
-#, fuzzy
-#| msgid "Other images of object %s"
 msgid "Other images of this project"
-msgstr "Autres images de l'objet %s"
+msgstr "Autres images de ce projet"
 
 msgid ""
 "No image has been upload for this object group / object. You can upload one "

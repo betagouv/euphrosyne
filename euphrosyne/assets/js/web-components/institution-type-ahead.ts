@@ -43,7 +43,6 @@ class InstitutionTypeAhead extends TypeAheadList {
     }
 
     return (await response.json()).items.map((item: RorResult) => {
-      console.log(item.locations[0]);
       return {
         label: `${item.names[0].value}, ${item.locations[0].geonames_details.country_name}`,
         id: item.id,

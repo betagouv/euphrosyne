@@ -1,8 +1,10 @@
 {% load dsfr %}
 <fieldset class="module {{ fieldset.classes }}">
-    {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}
+    {% if fieldset.name %}<h2 class="fr-h3">{{ fieldset.name }}</h2>{% endif %}
     {% if fieldset.description %}
-        <div class="description">{{ fieldset.description|safe }}</div>
+     <legend class="fr-fieldset__legend" id="identity-fieldset-legend">
+        <h3 class="fr-h5 fr-pl-0">{{ fieldset.description|safe }}</h3>
+    </legend>
     {% endif %}
     {% for line in fieldset %}
         <div class="form-row{% if line.fields|length == 1 and line.errors %} errors {% endif %}{% if not line.has_visible_field %} hidden{% endif %}{% for field in line %}{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% endfor %}">
