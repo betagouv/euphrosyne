@@ -35,3 +35,46 @@ class RiskPreventionPlan(TimestampedModel):
         run_label = self.run.label
         user_email = self.participation.user.email
         return f"Risk Prevention Plan for {run_label} - {user_email}"
+
+
+class ElectricalSignatureProcess(models.Model):
+    """
+    Model to represent an electrical signature process linked to a risk prevention plan.
+    """
+
+    label = models.CharField(
+        max_length=255,
+        verbose_name=_("Label"),
+        help_text=_("A descriptive label for the electrical signature process."),
+    )
+
+    risk_prevention_plan = models.ForeignKey(
+        RiskPreventionPlan,
+        on_delete=models.CASCADE,
+        related_name="electrical_signature_processes",
+    )
+
+    provider_name = models.CharField(
+        max_length=100,
+        verbose_name=_("Provider Name"),
+        help_text=_("The name of the electrical signature service provider."),
+    )
+    provider_workflow_id = models.CharField(
+        max_length=255,
+        verbose_name=_("Provider Workflow ID"),
+        help_text=_("The ID of the provider workflow associated with this process."),
+    )
+    is_completed = models.BooleanField(
+        default=False,
+        verbose_name=_("Is Completed"),
+        help_text=_(
+            "Indicates if the electrical signature process has been completed."
+        ),
+    )
+
+    class Meta:
+        verbose_name = _("Electrical Signature Process")
+        verbose_name_plural = _("Electrical Signature Processes")
+
+    def __str__(self):
+        return self.label
