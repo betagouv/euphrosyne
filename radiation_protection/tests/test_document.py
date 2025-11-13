@@ -4,8 +4,6 @@ from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
-from django.core import mail
-from django.test import override_settings
 from django.utils import timezone
 from docx import Document
 
@@ -16,14 +14,13 @@ from lab.runs.models import Run
 from lab.tests import factories as lab_factories
 from radiation_protection.certification import get_radioprotection_certification
 from radiation_protection.document import (
-    _fill_radiation_protection_document,
     _prepare_variables,
+    _replace_text_in_paragraph,
     _replace_variables_in_document,
-    fill_radiation_protection_documents,
-    replace_text_in_paragraph,
-    send_document_to_risk_advisor,
+    write_authorization_access_form,
+    write_risk_prevention_plan,
 )
-from radiation_protection.models import RiskPreventionPlan
+from radiation_protection.tests import factories as radiation_factories
 
 if TYPE_CHECKING:
     from docx.document import Document as DocumentObject
@@ -80,17 +77,20 @@ def test_replace_text_in_paragraph():
     """Test text replacement in a paragraph."""
     doc = Document()
     paragraph = doc.add_paragraph("Hello ${name}!")
-    replace_text_in_paragraph(paragraph, "${name}", "John")
+    _replace_text_in_paragraph(paragraph, "${name}", "John")
     assert paragraph.text == "Hello John!"
 
 
 @pytest.mark.django_db
 def test_prepare_variables_with_run(quiz_result: QuizResult, next_user_run: Run):
     """Test preparing variables when run is available."""
-    variables = _prepare_variables(quiz_result.user, next_user_run)
+    participation = next_user_run.project.participation_set.create(
+        user=quiz_result.user, institution=lab_factories.InstitutionFactory()
+    )
+    variables = _prepare_variables(participation, next_user_run)
 
-    assert variables["user_name"] == quiz_result.user.get_full_name()  # type: ignore # pylint: disable=line-too-long
-    assert variables["admin_name"] == next_user_run.project.admin.get_full_name()  # type: ignore # pylint: disable=line-too-long
+    assert variables["user_full_name"] == quiz_result.user.get_administrative_name()  # type: ignore # pylint: disable=line-too-long
+    assert variables["admin_name"] == next_user_run.project.admin.get_administrative_name()  # type: ignore # pylint: disable=line-too-long
     assert variables["run_date_start"] == next_user_run.start_date.strftime(  # type: ignore # pylint: disable=line-too-long
         "%d/%m/%Y"
     )
@@ -103,9 +103,12 @@ def test_prepare_variables_with_run(quiz_result: QuizResult, next_user_run: Run)
 @pytest.mark.django_db
 def test_prepare_variables_without_run(quiz_result: QuizResult):
     """Test preparing variables when no run is available."""
-    variables = _prepare_variables(quiz_result.user, None)
+    participation = lab_factories.ParticipationFactory(
+        user=quiz_result.user, institution=lab_factories.InstitutionFactory()
+    )
+    variables = _prepare_variables(participation, None)
 
-    assert variables["user_name"] == quiz_result.user.get_full_name()  # type: ignore
+    assert variables["user_full_name"] == quiz_result.user.get_administrative_name()  # type: ignore  # pylint: disable=line-too-long
     assert variables["admin_name"] == ""
     assert variables["run_date_start"] == ""
     assert variables["run_date_end"] == ""
@@ -119,9 +122,12 @@ def test_prepare_variables_without_passed_quiz_result(quiz_result: QuizResult):
         "radiation_protection.document.get_user_passed_certification_date"
     ) as mock_date:
         mock_date.return_value = None
-        variables = _prepare_variables(quiz_result.user, None)
+        participation = lab_factories.ParticipationFactory(
+            user=quiz_result.user, institution=lab_factories.InstitutionFactory()
+        )
+        variables = _prepare_variables(participation, None)
 
-    assert variables["user_name"] == quiz_result.user.get_full_name()  # type: ignore
+    assert variables["user_full_name"] == quiz_result.user.get_administrative_name()  # type: ignore # pylint: disable=line-too-long
     assert variables["admin_name"] == ""
     assert variables["run_date_start"] == ""
     assert variables["run_date_end"] == ""
@@ -148,88 +154,104 @@ def test_replace_variables_in_document(mock_document: "DocumentObject"):
 
 
 @pytest.mark.django_db
-@mock.patch("radiation_protection.document.Document")
-def test_fill_radiation_protection_document(
-    mock_document_class,
-    mock_document: "DocumentObject",
-    quiz_result: QuizResult,
-    next_user_run: Run,
-    mock_document_paths: list[Path],
+def test_prepare_variables_with_employer_and_institution(
+    quiz_result: QuizResult, next_user_run: Run
 ):
-    """Test filling the radiation protection document."""
-    mock_document_class.return_value = mock_document
-    mock_document_paths[0].parent.mkdir(parents=True, exist_ok=True)
-    mock_document_paths[0].touch()
-
-    result = _fill_radiation_protection_document(
-        document_path=mock_document_paths[0],
+    """Test preparing variables with employer and institution."""
+    employer = lab_factories.EmployerFactory()
+    participation = next_user_run.project.participation_set.create(
         user=quiz_result.user,
-        next_user_run=next_user_run,
+        institution=lab_factories.InstitutionFactory(),
+        employer=employer,
     )
+    variables = _prepare_variables(participation, next_user_run)
 
-    assert result is not None
-    assert isinstance(result, bytes)
+    assert variables["user_full_name"] == quiz_result.user.get_administrative_name()  # type: ignore  # pylint: disable=line-too-long
+    assert variables["user_email"] == quiz_result.user.email
+    assert variables["admin_name"] == next_user_run.project.admin.get_administrative_name()  # type: ignore  # pylint: disable=line-too-long
+    assert variables["run_date_start"] == next_user_run.start_date.strftime("%d/%m/%Y")  # type: ignore  # pylint: disable=line-too-long
+    assert variables["run_date_end"] == next_user_run.end_date.strftime("%d/%m/%Y")  # type: ignore  # pylint: disable=line-too-long
+    assert variables["certification_date"] == quiz_result.created.strftime("%d/%m/%Y")
+    assert variables["institution_name"] == participation.institution.name  # type: ignore # pylint: disable=line-too-long
+    assert (
+        variables["employer_full_name"]
+        == f"{employer.last_name.upper()} {employer.first_name}"
+    )
+    assert variables["employer_email"] == employer.email
+    assert variables["employer_function"] == employer.function
 
 
 @pytest.mark.django_db
-def test_fill_radiation_protection_documents(
-    quiz_result: QuizResult,
-    next_user_run: Run,
+def test_prepare_variables_without_institution(
+    quiz_result: QuizResult, next_user_run: Run
 ):
-    """Test filling multiple radiation protection documents."""
-    with mock.patch(
-        "radiation_protection.document._fill_radiation_protection_document"
-    ) as mock_fill:
-        mock_fill.return_value = b"test content"
-        documents = fill_radiation_protection_documents(
-            user=quiz_result.user, next_user_run=next_user_run
-        )
+    """Test preparing variables when institution is None."""
+    employer = lab_factories.EmployerFactory()
+    participation = next_user_run.project.participation_set.create(
+        user=quiz_result.user,
+        institution=None,
+        employer=employer,
+    )
+    variables = _prepare_variables(participation, next_user_run)
 
-        assert len(documents) == 2
-        assert all(isinstance(doc[1], bytes) for doc in documents)
-        assert mock_fill.call_count == 2
+    assert variables["user_full_name"] == quiz_result.user.get_administrative_name()  # type: ignore  # pylint: disable=line-too-long
+    assert variables["user_email"] == quiz_result.user.email
+    assert variables["admin_name"] == next_user_run.project.admin.get_administrative_name()  # type: ignore # pylint: disable=line-too-long
+    assert variables["run_date_start"] == next_user_run.start_date.strftime("%d/%m/%Y")  # type: ignore # pylint: disable=line-too-long
+    assert variables["run_date_end"] == next_user_run.end_date.strftime("%d/%m/%Y")  # type: ignore # pylint: disable=line-too-long
+    assert variables["certification_date"] == quiz_result.created.strftime("%d/%m/%Y")
+    assert variables["institution_name"] == ""
+    assert (
+        variables["employer_full_name"]
+        == f"{employer.last_name.upper()} {employer.first_name}"
+    )
+    assert variables["employer_email"] == employer.email
+    assert variables["employer_function"] == employer.function
 
 
-@override_settings(
-    RADIATION_PROTECTION_RISK_ADVISOR_EMAILS=[
-        "risk@example.com",
-        "another_risk@example.com",
-    ],
-    DEFAULT_FROM_EMAIL="noreply@example.com",
-)
 @pytest.mark.django_db
-def test_send_document_to_risk_advisors():
-    """Test sending document to risk advisors."""
-    user = auth_factories.StaffUserFactory()
-    participation = lab_factories.ParticipationFactory(user=user)
-    run = lab_factories.RunFactory(
-        start_date=timezone.now() + timedelta(days=7),
+def test_write_authorization_access_form(
+    quiz_result: QuizResult, next_user_run: Run, tmp_path: Path
+):
+    """Test writing authorization access form."""
+    employer = lab_factories.EmployerFactory()
+    participation = next_user_run.project.participation_set.create(
+        user=quiz_result.user,
+        institution=lab_factories.InstitutionFactory(),
+        employer=employer,
     )
-    plan = RiskPreventionPlan.objects.create(
-        participation=participation,
-        run=run,
+    risk_prevention_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation, run=next_user_run
     )
 
-    documents = [
-        ("test_fr.docx", b"French content"),
-        ("test_en.docx", b"English content"),
-    ]
+    output_path = tmp_path / "authorization_form.docx"
+    write_authorization_access_form(risk_prevention_plan, output_path)
 
-    result = send_document_to_risk_advisor(plan, documents)
+    assert output_path.exists()
+    # Verify the document can be opened
+    doc = Document(str(output_path))
+    assert len(doc.paragraphs) > 0
 
-    assert result is True
-    assert len(mail.outbox) == 2
-    email1 = mail.outbox[0]
-    email2 = mail.outbox[1]
-    assert email1.to == ["risk@example.com"]
-    assert email2.to == ["another_risk@example.com"]
-    assert (
-        email1.subject
-        == f"Document de certification des risques AGLAE pour {user.get_full_name()}"
+
+@pytest.mark.django_db
+def test_write_risk_prevention_plan(
+    quiz_result: QuizResult, next_user_run: Run, tmp_path: Path
+):
+    """Test writing risk prevention plan."""
+    employer = lab_factories.EmployerFactory()
+    participation = next_user_run.project.participation_set.create(
+        user=quiz_result.user,
+        institution=lab_factories.InstitutionFactory(),
+        employer=employer,
     )
-    assert (
-        email2.subject
-        == f"Document de certification des risques AGLAE pour {user.get_full_name()}"
+    risk_prevention_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation, run=next_user_run
     )
-    assert len(email1.attachments) == 2
-    assert len(email2.attachments) == 2
+
+    output_path = tmp_path / "risk_prevention_plan.docx"
+    write_risk_prevention_plan(risk_prevention_plan, output_path)
+
+    assert output_path.exists()
+    # Verify the document can be opened
+    doc = Document(str(output_path))
+    assert len(doc.paragraphs) > 0

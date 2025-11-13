@@ -18,7 +18,7 @@
       "size": "S"
     },
     {
-      "command": "*/10 * * * * python manage.py send_notifications",
+      "command": "*/10 * * * * python manage.py every_10_minutes_job",
       "size": "S"
     }
   ]

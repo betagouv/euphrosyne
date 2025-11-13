@@ -30,6 +30,10 @@ class TestCronJsonConfig(TestCase):
                 "pattern": "5 */6 * * *",
                 "command_fragment": "./scripts/scalingo_index_and_build_catalog.sh",
             },
+            "every_10_minutes_job": {
+                "pattern": "*/10 * * * *",
+                "command_fragment": "python manage.py every_10_minutes_job",
+            },
         }
 
     def test_cron_json_exists(self):

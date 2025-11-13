@@ -39,6 +39,10 @@ class User(AbstractUser):
         self.is_active = False
         self.save()
 
+    def get_administrative_name(self) -> str:
+        full_name = "%s %s" % (self.last_name.upper(), self.first_name)
+        return full_name.strip()
+
 
 class UserInvitation(User):
     class Meta:
