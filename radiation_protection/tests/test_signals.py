@@ -364,6 +364,37 @@ class TestHandleRadiationProtectionOnScheduleRun(TestCase):
         # Should not create duplicate
         assert RiskPreventionPlan.objects.count() == initial_count
 
+    @mock.patch("radiation_protection.signals.check_radio_protection_certification")
+    def test_plan_run_in_past(self, mock_check):
+        """Test handler when run is in the past."""
+        user = auth_factories.StaffUserFactory()
+        project = lab_factories.ProjectFactory()
+        participation = lab_factories.ParticipationFactory(
+            user=user, project=project, on_premises=True
+        )
+        past_run = lab_factories.RunFactory(
+            project=project,
+            start_date=timezone.now() - timedelta(days=7),
+            end_date=timezone.now() - timedelta(days=1),
+        )
+
+        mock_check.return_value = True
+
+        # Create existing plan
+        RiskPreventionPlan.objects.create(
+            participation=participation,
+            run=past_run,
+        )
+        initial_count = RiskPreventionPlan.objects.count()
+
+        handle_radiation_protection_on_schedule_run(
+            None,
+            instance=past_run,
+        )
+
+        # Should not create duplicate
+        assert RiskPreventionPlan.objects.count() == initial_count
+
     @mock.patch("radiation_protection.signals.logger")
     def test_exception_handling(self, mock_logger):
         """Test that exceptions are logged and don't crash the handler."""
