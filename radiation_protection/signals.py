@@ -105,6 +105,8 @@ def handle_radiation_protection_on_schedule_run(
     This is only done for runs that are upcoming
     and do not have a risk prevention plan yet
     """
+    if instance.start_date and instance.start_date < timezone.now():
+        return
     try:
         participations = Participation.objects.filter(
             project=instance.project, on_premises=True
