@@ -8,6 +8,11 @@ from datetime import timedelta
 import requests
 from django.conf import settings
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+
+if typing.TYPE_CHECKING:
+    from radiation_protection.models import ElectricalSignatureProcess
+
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +62,18 @@ def start_workflow(workflow_name: str, steps: list[Step], document_path: str) ->
 
     client.start_workflow(workflow_id)
     return workflow_id
+
+
+def get_status(signature_process: "ElectricalSignatureProcess") -> str | None:
+    client = GoodflagClient()
+    data = client.get_workflow_status(signature_process.provider_workflow_id)
+    if data["workflowStatus"] == "started":
+        steps_completed = "{}/{}".format(
+            sum(1 for step in data["steps"] if step["isFinished"] is True),
+            len(data["steps"]),
+        )
+        return _("started (%(steps_completed)s)") % {"steps_completed": steps_completed}
+    return data.get("workflowStatus")
 
 
 class GoodflagAPIError(Exception):
@@ -274,6 +291,11 @@ class GoodflagClient:
             f.write(response.content)
 
         logger.info("Document téléchargé: %s", output_path)
+
+    def retrieve_workflow(self, workflow_id: str) -> dict:
+        endpoint = f"/workflows/{workflow_id}"
+        response = self._make_request("GET", endpoint, headers=self.headers)
+        return response.json()
 
     def list_consent_pages(self):
         endpoint = "/consentPages"

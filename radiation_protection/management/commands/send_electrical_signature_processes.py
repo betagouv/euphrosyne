@@ -44,7 +44,9 @@ class Command(BaseCommand):
                     )
             except Exception as e:
                 logger.error(
-                    f"Error starting electrical signature process for plan {plan.id}: {e}"
+                    "Error starting electrical signature process for plan %s: %s",
+                    plan.id,
+                    str(e),
                 )
                 sentry_sdk.capture_exception(e)
 

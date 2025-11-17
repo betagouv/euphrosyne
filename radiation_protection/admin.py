@@ -3,7 +3,17 @@ from django.utils.translation import gettext_lazy as _
 
 from lab.admin.mixins import LabAdminAllowedMixin
 
-from .models import RiskPreventionPlan
+from .models import ElectricalSignatureProcess, RiskPreventionPlan
+
+
+class ElectricalSignatureProcessInline(admin.TabularInline):
+    model = ElectricalSignatureProcess
+    verbose_name = _("Related electrical signature process")
+    verbose_name_plural = _("Related electrical signature processes")
+    extra = 0
+
+    fields = ("label", "status")
+    readonly_fields = ("label", "status")
 
 
 @admin.register(RiskPreventionPlan)
@@ -24,3 +34,8 @@ class RiskPreventionPlanAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
 
     def has_change_permission(self, *args, **kwargs):
         return False
+
+    def get_inlines(self, request, obj):
+        if obj:
+            return [ElectricalSignatureProcessInline]
+        return super().get_inlines(request, obj)
