@@ -20,17 +20,22 @@ BASE_PATH = Path(settings.BASE_DIR) / "radiation_protection" / "assets"
 logger = logging.getLogger(__name__)
 
 
-def _get_risk_prevention_document_paths() -> list[Path]:
+def _get_risk_prevention_document_paths() -> dict[str, Path]:
     """Get the path to the radiation protection template document."""
-    return [
-        BASE_PATH / "AGLAE_plan_de_prevention_fr.docx",
-        BASE_PATH / "AGLAE_plan_de_prevention_en.docx",
-    ]
+    return {
+        "default": BASE_PATH / "AGLAE_plan_de_prevention.docx",
+        "en": BASE_PATH / "AGLAE_plan_de_prevention_english.docx",
+    }
 
 
-def _get_authorization_access_form_path() -> Path:
+def _get_authorization_access_form_path() -> dict[str, Path]:
     """Get the path to the radiation protection authorization access form."""
-    return BASE_PATH / "Formulaire_Autorisation_Acces_zone surveillee_ext_AGLAE.docx"
+    return {
+        "default": BASE_PATH
+        / "Formulaire_Autorisation_Acces_zone surveillee_ext_AGLAE.docx",
+        "en": BASE_PATH
+        / "Formulaire_Autorisation_Acces_zone surveillee_ext_AGLAE_english.docx",
+    }
 
 
 def _replace_text_in_paragraph(paragraph: Paragraph, key: str, value: str) -> None:
@@ -150,8 +155,18 @@ def _create_document(
 
 
 def write_authorization_access_form(plan: RiskPreventionPlan, write_path: Path):
+    document_dict = _get_authorization_access_form_path()
+    institution = plan.participation.institution
+    if (
+        institution
+        and institution.country
+        and institution.country.lower() not in ["france", "french"]
+    ):
+        document_path = document_dict.get("en", document_dict["default"])
+    else:
+        document_path = document_dict["default"]
     _create_document(
-        document_path=_get_authorization_access_form_path(),
+        document_path=document_path,
         write_path=write_path,
         participation=plan.participation,
         next_user_run=plan.run,
@@ -159,8 +174,18 @@ def write_authorization_access_form(plan: RiskPreventionPlan, write_path: Path):
 
 
 def write_risk_prevention_plan(plan: RiskPreventionPlan, write_path: Path):
+    document_dict = _get_risk_prevention_document_paths()
+    institution = plan.participation.institution
+    if (
+        institution
+        and institution.country
+        and institution.country.lower() not in ["france", "french"]
+    ):
+        document_path = document_dict.get("en", document_dict["default"])
+    else:
+        document_path = document_dict["default"]
     _create_document(
-        document_path=_get_risk_prevention_document_paths()[0],
+        document_path=document_path,
         write_path=write_path,
         participation=plan.participation,
         next_user_run=plan.run,

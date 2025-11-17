@@ -30,10 +30,10 @@ if TYPE_CHECKING:
 def mock_document_paths_fixture(settings):
     """Create mock document paths for testing."""
     base_path = Path(settings.BASE_DIR) / "radiation_protection" / "assets"
-    return [
-        base_path / "AGLAE_plan_de_prevention_fr.docx",
-        base_path / "AGLAE_plan_de_prevention_en.docx",
-    ]
+    return {
+        "default": base_path / "AGLAE_plan_de_prevention.docx",
+        "en": base_path / "AGLAE_plan_de_prevention_english.docx",
+    }
 
 
 @pytest.fixture(name="mock_document")
@@ -255,3 +255,161 @@ def test_write_risk_prevention_plan(
     # Verify the document can be opened
     doc = Document(str(output_path))
     assert len(doc.paragraphs) > 0
+
+
+@pytest.mark.django_db
+def test_write_authorization_access_form_non_french_institution(
+    quiz_result: QuizResult, next_user_run: Run, tmp_path: Path
+):
+    employer = lab_factories.EmployerFactory()
+    institution = lab_factories.InstitutionFactory(country="United States")
+    participation = next_user_run.project.participation_set.create(
+        user=quiz_result.user,
+        institution=institution,
+        employer=employer,
+    )
+    risk_prevention_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation, run=next_user_run
+    )
+
+    output_path = tmp_path / "authorization_form_en.docx"
+
+    with mock.patch("radiation_protection.document._create_document") as mock_create:
+        write_authorization_access_form(risk_prevention_plan, output_path)
+
+        # Verify _create_document was called with English template
+        mock_create.assert_called_once()
+        document_path_arg = mock_create.call_args[1]["document_path"]
+        assert "english" in str(document_path_arg).lower()
+
+
+@pytest.mark.django_db
+def test_write_authorization_access_form_french_institution(
+    quiz_result: QuizResult, next_user_run: Run, tmp_path: Path
+):
+    employer = lab_factories.EmployerFactory()
+    institution = lab_factories.InstitutionFactory(country="France")
+    participation = next_user_run.project.participation_set.create(
+        user=quiz_result.user,
+        institution=institution,
+        employer=employer,
+    )
+    risk_prevention_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation, run=next_user_run
+    )
+
+    output_path = tmp_path / "authorization_form_fr.docx"
+
+    with mock.patch("radiation_protection.document._create_document") as mock_create:
+        write_authorization_access_form(risk_prevention_plan, output_path)
+
+        # Verify _create_document was called with default template
+        mock_create.assert_called_once()
+        document_path_arg = mock_create.call_args[1]["document_path"]
+        assert "english" not in str(document_path_arg).lower()
+        assert "AGLAE_plan_de_prevention.docx" in str(
+            document_path_arg
+        ) or "Formulaire_Autorisation_Acces" in str(document_path_arg)
+
+
+@pytest.mark.django_db
+def test_write_authorization_access_form_no_institution(
+    quiz_result: QuizResult, next_user_run: Run, tmp_path: Path
+):
+    employer = lab_factories.EmployerFactory()
+    participation = next_user_run.project.participation_set.create(
+        user=quiz_result.user,
+        institution=None,
+        employer=employer,
+    )
+    risk_prevention_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation, run=next_user_run
+    )
+
+    output_path = tmp_path / "authorization_form_default.docx"
+
+    with mock.patch("radiation_protection.document._create_document") as mock_create:
+        write_authorization_access_form(risk_prevention_plan, output_path)
+
+        # Verify _create_document was called with default template
+        mock_create.assert_called_once()
+        document_path_arg = mock_create.call_args[1]["document_path"]
+        assert "english" not in str(document_path_arg).lower()
+
+
+@pytest.mark.django_db
+def test_write_risk_prevention_plan_non_french_institution(
+    quiz_result: QuizResult, next_user_run: Run, tmp_path: Path
+):
+    employer = lab_factories.EmployerFactory()
+    institution = lab_factories.InstitutionFactory(country="Germany")
+    participation = next_user_run.project.participation_set.create(
+        user=quiz_result.user,
+        institution=institution,
+        employer=employer,
+    )
+    risk_prevention_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation, run=next_user_run
+    )
+
+    output_path = tmp_path / "risk_prevention_plan_en.docx"
+
+    with mock.patch("radiation_protection.document._create_document") as mock_create:
+        write_risk_prevention_plan(risk_prevention_plan, output_path)
+
+        # Verify _create_document was called with English template
+        mock_create.assert_called_once()
+        document_path_arg = mock_create.call_args[1]["document_path"]
+        assert "english" in str(document_path_arg).lower()
+
+
+@pytest.mark.django_db
+def test_write_risk_prevention_plan_french_institution(
+    quiz_result: QuizResult, next_user_run: Run, tmp_path: Path
+):
+    employer = lab_factories.EmployerFactory()
+    institution = lab_factories.InstitutionFactory(country="French")
+    participation = next_user_run.project.participation_set.create(
+        user=quiz_result.user,
+        institution=institution,
+        employer=employer,
+    )
+    risk_prevention_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation, run=next_user_run
+    )
+
+    output_path = tmp_path / "risk_prevention_plan_fr.docx"
+
+    with mock.patch("radiation_protection.document._create_document") as mock_create:
+        write_risk_prevention_plan(risk_prevention_plan, output_path)
+
+        # Verify _create_document was called with default template
+        mock_create.assert_called_once()
+        document_path_arg = mock_create.call_args[1]["document_path"]
+        assert "english" not in str(document_path_arg).lower()
+
+
+@pytest.mark.django_db
+def test_write_risk_prevention_plan_no_institution(
+    quiz_result: QuizResult, next_user_run: Run, tmp_path: Path
+):
+    """Test writing risk prevention plan with no institution uses default template."""
+    employer = lab_factories.EmployerFactory()
+    participation = next_user_run.project.participation_set.create(
+        user=quiz_result.user,
+        institution=None,
+        employer=employer,
+    )
+    risk_prevention_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation, run=next_user_run
+    )
+
+    output_path = tmp_path / "risk_prevention_plan_default.docx"
+
+    with mock.patch("radiation_protection.document._create_document") as mock_create:
+        write_risk_prevention_plan(risk_prevention_plan, output_path)
+
+        # Verify _create_document was called with default template
+        mock_create.assert_called_once()
+        document_path_arg = mock_create.call_args[1]["document_path"]
+        assert "english" not in str(document_path_arg).lower()
