@@ -260,3 +260,7 @@ ul li {
   width: auto;
   display: inherit;
 }
+
+fieldset .inline-heading {
+  color: var(--text-title-grey) !important;
+}

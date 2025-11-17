@@ -5,6 +5,8 @@ from lab.projects.models import Participation
 from lab.runs.models import Run
 from shared.models import TimestampedModel
 
+from .electrical_signature.providers.goodflag import get_status
+
 
 class RiskPreventionPlan(TimestampedModel):
     """
@@ -71,6 +73,12 @@ class ElectricalSignatureProcess(models.Model):
             "Indicates if the electrical signature process has been completed."
         ),
     )
+
+    @property
+    def status(self):
+        if self.provider_name == "goodflag":
+            return get_status(self) or ""
+        return ""
 
     class Meta:
         verbose_name = _("Electrical Signature Process")

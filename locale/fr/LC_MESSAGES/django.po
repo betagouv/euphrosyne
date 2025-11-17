@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-13 23:19+0100\n"
+"POT-Creation-Date: 2025-11-17 04:11+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -1469,8 +1469,18 @@ msgstr ""
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"
 
+msgid "Related electrical signature process"
+msgstr "Processus de signature électrique associé"
+
+msgid "Related electrical signature processes"
+msgstr "Processus de signature électrique associés"
+
 msgid "Latest published risk prevention plans"
 msgstr "Derniers plans de prévention des risques publiés"
+
+#, python-format
+msgid "started (%(steps_completed)s)"
+msgstr "démarré (%(steps_completed)s)"
 
 msgid "Risk Advisor Notification Sent"
 msgstr "Notification envoyée au conseiller en risques"

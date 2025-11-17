@@ -35,12 +35,20 @@ class Command(BaseCommand):
             sentry_sdk.set_extra("run", plan.run.id)
 
             # Generate the document
-            processes = start_electrical_signature_processes(plan)
-            for process in processes:
-                self.stdout.write(
-                    "[send-electrical-signature-processes] Started electrical signature process %s."  # pylint: disable=line-too-long
-                    % process
+            try:
+                processes = start_electrical_signature_processes(plan)
+                for process in processes:
+                    self.stdout.write(
+                        "[send-electrical-signature-processes] Started electrical signature process %s."  # pylint: disable=line-too-long
+                        % process
+                    )
+            except Exception as e:
+                logger.error(
+                    "Error starting electrical signature process for plan %s: %s",
+                    plan.id,
+                    str(e),
                 )
+                sentry_sdk.capture_exception(e)
 
             # Mark the plan as sent
             plan.risk_advisor_notification_sent = True
