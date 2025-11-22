@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-17 04:11+0100\n"
+"POT-Creation-Date: 2025-11-22 22:35+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -1477,6 +1477,12 @@ msgstr "Processus de signature électrique associés"
 
 msgid "Latest published risk prevention plans"
 msgstr "Derniers plans de prévention des risques publiés"
+
+msgid "Risk prevention plan"
+msgstr "Plan de prévention des risques"
+
+msgid "Access authorization form"
+msgstr "Formulaire d'autorisation d'accès"
 
 #, python-format
 msgid "started (%(steps_completed)s)"

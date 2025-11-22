@@ -226,6 +226,8 @@ LANGUAGES = [
 
 LANGUAGE_CODE = "fr-fr"
 
+DEFAULT_LOCALE = LANGUAGE_CODE.split("-", maxsplit=1)[0]
+
 TIME_ZONE = "Europe/Paris"
 
 USE_I18N = True

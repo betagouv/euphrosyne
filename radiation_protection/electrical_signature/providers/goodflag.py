@@ -34,6 +34,7 @@ class Recipient(typing.TypedDict):
     email: str
     first_name: str
     last_name: str
+    preferred_locale: typing.NotRequired[str]
 
 
 class Step(typing.TypedDict):
@@ -168,6 +169,7 @@ class GoodflagClient:
                                 if step["step_type"] == StepType.SIGNATURE
                                 else None
                             ),
+                            "preferredLocale": recipient.get("preferred_locale", "fr"),
                         }
                         for recipient in step["recipients"]
                     ],
@@ -294,6 +296,11 @@ class GoodflagClient:
 
     def retrieve_workflow(self, workflow_id: str) -> dict:
         endpoint = f"/workflows/{workflow_id}"
+        response = self._make_request("GET", endpoint, headers=self.headers)
+        return response.json()
+
+    def retrieve_workflow_settings(self, workflow_id: str) -> dict:
+        endpoint = f"/workflows/{workflow_id}/settings"
         response = self._make_request("GET", endpoint, headers=self.headers)
         return response.json()
 

@@ -73,6 +73,14 @@ class Institution(models.Model):
             return f"{self.name}, {self.country}"
         return self.name
 
+    def get_administrative_locale(self):
+        """Get the administrative locale based on the institution country.
+        For now, only 'fr' and 'en' are supported.
+        """
+        if self.country and self.country.lower() not in ["france", "french"]:
+            return "en"
+        return "fr"
+
 
 class Employer(models.Model):
     email = models.EmailField(_("email address"), blank=False)

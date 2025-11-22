@@ -2,6 +2,7 @@ import tempfile
 from pathlib import Path
 
 from django.conf import settings
+from django.utils import translation
 
 from radiation_protection.document import (
     write_authorization_access_form,
@@ -52,13 +53,19 @@ def start_electrical_signature_processes(
     if not employer:
         raise ValueError(f"Participation {participation.id} has no employer.")
 
+    institution_locale = (
+        participation.institution.get_administrative_locale()
+        if participation.institution
+        else settings.DEFAULT_LOCALE
+    )
+    with translation.override(institution_locale):
+        prevention_plan_base_label = translation.gettext("Risk prevention plan")
+        access_form_base_label = translation.gettext("Access authorization form")
+    run_date_str = run.start_date.strftime("%d/%m/%y") if run.start_date else ""
+
     # AUTHORIZATION ACCESS FORM
     with tempfile.NamedTemporaryFile(suffix=".docx") as temp_file:
-        workflow_name = "Formulaire d'autorisation d'accès - %s - %s - %s" % (
-            f"{participation.user.get_administrative_name()}",
-            run.project.name,
-            run.label,
-        )
+        workflow_name = f"AGLAE - {access_form_base_label} - {participation.user.get_administrative_name()} - {run.project.name} - {run_date_str}"  # pylint: disable=line-too-long
         write_authorization_access_form(
             plan=risk_prevention_plan,
             write_path=Path(temp_file.name),
@@ -74,6 +81,7 @@ def start_electrical_signature_processes(
                             "email": participation.user.email,
                             "first_name": participation.user.first_name,
                             "last_name": participation.user.last_name,
+                            "preferred_locale": institution_locale,
                         },
                     ],
                 },
@@ -84,6 +92,7 @@ def start_electrical_signature_processes(
                             "email": employer.email,
                             "first_name": employer.first_name,
                             "last_name": employer.last_name,
+                            "preferred_locale": institution_locale,
                         },
                     ],
                 },
@@ -101,11 +110,7 @@ def start_electrical_signature_processes(
 
         # RISK PREVENTION PLAN
         with tempfile.NamedTemporaryFile(suffix=".docx") as temp_file:
-            workflow_name = "Plan de prévention des risques - %s - %s - %s" % (
-                f"{participation.user.get_administrative_name()}",
-                run.project.name,
-                run.label,
-            )
+            workflow_name = f"AGLAE - {prevention_plan_base_label} - {participation.user.get_administrative_name()} - {run.project.name} - {run_date_str}"  # pylint: disable=line-too-long
             write_risk_prevention_plan(
                 plan=risk_prevention_plan,
                 write_path=Path(temp_file.name),
@@ -121,6 +126,7 @@ def start_electrical_signature_processes(
                                 "email": participation.user.email,
                                 "first_name": participation.user.first_name,
                                 "last_name": participation.user.last_name,
+                                "preferred_locale": institution_locale,
                             },
                         ],
                     },
@@ -131,6 +137,7 @@ def start_electrical_signature_processes(
                                 "email": employer.email,
                                 "first_name": employer.first_name,
                                 "last_name": employer.last_name,
+                                "preferred_locale": institution_locale,
                             },
                         ],
                     },
