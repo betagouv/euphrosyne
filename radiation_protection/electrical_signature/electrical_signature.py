@@ -12,7 +12,6 @@ from radiation_protection.models import ElectricalSignatureProcess, RiskPreventi
 from .providers.goodflag import StepType, start_workflow
 
 ELECTRICAL_SIGNATURE_PROVIDER_NAME = "goodflag"
-RISK_PREVENTION_FILE = "radiation_protection/assets/AGLAE_plan_de_prevention_fr.docx"
 
 
 def start_electrical_signature_processes(
