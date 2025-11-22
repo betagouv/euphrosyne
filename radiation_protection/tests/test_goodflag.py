@@ -9,6 +9,7 @@ from docx import Document
 from radiation_protection.electrical_signature.providers.goodflag import (
     GoodflagAPIError,
     GoodflagClient,
+    Step,
     StepType,
     start_workflow,
 )
@@ -35,6 +36,7 @@ def sample_steps_fixture():
                     "email": "user@example.com",
                     "first_name": "John",
                     "last_name": "Doe",
+                    "preferred_locale": "fr",
                 }
             ],
         },
@@ -45,6 +47,7 @@ def sample_steps_fixture():
                     "email": "signer@example.com",
                     "first_name": "Jane",
                     "last_name": "Smith",
+                    "preferred_locale": "en",
                 }
             ],
         },
@@ -97,6 +100,13 @@ def test_create_workflow(mock_request, goodflag_client: GoodflagClient, sample_s
     call_kwargs = mock_request.call_args[1]
     assert call_kwargs["json"]["name"] == "Test Workflow"
     assert len(call_kwargs["json"]["steps"]) == 2
+
+    # Verify preferredLocale is included for recipients
+    step_0_recipient = call_kwargs["json"]["steps"][0]["recipients"][0]
+    assert step_0_recipient["preferredLocale"] == "fr"
+
+    step_1_recipient = call_kwargs["json"]["steps"][1]["recipients"][0]
+    assert step_1_recipient["preferredLocale"] == "en"
 
 
 @mock.patch(
@@ -253,3 +263,78 @@ def test_start_workflow_function(mock_client_class, sample_steps):
             assert mock_client.create_viewer.call_count == 2
         finally:
             Path(temp_file.name).unlink()
+
+
+@mock.patch(
+    "radiation_protection.electrical_signature.providers.goodflag.requests.request"
+)
+def test_create_workflow_with_default_preferred_locale(
+    mock_request, goodflag_client: GoodflagClient
+):
+    """Test that preferredLocale defaults to 'fr' when not provided."""
+    mock_response = mock.Mock()
+    mock_response.json.return_value = {"id": "workflow_123"}
+    mock_response.ok = True
+    mock_request.return_value = mock_response
+
+    # Create steps without preferred_locale
+    steps: list[Step] = [
+        {
+            "step_type": StepType.APPROVAL,
+            "recipients": [
+                {
+                    "email": "user@example.com",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                }
+            ],
+        },
+    ]
+
+    goodflag_client.create_workflow(name="Test Workflow", steps=steps)
+
+    call_kwargs = mock_request.call_args[1]
+    recipient = call_kwargs["json"]["steps"][0]["recipients"][0]
+    # Should default to 'fr'
+    assert recipient["preferredLocale"] == "fr"
+
+
+@mock.patch(
+    "radiation_protection.electrical_signature.providers.goodflag.requests.request"
+)
+def test_create_workflow_with_multiple_recipients_different_locales(
+    mock_request, goodflag_client: GoodflagClient
+):
+    """Test workflow creation with multiple recipients
+    having different preferred locales."""
+    mock_response = mock.Mock()
+    mock_response.json.return_value = {"id": "workflow_123"}
+    mock_response.ok = True
+    mock_request.return_value = mock_response
+
+    steps: list[Step] = [
+        {
+            "step_type": StepType.SIGNATURE,
+            "recipients": [
+                {
+                    "email": "user1@example.com",
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "preferred_locale": "en",
+                },
+                {
+                    "email": "user2@example.com",
+                    "first_name": "Marie",
+                    "last_name": "Dupont",
+                    "preferred_locale": "fr",
+                },
+            ],
+        },
+    ]
+
+    goodflag_client.create_workflow(name="Test Workflow", steps=steps)
+
+    call_kwargs = mock_request.call_args[1]
+    recipients = call_kwargs["json"]["steps"][0]["recipients"]
+    assert recipients[0]["preferredLocale"] == "en"
+    assert recipients[1]["preferredLocale"] == "fr"

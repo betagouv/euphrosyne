@@ -118,3 +118,47 @@ class TestInstitutionModel(TestCase):
             Institution.objects.create(
                 name="Test Institution", country="France", ror_id="123"
             )
+
+    def test_get_administrative_locale_french_country(self):
+        """Test get_administrative_locale returns 'fr' for France."""
+        institution = Institution.objects.create(
+            name="French Institution", country="France"
+        )
+        assert institution.get_administrative_locale() == "fr"
+
+    def test_get_administrative_locale_french_string(self):
+        """Test get_administrative_locale returns 'fr' for 'French' country."""
+        institution = Institution.objects.create(
+            name="French Institution", country="French"
+        )
+        assert institution.get_administrative_locale() == "fr"
+
+    def test_get_administrative_locale_non_french_country(self):
+        """Test get_administrative_locale returns 'en' for non-French countries."""
+        institution = Institution.objects.create(
+            name="US Institution", country="United States"
+        )
+        assert institution.get_administrative_locale() == "en"
+
+    def test_get_administrative_locale_no_country(self):
+        """Test get_administrative_locale returns 'fr' when country is None."""
+        institution = Institution.objects.create(name="Institution without country")
+        assert institution.get_administrative_locale() == "fr"
+
+    def test_get_administrative_locale_empty_country(self):
+        """Test get_administrative_locale returns 'fr' when country is empty."""
+        institution = Institution.objects.create(
+            name="Institution with empty country", country=""
+        )
+        assert institution.get_administrative_locale() == "fr"
+
+    def test_get_administrative_locale_case_insensitive(self):
+        """Test get_administrative_locale is case insensitive."""
+        institution_upper = Institution.objects.create(
+            name="French Upper", country="FRANCE"
+        )
+        institution_mixed = Institution.objects.create(
+            name="French Mixed", country="FrAnCe"
+        )
+        assert institution_upper.get_administrative_locale() == "fr"
+        assert institution_mixed.get_administrative_locale() == "fr"

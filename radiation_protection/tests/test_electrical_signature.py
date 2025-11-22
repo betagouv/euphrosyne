@@ -54,7 +54,7 @@ def test_start_electrical_signature_processes(
     auth_process = processes[0]
     assert auth_process.provider_name == "goodflag"
     assert auth_process.provider_workflow_id == "workflow_auth_123"
-    assert "Formulaire d'autorisation d'accès" in auth_process.label
+    assert "AGLAE - " in auth_process.label
     assert not auth_process.is_completed
     assert auth_process.risk_prevention_plan == risk_prevention_plan
 
@@ -62,7 +62,7 @@ def test_start_electrical_signature_processes(
     risk_process = processes[1]
     assert risk_process.provider_name == "goodflag"
     assert risk_process.provider_workflow_id == "workflow_risk_123"
-    assert "Plan de prévention des risques" in risk_process.label
+    assert "AGLAE - " in risk_process.label
     assert not risk_process.is_completed
     assert risk_process.risk_prevention_plan == risk_prevention_plan
 
@@ -132,7 +132,8 @@ def test_start_electrical_signature_processes_workflow_steps(
 def test_start_electrical_signature_processes_workflow_names(
     mock_start_workflow, risk_prevention_plan, settings
 ):
-    """Test that workflow names include user, project, and run information."""
+    """Test that workflow names include AGLAE prefix, user, project,
+    and run information."""
     settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
     settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
 
@@ -143,21 +144,269 @@ def test_start_electrical_signature_processes_workflow_names(
     # Check authorization access form workflow name
     auth_call = mock_start_workflow.call_args_list[0]
     auth_workflow_name = auth_call[1]["workflow_name"]
-    assert "Formulaire d'autorisation d'accès" in auth_workflow_name
+    assert auth_workflow_name.startswith("AGLAE - ")
     assert (
         risk_prevention_plan.participation.user.get_administrative_name()
         in auth_workflow_name
     )
     assert risk_prevention_plan.run.project.name in auth_workflow_name
-    assert risk_prevention_plan.run.label in auth_workflow_name
 
     # Check risk prevention plan workflow name
     risk_call = mock_start_workflow.call_args_list[1]
     risk_workflow_name = risk_call[1]["workflow_name"]
-    assert "Plan de prévention des risques" in risk_workflow_name
+    assert risk_workflow_name.startswith("AGLAE - ")
     assert (
         risk_prevention_plan.participation.user.get_administrative_name()
         in risk_workflow_name
     )
     assert risk_prevention_plan.run.project.name in risk_workflow_name
-    assert risk_prevention_plan.run.label in risk_workflow_name
+
+
+@pytest.mark.django_db
+@mock.patch(
+    "radiation_protection.electrical_signature.electrical_signature.start_workflow"
+)
+@mock.patch(
+    "radiation_protection.electrical_signature.electrical_signature.translation"
+)
+def test_start_electrical_signature_processes_english_translation(
+    mock_translation, mock_start_workflow, settings
+):
+    """Test that translation.override is called with 'en'
+    for non-French institutions."""
+    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
+    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
+
+    # Create a risk prevention plan with a non-French institution
+    user = lab_factories.StaffUserFactory()
+    admin = lab_factories.StaffUserFactory()
+    project = lab_factories.ProjectFactory(admin=admin)
+    run = lab_factories.RunFactory(project=project)
+    institution = lab_factories.InstitutionFactory(country="United States")
+    employer = lab_factories.EmployerFactory()
+
+    participation = project.participation_set.create(
+        user=user, institution=institution, employer=employer
+    )
+
+    risk_prevention_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation, run=run
+    )
+
+    mock_start_workflow.side_effect = ["workflow_auth_123", "workflow_risk_123"]
+
+    start_electrical_signature_processes(risk_prevention_plan)
+
+    # Verify that translation.override was called with 'en' for US institution
+    mock_translation.override.assert_called_once_with("en")
+
+
+@pytest.mark.django_db
+@mock.patch(
+    "radiation_protection.electrical_signature.electrical_signature.start_workflow"
+)
+@mock.patch(
+    "radiation_protection.electrical_signature.electrical_signature.translation"
+)
+def test_start_electrical_signature_processes_french_institution(
+    mock_translation, mock_start_workflow, settings
+):
+    """Test that translation.override is called with 'fr' for French institutions."""
+    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
+    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
+
+    # Create a risk prevention plan with a French institution
+    user = lab_factories.StaffUserFactory()
+    admin = lab_factories.StaffUserFactory()
+    project = lab_factories.ProjectFactory(admin=admin)
+    run = lab_factories.RunFactory(project=project)
+    institution = lab_factories.InstitutionFactory(country="France")
+    employer = lab_factories.EmployerFactory()
+
+    participation = project.participation_set.create(
+        user=user, institution=institution, employer=employer
+    )
+
+    risk_prevention_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation, run=run
+    )
+
+    mock_start_workflow.side_effect = ["workflow_auth_123", "workflow_risk_123"]
+
+    start_electrical_signature_processes(risk_prevention_plan)
+
+    # Verify that translation.override was called with 'fr' for French institution
+    mock_translation.override.assert_called_once_with("fr")
+
+
+@pytest.mark.django_db
+@mock.patch(
+    "radiation_protection.electrical_signature.electrical_signature.start_workflow"
+)
+@mock.patch(
+    "radiation_protection.electrical_signature.electrical_signature.translation"
+)
+def test_start_electrical_signature_processes_no_institution(
+    mock_translation, mock_start_workflow, settings
+):
+    """Test that translation.override defaults to 'fr'
+    when no institution is provided."""
+    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
+    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
+
+    # Create a risk prevention plan without institution
+    user = lab_factories.StaffUserFactory()
+    admin = lab_factories.StaffUserFactory()
+    project = lab_factories.ProjectFactory(admin=admin)
+    run = lab_factories.RunFactory(project=project)
+    employer = lab_factories.EmployerFactory()
+
+    participation = project.participation_set.create(
+        user=user, institution=None, employer=employer
+    )
+
+    risk_prevention_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation, run=run
+    )
+
+    mock_start_workflow.side_effect = ["workflow_auth_123", "workflow_risk_123"]
+
+    start_electrical_signature_processes(risk_prevention_plan)
+
+    # Verify that translation.override was called with default locale 'fr'
+    mock_translation.override.assert_called_once_with("fr")
+
+
+@pytest.mark.django_db
+@mock.patch(
+    "radiation_protection.electrical_signature.electrical_signature.start_workflow"
+)
+def test_start_electrical_signature_processes_uses_run_date(
+    mock_start_workflow, settings
+):
+    """Test that workflow names include formatted run start date."""
+    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
+    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
+
+    user = lab_factories.StaffUserFactory()
+    admin = lab_factories.StaffUserFactory()
+    project = lab_factories.ProjectFactory(admin=admin)
+    run = lab_factories.RunFactory(project=project)
+    institution = lab_factories.InstitutionFactory()
+    employer = lab_factories.EmployerFactory()
+
+    participation = project.participation_set.create(
+        user=user, institution=institution, employer=employer
+    )
+
+    risk_prevention_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation, run=run
+    )
+
+    mock_start_workflow.side_effect = ["workflow_auth_123", "workflow_risk_123"]
+
+    start_electrical_signature_processes(risk_prevention_plan)
+
+    # Check that both workflow names include the run start date
+    auth_call = mock_start_workflow.call_args_list[0]
+    auth_workflow_name = auth_call[1]["workflow_name"]
+    run_date_str = run.start_date.strftime("%d/%m/%y")
+    assert run_date_str in auth_workflow_name
+
+    risk_call = mock_start_workflow.call_args_list[1]
+    risk_workflow_name = risk_call[1]["workflow_name"]
+    assert run_date_str in risk_workflow_name
+
+
+@pytest.mark.django_db
+@mock.patch(
+    "radiation_protection.electrical_signature.electrical_signature.start_workflow"
+)
+def test_start_electrical_signature_processes_preferred_locale_for_french(  # pylint: disable=too-many-locals
+    mock_start_workflow, settings
+):
+    """Test that preferred_locale is set to 'fr' for French institutions."""
+    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
+    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
+
+    user = lab_factories.StaffUserFactory()
+    admin = lab_factories.StaffUserFactory()
+    project = lab_factories.ProjectFactory(admin=admin)
+    run = lab_factories.RunFactory(project=project)
+    institution = lab_factories.InstitutionFactory(country="France")
+    employer = lab_factories.EmployerFactory()
+
+    participation = project.participation_set.create(
+        user=user, institution=institution, employer=employer
+    )
+
+    risk_prevention_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation, run=run
+    )
+
+    mock_start_workflow.side_effect = ["workflow_auth_123", "workflow_risk_123"]
+
+    start_electrical_signature_processes(risk_prevention_plan)
+
+    # Check authorization access form - verify preferred_locale for user and employer
+    auth_call = mock_start_workflow.call_args_list[0]
+    auth_steps = auth_call[1]["steps"]
+    for step in auth_steps:
+        for recipient in step["recipients"]:
+            assert recipient["preferred_locale"] == "fr"
+
+    # Check risk prevention plan - verify preferred_locale for user and employer
+    # Note: advisor (third step) doesn't have preferred_locale set
+    risk_call = mock_start_workflow.call_args_list[1]
+    risk_steps = risk_call[1]["steps"]
+    # Check first two steps (approval and employer signature)
+    for step in risk_steps[:2]:
+        for recipient in step["recipients"]:
+            assert recipient["preferred_locale"] == "fr"
+
+
+@pytest.mark.django_db
+@mock.patch(
+    "radiation_protection.electrical_signature.electrical_signature.start_workflow"
+)
+def test_start_electrical_signature_processes_preferred_locale_for_english(  # pylint: disable=too-many-locals
+    mock_start_workflow, settings
+):
+    """Test that preferred_locale is set to 'en' for non-French institutions."""
+    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
+    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
+
+    user = lab_factories.StaffUserFactory()
+    admin = lab_factories.StaffUserFactory()
+    project = lab_factories.ProjectFactory(admin=admin)
+    run = lab_factories.RunFactory(project=project)
+    institution = lab_factories.InstitutionFactory(country="United States")
+    employer = lab_factories.EmployerFactory()
+
+    participation = project.participation_set.create(
+        user=user, institution=institution, employer=employer
+    )
+
+    risk_prevention_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation, run=run
+    )
+
+    mock_start_workflow.side_effect = ["workflow_auth_123", "workflow_risk_123"]
+
+    start_electrical_signature_processes(risk_prevention_plan)
+
+    # Check authorization access form - verify preferred_locale for user and employer
+    auth_call = mock_start_workflow.call_args_list[0]
+    auth_steps = auth_call[1]["steps"]
+    for step in auth_steps:
+        for recipient in step["recipients"]:
+            assert recipient["preferred_locale"] == "en"
+
+    # Check risk prevention plan - verify preferred_locale for user and employer
+    # Note: advisor (third step) doesn't have preferred_locale set
+    risk_call = mock_start_workflow.call_args_list[1]
+    risk_steps = risk_call[1]["steps"]
+    # Check first two steps (approval and employer signature)
+    for step in risk_steps[:2]:
+        for recipient in step["recipients"]:
+            assert recipient["preferred_locale"] == "en"
