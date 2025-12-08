@@ -137,7 +137,7 @@ jobs:
           node-version: 20
           cache: "npm"
       - name: Install modules
-        run: npm install
+        run: npm ci
 
       - name: Run eslint
         run: npx eslint .
