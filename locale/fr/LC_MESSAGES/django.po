@@ -1470,10 +1470,10 @@ msgid "Verify your information"
 msgstr "Vérifiez vos informations"
 
 msgid "Related electrical signature process"
-msgstr "Processus de signature électrique associé"
+msgstr "Processus de signature électronique associé"
 
 msgid "Related electrical signature processes"
-msgstr "Processus de signature électrique associés"
+msgstr "Processus de signature électronique associés"
 
 msgid "Latest published risk prevention plans"
 msgstr "Derniers plans de prévention des risques publiés"
@@ -1489,10 +1489,10 @@ msgid "started (%(steps_completed)s)"
 msgstr "démarré (%(steps_completed)s)"
 
 msgid "Risk Advisor Notification Sent"
-msgstr "Notification envoyée au conseiller en risques"
+msgstr "Notification envoyée au conseiller en prévention"
 
 msgid "Indicates if the risk advisor has been notified about this plan."
-msgstr "Indique si le conseiller en risques a été informé de ce plan."
+msgstr "Indique si le conseiller en prévention a été informé de ce plan."
 
 msgid "Run Risk Prevention Plan"
 msgstr "Plan de prévention des risques du run"
@@ -1501,10 +1501,10 @@ msgid "Run Risk Prevention Plans"
 msgstr "Plans de prévention des risques du run"
 
 msgid "A descriptive label for the electrical signature process."
-msgstr "Un libellé descriptif pour le processus de signature électrique."
+msgstr "Un libellé descriptif pour le processus de signature électronique."
 
 msgid "The name of the electrical signature service provider."
-msgstr "Le nom du fournisseur de services de signature électrique."
+msgstr "Le nom du fournisseur de services de signature électronique."
 
 msgid "Provider Workflow ID"
 msgstr "Identifiant du workflow du fournisseur"
@@ -1516,13 +1516,13 @@ msgid "Is Completed"
 msgstr "Est terminé"
 
 msgid "Indicates if the electrical signature process has been completed."
-msgstr "Indique si le processus de signature électrique est terminé."
+msgstr "Indique si le processus de signature électronique est terminé."
 
 msgid "Electrical Signature Process"
-msgstr "Processus de signature électrique"
+msgstr "Processus de signature électronique"
 
 msgid "Electrical Signature Processes"
-msgstr "Processus de signature électrique"
+msgstr "Processus de signature électronique"
 
 msgid "Date this entry was first created"
 msgstr "Date de création de cette entrée"
