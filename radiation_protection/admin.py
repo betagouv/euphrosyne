@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 from lab.admin.mixins import LabAdminAllowedMixin
+from lab.permissions import is_lab_admin
 
 from .models import ElectricalSignatureProcess, RiskPreventionPlan
 
@@ -14,6 +15,9 @@ class ElectricalSignatureProcessInline(admin.TabularInline):
 
     fields = ("label", "status")
     readonly_fields = ("label", "status")
+
+    def has_view_permission(self, request, obj=None):
+        return is_lab_admin(request.user) or super().has_view_permission(request, obj)
 
 
 @admin.register(RiskPreventionPlan)
