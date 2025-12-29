@@ -3,6 +3,14 @@
 from django.db import migrations, models
 
 
+def set_leader_on_premises(apps, _):
+    participation_model = apps.get_model("lab", "Participation")
+
+    participation_model.objects.filter(is_leader=True, on_premises=False).update(
+        on_premises=True
+    )
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -18,5 +26,8 @@ class Migration(migrations.Migration):
                 help_text="Is the user going to be at the New AGLAE facility?",
                 verbose_name="On premises",
             ),
+        ),
+        migrations.RunPython(
+            set_leader_on_premises, reverse_code=migrations.RunPython.noop
         ),
     ]
