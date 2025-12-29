@@ -4,6 +4,9 @@ on:
     types: [opened, reopened, synchronize, edited]
   workflow_call:
 
+permissions:
+  contents: read
+
 env:
   DJANGO_SECRET_KEY: n0t5os3cre7-${{ github.sha }}
   EMAIL_HOST: localhost
