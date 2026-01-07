@@ -26,7 +26,9 @@ def _parse_feature_list(raw_value: str) -> List[str]:
 
 def enabled_features() -> List[str]:
     raw_features = os.getenv("EUPHROSYNE_FEATURES")
-    if raw_features:
+    if raw_features is not None:
+        if not raw_features.strip():
+            return []
         requested = _parse_feature_list(raw_features)
         return [feature for feature in requested if feature in FEATURE_APPS]
     return list(FEATURE_APPS.keys())

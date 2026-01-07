@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import ImageLoading from "../../../../../lab_notebook/assets/js/components/ImageLoading";
+import ImageLoading from "../../../../../shared/js/images/ImageLoading";
 import { getUserData } from "../../../../../euphrosyne/assets/js/main";
 
 interface RadiationProtectionCheckProps {

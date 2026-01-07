@@ -1,12 +1,12 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { NotebookContext } from "../Notebook.context";
 import { constructImageStorageUrl } from "../utils";
-import { IRunObjectImage } from "../IImageTransform";
+import { IRunObjectImage } from "../../../../shared/js/images/types";
 import { css } from "@emotion/react";
-import ImageGrid from "./ImageGrid";
+import ImageGrid from "../../../../shared/js/images/ImageGrid";
 import CroppedImageDisplay from "./CroppedImageDisplay";
 import { getToken } from "../../../../shared/js/jwt";
-import { IMeasuringPointImage } from "../IMeasuringPoint";
+import { IMeasuringPointImage } from "../../../../shared/js/images/types";
 import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 
 const modalStyle = css({

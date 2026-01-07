@@ -1,6 +1,8 @@
-import { IPointLocation } from "../IImagePointLocation";
-import type { IRunObjectImageWithUrl } from "../IImageTransform";
-import { IMeasuringPoint } from "../IMeasuringPoint";
+import type {
+  IMeasuringPoint,
+  IPointLocation,
+  IRunObjectImageWithUrl,
+} from "../../../../shared/js/images/types";
 import ImageMeasuringPointer from "./ImageMeasuringPointer";
 
 export default function AddMeasuringPointToImage({

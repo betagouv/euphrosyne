@@ -1,5 +1,7 @@
-import { IPointLocation } from "../../../lab_notebook/assets/js/IImagePointLocation";
-import { IMeasuringPoint } from "../../../lab_notebook/assets/js/IMeasuringPoint";
+import {
+  IMeasuringPoint,
+  IPointLocation,
+} from "../../../shared/js/images/types";
 import { getCSRFToken } from "./utils";
 
 interface IMeasuringPointUpdate {

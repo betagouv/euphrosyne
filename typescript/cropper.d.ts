@@ -3,7 +3,7 @@
 
 import React, { RefObject } from "react";
 
-import { IImageTransform } from "../lab_notebook/assets/js/IImageTransform";
+import { IImageTransform } from "../shared/js/images/types";
 import CropperSelection from "@cropper/element-selection";
 import CropperImage from "@cropper/element-image";
 

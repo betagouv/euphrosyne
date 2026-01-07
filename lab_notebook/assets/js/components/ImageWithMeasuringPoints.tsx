@@ -1,8 +1,11 @@
 import { useCallback, useState } from "react";
-import { IImageTransform } from "../IImageTransform";
-import { IPointLocation } from "../IImagePointLocation";
 import { Interpolation, Theme } from "@emotion/react";
-import CroppedImage from "./CroppedImage";
+
+import CroppedImage from "../../../../shared/js/images/CroppedImage";
+import {
+  IImageTransform,
+  IPointLocation,
+} from "../../../../shared/js/images/types";
 
 interface IMeasuringPoint {
   name: string;

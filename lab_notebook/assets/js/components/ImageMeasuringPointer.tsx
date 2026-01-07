@@ -1,5 +1,7 @@
-import { IImageTransform } from "../IImageTransform";
-import { IPointLocation } from "../IImagePointLocation";
+import {
+  IImageTransform,
+  IPointLocation,
+} from "../../../../shared/js/images/types";
 import { useEffect, useRef, useState, useCallback } from "react";
 import SegmentedSelectMode, { SelectionMode } from "./SegmentedSelectMode";
 import { css } from "@emotion/react";
