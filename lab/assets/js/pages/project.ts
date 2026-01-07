@@ -17,6 +17,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const projectPageData = getTemplateJSONData<ProjectPageData>(
     "project-changeform-data",
   );
+  const featureFlags =
+    getTemplateJSONData<Record<string, boolean>>("feature-flags") || {};
 
   const form = Array.from(document.forms).filter(
     (f) => f.id == "project_form",
@@ -53,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
       createElement(ProjectParticipationsSection, {
         projectId: projectPageData.projectId,
         userData,
+        isRadiationProtectionEnabled: featureFlags.radiation_protection ?? true,
       }),
     );
   }

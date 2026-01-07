@@ -13,6 +13,7 @@ from django.views.decorators.http import require_POST
 
 from certification.certifications.models import QuizCertification
 from certification.providers.tally.dataclasses import TallyWebhookData
+
 from ...certifications.results import create_quiz_result
 from ...models import Certification
 

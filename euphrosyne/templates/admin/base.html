@@ -113,6 +113,11 @@
       "email": "{{ user.email }}"
     }
   </script>
+  <script id="feature-flags" type="application/json">
+    {% autoescape off %}
+    {% feature_flags_json %}
+    {% endautoescape %}
+  </script>
 {% endif %}
 </body>
 </html>
