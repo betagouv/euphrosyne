@@ -2,7 +2,7 @@ import { css } from "@emotion/react";
 import ObjectSelect from "./ObjectSelect";
 import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 import { HTMLProps } from "react";
-import { IMeasuringPoint } from "../IMeasuringPoint";
+import { IMeasuringPoint } from "../../../../shared/js/images/types";
 
 const addButtonStyle = css({
   marginTop: "8px",

@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
-import { IImageTransform } from "../IImageTransform";
-import ImageLoading from "./ImageLoading";
 import { css } from "@emotion/react";
-import { IMeasuringPoint } from "../IMeasuringPoint";
+
+import ImageLoading from "../../../../shared/js/images/ImageLoading";
+import {
+  IImageTransform,
+  IMeasuringPoint,
+} from "../../../../shared/js/images/types";
 import ImageWithMeasuringPoints from "./ImageWithMeasuringPoints";
 
 const visiblePlaceholderStyle = css({

@@ -1,8 +1,9 @@
 import { Fragment, useState } from "react";
-import ImageLoading from "./components/ImageLoading";
 import { css } from "@emotion/react";
-import { IImageTransform } from "./IImageTransform";
-import CroppedImage from "./components/CroppedImage";
+
+import { IImageTransform } from "./types";
+import CroppedImage from "./CroppedImage";
+import ImageLoading from "./ImageLoading";
 
 const visiblePlaceholderStyle = css({
   position: "absolute",

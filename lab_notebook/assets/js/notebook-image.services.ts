@@ -1,6 +1,6 @@
 import { UploadSasUrlMixin } from "../../../lab/assets/js/upload-sas-url-mixin";
 import { getCSRFToken } from "../../../lab/assets/js/utils.js";
-import { IRunObjectImage } from "./IImageTransform.js";
+import { IRunObjectImage } from "../../../shared/js/images/types.js";
 
 export class StorageImageServices {
   protected fetchFn: typeof fetch;

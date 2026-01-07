@@ -1,5 +1,8 @@
 import { createContext, Dispatch, SetStateAction, useState } from "react";
-import { IMeasuringPoint, IMeasuringPointImage } from "./IMeasuringPoint";
+import {
+  IMeasuringPoint,
+  IMeasuringPointImage,
+} from "../../../shared/js/images/types";
 import {
   RunMeasuringPointStandards,
   IStandard,

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { IMeasuringPoint } from "../IMeasuringPoint";
+import type { IMeasuringPoint } from "../../../../shared/js/images/types";
 import MeasuringPoint from "./MeasuringPoint";
 import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 import { fetchRunObjectGroups } from "../../../../lab/objects/assets/js/services";

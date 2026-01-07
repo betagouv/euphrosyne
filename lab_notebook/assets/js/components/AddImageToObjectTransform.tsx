@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { CopperSelectionChangeEvent } from "../../../../typescript/cropper";
-import { IImageTransform, IImagewithUrl } from "../IImageTransform";
+import { IImageTransform, IImagewithUrl } from "../../../../shared/js/images/types";
 import ImageCropper from "./ImageCropper";
 
 export default function AddImageToObjectTransform({

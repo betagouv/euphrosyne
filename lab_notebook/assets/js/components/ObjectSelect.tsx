@@ -1,7 +1,7 @@
 import { ChangeEvent, useContext, useId } from "react";
 import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 import { updateMeasuringPointObjectId } from "../../../../lab/assets/js/measuring-point.services";
-import { IMeasuringPoint } from "../IMeasuringPoint";
+import { IMeasuringPoint } from "../../../../shared/js/images/types";
 import { NotebookContext } from "../Notebook.context";
 
 export default function ObjectSelect({

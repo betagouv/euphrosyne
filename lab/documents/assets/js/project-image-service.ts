@@ -1,4 +1,4 @@
-import { IImagewithUrl } from "../../../../lab_notebook/assets/js/IImageTransform.js";
+import { IImagewithUrl } from "../../../../shared/js/images/types.js";
 import { UploadSasUrlMixin } from "../../../assets/js/upload-sas-url-mixin";
 
 export class ProjectImageServices extends UploadSasUrlMixin {

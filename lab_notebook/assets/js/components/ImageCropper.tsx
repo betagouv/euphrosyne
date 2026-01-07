@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { IImageTransform } from "../IImageTransform";
+import { IImageTransform } from "../../../../shared/js/images/types";
 
 import CropperCanvas from "@cropper/element-canvas";
 import CropperImage from "@cropper/element-image";

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { IImageTransform } from "../IImageTransform";
 import { Interpolation, Theme } from "@emotion/react";
+
+import { IImageTransform } from "./types";
 
 interface ICroppedImageProps extends React.HTMLProps<HTMLImageElement> {
   src: string;
@@ -22,13 +23,13 @@ export default function CroppedImage({
   const [imageWidth, setImageWidth] = useState(imageTransform?.width || 100);
 
   useEffect(() => {
-    const i = new Image();
-    i.addEventListener("load", () => {
-      setImageWidth(i.naturalWidth);
-      setImageHeight(i.naturalHeight);
-      onImageLoaded?.(i);
+    const image = new Image();
+    image.addEventListener("load", () => {
+      setImageWidth(image.naturalWidth);
+      setImageHeight(image.naturalHeight);
+      onImageLoaded?.(image);
     });
-    i.src = src;
+    image.src = src;
   }, [src]);
 
   const viewBox = imageTransform

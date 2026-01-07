@@ -7,7 +7,7 @@ import {
 } from "react";
 import ObjectSelect from "./ObjectSelect";
 import type { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
-import type { IMeasuringPoint } from "../IMeasuringPoint";
+import type { IMeasuringPoint } from "../../../../shared/js/images/types";
 import AddImageToObject from "./AddImageToObject";
 import AddImageToObjectTransform from "./AddImageToObjectTransform";
 import {
@@ -15,10 +15,10 @@ import {
   IImagewithUrl,
   IRunObjectImage,
   IRunObjectImageWithUrl,
-} from "../IImageTransform";
+} from "../../../../shared/js/images/types";
 import { RunObjectGroupImageServices } from "../notebook-image.services";
 import AddMeasuringPointToImage from "./AddMeasuringPointToImage";
-import { IPointLocation } from "../IImagePointLocation";
+import { IPointLocation } from "../../../../shared/js/images/types";
 import {
   addMeasuringPointImage,
   deleteMeasuringPointImage,
