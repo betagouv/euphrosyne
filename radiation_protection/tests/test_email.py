@@ -16,10 +16,10 @@ class TestNotifyAdditionalEmails(TestCase):
             first_name="John", last_name="Doe", email="john.doe@example.com"
         )
 
-    @override_settings(
-        RADIATION_PROTECTION_SETTINGS={
-            "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS": None
-        }
+    @mock.patch(
+        "radiation_protection.email.app_settings."
+        "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS",
+        None,
     )
     def test_no_additional_emails_configured(self):
         """Test that function returns early when no additional emails are configured."""
@@ -28,10 +28,10 @@ class TestNotifyAdditionalEmails(TestCase):
         # No emails should be sent
         self.assertEqual(len(mail.outbox), 0)
 
-    @override_settings(
-        RADIATION_PROTECTION_SETTINGS={
-            "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS": []
-        }
+    @mock.patch(
+        "radiation_protection.email.app_settings."
+        "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS",
+        [],
     )
     def test_empty_additional_emails_list(self):
         """Test that function returns early when additional emails list is empty."""
@@ -40,14 +40,11 @@ class TestNotifyAdditionalEmails(TestCase):
         # No emails should be sent
         self.assertEqual(len(mail.outbox), 0)
 
-    @override_settings(
-        RADIATION_PROTECTION_SETTINGS={
-            "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS": [
-                "admin@example.com",
-                "security@example.com",
-            ]
-        },
-        DEFAULT_FROM_EMAIL="noreply@example.com",
+    @override_settings(DEFAULT_FROM_EMAIL="noreply@example.com")
+    @mock.patch(
+        "radiation_protection.email.app_settings."
+        "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS",
+        ["admin@example.com", "security@example.com"],
     )
     def test_successful_email_notification(self):
         """Test successful email notification to additional emails."""
@@ -69,11 +66,11 @@ class TestNotifyAdditionalEmails(TestCase):
         self.assertIn("formation aux risques présents à AGLAE", email.body)
         self.assertIn("Euphrosyne", email.body)
 
-    @override_settings(
-        RADIATION_PROTECTION_SETTINGS={
-            "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS": ["test@example.com"]
-        },
-        DEFAULT_FROM_EMAIL="sender@example.com",
+    @override_settings(DEFAULT_FROM_EMAIL="sender@example.com")
+    @mock.patch(
+        "radiation_protection.email.app_settings."
+        "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS",
+        ["test@example.com"],
     )
     def test_email_content_with_user_without_last_name(self):
         """Test email content when user has no last name."""
@@ -90,11 +87,11 @@ class TestNotifyAdditionalEmails(TestCase):
         )
         self.assertIn("Jane", email.body)
 
-    @override_settings(
-        RADIATION_PROTECTION_SETTINGS={
-            "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS": ["test@example.com"]
-        },
-        DEFAULT_FROM_EMAIL="sender@example.com",
+    @override_settings(DEFAULT_FROM_EMAIL="sender@example.com")
+    @mock.patch(
+        "radiation_protection.email.app_settings."
+        "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS",
+        ["test@example.com"],
     )
     def test_email_content_with_user_without_first_name(self):
         """Test email content when user has no first name."""
@@ -111,11 +108,11 @@ class TestNotifyAdditionalEmails(TestCase):
         )
         self.assertIn("Smith", email.body)
 
-    @override_settings(
-        RADIATION_PROTECTION_SETTINGS={
-            "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS": ["test@example.com"]
-        },
-        DEFAULT_FROM_EMAIL="sender@example.com",
+    @override_settings(DEFAULT_FROM_EMAIL="sender@example.com")
+    @mock.patch(
+        "radiation_protection.email.app_settings."
+        "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS",
+        ["test@example.com"],
     )
     def test_email_content_with_user_without_names(self):
         """Test email content when user has no first or last name."""
@@ -132,10 +129,10 @@ class TestNotifyAdditionalEmails(TestCase):
             email.subject, "Nouveau certificat de formation aux risques pour "
         )
 
-    @override_settings(
-        RADIATION_PROTECTION_SETTINGS={
-            "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS": ["test@example.com"]
-        }
+    @mock.patch(
+        "radiation_protection.email.app_settings."
+        "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS",
+        ["test@example.com"],
     )
     @mock.patch("radiation_protection.email.mail.EmailMultiAlternatives.send")
     @mock.patch("radiation_protection.email.logger")
@@ -153,10 +150,10 @@ class TestNotifyAdditionalEmails(TestCase):
         self.assertEqual(args[1], self.user.id)
         self.assertEqual(args[2], "SMTP server error")
 
-    @override_settings(
-        RADIATION_PROTECTION_SETTINGS={
-            "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS": ["test@example.com"]
-        }
+    @mock.patch(
+        "radiation_protection.email.app_settings."
+        "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS",
+        ["test@example.com"],
     )
     @mock.patch("radiation_protection.email.mail.EmailMultiAlternatives")
     @mock.patch("radiation_protection.email.logger")
@@ -174,10 +171,10 @@ class TestNotifyAdditionalEmails(TestCase):
         self.assertEqual(args[1], self.user.id)
         self.assertEqual(args[2], "Email creation failed")
 
-    @override_settings(
-        RADIATION_PROTECTION_SETTINGS={
-            "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS": ["admin@example.com"]
-        }
+    @mock.patch(
+        "radiation_protection.email.app_settings."
+        "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS",
+        ["admin@example.com"],
     )
     def test_email_multipart_structure(self):
         """Test that EmailMultiAlternatives is used correctly."""
@@ -194,13 +191,10 @@ class TestNotifyAdditionalEmails(TestCase):
         self.assertTrue(email.body)
         self.assertEqual(email.to, ["admin@example.com"])
 
-    @override_settings(
-        RADIATION_PROTECTION_SETTINGS={
-            "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS": [
-                "test1@example.com",
-                "test2@example.com",
-            ]
-        }
+    @mock.patch(
+        "radiation_protection.email.app_settings."
+        "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS",
+        ["test1@example.com", "test2@example.com"],
     )
     def test_multiple_recipients(self):
         """Test sending email to multiple recipients."""
@@ -212,10 +206,10 @@ class TestNotifyAdditionalEmails(TestCase):
         self.assertIn("test1@example.com", email.to)
         self.assertIn("test2@example.com", email.to)
 
-    @override_settings(
-        RADIATION_PROTECTION_SETTINGS={
-            "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS": ["test@example.com"]
-        }
+    @mock.patch(
+        "radiation_protection.email.app_settings."
+        "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS",
+        ["test@example.com"],
     )
     def test_email_body_formatting(self):
         """Test that email body is properly formatted."""

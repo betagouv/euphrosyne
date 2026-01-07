@@ -3,7 +3,6 @@ from unittest import mock
 
 import pytest
 from django.core.management import call_command
-from django.test import override_settings
 
 from lab.tests import factories as lab_factories
 from radiation_protection.models import ElectricalSignatureProcess
@@ -33,11 +32,17 @@ def risk_prevention_plan_fixture():
 
 @pytest.fixture(autouse=True)
 def radiation_protection_settings():
-    with override_settings(
-        RADIATION_PROTECTION_SETTINGS={
-            "RADIATION_PROTECTION_RISK_ADVISOR_EMAIL": "advisor@example.com",
-            "RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME": "John Advisor",
-        }
+    with (
+        mock.patch(
+            "radiation_protection.electrical_signature.electrical_signature."
+            "app_settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL",
+            "advisor@example.com",
+        ),
+        mock.patch(
+            "radiation_protection.electrical_signature.electrical_signature."
+            "app_settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME",
+            "John Advisor",
+        ),
     ):
         yield
 
