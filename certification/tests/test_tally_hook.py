@@ -45,7 +45,11 @@ class TestTallyHook(TestCase):
         computed_hmac = base64.b64encode(digest)
 
         request.headers = {"Tally-Signature": computed_hmac.decode("utf-8")}
-        with override_settings(RADIATION_PROTECTION_TALLY_SECRET_KEY="test"):
+        with override_settings(
+            RADIATION_PROTECTION_SETTINGS={
+                "RADIATION_PROTECTION_TALLY_SECRET_KEY": "test"
+            }
+        ):
             self.assertTrue(_validate_signature(request))
 
     @mock.patch(

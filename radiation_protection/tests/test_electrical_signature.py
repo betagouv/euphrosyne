@@ -1,6 +1,7 @@
 from unittest import mock
 
 import pytest
+from django.test import override_settings
 
 from lab.tests import factories as lab_factories
 from radiation_protection.electrical_signature.electrical_signature import (
@@ -29,17 +30,25 @@ def risk_prevention_plan_fixture():
     )
 
 
+@pytest.fixture(autouse=True)
+def radiation_protection_settings():
+    with override_settings(
+        RADIATION_PROTECTION_SETTINGS={
+            "RADIATION_PROTECTION_RISK_ADVISOR_EMAIL": "advisor@example.com",
+            "RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME": "John Advisor",
+        }
+    ):
+        yield
+
+
 @pytest.mark.django_db
 @mock.patch(
     "radiation_protection.electrical_signature.electrical_signature.start_workflow"
 )
 def test_start_electrical_signature_processes(
-    mock_start_workflow, risk_prevention_plan, settings
+    mock_start_workflow, risk_prevention_plan
 ):
     """Test starting electrical signature processes."""
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
-
     mock_start_workflow.side_effect = ["workflow_auth_123", "workflow_risk_123"]
 
     processes = start_electrical_signature_processes(risk_prevention_plan)
@@ -75,12 +84,9 @@ def test_start_electrical_signature_processes(
     "radiation_protection.electrical_signature.electrical_signature.start_workflow"
 )
 def test_start_electrical_signature_processes_workflow_steps(
-    mock_start_workflow, risk_prevention_plan, settings
+    mock_start_workflow, risk_prevention_plan
 ):
     """Test that the correct workflow steps are created."""
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
-
     mock_start_workflow.side_effect = ["workflow_auth_123", "workflow_risk_123"]
 
     start_electrical_signature_processes(risk_prevention_plan)
@@ -130,13 +136,10 @@ def test_start_electrical_signature_processes_workflow_steps(
     "radiation_protection.electrical_signature.electrical_signature.start_workflow"
 )
 def test_start_electrical_signature_processes_workflow_names(
-    mock_start_workflow, risk_prevention_plan, settings
+    mock_start_workflow, risk_prevention_plan
 ):
     """Test that workflow names include AGLAE prefix, user, project,
     and run information."""
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
-
     mock_start_workflow.side_effect = ["workflow_auth_123", "workflow_risk_123"]
 
     start_electrical_signature_processes(risk_prevention_plan)
@@ -170,13 +173,10 @@ def test_start_electrical_signature_processes_workflow_names(
     "radiation_protection.electrical_signature.electrical_signature.translation"
 )
 def test_start_electrical_signature_processes_english_translation(
-    mock_translation, mock_start_workflow, settings
+    mock_translation, mock_start_workflow
 ):
     """Test that translation.override is called with 'en'
     for non-French institutions."""
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
-
     # Create a risk prevention plan with a non-French institution
     user = lab_factories.StaffUserFactory()
     admin = lab_factories.StaffUserFactory()
@@ -209,12 +209,9 @@ def test_start_electrical_signature_processes_english_translation(
     "radiation_protection.electrical_signature.electrical_signature.translation"
 )
 def test_start_electrical_signature_processes_french_institution(
-    mock_translation, mock_start_workflow, settings
+    mock_translation, mock_start_workflow
 ):
     """Test that translation.override is called with 'fr' for French institutions."""
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
-
     # Create a risk prevention plan with a French institution
     user = lab_factories.StaffUserFactory()
     admin = lab_factories.StaffUserFactory()
@@ -247,13 +244,10 @@ def test_start_electrical_signature_processes_french_institution(
     "radiation_protection.electrical_signature.electrical_signature.translation"
 )
 def test_start_electrical_signature_processes_no_institution(
-    mock_translation, mock_start_workflow, settings
+    mock_translation, mock_start_workflow
 ):
     """Test that translation.override defaults to 'fr'
     when no institution is provided."""
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
-
     # Create a risk prevention plan without institution
     user = lab_factories.StaffUserFactory()
     admin = lab_factories.StaffUserFactory()
@@ -281,13 +275,8 @@ def test_start_electrical_signature_processes_no_institution(
 @mock.patch(
     "radiation_protection.electrical_signature.electrical_signature.start_workflow"
 )
-def test_start_electrical_signature_processes_uses_run_date(
-    mock_start_workflow, settings
-):
+def test_start_electrical_signature_processes_uses_run_date(mock_start_workflow):
     """Test that workflow names include formatted run start date."""
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
-
     user = lab_factories.StaffUserFactory()
     admin = lab_factories.StaffUserFactory()
     project = lab_factories.ProjectFactory(admin=admin)
@@ -323,12 +312,9 @@ def test_start_electrical_signature_processes_uses_run_date(
     "radiation_protection.electrical_signature.electrical_signature.start_workflow"
 )
 def test_start_electrical_signature_processes_preferred_locale_for_french(  # pylint: disable=too-many-locals
-    mock_start_workflow, settings
+    mock_start_workflow,
 ):
     """Test that preferred_locale is set to 'fr' for French institutions."""
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
-
     user = lab_factories.StaffUserFactory()
     admin = lab_factories.StaffUserFactory()
     project = lab_factories.ProjectFactory(admin=admin)
@@ -370,12 +356,9 @@ def test_start_electrical_signature_processes_preferred_locale_for_french(  # py
     "radiation_protection.electrical_signature.electrical_signature.start_workflow"
 )
 def test_start_electrical_signature_processes_preferred_locale_for_english(  # pylint: disable=too-many-locals
-    mock_start_workflow, settings
+    mock_start_workflow,
 ):
     """Test that preferred_locale is set to 'en' for non-French institutions."""
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
-
     user = lab_factories.StaffUserFactory()
     admin = lab_factories.StaffUserFactory()
     project = lab_factories.ProjectFactory(admin=admin)

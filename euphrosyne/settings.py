@@ -25,6 +25,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
+from euphrosyne.features import add_feature_apps, enabled_features
+
 # pylint: disable=abstract-class-instantiated
 sentry_sdk.init(
     dsn=os.getenv("SENTRY_DSN"),
@@ -64,7 +66,7 @@ SITE_URL = os.environ["SITE_URL"]
 
 # Application definition
 
-INSTALLED_APPS = [
+CORE_INSTALLED_APPS = [
     "corsheaders",
     "euphrosyne.apps.AdminConfig",
     "euphrosyne.methods.apps.MethodsConfig",  # Use explicit app config for methods
@@ -81,16 +83,19 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
     "lab",
-    "data_request",
-    "lab_notebook",
     "orcid_oauth",
     "static_pages",
     "standard",
     "certification",
-    "radiation_protection",
     "log_email",
     "drf_spectacular",
-] + (["debug_toolbar"] if DEBUG else [])
+]
+
+EUPHROSYNE_FEATURES = enabled_features()
+
+INSTALLED_APPS = add_feature_apps(CORE_INSTALLED_APPS) + (
+    ["debug_toolbar"] if DEBUG else []
+)
 
 MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else []) + [
     "corsheaders.middleware.CorsMiddleware",
@@ -393,22 +398,3 @@ FORCE_LAST_CGU_ACCEPTANCE_DT = (
 # This should point to the concrete implementation with field definitions
 # All migrations related to these fields will be generated in the euphrosyne app
 METHOD_MODEL_CLASS = "euphrosyne.methods.models.EuphrosyneMethodModel"
-
-# CERTIFICATIONS
-RADIATION_PROTECTION_TALLY_SECRET_KEY = os.environ[
-    "RADIATION_PROTECTION_TALLY_SECRET_KEY"
-]
-
-RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = os.environ.get(
-    "RADIATION_PROTECTION_RISK_ADVISOR_EMAIL"
-)
-RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = os.environ.get(
-    "RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME", ""
-)
-RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS = [
-    email
-    for email in os.environ.get(
-        "RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS", ""
-    ).split(",")
-    if email
-]

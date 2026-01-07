@@ -1,5 +1,6 @@
 from typing import List
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.shortcuts import redirect
@@ -22,12 +23,10 @@ class AdminSite(admin.AdminSite):
     index_title = _("Dashboard")
 
     def get_urls(self) -> List[URLResolver]:  # type: ignore[override]
-        urls = [
+        urls: List[URLResolver] = [
             path(
                 "lab/project/<project_id>/documents",
-                self.admin_view(
-                    ProjectDocumentsView.as_view()  # type: ignore[type-var]
-                ),
+                self.admin_view(ProjectDocumentsView.as_view()),  # type: ignore[type-var]
                 name="lab_project_documents",
             ),
             path(
@@ -37,20 +36,19 @@ class AdminSite(admin.AdminSite):
             ),
             path(
                 "lab/objectgroup/eros_import",
-                self.admin_view(
-                    ObjectImportErosView.as_view()  # type: ignore[type-var]
-                ),
+                self.admin_view(ObjectImportErosView.as_view()),  # type: ignore[type-var]
                 name="lab_objectgroup_erosimport",
             ),
             path(
                 "lab/objectgroup/pop_import",
-                self.admin_view(
-                    ObjectImportPOPView.as_view()  # type: ignore[type-var]
-                ),
+                self.admin_view(ObjectImportPOPView.as_view()),  # type: ignore[type-var]
                 name="lab_objectgroup_popimport",
             ),
-            path("", include("lab_notebook.urls")),
         ]
+
+        if apps.is_installed("lab_notebook"):
+            urls.append(path("", include("lab_notebook.urls")))
+
         if settings.HDF5_ENABLE:
             urls.append(
                 path(

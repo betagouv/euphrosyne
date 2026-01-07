@@ -22,7 +22,11 @@ from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
 
 from euphro_auth.views import UserTokenRegistrationView, cgu_acceptance_view
-from orcid_oauth.views import UserCompleteAccountView
+
+try:
+    from orcid_oauth.views import UserCompleteAccountView
+except ImportError:  # pragma: no cover - only when feature disabled
+    UserCompleteAccountView = None
 
 urlpatterns = [
     path("", include("social_django.urls")),
@@ -52,10 +56,16 @@ urlpatterns = [
         UserTokenRegistrationView.as_view(),
         name="registration_token",
     ),
-    path(
-        "registration/orcid/verify/<token>",
-        UserCompleteAccountView.as_view(),
-        name="complete_registration_orcid",
+    *(
+        [
+            path(
+                "registration/orcid/verify/<token>",
+                UserCompleteAccountView.as_view(),
+                name="complete_registration_orcid",
+            )
+        ]
+        if UserCompleteAccountView
+        else []
     ),
     path(
         "cgu-acceptance/",
