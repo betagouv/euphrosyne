@@ -31,6 +31,7 @@ class AppLazySettings(LazySettings):
         from my_app.app_settings import settings
         settings.MY_SETTING
     """
+
     __slots__ = ("_configured", "_defaults_module", "_override_name")
 
     def __init__(self):
@@ -39,9 +40,23 @@ class AppLazySettings(LazySettings):
         object.__setattr__(self, "_defaults_module", None)
         object.__setattr__(self, "_override_name", None)
 
-    def configure(self, *, defaults_module: str, project_override_name: str) -> None:
+    def configure(self, default_settings=None, **options) -> None:
+        defaults_module = options.pop("defaults_module", None)
+        override_name = options.pop("project_override_name", None)
+        if options:
+            unexpected = ", ".join(sorted(options.keys()))
+            raise TypeError(f"Unexpected configure options: {unexpected}")
+        if defaults_module is None and isinstance(default_settings, str):
+            defaults_module = default_settings
+        if defaults_module is None or override_name is None:
+            raise TypeError(
+                "configure() requires defaults_module and project_override_name."
+            )
+        if default_settings is not None and not isinstance(default_settings, str):
+            raise TypeError("default_settings must be a module path string if set.")
+
         object.__setattr__(self, "_defaults_module", defaults_module)
-        object.__setattr__(self, "_override_name", project_override_name)
+        object.__setattr__(self, "_override_name", override_name)
         object.__setattr__(self, "_configured", True)
         object.__setattr__(self, "_wrapped", empty)
 
@@ -78,7 +93,10 @@ def connect_reload_signal(app_settings: AppLazySettings):
     def _reload(**kwargs):
         if not getattr(app_settings, "_configured", False):
             return
-        if kwargs.get("setting") == app_settings._override_name:
-            app_settings._wrapped = empty
+        if (
+            kwargs.get("setting")
+            == app_settings._override_name  # pylint: disable=protected-access
+        ):
+            app_settings._wrapped = empty  # pylint: disable=protected-access
 
     return _reload
