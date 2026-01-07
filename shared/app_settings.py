@@ -93,10 +93,8 @@ def connect_reload_signal(app_settings: AppLazySettings):
     def _reload(**kwargs):
         if not getattr(app_settings, "_configured", False):
             return
-        if (
-            kwargs.get("setting")
-            == app_settings._override_name  # pylint: disable=protected-access
-        ):
-            app_settings._wrapped = empty  # pylint: disable=protected-access
+        override_name = object.__getattribute__(app_settings, "_override_name")
+        if kwargs.get("setting") == override_name:
+            object.__setattr__(app_settings, "_wrapped", empty)
 
     return _reload
