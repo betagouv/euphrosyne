@@ -36,8 +36,9 @@ def start_electrical_signature_processes(
     # For example, you might send a request to the provider's API here
     run = risk_prevention_plan.run
     risk_advisor_email = app_settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL
+    parts = app_settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME.split(" ", 1)
     risk_advisor_first_name, risk_advisor_last_name = (
-        app_settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME.split(" ", 1)
+        (parts[0], parts[1]) if len(parts) == 2 else (parts[0], "")
     )
 
     participation = risk_prevention_plan.participation
