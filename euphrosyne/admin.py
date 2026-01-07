@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import include, path, reverse
-from django.urls.resolvers import URLResolver, URLPattern
+from django.urls.resolvers import URLPattern, URLResolver
 from django.utils.translation import gettext_lazy as _
 
 from lab.documents.views import ProjectDocumentsView
