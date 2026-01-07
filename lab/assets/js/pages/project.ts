@@ -55,7 +55,8 @@ document.addEventListener("DOMContentLoaded", () => {
       createElement(ProjectParticipationsSection, {
         projectId: projectPageData.projectId,
         userData,
-        isRadiationProtectionEnabled: featureFlags.radiation_protection ?? true,
+        isRadiationProtectionEnabled:
+          featureFlags.radiation_protection ?? false,
       }),
     );
   }
