@@ -26,7 +26,7 @@ class AdminSite(admin.AdminSite):
         urls: List[URLResolver] = [
             path(
                 "lab/project/<project_id>/documents",
-                self.admin_view(ProjectDocumentsView.as_view()),  # type: ignore[type-var]
+                self.admin_view(ProjectDocumentsView.as_view()),  # type: ignore[type-var] # pylint: disable=line-too-long
                 name="lab_project_documents",
             ),
             path(
@@ -36,12 +36,12 @@ class AdminSite(admin.AdminSite):
             ),
             path(
                 "lab/objectgroup/eros_import",
-                self.admin_view(ObjectImportErosView.as_view()),  # type: ignore[type-var]
+                self.admin_view(ObjectImportErosView.as_view()),  # type: ignore[type-var] # pylint: disable=line-too-long
                 name="lab_objectgroup_erosimport",
             ),
             path(
                 "lab/objectgroup/pop_import",
-                self.admin_view(ObjectImportPOPView.as_view()),  # type: ignore[type-var]
+                self.admin_view(ObjectImportPOPView.as_view()),  # type: ignore[type-var] # pylint: disable=line-too-long
                 name="lab_objectgroup_popimport",
             ),
         ]
