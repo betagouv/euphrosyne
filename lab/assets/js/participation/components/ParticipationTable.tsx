@@ -9,6 +9,7 @@ interface ParticipationTableProps {
   canEdit?: boolean;
   onDeleteClick?: (participation: Participation) => void;
   onEditClick?: (participation: Participation) => void;
+  isRadiationProtectionEnabled?: boolean;
 }
 export default function ParticipationTable({
   participations,
@@ -18,6 +19,7 @@ export default function ParticipationTable({
   canEdit = false,
   onDeleteClick,
   onEditClick,
+  isRadiationProtectionEnabled,
 }: ParticipationTableProps) {
   const t = {
     deleteButtonLabel: window.gettext("Delete participation"),
@@ -82,16 +84,17 @@ export default function ParticipationTable({
                           {t.deleteButtonLabel}
                         </button>
                       )}
-                      {participation.onPremises && (
-                        <span
-                          className="fr-p-2v"
-                          style={{ display: "inline-block" }}
-                        >
-                          <RadiationProtectionCheck
-                            userId={participation.user.id}
-                          />
-                        </span>
-                      )}
+                      {participation.onPremises &&
+                        isRadiationProtectionEnabled && (
+                          <span
+                            className="fr-p-2v"
+                            style={{ display: "inline-block" }}
+                          >
+                            <RadiationProtectionCheck
+                              userId={participation.user.id}
+                            />
+                          </span>
+                        )}
                     </td>
                   </tr>
                 ))}
