@@ -69,11 +69,15 @@ You can copy this file to a new `.env` file to easily set up your environment.
 
 ### Optional modules
 
-Euphrosyne ships optional modules that can be enabled per instance. By default all optional modules are enabled. Override with `EUPHROSYNE_FEATURES` (comma-separated):
+Euphrosyne ships optional modules that can be enabled per instance. By default all optional modules are enabled. 
+
+To enable specific modules, set `EUPHROSYNE_FEATURES` to a comma-separated list:
 
 ```
 EUPHROSYNE_FEATURES=data_request,lab_notebook,radiation_protection
 ```
+
+**Note**: If `EUPHROSYNE_FEATURES` is not set or is set to an empty value, all optional modules are enabled by default. To enable only specific modules, explicitly list them.
 
 Available optional modules:
 

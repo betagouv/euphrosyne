@@ -25,12 +25,23 @@ def _parse_feature_list(raw_value: str) -> List[str]:
 
 
 def enabled_features() -> List[str]:
+    """
+    Returns enabled features based on EUPHROSYNE_FEATURES env variable.
+
+    Behavior:
+    - If EUPHROSYNE_FEATURES is not set: all features enabled (default)
+    - If set to empty string or whitespace: all features enabled (default)
+    - If set to comma-separated list: only those features are enabled
+
+    Returns:
+        List of feature names that should be enabled
+    """
     raw_features = os.getenv("EUPHROSYNE_FEATURES")
-    if raw_features is not None:
-        if not raw_features.strip():
-            return []
+    if raw_features is not None and raw_features.strip():
+        # Environment variable is set and non-empty: parse and filter
         requested = _parse_feature_list(raw_features)
         return [feature for feature in requested if feature in FEATURE_APPS]
+    # Environment variable is not set or empty: enable all by default
     return list(FEATURE_APPS.keys())
 
 
