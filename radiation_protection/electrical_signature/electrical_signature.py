@@ -16,7 +16,7 @@ from .providers.goodflag import StepType, start_workflow
 ELECTRICAL_SIGNATURE_PROVIDER_NAME = "goodflag"
 
 
-def start_electrical_signature_processes(
+def start_electrical_signature_processes(  # pylint: disable=too-many-locals
     risk_prevention_plan: RiskPreventionPlan,
 ) -> list[ElectricalSignatureProcess]:
     """
