@@ -1,6 +1,13 @@
 # Feature toggles
 
-Euphrosyne supports enabling/disabling optional modules per deployment via `EUPHROSYNE_FEATURES` (comma-separated). Defaults to all known features enabled.
+Euphrosyne supports enabling/disabling optional modules per deployment via the `EUPHROSYNE_FEATURES` environment variable.
+
+## Behavior
+
+- **Not set or empty**: All available features are enabled (default behavior)
+- **Set to comma-separated list**: Only the specified features are enabled
+
+This means that setting `EUPHROSYNE_FEATURES` to an empty string (`EUPHROSYNE_FEATURES=""`) has the same effect as not setting it at all—all features will be enabled.
 
 ## Available features
 
