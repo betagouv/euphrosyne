@@ -22,11 +22,7 @@ from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
 
 from euphro_auth.views import UserTokenRegistrationView, cgu_acceptance_view
-
-try:
-    from orcid_oauth.views import UserCompleteAccountView
-except ImportError:  # pragma: no cover - only when feature disabled
-    UserCompleteAccountView = None
+from orcid_oauth.views import UserCompleteAccountView
 
 urlpatterns = [
     path("", include("social_django.urls")),
