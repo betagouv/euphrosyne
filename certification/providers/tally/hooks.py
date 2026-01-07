@@ -6,7 +6,6 @@ import hmac
 import json
 import logging
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -14,6 +13,7 @@ from django.views.decorators.http import require_POST
 
 from certification.certifications.models import QuizCertification
 from certification.providers.tally.dataclasses import TallyWebhookData
+from radiation_protection.app_settings import settings as app_settings
 
 from ...certifications.results import create_quiz_result
 from ...models import Certification
@@ -25,7 +25,7 @@ def _validate_signature(request):
     # Get the Tally-Signature header value
     signature_header = request.headers.get("Tally-Signature")
 
-    secret_key = settings.RADIATION_PROTECTION_TALLY_SECRET_KEY
+    secret_key = app_settings.RADIATION_PROTECTION_TALLY_SECRET_KEY
 
     digest = hmac.new(
         secret_key.encode("utf-8"), request.body, digestmod=hashlib.sha256

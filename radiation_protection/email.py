@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core import mail
 
 from euphro_auth.models import User
+from radiation_protection.app_settings import settings as app_settings
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +13,7 @@ def notify_additional_emails(user: User) -> None:
     """
     Notify additional emails about the radiation protection document.
     """
-    additional_emails = settings.RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS
+    additional_emails = app_settings.RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS
     if not additional_emails:
         return
 

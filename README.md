@@ -67,6 +67,28 @@ You can copy this file to a new `.env` file to easily set up your environment.
 | SOCIAL_AUTH_ORCID_KEY                               | ORCID application credentials for user authentication                                                                                                                                                                                             |
 | SOCIAL_AUTH_ORCID_SECRET                            | ORCID application credentials for user authentication                                                                                                                                                                                             |
 
+### Optional modules
+
+Euphrosyne ships optional modules that can be enabled per instance. By default all optional modules are enabled. Override with `EUPHROSYNE_FEATURES` (comma-separated):
+
+```
+EUPHROSYNE_FEATURES=data_request,lab_notebook,radiation_protection
+```
+
+Available optional modules:
+
+- `data_request` — data access workflow and approvals
+- `lab_notebook` — digital lab notebook features
+- `radiation_protection` — radiation protection certification and prevention plans (`radiation_protection/README.md`)
+
+Optional project overrides can be provided as a dict in settings:
+
+```
+RADIATION_PROTECTION_SETTINGS = {
+    "RADIATION_PROTECTION_RISK_ADVISOR_EMAIL": "advisor@example.com",
+}
+```
+
 ## Development
 
 To start the Django development server, run:
