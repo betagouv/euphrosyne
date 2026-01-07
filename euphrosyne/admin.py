@@ -1,11 +1,9 @@
-from typing import List
-
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import include, path, reverse
-from django.urls.resolvers import URLResolver
+from django.urls.resolvers import URLResolver, URLPattern
 from django.utils.translation import gettext_lazy as _
 
 from lab.documents.views import ProjectDocumentsView
@@ -22,8 +20,8 @@ class AdminSite(admin.AdminSite):
     site_header = "Euphrosyne"
     index_title = _("Dashboard")
 
-    def get_urls(self) -> List[URLResolver]:  # type: ignore[override]
-        urls: List[URLResolver] = [
+    def get_urls(self) -> list[URLPattern, URLResolver]:  # type: ignore[override]
+        urls: list[URLResolver] = [
             path(
                 "lab/project/<project_id>/documents",
                 self.admin_view(ProjectDocumentsView.as_view()),  # type: ignore[type-var] # pylint: disable=line-too-long

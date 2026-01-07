@@ -56,16 +56,10 @@ urlpatterns = [
         UserTokenRegistrationView.as_view(),
         name="registration_token",
     ),
-    *(
-        [
-            path(
-                "registration/orcid/verify/<token>",
-                UserCompleteAccountView.as_view(),
-                name="complete_registration_orcid",
-            )
-        ]
-        if UserCompleteAccountView
-        else []
+    path(
+        "registration/orcid/verify/<token>",
+        UserCompleteAccountView.as_view(),
+        name="complete_registration_orcid",
     ),
     path(
         "cgu-acceptance/",
