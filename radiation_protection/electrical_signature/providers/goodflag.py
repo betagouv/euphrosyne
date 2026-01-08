@@ -111,11 +111,11 @@ class GoodflagClient:
         )
 
         if not self.base_url:
-            raise ValueError("GOODFLAG_API_BASE environment variable is required")
+            raise ValueError("GOODFLAG_API_BASE is required")
         if not self.api_token:
-            raise ValueError("GOODFLAG_API_TOKEN environment variable is required")
+            raise ValueError("GOODFLAG_API_TOKEN is required")
         if not self.user_id:
-            raise ValueError("GOODFLAG_USER_ID environment variable is required")
+            raise ValueError("GOODFLAG_USER_ID is required")
         if not self.consent_page_id:
             raise ValueError("GOODFLAG_SIGNATURE_CONSENT_PAGE_ID is required")
         if not self.signature_profile_id:
