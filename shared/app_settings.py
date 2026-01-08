@@ -78,7 +78,7 @@ class AppLazySettings(LazySettings):
             return
 
         if not isinstance(override_value, dict):
-            raise RuntimeError(f"{self._override_name} must be a dict of overrides.")
+            raise RuntimeError(f"{override_name} must be a dict of overrides.")
 
         holder = UserSettingsHolder(base_settings)
         for key, value in override_value.items():
