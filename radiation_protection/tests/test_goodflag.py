@@ -67,7 +67,12 @@ def test_goodflag_client_initialization():
     assert "Bearer test_token" in client.headers["Authorization"]
 
 
-@mock.patch.dict("os.environ", {}, clear=True)
+@mock.patch(
+    "radiation_protection.electrical_signature.providers.goodflag.app_settings",
+    mock.MagicMock(
+        GOODFLAG_API_BASE=None, GOODFLAG_API_TOKEN=None, GOODFLAG_USER_ID=None
+    ),
+)
 def test_goodflag_client_missing_credentials():
     """Test Goodflag client raises error when credentials are missing."""
     with pytest.raises(ValueError, match="GOODFLAG_API_BASE"):
@@ -153,7 +158,7 @@ def test_upload_document(mock_request, goodflag_client: GoodflagClient):
 
 def test_upload_document_file_not_found(goodflag_client: GoodflagClient):
     """Test upload document with non-existent file."""
-    with pytest.raises(GoodflagAPIError, match="n'existe pas"):
+    with pytest.raises(GoodflagAPIError, match="does not exist"):
         goodflag_client.upload_document("workflow_123", "/nonexistent/file.pdf")
 
 
