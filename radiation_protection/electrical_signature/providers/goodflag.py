@@ -10,10 +10,11 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from radiation_protection.app_settings import settings as app_settings
+
 if typing.TYPE_CHECKING:
     from radiation_protection.models import ElectricalSignatureProcess
 
-from radiation_protection.app_settings import settings as app_settings
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +92,7 @@ class GoodflagAPIError(Exception):
 class GoodflagClient:
     """Client to interact with the Goodflag Workflow Manager API."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         base_url: str | None = None,
         api_token: str | None = None,
