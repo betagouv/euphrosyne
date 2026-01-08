@@ -101,7 +101,7 @@ class GoodflagClient:
         signature_profile_id: str | None = None,
     ):
 
-        self.base_url = app_settings.GOODFLAG_API_BASE  # type: ignore[misc]
+        self.base_url = base_url or app_settings.GOODFLAG_API_BASE  # type: ignore[misc]
         self.api_token = api_token or app_settings.GOODFLAG_API_TOKEN  # type: ignore[misc] # pylint: disable=line-too-long
         self.user_id = user_id or app_settings.GOODFLAG_USER_ID  # type: ignore[misc] # pylint: disable=line-too-long
         self.consent_page_id = (
@@ -174,7 +174,7 @@ class GoodflagClient:
                             "firstName": recipient["first_name"],
                             "lastName": recipient["last_name"],
                             "consentPageId": (
-                                self.signature_profile_id
+                                self.consent_page_id
                                 if step["step_type"] == StepType.SIGNATURE
                                 else None
                             ),
