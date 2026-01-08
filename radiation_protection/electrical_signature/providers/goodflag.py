@@ -10,17 +10,15 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from radiation_protection.app_settings import settings as app_settings
+
 if typing.TYPE_CHECKING:
     from radiation_protection.models import ElectricalSignatureProcess
 
 
 logger = logging.getLogger(__name__)
 
-SIGNATURE_CONSENT_PAGE_ID = "cop_DK7inaJS6nLgUHng93CsQKaS"
-# SIGNATURE_PROFILE_ID = "sip_JuK7JYy153CqAB83EUaAduC1"  # PDF
-SIGNATURE_PROFILE_ID = "sip_JSwKQjyM1oRzTVVUEkG9bTKQ"  # WORD
-
-REDIRECT_URL = f"{settings.SITE_URL}/electical_signature/webhooks/goodlfag"
+REDIRECT_URL = f"{settings.SITE_URL}/electrical_signature/webhooks/goodflag"
 
 SIGNATURE_EXPIRED_TD = timedelta(days=30)
 
@@ -78,7 +76,7 @@ def get_status(signature_process: "ElectricalSignatureProcess") -> str | None:
 
 
 class GoodflagAPIError(Exception):
-    """Exception levée lors d'erreurs avec l'API Goodflag."""
+    """Exception raised when errors occur with the Goodflag API."""
 
     def __init__(
         self,
@@ -92,25 +90,37 @@ class GoodflagAPIError(Exception):
 
 
 class GoodflagClient:
-    """Client pour interagir avec l'API Goodflag Workflow Manager."""
+    """Client to interact with the Goodflag Workflow Manager API."""
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         base_url: str | None = None,
         api_token: str | None = None,
         user_id: str | None = None,
+        consent_page_id: str | None = None,
+        signature_profile_id: str | None = None,
     ):
 
-        self.base_url = base_url or os.getenv("GOODFLAG_API_BASE")
-        self.api_token = api_token or os.getenv("GOODFLAG_API_TOKEN")
-        self.user_id = user_id or os.getenv("GOODFLAG_USER_ID")
+        self.base_url = base_url or app_settings.GOODFLAG_API_BASE  # type: ignore[misc]
+        self.api_token = api_token or app_settings.GOODFLAG_API_TOKEN  # type: ignore[misc] # pylint: disable=line-too-long
+        self.user_id = user_id or app_settings.GOODFLAG_USER_ID  # type: ignore[misc] # pylint: disable=line-too-long
+        self.consent_page_id = (
+            consent_page_id or app_settings.GOODFLAG_SIGNATURE_CONSENT_PAGE_ID  # type: ignore[misc] # pylint: disable=line-too-long
+        )
+        self.signature_profile_id = (
+            signature_profile_id or app_settings.GOODFLAG_SIGNATURE_PROFILE_ID  # type: ignore[misc] # pylint: disable=line-too-long
+        )
 
         if not self.base_url:
-            raise ValueError("GOODFLAG_API_BASE environment variable is required")
+            raise ValueError("GOODFLAG_API_BASE is required")
         if not self.api_token:
-            raise ValueError("GOODFLAG_API_TOKEN environment variable is required")
+            raise ValueError("GOODFLAG_API_TOKEN is required")
         if not self.user_id:
-            raise ValueError("GOODFLAG_USER_ID environment variable is required")
+            raise ValueError("GOODFLAG_USER_ID is required")
+        if not self.consent_page_id:
+            raise ValueError("GOODFLAG_SIGNATURE_CONSENT_PAGE_ID is required")
+        if not self.signature_profile_id:
+            raise ValueError("GOODFLAG_SIGNATURE_PROFILE_ID is required")
 
         self.base_url = self.base_url.rstrip("/") + "/api"
         self.headers = {
@@ -143,14 +153,13 @@ class GoodflagClient:
 
     def create_workflow(self, name: str, steps: list[Step]) -> dict:
         """
-        Crée un nouveau workflow avec étapes d'approbation et de signature.
+        Create a new workflow with approval and signature steps.
 
         Args:
-            name: Nom du workflow
-            steps: Liste des étapes du workflow
-
+            name: Name of the workflow
+            steps: List of workflow steps
         Returns:
-            dict contenant la réponse de l'API (incluant workflowId)
+            dict containing the API response (including workflowId)
         """
         endpoint = f"/users/{self.user_id}/workflows"
 
@@ -165,7 +174,7 @@ class GoodflagClient:
                             "firstName": recipient["first_name"],
                             "lastName": recipient["last_name"],
                             "consentPageId": (
-                                SIGNATURE_CONSENT_PAGE_ID
+                                self.consent_page_id
                                 if step["step_type"] == StepType.SIGNATURE
                                 else None
                             ),
@@ -203,19 +212,19 @@ class GoodflagClient:
         file_path: str,
     ) -> dict:
         """
-        Upload un document PDF dans un workflow.
+        Upload a PDF document to a workflow.
 
         Args:
-            workflow_id: ID du workflow
-            file_path: Chemin vers le fichier PDF
+            workflow_id: ID of the workflow
+            file_path: Path to the PDF file
         """
         if not os.path.exists(file_path):
-            raise GoodflagAPIError(f"Le fichier {file_path} n'existe pas")
+            raise GoodflagAPIError(f"The file {file_path} does not exist")
 
         endpoint = f"/workflows/{workflow_id}/parts"
         params = {
             "createDocuments": "true",
-            "signatureProfileId": SIGNATURE_PROFILE_ID,
+            "signatureProfileId": self.signature_profile_id,
             "convertToPdf": "true",
             "pdf2pdfa": "forced",
         }
@@ -243,10 +252,10 @@ class GoodflagClient:
         document_id: str,
     ) -> dict:
         """
-        Crée un viewer pour visualiser un document.
+        Create a viewer to visualize a document.
 
         Args:
-            document_id: ID du document
+            document_id: ID of the document
         """
         endpoint = f"/documents/{document_id}/viewer"
 
@@ -262,10 +271,10 @@ class GoodflagClient:
 
     def get_workflow_status(self, workflow_id: str) -> dict:
         """
-        Récupère le statut d'un workflow.
+        Retrieve the status of a workflow.
 
         Args:
-            workflow_id: ID du workflow
+            workflow_id: ID of the workflow
 
         """
         endpoint = f"/workflows/{workflow_id}"
@@ -275,11 +284,11 @@ class GoodflagClient:
 
     def download_document(self, document_id: str, output_path: str) -> None:
         """
-        Télécharge un document signé.
+        Download a signed document.
 
         Args:
-            document_id: ID du document
-            output_path: Chemin de sauvegarde du fichier
+            document_id: ID of the document
+            output_path: Path to save the file
         """
         endpoint = f"/documents/{document_id}/download"
 
