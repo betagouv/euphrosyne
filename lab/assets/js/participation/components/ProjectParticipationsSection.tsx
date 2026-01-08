@@ -12,6 +12,7 @@ import { UserData } from "../../../../../euphrosyne/assets/js/main";
 interface ProjectParticipationsFormProps {
   projectId: number;
   userData: UserData;
+  isRadiationProtectionEnabled: boolean;
 }
 
 interface AddParticipationButtonProps {
@@ -82,6 +83,7 @@ function AddParticipationButton({
 export default function ProjectParticipationsForm({
   projectId,
   userData,
+  isRadiationProtectionEnabled,
 }: ProjectParticipationsFormProps) {
   const t = {
     leaderParticipationsTable: window.gettext("Project leader"),
@@ -182,6 +184,7 @@ export default function ProjectParticipationsForm({
             editModalId={leaderModalId}
             canDelete={false}
             canEdit={userData.isLabAdmin}
+            isRadiationProtectionEnabled={isRadiationProtectionEnabled}
           />
         )}
         {!leaderParticipation && userData.isLabAdmin && (
@@ -210,6 +213,7 @@ export default function ProjectParticipationsForm({
             onEditClick={(participation) => {
               setOnPremisesParticipationToEdit(participation);
             }}
+            isRadiationProtectionEnabled={isRadiationProtectionEnabled}
           />
         )}
         {isLabAdminOrProjectLeader(userData, leaderParticipation) && (

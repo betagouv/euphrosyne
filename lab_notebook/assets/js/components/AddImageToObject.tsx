@@ -5,11 +5,14 @@ import {
   RunObjectGroupImageServices,
 } from "../notebook-image.services";
 import { NotebookContext } from "../Notebook.context";
-import { IImagewithUrl, IRunObjectImageWithUrl } from "../IImageTransform";
-import ImageGrid from "./ImageGrid";
+import {
+  IImagewithUrl,
+  IRunObjectImageWithUrl,
+} from "../../../../shared/js/images/types";
+import ImageGrid from "../../../../shared/js/images/ImageGrid";
 import UploadObjectImage from "./UploadObjectImage";
-import ImageLoading from "./ImageLoading";
-import ImageWithPlaceholder from "../ImageWithPlaceholder";
+import ImageLoading from "../../../../shared/js/images/ImageLoading";
+import ImageWithPlaceholder from "../../../../shared/js/images/ImageWithPlaceholder";
 import { ProjectImageServices } from "../../../../lab/documents/assets/js/project-image-service";
 import { constructImageStorageUrl, extractProviderFromPath } from "../utils";
 import { getToken } from "../../../../shared/js/jwt";

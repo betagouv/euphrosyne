@@ -6,7 +6,6 @@ import hmac
 import json
 import logging
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -21,11 +20,12 @@ from ...models import Certification
 logger = logging.getLogger(__name__)
 
 
-def _validate_signature(request):
+def _validate_signature(request: HttpRequest, secret_key: str) -> bool:
     # Get the Tally-Signature header value
     signature_header = request.headers.get("Tally-Signature")
 
-    secret_key = settings.RADIATION_PROTECTION_TALLY_SECRET_KEY
+    if not signature_header:
+        raise ValueError("Tally webhook : missing Tally-Signature header")
 
     digest = hmac.new(
         secret_key.encode("utf-8"), request.body, digestmod=hashlib.sha256
@@ -36,8 +36,10 @@ def _validate_signature(request):
 
 @csrf_exempt
 @require_POST
-def tally_webhook(request: HttpRequest):  # pylint: disable=too-many-return-statements
-    is_signature_valid = _validate_signature(request)
+def tally_webhook(
+    request: HttpRequest, secret_key: str
+):  # pylint: disable=too-many-return-statements
+    is_signature_valid = _validate_signature(request, secret_key)
     if not is_signature_valid:
         logger.error("Tally webhook : invalid signature")
         return JsonResponse({"error": "Invalid signature"}, status=403)

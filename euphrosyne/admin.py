@@ -1,10 +1,9 @@
-from typing import List
-
+from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import include, path, reverse
-from django.urls.resolvers import URLResolver
+from django.urls.resolvers import URLPattern, URLResolver
 from django.utils.translation import gettext_lazy as _
 
 from lab.documents.views import ProjectDocumentsView
@@ -21,13 +20,11 @@ class AdminSite(admin.AdminSite):
     site_header = "Euphrosyne"
     index_title = _("Dashboard")
 
-    def get_urls(self) -> List[URLResolver]:  # type: ignore[override]
-        urls = [
+    def get_urls(self) -> list[URLPattern | URLResolver]:  # type: ignore[override]
+        urls: list[URLPattern | URLResolver] = [
             path(
                 "lab/project/<project_id>/documents",
-                self.admin_view(
-                    ProjectDocumentsView.as_view()  # type: ignore[type-var]
-                ),
+                self.admin_view(ProjectDocumentsView.as_view()),  # type: ignore[type-var] # pylint: disable=line-too-long
                 name="lab_project_documents",
             ),
             path(
@@ -37,20 +34,19 @@ class AdminSite(admin.AdminSite):
             ),
             path(
                 "lab/objectgroup/eros_import",
-                self.admin_view(
-                    ObjectImportErosView.as_view()  # type: ignore[type-var]
-                ),
+                self.admin_view(ObjectImportErosView.as_view()),  # type: ignore[type-var] # pylint: disable=line-too-long
                 name="lab_objectgroup_erosimport",
             ),
             path(
                 "lab/objectgroup/pop_import",
-                self.admin_view(
-                    ObjectImportPOPView.as_view()  # type: ignore[type-var]
-                ),
+                self.admin_view(ObjectImportPOPView.as_view()),  # type: ignore[type-var] # pylint: disable=line-too-long
                 name="lab_objectgroup_popimport",
             ),
-            path("", include("lab_notebook.urls")),
         ]
+
+        if apps.is_installed("lab_notebook"):
+            urls.append(path("", include("lab_notebook.urls")))
+
         if settings.HDF5_ENABLE:
             urls.append(
                 path(

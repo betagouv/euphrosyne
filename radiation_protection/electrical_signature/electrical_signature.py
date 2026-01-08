@@ -4,6 +4,7 @@ from pathlib import Path
 from django.conf import settings
 from django.utils import translation
 
+from radiation_protection.app_settings import settings as app_settings
 from radiation_protection.document import (
     write_authorization_access_form,
     write_risk_prevention_plan,
@@ -15,7 +16,7 @@ from .providers.goodflag import StepType, start_workflow
 ELECTRICAL_SIGNATURE_PROVIDER_NAME = "goodflag"
 
 
-def start_electrical_signature_processes(
+def start_electrical_signature_processes(  # pylint: disable=too-many-locals
     risk_prevention_plan: RiskPreventionPlan,
 ) -> list[ElectricalSignatureProcess]:
     """
@@ -34,9 +35,10 @@ def start_electrical_signature_processes(
     # Interact with the external API to start the process
     # For example, you might send a request to the provider's API here
     run = risk_prevention_plan.run
-    risk_advisor_email = settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL
+    risk_advisor_email = app_settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL  # type: ignore[misc] # pylint: disable=line-too-long
+    parts = app_settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME.rsplit(" ", 1)  # type: ignore[misc] # pylint: disable=line-too-long
     risk_advisor_first_name, risk_advisor_last_name = (
-        settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME.split(" ", 1)
+        (parts[0], parts[1]) if len(parts) == 2 else (parts[0], "")
     )
 
     participation = risk_prevention_plan.participation
@@ -56,7 +58,7 @@ def start_electrical_signature_processes(
     institution_locale = (
         participation.institution.get_administrative_locale()
         if participation.institution
-        else settings.DEFAULT_LOCALE
+        else getattr(settings, "DEFAULT_LOCALE", "fr")
     )
     with translation.override(institution_locale):
         prevention_plan_base_label = translation.gettext("Risk prevention plan")

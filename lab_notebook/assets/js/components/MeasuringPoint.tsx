@@ -1,6 +1,6 @@
 import { css } from "@emotion/react";
 import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
-import type { IMeasuringPoint } from "../IMeasuringPoint";
+import type { IMeasuringPoint } from "../../../../shared/js/images/types";
 import MeasuringPointComments from "./MeasuringPointComments";
 import { NotebookContext } from "../Notebook.context";
 import { useContext, useEffect, useState } from "react";

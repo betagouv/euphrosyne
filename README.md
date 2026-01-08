@@ -59,13 +59,41 @@ You can copy this file to a new `.env` file to easily set up your environment.
 | MATOMO_SITE_ID                                      | Matomo site ID for analytics                                                                                                                                                                                                                      |
 | ORCID_USE_SANDBOX                                   | ORCID authentication environment selection. If set to 'true', sandbox environment is used. Defaults to false                                                                                                                                      |
 | RADIATION_PROTECTION_TALLY_SECRET_KEY               | Secret key used to secure the webhook where Tally posts the results of the radiation protection quiz. It can be found on the integrations configuration page in the Tally form (via https://tally.so/dashboard). (via https://tally.so/dashboard) |
-| RADIATION_PROTECTION_RISK_ADVISOR_EMAILS            | Email to risk advisor to send prevention plans                                                                                                                                                                                                    |
 | RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS | Aditional emails to notify when a user successfuly pass the radiation protection certification                                                                                                                                                    |
 | SITE_URL                                            | The URL of this Euphrosyne instance                                                                                                                                                                                                               |
 | SENTRY_DSN                                          | Optional. Sentry DSN. If omitted, Sentry will not be used                                                                                                                                                                                         |
 | SENTRY_ENVIRONMENT                                  | Tag used to filter Sentry events. Possible choices: 'production', 'staging' or 'dev'                                                                                                                                                              |
 | SOCIAL_AUTH_ORCID_KEY                               | ORCID application credentials for user authentication                                                                                                                                                                                             |
 | SOCIAL_AUTH_ORCID_SECRET                            | ORCID application credentials for user authentication                                                                                                                                                                                             |
+
+### Optional modules
+
+Euphrosyne ships optional modules that can be enabled per instance. By default all optional modules are enabled. 
+
+To enable specific modules, set `EUPHROSYNE_FEATURES` to a comma-separated list:
+
+```
+EUPHROSYNE_FEATURES=data_request,lab_notebook,radiation_protection
+```
+
+**Note**: 
+- If `EUPHROSYNE_FEATURES` is **not set**: all optional modules are enabled by default
+- If `EUPHROSYNE_FEATURES` is **set to an empty value** (e.g., `EUPHROSYNE_FEATURES=""`): all optional modules are disabled
+- To enable only specific modules, explicitly list them in a comma-separated format
+
+Available optional modules:
+
+- `data_request` — data access workflow and approvals
+- `lab_notebook` — digital lab notebook features
+- `radiation_protection` — radiation protection certification and prevention plans (`radiation_protection/README.md`)
+
+Optional project overrides can be provided as a dict in settings:
+
+```
+RADIATION_PROTECTION_SETTINGS = {
+    "RADIATION_PROTECTION_RISK_ADVISOR_EMAIL": "advisor@example.com",
+}
+```
 
 ## Development
 

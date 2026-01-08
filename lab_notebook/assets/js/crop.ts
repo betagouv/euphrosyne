@@ -16,7 +16,7 @@
  * @module crop
  */
 
-import { IImageTransform } from "./IImageTransform";
+import { IImageTransform } from "../../../shared/js/images/types";
 
 /**
  * Crops an image using a canvas and resolves the cropped image as a data URL.

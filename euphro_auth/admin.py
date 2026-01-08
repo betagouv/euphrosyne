@@ -177,8 +177,6 @@ class UserAdmin(DjangoUserAdmin):
         "email",
     )
 
-    readonly_fields = ("password_display", "has_radiation_certification")
-
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.prefetch_related("groups")
@@ -198,9 +196,12 @@ class UserAdmin(DjangoUserAdmin):
         return list_display
 
     def get_readonly_fields(self, request: HttpRequest, obj: Optional[User] = None):
+        fields = ["password_display"]
+        if apps.is_installed("radiation_protection"):
+            fields += ["has_radiation_certification"]
         if request.user.is_superuser:
-            return self.readonly_fields + ("is_superuser",)
-        return self.readonly_fields
+            return fields + ["is_superuser"]
+        return fields
 
     def get_fieldsets(self, request: HttpRequest, obj: Optional[User] = None):
         fieldset_classes = [
@@ -230,14 +231,17 @@ class UserAdmin(DjangoUserAdmin):
                         "classes": [*fieldset_classes],
                     },
                 ),
-                (
-                    _("Certifications"),
-                    {
-                        "fields": ("has_radiation_certification",),
-                        "classes": [*fieldset_classes],
-                    },
-                ),
             ]
+            if apps.is_installed("radiation_protection"):
+                fieldsets += [
+                    (
+                        _("Certifications"),
+                        {
+                            "fields": ("has_radiation_certification",),
+                            "classes": [*fieldset_classes],
+                        },
+                    ),
+                ]
         if request.user.is_superuser:
             fieldsets += [
                 (  # type: ignore[list-item]

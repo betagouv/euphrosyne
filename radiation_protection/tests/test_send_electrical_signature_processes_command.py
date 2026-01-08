@@ -30,17 +30,31 @@ def risk_prevention_plan_fixture():
     )
 
 
+@pytest.fixture(autouse=True)
+def radiation_protection_settings():
+    with (
+        mock.patch(
+            "radiation_protection.electrical_signature.electrical_signature."
+            "app_settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL",
+            "advisor@example.com",
+        ),
+        mock.patch(
+            "radiation_protection.electrical_signature.electrical_signature."
+            "app_settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME",
+            "John Advisor",
+        ),
+    ):
+        yield
+
+
 @pytest.mark.django_db
 @mock.patch(
     "radiation_protection.management.commands.send_electrical_signature_processes.start_electrical_signature_processes"  # pylint: disable=line-too-long
 )
 def test_send_electrical_signature_processes_command(
-    mock_start_processes, risk_prevention_plan, settings
+    mock_start_processes, risk_prevention_plan
 ):
     """Test the send_electrical_signature_processes management command."""
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
-
     # Mock the electrical signature processes that will be created
     mock_process_1 = mock.Mock(spec=ElectricalSignatureProcess)
     mock_process_1.__str__ = mock.Mock(return_value="Process 1")
@@ -69,13 +83,8 @@ def test_send_electrical_signature_processes_command(
 @mock.patch(
     "radiation_protection.management.commands.send_electrical_signature_processes.start_electrical_signature_processes"  # pylint: disable=line-too-long
 )
-def test_send_electrical_signature_processes_command_no_plans(
-    mock_start_processes, settings
-):
+def test_send_electrical_signature_processes_command_no_plans(mock_start_processes):
     """Test the command when there are no plans to process."""
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
-
     out = StringIO()
     call_command("send_electrical_signature_processes", stdout=out)
 
@@ -88,13 +97,8 @@ def test_send_electrical_signature_processes_command_no_plans(
 @mock.patch(
     "radiation_protection.management.commands.send_electrical_signature_processes.start_electrical_signature_processes"  # pylint: disable=line-too-long
 )
-def test_send_electrical_signature_processes_command_already_sent(
-    mock_start_processes, settings
-):
+def test_send_electrical_signature_processes_command_already_sent(mock_start_processes):
     """Test the command skips plans that were already sent."""
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
-
     user = lab_factories.StaffUserFactory()
     admin = lab_factories.StaffUserFactory()
     project = lab_factories.ProjectFactory(admin=admin)
@@ -126,12 +130,9 @@ def test_send_electrical_signature_processes_command_already_sent(
     "radiation_protection.management.commands.send_electrical_signature_processes.start_electrical_signature_processes"  # pylint: disable=line-too-long
 )
 def test_send_electrical_signature_processes_command_multiple_plans(
-    mock_start_processes, settings
+    mock_start_processes,
 ):
     """Test the command with multiple plans to process."""
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL = "advisor@example.com"
-    settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME = "John Advisor"
-
     # Create multiple plans
     plans = []
     for _ in range(3):

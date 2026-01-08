@@ -8,10 +8,10 @@ import { DocumentFileService } from "../document-file-service";
 import FileTable, { Col } from "../../../../assets/js/components/FileTable";
 import DocumentUploadModal from "./DocumentUploadModal";
 import BaseFileActionCell from "../../../../assets/js/components/BaseFileActionCell";
-import { IImagewithUrl } from "../../../../../lab_notebook/assets/js/IImageTransform";
+import { IImagewithUrl } from "../../../../../shared/js/images/types";
 import { ProjectImageServices } from "../project-image-service";
-import ImageGrid from "../../../../../lab_notebook/assets/js/components/ImageGrid";
-import ImageWithPlaceholder from "../../../../../lab_notebook/assets/js/ImageWithPlaceholder";
+import ImageGrid from "../../../../../shared/js/images/ImageGrid";
+import ImageWithPlaceholder from "../../../../../shared/js/images/ImageWithPlaceholder";
 import { uploadFile } from "../../../../assets/js/blob-service";
 import { useClientContext } from "../../../../../shared/js/EuphrosyneToolsClient.context";
 

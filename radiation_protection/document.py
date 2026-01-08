@@ -16,6 +16,7 @@ if TYPE_CHECKING:
     from docx.document import Document as DocumentObject
 
 BASE_PATH = Path(settings.BASE_DIR) / "radiation_protection" / "assets"
+DEFAULT_LOCALE = getattr(settings, "DEFAULT_LOCALE", "fr")
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 def _get_risk_prevention_document_paths() -> dict[str, Path]:
     """Get the path to the radiation protection template document."""
     return {
-        settings.DEFAULT_LOCALE: BASE_PATH / "AGLAE_plan_de_prevention.docx",
+        DEFAULT_LOCALE: BASE_PATH / "AGLAE_plan_de_prevention.docx",
         "en": BASE_PATH / "AGLAE_plan_de_prevention_english.docx",
     }
 
@@ -31,7 +32,7 @@ def _get_risk_prevention_document_paths() -> dict[str, Path]:
 def _get_authorization_access_form_path() -> dict[str, Path]:
     """Get the path to the radiation protection authorization access form."""
     return {
-        settings.DEFAULT_LOCALE: BASE_PATH
+        DEFAULT_LOCALE: BASE_PATH
         / "Formulaire_Autorisation_Acces_zone surveillee_ext_AGLAE.docx",
         "en": BASE_PATH
         / "Formulaire_Autorisation_Acces_zone surveillee_ext_AGLAE_english.docx",
@@ -162,9 +163,9 @@ def write_authorization_access_form(plan: RiskPreventionPlan, write_path: Path):
         and institution.country
         and institution.country.lower() not in ["france", "french"]
     ):
-        document_path = document_dict.get("en", document_dict[settings.DEFAULT_LOCALE])
+        document_path = document_dict.get("en", document_dict[DEFAULT_LOCALE])
     else:
-        document_path = document_dict[settings.DEFAULT_LOCALE]
+        document_path = document_dict[DEFAULT_LOCALE]
     _create_document(
         document_path=document_path,
         write_path=write_path,
@@ -177,9 +178,9 @@ def write_risk_prevention_plan(plan: RiskPreventionPlan, write_path: Path):
     document_dict = _get_risk_prevention_document_paths()
     institution = plan.participation.institution
     if institution and institution.get_administrative_locale() == "en":
-        document_path = document_dict.get("en", document_dict[settings.DEFAULT_LOCALE])
+        document_path = document_dict.get("en", document_dict[DEFAULT_LOCALE])
     else:
-        document_path = document_dict[settings.DEFAULT_LOCALE]
+        document_path = document_dict[DEFAULT_LOCALE]
     _create_document(
         document_path=document_path,
         write_path=write_path,

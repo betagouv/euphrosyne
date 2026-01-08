@@ -4,7 +4,7 @@ import hmac
 import json
 from unittest import mock
 
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 from certification.certifications.models import (
     Certification,
@@ -45,11 +45,11 @@ class TestTallyHook(TestCase):
         computed_hmac = base64.b64encode(digest)
 
         request.headers = {"Tally-Signature": computed_hmac.decode("utf-8")}
-        with override_settings(RADIATION_PROTECTION_TALLY_SECRET_KEY="test"):
-            self.assertTrue(_validate_signature(request))
+        self.assertTrue(_validate_signature(request, "test"))
 
     @mock.patch(
-        "certification.providers.tally.hooks._validate_signature", lambda _: False
+        "certification.providers.tally.hooks._validate_signature",
+        lambda _request, _secret_key: False,
     )
     def test_validate_signature_invalid(self):
         response = self.client.post(
@@ -59,7 +59,8 @@ class TestTallyHook(TestCase):
         assert response.status_code == 403
 
     @mock.patch(
-        "certification.providers.tally.hooks._validate_signature", lambda _: True
+        "certification.providers.tally.hooks._validate_signature",
+        lambda _request, _secret_key: True,
     )
     def test_hook_when_no_certification(self):
         response = self.client.post(
@@ -69,7 +70,8 @@ class TestTallyHook(TestCase):
         assert response.json() == {"error": "Certificate name is required"}
 
     @mock.patch(
-        "certification.providers.tally.hooks._validate_signature", lambda _: True
+        "certification.providers.tally.hooks._validate_signature",
+        lambda _request, _secret_key: True,
     )
     @mock.patch("certification.providers.tally.hooks.TallyWebhookData.from_tally_data")
     def test_hook_when_no_email(self, mock_from_tally_data: mock.MagicMock):
@@ -87,7 +89,8 @@ class TestTallyHook(TestCase):
         assert response.json() == {"error": "Email is required"}
 
     @mock.patch(
-        "certification.providers.tally.hooks._validate_signature", lambda _: True
+        "certification.providers.tally.hooks._validate_signature",
+        lambda _request, _secret_key: True,
     )
     @mock.patch("certification.providers.tally.hooks.TallyWebhookData.from_tally_data")
     def test_hook_when_no_score(self, mock_from_tally_data: mock.MagicMock):
@@ -106,7 +109,8 @@ class TestTallyHook(TestCase):
         assert response.json() == {"error": "Score is required"}
 
     @mock.patch(
-        "certification.providers.tally.hooks._validate_signature", lambda _: True
+        "certification.providers.tally.hooks._validate_signature",
+        lambda _request, _secret_key: True,
     )
     @mock.patch("certification.providers.tally.hooks.TallyWebhookData.from_tally_data")
     def test_hook_when_score_is_zero(self, mock_from_tally_data: mock.MagicMock):
@@ -124,7 +128,8 @@ class TestTallyHook(TestCase):
         assert response.status_code == 200
 
     @mock.patch(
-        "certification.providers.tally.hooks._validate_signature", lambda _: True
+        "certification.providers.tally.hooks._validate_signature",
+        lambda _request, _secret_key: True,
     )
     @mock.patch(
         "certification.providers.tally.hooks.create_quiz_result",
@@ -149,7 +154,8 @@ class TestTallyHook(TestCase):
         assert response.json() == {"error": "Certification not found"}
 
     @mock.patch(
-        "certification.providers.tally.hooks._validate_signature", lambda _: True
+        "certification.providers.tally.hooks._validate_signature",
+        lambda _request, _secret_key: True,
     )
     def test_tally_webhook_valid_when_passing_score(self):
         user = StaffUserFactory()
@@ -178,7 +184,8 @@ class TestTallyHook(TestCase):
         ).exists()
 
     @mock.patch(
-        "certification.providers.tally.hooks._validate_signature", lambda _: True
+        "certification.providers.tally.hooks._validate_signature",
+        lambda _request, _secret_key: True,
     )
     def test_tally_webhook_valid_when_not_passing_score(self):
         user = StaffUserFactory()
@@ -207,7 +214,8 @@ class TestTallyHook(TestCase):
         ).exists()
 
     @mock.patch(
-        "certification.providers.tally.hooks._validate_signature", lambda _: True
+        "certification.providers.tally.hooks._validate_signature",
+        lambda _request, _secret_key: True,
     )
     @mock.patch("certification.providers.tally.hooks.TallyWebhookData.from_tally_data")
     def test_hook_when_score_when_no_quiz_url(
@@ -227,7 +235,8 @@ class TestTallyHook(TestCase):
         assert response.json() == {"error": "quiz url is required"}
 
     @mock.patch(
-        "certification.providers.tally.hooks._validate_signature", lambda _: True
+        "certification.providers.tally.hooks._validate_signature",
+        lambda _request, _secret_key: True,
     )
     @mock.patch("certification.providers.tally.hooks.TallyWebhookData.from_tally_data")
     def test_hook_when_invalid_quiz_url(self, mock_from_tally_data: mock.MagicMock):

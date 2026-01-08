@@ -1,5 +1,5 @@
 import { getExternalImageService } from "../../../lab/assets/js/external_image/registry";
-import { ImageProvider } from "./IImageTransform";
+import { ImageProvider } from "../../../shared/js/images/types";
 
 export function extractPath(pathname: string, provider: ImageProvider): string {
   // For EROS images
