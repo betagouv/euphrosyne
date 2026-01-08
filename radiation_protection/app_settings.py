@@ -11,9 +11,6 @@ def _split_emails(value: str) -> List[str]:
 RADIATION_PROTECTION_TALLY_SECRET_KEY: Optional[str] = os.getenv(
     "RADIATION_PROTECTION_TALLY_SECRET_KEY"
 )
-RADIATION_PROTECTION_RISK_ADVISOR_EMAILS: List[str] = _split_emails(
-    os.environ.get("RADIATION_PROTECTION_RISK_ADVISOR_EMAILS", "")
-)
 RADIATION_PROTECTION_RISK_ADVISOR_EMAIL: Optional[str] = os.getenv(
     "RADIATION_PROTECTION_RISK_ADVISOR_EMAIL"
 )
