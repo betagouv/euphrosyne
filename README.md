@@ -77,7 +77,10 @@ To enable specific modules, set `EUPHROSYNE_FEATURES` to a comma-separated list:
 EUPHROSYNE_FEATURES=data_request,lab_notebook,radiation_protection
 ```
 
-**Note**: If `EUPHROSYNE_FEATURES` is not set or is set to an empty value, all optional modules are enabled by default. To enable only specific modules, explicitly list them.
+**Note**: 
+- If `EUPHROSYNE_FEATURES` is **not set**: all optional modules are enabled by default
+- If `EUPHROSYNE_FEATURES` is **set to an empty value** (e.g., `EUPHROSYNE_FEATURES=""`): all optional modules are disabled
+- To enable only specific modules, explicitly list them in a comma-separated format
 
 Available optional modules:
 

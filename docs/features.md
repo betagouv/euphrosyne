@@ -4,10 +4,11 @@ Euphrosyne supports enabling/disabling optional modules per deployment via the `
 
 ## Behavior
 
-- **Not set or empty**: All available features are enabled (default behavior)
+- **Not set**: All available features are enabled (default behavior)
+- **Set to empty string or whitespace**: NO features are enabled (all disabled)
 - **Set to comma-separated list**: Only the specified features are enabled
 
-This means that setting `EUPHROSYNE_FEATURES` to an empty string (`EUPHROSYNE_FEATURES=""`) has the same effect as not setting it at all—all features will be enabled.
+This means that setting `EUPHROSYNE_FEATURES` to an empty string (`EUPHROSYNE_FEATURES=""`) is the only way to disable all optional features.
 
 ## Available features
 
