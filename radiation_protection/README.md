@@ -10,6 +10,15 @@ risk prevention plans, and related notifications.
 - `RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME`
 - `RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS`
 
+### Electronic signature providers
+
+#### Goodflag
+- `GOODFLAG_API_BASE`
+- `GOODFLAG_API_TOKEN`
+- `GOODFLAG_USER_ID`
+- `GOODFLAG_SIGNATURE_CONSENT_PAGE_ID`
+- `GOODFLAG_SIGNATURE_PROFILE_ID`
+
 ## Project overrides
 
 You can override defaults via Django settings:
