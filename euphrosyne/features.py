@@ -49,8 +49,22 @@ def enabled_features() -> List[str]:
     return list(FEATURE_APPS.keys())
 
 
-def add_feature_apps(installed_apps: Iterable[str]) -> List[str]:
+def add_feature_apps(
+    installed_apps: Iterable[str], features: List[str] | None = None
+) -> List[str]:
+    """
+    Add feature apps to the installed apps list.
+
+    Args:
+        installed_apps: Base list of installed Django apps
+        features: List of enabled feature names. If None, computes from environment.
+
+    Returns:
+        Updated list of installed apps including feature apps
+    """
     updated_apps = list(installed_apps)
-    for feature in enabled_features():
+    if features is None:
+        features = enabled_features()
+    for feature in features:
         updated_apps += FEATURE_APPS[feature]
     return updated_apps
