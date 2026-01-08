@@ -17,7 +17,7 @@ from radiation_protection.app_settings import settings as app_settings
 
 logger = logging.getLogger(__name__)
 
-REDIRECT_URL = f"{settings.SITE_URL}/electical_signature/webhooks/goodflag"
+REDIRECT_URL = f"{settings.SITE_URL}/electrical_signature/webhooks/goodflag"
 
 SIGNATURE_EXPIRED_TD = timedelta(days=30)
 
