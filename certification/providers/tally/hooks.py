@@ -24,6 +24,9 @@ def _validate_signature(request: HttpRequest, secret_key: str) -> bool:
     # Get the Tally-Signature header value
     signature_header = request.headers.get("Tally-Signature")
 
+    if not signature_header:
+        raise ValueError("Tally webhook : missing Tally-Signature header")
+
     digest = hmac.new(
         secret_key.encode("utf-8"), request.body, digestmod=hashlib.sha256
     ).digest()
