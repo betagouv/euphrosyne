@@ -93,7 +93,7 @@ CORE_INSTALLED_APPS = [
 
 EUPHROSYNE_FEATURES = enabled_features()
 
-INSTALLED_APPS = add_feature_apps(CORE_INSTALLED_APPS) + (
+INSTALLED_APPS = add_feature_apps(CORE_INSTALLED_APPS, EUPHROSYNE_FEATURES) + (
     ["debug_toolbar"] if DEBUG else []
 )
 
