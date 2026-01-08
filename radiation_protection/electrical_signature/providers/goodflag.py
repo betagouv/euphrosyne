@@ -173,7 +173,7 @@ class GoodflagClient:
                             "firstName": recipient["first_name"],
                             "lastName": recipient["last_name"],
                             "consentPageId": (
-                                self.signature_profile_id
+                                self.consent_page_id
                                 if step["step_type"] == StepType.SIGNATURE
                                 else None
                             ),
