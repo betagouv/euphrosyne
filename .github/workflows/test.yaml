@@ -1,11 +1,15 @@
 name: Test
 on:
   pull_request:
-    types: [opened, reopened, synchronize, edited]
+    types: [opened, reopened, synchronize]
   workflow_call:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 env:
   DJANGO_SECRET_KEY: n0t5os3cre7-${{ github.sha }}
@@ -28,19 +32,16 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # -- block install --
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Use the cached python install for dev requirements
-        uses: actions/cache@v4
-        id: python-cache
-        with:
-          path: /opt/hostedtoolcache/Python/${{ env.PYTHON_VERSION }}
-          key: ${{ runner.os }}-python-${{ env.PYTHON_VERSION }}-${{ hashFiles('requirements/dev.txt', 'requirements/base.txt') }}
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            requirements/dev.txt
+            requirements/base.txt
       - name: Install dev requirements
-        if: steps.python-cache.outputs.cache-hit != 'true'
         run: pip install -r requirements/dev.txt
       # -- endblock install --
 
@@ -48,13 +49,13 @@ jobs:
         run: sudo apt install gettext
 
       - name: Pylint check
-        run: python -m pylint $(find . -type f -path '*.py' -not -path '*/migrations*')
+        run: python -m pylint $(git ls-files '*.py' | grep -v '/migrations/')
       - name: Black check
         run: python -m black --check .
       - name: Isort check
         run: python -m isort --check .
       - name: Flake8 check with mccabe complexity 10
-        run: python -m flake8 --max-complexity 10 .
+        run: python -m flake8 --max-complexity 10 $(git ls-files '*.py' | grep -v '/migrations/')
 
       - name: Check no migration is missing
         run: ./manage.py makemigrations --check --dry-run
@@ -74,7 +75,7 @@ jobs:
 
       - name: Run mypy on selected folders
         run: |
-          python -m mypy .
+          python -m mypy $(git ls-files '*.py' | grep -v '/migrations/')
 
   python-tests:
     runs-on: ubuntu-22.04
@@ -94,19 +95,16 @@ jobs:
           - 5432:5432
     steps:
       # -- block install --
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Use the cached python install for dev requirements
-        uses: actions/cache@v4
-        id: python-cache
-        with:
-          path: /opt/hostedtoolcache/Python/${{ env.PYTHON_VERSION }}
-          key: ${{ runner.os }}-python-${{ env.PYTHON_VERSION }}-${{ hashFiles('requirements/dev.txt', 'requirements/base.txt') }}
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            requirements/dev.txt
+            requirements/base.txt
       - name: Install dev requirements
-        if: steps.python-cache.outputs.cache-hit != 'true'
         run: pip install -r requirements/dev.txt
 
       - uses: actions/setup-node@v4
@@ -134,7 +132,7 @@ jobs:
   frontend-tests:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
