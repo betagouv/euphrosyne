@@ -20,8 +20,8 @@ class AdminSite(admin.AdminSite):
     site_header = "Euphrosyne"
     index_title = _("Dashboard")
 
-    def get_urls(self) -> list[URLPattern, URLResolver]:  # type: ignore[override]
-        urls: list[URLResolver] = [
+    def get_urls(self) -> list[URLPattern | URLResolver]:  # type: ignore[override]
+        urls: list[URLPattern | URLResolver] = [
             path(
                 "lab/project/<project_id>/documents",
                 self.admin_view(ProjectDocumentsView.as_view()),  # type: ignore[type-var] # pylint: disable=line-too-long
