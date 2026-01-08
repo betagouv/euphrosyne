@@ -36,7 +36,7 @@ def start_electrical_signature_processes(  # pylint: disable=too-many-locals
     # For example, you might send a request to the provider's API here
     run = risk_prevention_plan.run
     risk_advisor_email = app_settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL  # type: ignore[misc] # pylint: disable=line-too-long
-    parts = app_settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME.split(" ", 1)  # type: ignore[misc] # pylint: disable=line-too-long
+    parts = app_settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME.rsplit(" ", 1)  # type: ignore[misc] # pylint: disable=line-too-long
     risk_advisor_first_name, risk_advisor_last_name = (
         (parts[0], parts[1]) if len(parts) == 2 else (parts[0], "")
     )

@@ -398,3 +398,105 @@ def test_start_electrical_signature_processes_preferred_locale_for_english(  # p
     for step in risk_steps[:2]:
         for recipient in step["recipients"]:
             assert recipient["preferred_locale"] == "en"
+
+
+@pytest.mark.django_db
+@mock.patch(
+    "radiation_protection.electrical_signature.electrical_signature.start_workflow"
+)
+def test_risk_advisor_name_with_middle_name(
+    mock_start_workflow, risk_prevention_plan
+):
+    """Test that names with middle names are handled correctly using rsplit."""
+    with (
+        mock.patch(
+            "radiation_protection.electrical_signature.electrical_signature."
+            "app_settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL",
+            "advisor@example.com",
+        ),
+        mock.patch(
+            "radiation_protection.electrical_signature.electrical_signature."
+            "app_settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME",
+            "Jean Marie Dupont",
+        ),
+    ):
+        mock_start_workflow.side_effect = ["workflow_auth_123", "workflow_risk_123"]
+
+        start_electrical_signature_processes(risk_prevention_plan)
+
+        # Check risk prevention plan workflow (second call)
+        risk_call = mock_start_workflow.call_args_list[1]
+        risk_steps = risk_call[1]["steps"]
+
+        # Check advisor (third step) has correct name split
+        advisor_recipient = risk_steps[2]["recipients"][0]
+        assert advisor_recipient["first_name"] == "Jean Marie"
+        assert advisor_recipient["last_name"] == "Dupont"
+
+
+@pytest.mark.django_db
+@mock.patch(
+    "radiation_protection.electrical_signature.electrical_signature.start_workflow"
+)
+def test_risk_advisor_name_with_single_name(
+    mock_start_workflow, risk_prevention_plan
+):
+    """Test that single names are handled correctly."""
+    with (
+        mock.patch(
+            "radiation_protection.electrical_signature.electrical_signature."
+            "app_settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL",
+            "advisor@example.com",
+        ),
+        mock.patch(
+            "radiation_protection.electrical_signature.electrical_signature."
+            "app_settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME",
+            "Madonna",
+        ),
+    ):
+        mock_start_workflow.side_effect = ["workflow_auth_123", "workflow_risk_123"]
+
+        start_electrical_signature_processes(risk_prevention_plan)
+
+        # Check risk prevention plan workflow (second call)
+        risk_call = mock_start_workflow.call_args_list[1]
+        risk_steps = risk_call[1]["steps"]
+
+        # Check advisor (third step) has correct name split
+        advisor_recipient = risk_steps[2]["recipients"][0]
+        assert advisor_recipient["first_name"] == "Madonna"
+        assert advisor_recipient["last_name"] == ""
+
+
+@pytest.mark.django_db
+@mock.patch(
+    "radiation_protection.electrical_signature.electrical_signature.start_workflow"
+)
+def test_risk_advisor_name_with_compound_last_name(
+    mock_start_workflow, risk_prevention_plan
+):
+    """Test that compound last names are handled correctly using rsplit."""
+    with (
+        mock.patch(
+            "radiation_protection.electrical_signature.electrical_signature."
+            "app_settings.RADIATION_PROTECTION_RISK_ADVISOR_EMAIL",
+            "advisor@example.com",
+        ),
+        mock.patch(
+            "radiation_protection.electrical_signature.electrical_signature."
+            "app_settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME",
+            "John Smith-Johnson",
+        ),
+    ):
+        mock_start_workflow.side_effect = ["workflow_auth_123", "workflow_risk_123"]
+
+        start_electrical_signature_processes(risk_prevention_plan)
+
+        # Check risk prevention plan workflow (second call)
+        risk_call = mock_start_workflow.call_args_list[1]
+        risk_steps = risk_call[1]["steps"]
+
+        # Check advisor (third step) has correct name split
+        advisor_recipient = risk_steps[2]["recipients"][0]
+        assert advisor_recipient["first_name"] == "John"
+        assert advisor_recipient["last_name"] == "Smith-Johnson"
