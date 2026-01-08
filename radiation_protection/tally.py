@@ -10,5 +10,5 @@ from radiation_protection.app_settings import settings as app_settings
 @require_POST
 def tally_webhook(request: HttpRequest) -> JsonResponse:
     return base_tally_webhook(
-        request, app_settings.RADIATION_PROTECTION_TALLY_SECRET_KEY
+        request, app_settings.RADIATION_PROTECTION_TALLY_SECRET_KEY  # type: ignore[misc] # pylint: disable=line-too-long
     )
