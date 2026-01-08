@@ -233,7 +233,7 @@ class UserAdmin(DjangoUserAdmin):
                 ),
             ]
             if apps.is_installed("radiation_protection"):
-                fieldsets[-1] += (
+                fieldsets += [
                     (
                         _("Certifications"),
                         {
@@ -241,7 +241,7 @@ class UserAdmin(DjangoUserAdmin):
                             "classes": [*fieldset_classes],
                         },
                     ),
-                )
+                ]
         if request.user.is_superuser:
             fieldsets += [
                 (  # type: ignore[list-item]
