@@ -13,7 +13,7 @@ def notify_additional_emails(user: User) -> None:
     """
     Notify additional emails about the radiation protection document.
     """
-    additional_emails = app_settings.RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS
+    additional_emails = app_settings.RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS  # type: ignore[misc] # pylint: disable=line-too-long
     if not additional_emails:
         return
 
