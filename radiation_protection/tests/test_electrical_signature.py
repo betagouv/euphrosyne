@@ -404,9 +404,7 @@ def test_start_electrical_signature_processes_preferred_locale_for_english(  # p
 @mock.patch(
     "radiation_protection.electrical_signature.electrical_signature.start_workflow"
 )
-def test_risk_advisor_name_with_middle_name(
-    mock_start_workflow, risk_prevention_plan
-):
+def test_risk_advisor_name_with_middle_name(mock_start_workflow, risk_prevention_plan):
     """Test that names with middle names are handled correctly using rsplit."""
     with (
         mock.patch(
@@ -438,9 +436,7 @@ def test_risk_advisor_name_with_middle_name(
 @mock.patch(
     "radiation_protection.electrical_signature.electrical_signature.start_workflow"
 )
-def test_risk_advisor_name_with_single_name(
-    mock_start_workflow, risk_prevention_plan
-):
+def test_risk_advisor_name_with_single_name(mock_start_workflow, risk_prevention_plan):
     """Test that single names are handled correctly."""
     with (
         mock.patch(
