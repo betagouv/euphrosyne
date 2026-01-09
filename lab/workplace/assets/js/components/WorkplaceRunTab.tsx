@@ -41,6 +41,7 @@ export default function WorkplaceRunTab({
             <div className="fr-background-default--grey fr-p-3v">
               <h3>HDF5</h3>
               <HDF5FileTable
+                projectId={project.id}
                 projectSlug={project.slug}
                 runName={run.label}
               />
