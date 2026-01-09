@@ -8,27 +8,47 @@ import BaseDirectoryActionCell from "../../../../assets/js/components/BaseDirect
 import toolsFetch from "../../../../../shared/js/euphrosyne-tools-client";
 
 interface HDF5FileTableProps {
+  projectId: string;
   projectSlug: string;
   runName: string;
 }
 
 function HDF5TableActionCell({
+  projectId,
   onDirectoryOpen,
 }: {
+  projectId: string;
   onDirectoryOpen: (name: string) => void;
 }) {
+  const t = {
+    "View file": window.gettext("View file"),
+  };
+
   const file = useContext(FileContext);
 
   return (
     <td>
-      {file?.isDir ? (
-        <BaseDirectoryActionCell onOpen={onDirectoryOpen} />
-      ) : null}
+      {file &&
+        (!file.isDir ? (
+          <ul className="fr-btns-group fr-btns-group--inline fr-btns-group--sm">
+            <li>
+              <a
+                className="fr-btn fr-icon-eye-line fr-btn--secondary"
+                href={`/lab/project/${projectId}/hdf5-viewer?file=${file.path}`}
+              >
+                {t["View file"]}
+              </a>
+            </li>
+          </ul>
+        ) : (
+          <BaseDirectoryActionCell onOpen={onDirectoryOpen} />
+        ))}
     </td>
   );
 }
 
 export default function HDF5FileTable({
+  projectId,
   projectSlug,
   runName,
 }: HDF5FileTableProps) {
@@ -67,7 +87,10 @@ export default function HDF5FileTable({
       folder={folder}
       onPreviousFolderClick={removeLastFolder}
       actionCell={
-        <HDF5TableActionCell onDirectoryOpen={appendFolder} />
+        <HDF5TableActionCell
+          projectId={projectId}
+          onDirectoryOpen={appendFolder}
+        />
       }
     />
   );

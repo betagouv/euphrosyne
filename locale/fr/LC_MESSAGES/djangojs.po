@@ -257,6 +257,9 @@ msgstr "Choisissez un fichier"
 msgid "The following file formats are not accepted : %s"
 msgstr "Ces formats de fichier ne sont pas acceptés : %s"
 
+msgid "View file"
+msgstr "Voir le fichier"
+
 msgid "No object in this run yet"
 msgstr "Aucun objet dans ce run"
 

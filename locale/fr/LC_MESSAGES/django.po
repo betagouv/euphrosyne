@@ -694,6 +694,9 @@ msgstr ""
 "[Euphrosyne] Fin d’embargo de vos données %(facility_name)s sur le run "
 "%(run_label)s du projet %(project_name)s"
 
+msgid "HDF5 Viewer"
+msgstr "Visionneur HDF5"
+
 msgid "Run"
 msgstr "Run"
 
