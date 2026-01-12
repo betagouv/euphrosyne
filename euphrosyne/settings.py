@@ -21,6 +21,7 @@ import dj_database_url
 import psycopg2
 import sentry_sdk
 from django.http import HttpRequest
+from django.utils.csp import CSP
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -60,6 +61,26 @@ CORS_ALLOWED_ORIGINS = (
 CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split()
 
 SITE_URL = os.environ["SITE_URL"]
+
+CSP_ENFORCE = os.getenv("CSP_ENFORCE", "false").lower() == "true"
+SECURE_CSP_REPORT_ONLY = {
+    "default-src": [CSP.SELF],
+    "img-src": [CSP.SELF, "data:", "https://info.orcid.org"],
+    "script-src": [CSP.SELF, CSP.UNSAFE_INLINE, "https://stats.beta.gouv.fr"],
+    "style-src": [CSP.SELF, CSP.UNSAFE_INLINE],
+    "connect-src": [
+        CSP.SELF,
+        "https://stats.beta.gouv.fr",
+        "https://opentheso.huma-num.fr",
+        "https://secure.geonames.org",
+        "https://api.ror.org",
+    ],
+    "font-src": [CSP.SELF, "data:"],
+    "object-src": [CSP.NONE],
+    "base-uri": [CSP.SELF],
+    "form-action": [CSP.SELF],
+}
+SECURE_CSP = SECURE_CSP_REPORT_ONLY if CSP_ENFORCE else None
 
 
 # Application definition
