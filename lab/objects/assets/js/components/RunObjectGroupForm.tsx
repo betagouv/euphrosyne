@@ -30,9 +30,6 @@ export default function RunObjectGroupForm({
     "Import with EROS ID": window.gettext("Import with EROS ID"),
     "Import with POP Reference": window.gettext("Import with POP Reference"),
     "An error occurred.": window.gettext("An error occurred."),
-    "POP is disabled but will be available soon.": window.gettext(
-      "POP is disabled but will be available soon.",
-    ),
   };
 
   const [runObjectGroups, setRunObjectGroups] = useState<RunObjectGroup[]>([]);
@@ -125,21 +122,12 @@ export default function RunObjectGroupForm({
           </li>
           <li>
             <a
+              href={`/lab/objectgroup/pop_import?_to_field=id&_popup=1&run=${run.id}`}
               className="related-widget-wrapper-link fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-download-line"
               data-popup="yes"
-              role="link"
-              aria-disabled="true"
-              aria-describedby="object-import-pop-tooltip"
             >
               {t["Import with POP Reference"]}
             </a>
-            <span
-              className="fr-tooltip fr-placement"
-              id="object-import-pop-tooltip"
-              role="tooltip"
-            >
-              {t["POP is disabled but will be available soon."]}
-            </span>
           </li>
         </ul>
       </div>
