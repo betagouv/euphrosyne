@@ -2,6 +2,7 @@ from datetime import datetime, time, timedelta
 
 import sentry_sdk
 from django.core.management.base import BaseCommand
+from django.tasks import task
 from django.utils import timezone
 
 from lab.emails import send_ending_embargo_email
@@ -36,42 +37,73 @@ def get_runs_with_embargos_ending_in_range(from_in_days: int, to_in_days: int):
     return runs
 
 
+def _format_message(stream, message, style=None):
+    return {"stream": stream, "message": message, "style": style}
+
+
+@task
+def alert_end_run_embargos_task():
+    messages = []
+    date_range = tuple(d.strftime("%Y/%m/%d") for d in _get_check_dates(30, 36))
+    messages.append(
+        _format_message(
+            "stdout",
+            "[alert end run embargos] Querying for runs that are ending in date range from %s to %s"
+            % date_range,
+        )
+    )
+
+    runs = get_runs_with_embargos_ending_in_range(30, 36)
+
+    messages.append(
+        _format_message(
+            "stdout",
+            "[alert end run embargos] Found %s runs" % (len(runs)),
+            style="success",
+        )
+    )
+
+    for run in runs:
+        leader = run.project.leader
+        if not leader:
+            messages.append(
+                _format_message(
+                    "stdout",
+                    "[alert end run embargos] No leader found for project %s."
+                    % run.project,
+                    style="warning",
+                )
+            )
+            continue
+        try:
+            send_ending_embargo_email(emails=[leader.user.email], run=run)
+        except Exception as e:
+            messages.append(
+                _format_message(
+                    "stderr",
+                    "[alert end run embargos] Error sending email to %s. Reason: %s"
+                    % (leader.user.email, str(e)),
+                )
+            )
+            sentry_sdk.capture_exception(e)
+            continue
+    return messages
+
+
 class Command(BaseCommand):
     help = "Alert project leaders of ending run emabrgo."
 
     def handle(self, *args, **options):
-        self.stdout.write(
-            # pylint: disable=line-too-long
-            "[alert end run embargos] Querying for runs that are ending in date range from %s to %s"
-            % (tuple(d.strftime("%Y/%m/%d") for d in _get_check_dates(30, 36))),
-        )
-
-        runs = get_runs_with_embargos_ending_in_range(30, 36)
-
-        self.stdout.write(
-            self.style.SUCCESS(
-                "[alert end run embargos] Found %s runs" % (len(runs)),
-            )
-        )
-        for run in runs:
-            leader = run.project.leader
-            if not leader:
-                self.stdout.write(
-                    self.style.WARNING(
-                        "[alert end run embargos] No leader found for project %s."
-                        % run.project
-                    ),
-                )
-                continue
-            try:
-                send_ending_embargo_email(
-                    emails=[run.project.leader.user.email], run=run
-                )
-
-            except Exception as e:
-                self.stderr.write(
-                    "[alert end run embargos] Error sending email to %s. Reason: %s"
-                    % (run.project.leader.user.email, str(e))
-                )
-                sentry_sdk.capture_exception(e)
-                continue
+        result = alert_end_run_embargos_task.enqueue()
+        if not result.is_finished:
+            self.stdout.write("alert_end_run_embargos task enqueued.")
+            return
+        for message in result.return_value:
+            stream = self.stderr if message["stream"] == "stderr" else self.stdout
+            style = message.get("style")
+            if style == "success":
+                stream.write(self.style.SUCCESS(message["message"]))
+            elif style == "warning":
+                stream.write(self.style.WARNING(message["message"]))
+            else:
+                stream.write(message["message"])
