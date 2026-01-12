@@ -2,7 +2,7 @@
 
 {% blocktrans %}Data Request{% endblocktrans %}
 
-{% blocktrans with facility_name=facility_name %}Thank you for your interest in %(facility_name)s data catalog. We have processed your request and generated the following links for you to download the data you have selected:{% endblocktrans %}
+{% blocktrans with facility_name=facility_name %}Thank you for your interest in {{ facility_name }} data catalog. We have processed your request and generated the following links for you to download the data you have selected:{% endblocktrans %}
 
 {% for link in links %}
 - {{ link.name }} ({{ link.url }}) - {% if link.data_type == "raw_data" %}{% blocktrans %}Raw data{% endblocktrans %}{% else %}{% blocktrans %}Processed data{% endblocktrans %}{% endif %}
@@ -13,4 +13,4 @@
 {% blocktranslate with formatted_exp_date=expiration_date|date:"DATETIME_FORMAT" %}Note that the links will be active until {{ formatted_exp_date }}.{% endblocktranslate %}
 
 {% blocktrans %}Thank you,{% endblocktrans %}
-{% blocktrans with facility_name=facility_name %}The %(facility_name)s Team{% endblocktrans %}
+{% blocktrans with facility_name=facility_name %}The {{ facility_name }} Team{% endblocktrans %}
