@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-12 16:50+0100\n"
+"POT-Creation-Date: 2026-01-09 15:50+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -270,9 +270,6 @@ msgstr "Importer avec une référence POP"
 
 msgid "An error occurred."
 msgstr "Une erreur s'est produite."
-
-msgid "POP is disabled but will be available soon."
-msgstr "POP est désactivé mais sera bientôt disponible."
 
 msgid "Import an object group or object from project"
 msgstr "Importer un groupe d'objets ou un objet du projet"
