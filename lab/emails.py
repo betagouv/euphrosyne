@@ -5,8 +5,8 @@ import logging
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from euphrosyne.branding import get_branding
 from euphro_auth.models import User
+from euphrosyne.branding import get_branding
 from shared.email_utils import send_email_with_language, use_user_language
 
 from .models import Project, Run

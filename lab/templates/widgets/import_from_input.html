@@ -1,8 +1,6 @@
 {% load i18n %}
 
-{% blocktrans asvar error_message with facility_short_name=facility_short_name %}
-An error occurred while retrieving the object. Please contact the {{ facility_short_name }} team if the error persists.
-{% endblocktrans %}
+{% blocktrans asvar error_message with facility_short_name=facility_short_name %}An error occurred while retrieving the object. Please contact the {{ facility_short_name }} team if the error persists.{% endblocktrans %}
 <div class="import-from-input fr-input-group" data-fetch-url="{{ widget.attrs.import_url }}" data-error-message="{{ error_message }}" {% for key, field_id in widget.field_id_mapping %}data-import-{{key}}={{field_id}}{% endfor %}>
     <div class="fr-search-bar" role="search">
         <input class="fr-input" type="search" id="import-input-{{ widget.name }}" name="{{ widget.name }}" {% if widget.value != None %} value="{{ widget.value }}"{% endif %} {% include "django/forms/widgets/attrs.html" %}>
