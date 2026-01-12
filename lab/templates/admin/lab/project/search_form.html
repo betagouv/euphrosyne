@@ -15,7 +15,7 @@
 <div><!-- DIV needed for valid HTML -->
 {% if show_result_count %}
 {% if cl.query %}
-    <span class="small quiet">{% blocktranslate count counter=cl.result_count %}{{ counter }} result{% plural %}{{ counter }} results{% endblocktranslate %} (<a href="?{% if cl.is_popup %}{{ is_popup_var }}=1{% if cl.add_facets %}&{% endif %}{% endif %}{% if cl.add_facets %}{{ is_facets_var }}{% endif %}">{% if cl.show_full_result_count %}{% blocktranslate with full_result_count=cl.full_result_count %}{{ full_result_count }} total{% endblocktranslate %}{% else %}{% translate "Show all" %}{% endif %}</a>)</span>
+    <span class="small quiet">{% blocktranslate count counter=cl.result_count %}{{ counter }} result{% plural %}{{ counter }} results{% endblocktranslate %} ({% if cl.is_popup and cl.add_facets %}<a href="{% querystring cl.get_filters_params _popup=1 _facets="" %}">{% elif cl.is_popup %}<a href="{% querystring cl.get_filters_params _popup=1 %}">{% elif cl.add_facets %}<a href="{% querystring cl.get_filters_params _facets="" %}">{% else %}<a href="{% querystring cl.get_filters_params %}">{% endif %}{% if cl.show_full_result_count %}{% blocktranslate with full_result_count=cl.full_result_count %}{{ full_result_count }} total{% endblocktranslate %}{% else %}{% translate "Show all" %}{% endif %}</a>)</span>
 {% else %}
     <span class="small quiet">{% blocktranslate count counter=cl.full_result_count %}{{ counter }} project{% plural %}{{ counter }} projects{% endblocktranslate %}</span>
 {% endif %}
