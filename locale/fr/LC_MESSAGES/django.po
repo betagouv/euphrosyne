@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-15 17:05+0100\n"
+"POT-Creation-Date: 2026-01-20 09:21+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -1268,14 +1268,6 @@ msgstr ""
 "Utilisez le champ de recherche pour importer un objet à partir de "
 "%(provider_name)s. Le nom de l'objet sera affiché dans le champ suivant."
 
-#, python-format
-msgid ""
-"An error occurred while retrieving the object. Please contact the "
-"%(facility_short_name)s team if the error persists."
-msgstr ""
-"Une erreur s'est produite lors de la recherche de l'objet. Si l'erreur "
-"persiste, veuillez contacter l'équipe %(facility_short_name)s."
-
 msgid "Documents"
 msgstr "Documents"
 
@@ -1335,6 +1327,14 @@ msgstr ""
 
 msgid "Workplace"
 msgstr "Workplace"
+
+#, python-format
+msgid ""
+"An error occurred while retrieving the object. Please contact the "
+"%(facility_short_name)s team if the error persists."
+msgstr ""
+"Une erreur s'est produite lors de la recherche de l'objet. Si l'erreur "
+"persiste, veuillez contacter l'équipe %(facility_short_name)s."
 
 msgid "Country"
 msgstr "Pays"

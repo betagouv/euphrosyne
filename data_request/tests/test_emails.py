@@ -37,7 +37,7 @@ class DataRequestEmailsTestCase(TestCase):
         )
 
         assert len(mail.outbox) == 1
-        assert mail.outbox[0].subject == gettext("Your %(facility_name)s data links") % {
-            "facility_name": settings.FACILITY_NAME
-        }
+        assert mail.outbox[0].subject == gettext(
+            "Your %(facility_name)s data links"
+        ) % {"facility_name": settings.FACILITY_NAME}
         assert mail.outbox[0].to == ["test@test.fr"]

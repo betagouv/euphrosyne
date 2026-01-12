@@ -6,8 +6,8 @@ import typing
 
 from django.utils.translation import gettext as _
 
-from euphrosyne.branding import get_branding
 from euphro_auth.models import User
+from euphrosyne.branding import get_branding
 from shared.email_utils import send_email_with_language, use_user_language
 
 logger = logging.getLogger(__name__)

@@ -185,7 +185,8 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
                 format_lazy(
                     _(
                         "You do not have permission for this project. "
-                        "If you think this is an error, please contact the %(facility_name)s team."
+                        "If you think this is an error, please contact "
+                        "the %(facility_name)s team."
                     ),
                     facility_name=settings.FACILITY_NAME,
                 ),
