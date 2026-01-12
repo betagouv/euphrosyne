@@ -50,8 +50,8 @@
                 {% endfor %}
                 {% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission %}<th>{% translate "Delete?" %}</th>{% endif %}
               </tr></thead>
-              <tbody>
-              {% for inline_admin_form in inline_admin_formset %}
+
+              {% partialdef inline_admin_form_row %}
               {% if inline_admin_form.form.non_field_errors %}
               <tr class="row-form-errors"><td colspan="{{ inline_admin_form|cell_count }}">{{ inline_admin_form.form.non_field_errors }}</td></tr>
               {% endif %}
@@ -86,7 +86,12 @@
                       <td class="delete">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>
                       {% endif %}
                     </tr>
-                    {% endfor %}
+              {% endpartialdef %}
+
+              <tbody>
+              {% for inline_admin_form in inline_admin_formset %}
+              {% partial inline_admin_form_row %}
+              {% endfor %}
             </tbody>
           </table>
       </div>
