@@ -2,7 +2,7 @@ import logging
 import smtplib
 from contextlib import contextmanager
 
-from django.core.mail.message import EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.template import loader
 from django.utils import translation
 

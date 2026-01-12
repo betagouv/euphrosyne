@@ -119,7 +119,7 @@ class TestNotifyAdditionalEmails(TestCase):
     @override_settings(
         RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS=["test@example.com"]
     )
-    @mock.patch("radiation_protection.email.mail.EmailMultiAlternatives.send")
+    @mock.patch("radiation_protection.email.EmailMessage.send")
     @mock.patch("radiation_protection.email.logger")
     def test_email_send_failure_logs_error(self, mock_logger, mock_send):
         """Test that email send failures are logged properly."""
@@ -138,7 +138,7 @@ class TestNotifyAdditionalEmails(TestCase):
     @override_settings(
         RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS=["test@example.com"]
     )
-    @mock.patch("radiation_protection.email.mail.EmailMultiAlternatives")
+    @mock.patch("radiation_protection.email.EmailMessage")
     @mock.patch("radiation_protection.email.logger")
     def test_email_creation_failure_logs_error(self, mock_logger, mock_email_class):
         """Test that email creation failures are logged properly."""
@@ -158,14 +158,14 @@ class TestNotifyAdditionalEmails(TestCase):
         RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS=["admin@example.com"]
     )
     def test_email_multipart_structure(self):
-        """Test that EmailMultiAlternatives is used correctly."""
+        """Test that EmailMessage is used correctly."""
         notify_additional_emails(self.user)
 
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
 
-        # Verify it's a multipart email (EmailMultiAlternatives)
-        self.assertIsInstance(email, mail.EmailMultiAlternatives)
+        # Verify it's an EmailMessage
+        self.assertIsInstance(email, mail.EmailMessage)
 
         # Verify email structure
         self.assertTrue(email.subject)
