@@ -1,5 +1,6 @@
 from typing import Any, Dict
 
+from django.conf import settings
 from django.forms import widgets
 
 from lab.thesauri.models import ThesorusConceptModel
@@ -45,6 +46,7 @@ class ImportFromInput(widgets.TextInput):
 
     def get_context(self, name: str, value: Any, attrs: dict | None) -> Dict[str, Any]:
         context = super().get_context(name, value, attrs)
+        context["facility_short_name"] = settings.FACILITY_SHORT_NAME
         context["widget"]["field_id_mapping"] = tuple(
             (
                 key,
