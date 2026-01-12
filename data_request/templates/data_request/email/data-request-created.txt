@@ -2,7 +2,7 @@
 
 {% blocktrans %}Data Request{% endblocktrans %}
 
-{% blocktrans %}We have received your data request. A member of the New AGLAE team will review it as soon as possible and get back to you.{% endblocktrans %}
+{% blocktrans with facility_name=facility_name %}We have received your data request. A member of the %(facility_name)s team will review it as soon as possible and get back to you.{% endblocktrans %}
 
 {% blocktrans %}Have a good day,{% endblocktrans %}
-{% blocktrans %}The New AGLAE Team{% endblocktrans %}
+{% blocktrans with facility_name=facility_name %}The %(facility_name)s Team{% endblocktrans %}

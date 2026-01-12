@@ -6,6 +6,7 @@ import typing
 
 from django.utils.translation import gettext as _
 
+from euphrosyne.branding import get_branding
 from euphro_auth.models import User
 from shared.email_utils import send_email_with_language, use_user_language
 
@@ -38,14 +39,15 @@ def send_data_request_created_email(email: str):
 
     # Try to get the user to respect their language preference
     user = User.objects.filter(email=email).first()
+    branding = get_branding()
 
     with use_user_language(user=user):
-        subject = _("[New AGLAE] Data request received")
+        subject = _("[%(facility_name)s] Data request received") % branding.__dict__
 
     send_email_with_language(
         subject=subject,
         template_name=template_name,
-        context={},
+        context={"facility_name": branding.facility_name},
         to_emails=[email],
         user=user,
     )
@@ -61,14 +63,15 @@ def send_data_email(email: str, context: DataEmailContext):
 
     # Try to get the user to respect their language preference
     user = User.objects.filter(email=email).first()
+    branding = get_branding()
 
     with use_user_language(user=user):
-        subject = _("Your New AGLAE data links")
+        subject = _("Your %(facility_name)s data links") % branding.__dict__
 
     send_email_with_language(
         subject=subject,
         template_name=template_name,
-        context=context,
+        context={**context, "facility_name": branding.facility_name},
         to_emails=[email],
         user=user,
     )

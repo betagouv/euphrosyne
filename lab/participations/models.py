@@ -3,6 +3,7 @@ from django.contrib.postgres.constraints import ExclusionConstraint
 from django.contrib.postgres.fields import RangeOperators
 from django.db import models
 from django.db.models.constraints import UniqueConstraint
+from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
 from shared.models import TimestampedModel
@@ -25,7 +26,10 @@ class Participation(TimestampedModel):
     on_premises = models.BooleanField(
         verbose_name=_("On premises"),
         default=False,
-        help_text=_("Is the user going to be at the New AGLAE facility?"),
+        help_text=format_lazy(
+            _("Is the user going to be at the %(facility_name)s facility?"),
+            facility_name=settings.FACILITY_NAME,
+        ),
     )
 
     def __str__(self):

@@ -5,6 +5,7 @@ import logging
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
+from euphrosyne.branding import get_branding
 from euphro_auth.models import User
 from shared.email_utils import send_email_with_language, use_user_language
 
@@ -77,21 +78,26 @@ def send_ending_embargo_email(emails: list[str], run: Run):
 
     Respects each recipient's language preference.
     """
+    branding = get_branding()
     context = {
         "run_label": run.label,
         "project_name": run.project.name,
         "embargo_end_date": run.embargo_date,
+        "facility_short_name": branding.facility_short_name,
     }
 
     # Send individual emails to respect each user's language preference
     for email in emails:
         user = User.objects.filter(email=email).first()
-
         with use_user_language(user=user):
             subject = _(
                 # pylint: disable=line-too-long
-                "[Euphrosyne] End of AGLAE Data Embargo for run %(run_label)s in project %(project_name)s"
-            ) % {"run_label": run.label, "project_name": run.project.name}
+                "[Euphrosyne] End of %(facility_short_name)s Data Embargo for run %(run_label)s in project %(project_name)s"
+            ) % {
+                "facility_short_name": branding.facility_short_name,
+                "run_label": run.label,
+                "project_name": run.project.name,
+            }
 
         send_email_with_language(
             subject=subject,
