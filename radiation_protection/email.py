@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from django.core import mail
+from django.core.mail import EmailMessage
 
 from euphro_auth.models import User
 
@@ -22,7 +22,7 @@ def notify_additional_emails(user: User) -> None:
     plain_message = f"Bonjour,\n{user_full_name} vient d'obtenir son certificat de formation aux risques présents à AGLAE.\nBisous\nEuphrosyne\n"  # pylint: disable=line-too-long
 
     try:
-        email = mail.EmailMultiAlternatives(
+        email = EmailMessage(
             subject=subject,
             body=plain_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
