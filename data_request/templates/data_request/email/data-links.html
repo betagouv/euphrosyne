@@ -9,7 +9,7 @@
 </head>
 <body>
     <h1>{% trans "Data Request" %}</h1>
-    <p>{% blocktrans with facility_name=facility_name %}Thank you for your interest in %(facility_name)s data catalog. We have processed your request and generated the following links for you to download the data you have selected:{% endblocktrans %}</p>
+    <p>{% blocktrans with facility_name=facility_name %}Thank you for your interest in {{ facility_name }} data catalog. We have processed your request and generated the following links for you to download the data you have selected:{% endblocktrans %}</p>
     
     <ul>
         {% for link in links %}
@@ -25,7 +25,7 @@
 
     
     <p>{% trans "Thank you" %},</p>
-    <p>{% blocktrans with facility_name=facility_name %}The %(facility_name)s Team{% endblocktrans %}</p>
+    <p>{% blocktrans with facility_name=facility_name %}The {{ facility_name }} Team{% endblocktrans %}</p>
 </body>
 </html>
 {% endautoescape %}

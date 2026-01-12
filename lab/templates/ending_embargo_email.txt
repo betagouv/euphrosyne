@@ -3,10 +3,10 @@
 
 {% blocktrans with embargo_end_date_ft=embargo_end_date|date:"SHORT_DATE_FORMAT" %}We would like to inform you that the end date of the embargo on your data of run {{ run_label }} of project {{ project_name }} will be effective the {{ embargo_end_date_ft }}. After this period, your raw data will be accessible through the data catalog.{% endblocktrans %}
 
-{% blocktrans with facility_short_name=facility_short_name %}If, however, these data cannot be made publicly available at that time, please contact the %(facility_short_name)s team to request an extension of the embargo, specifying:{% endblocktrans %}
+{% blocktrans with facility_short_name=facility_short_name %}If, however, these data cannot be made publicly available at that time, please contact the {{ facility_short_name }} team to request an extension of the embargo, specifying:{% endblocktrans %}
 - {% blocktrans %}The reason for the request,{% endblocktrans %}
 - {% blocktrans %}The desired extension period.{% endblocktrans %}
 
 {% blocktrans %}For any questions or specific requests, please feel free to contact us.{% endblocktrans %}
 {% blocktrans %}Best regards,{% endblocktrans %}
-{% blocktrans with facility_short_name=facility_short_name %}The %(facility_short_name)s Team{% endblocktrans %}
+{% blocktrans with facility_short_name=facility_short_name %}The {{ facility_short_name }} Team{% endblocktrans %}
