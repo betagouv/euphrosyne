@@ -12,7 +12,7 @@
             <div class="fr-footer__content">
                 <p class="fr-footer__content-desc">
                     {% with aglae_link='<a href="'|add:facility_url|add:'">'|add:facility_name|add:'</a>' %}
-                        {% blocktranslate with aglae_link=aglae_link %}Euphrosyne, open {{ aglae_link }} data.{% endblocktranslate %}
+                        {% blocktranslate with aglae_link=aglae_link|safe %}Euphrosyne, open {{ aglae_link }} data.{% endblocktranslate %}
                     {% endwith %}
                 </p>
                 <ul class="fr-footer__content-list">
