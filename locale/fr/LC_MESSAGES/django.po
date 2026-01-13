@@ -664,10 +664,10 @@ msgstr ""
 
 #, python-format
 msgid ""
-"[Euphrosyne] End of %(facility_short_name)s Data Embargo for run "
-"%(run_label)s in project %(project_name)s"
+"[Euphrosyne] End of %(facility_name)s Data Embargo for run %(run_label)s in "
+"project %(project_name)s"
 msgstr ""
-"[Euphrosyne] Fin d’embargo de vos données %(facility_short_name)s sur le run "
+"[Euphrosyne] Fin d’embargo de vos données %(facility_name)s sur le run "
 "%(run_label)s du projet %(project_name)s"
 
 msgid "Run"
@@ -1288,12 +1288,12 @@ msgstr ""
 #, python-format
 msgid ""
 "If, however, these data cannot be made publicly available at that time, "
-"please contact the %(facility_short_name)s team to request an extension of "
-"the embargo, specifying:"
+"please contact the %(facility_name)s team to request an extension of the "
+"embargo, specifying:"
 msgstr ""
 "Si toutefois ces données ne peuvent pas être ouvertes à cette échéance, nous "
-"vous invitons à contacter l’équipe %(facility_short_name)s afin de demander "
-"une prolongation de l’embargo, en précisant :"
+"vous invitons à contacter l’équipe %(facility_name)s afin de demander une "
+"prolongation de l’embargo, en précisant :"
 
 msgid "The reason for the request,"
 msgstr "La raison motivant cette demande,"
@@ -1307,10 +1307,6 @@ msgstr ""
 
 msgid "Best regards,"
 msgstr "Cordialement,"
-
-#, python-format
-msgid "The %(facility_short_name)s Team"
-msgstr "L'équipe %(facility_short_name)s"
 
 msgid "Other"
 msgstr "Autre"
@@ -1341,10 +1337,10 @@ msgstr "Rejoindre le projet"
 #, python-format
 msgid ""
 "An error occurred while retrieving the object. Please contact the "
-"%(facility_short_name)s team if the error persists."
+"%(facility_name)s team if the error persists."
 msgstr ""
 "Une erreur s'est produite lors de la recherche de l'objet. Si l'erreur "
-"persiste, veuillez contacter l'équipe %(facility_short_name)s."
+"persiste, veuillez contacter l'équipe %(facility_name)s."
 
 msgid "Country"
 msgstr "Pays"

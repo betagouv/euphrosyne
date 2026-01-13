@@ -83,7 +83,7 @@ def send_ending_embargo_email(emails: list[str], run: Run):
         "run_label": run.label,
         "project_name": run.project.name,
         "embargo_end_date": run.embargo_date,
-        "facility_short_name": branding.facility_short_name,
+        "facility_name": branding.facility_name,
     }
 
     # Send individual emails to respect each user's language preference
@@ -92,9 +92,9 @@ def send_ending_embargo_email(emails: list[str], run: Run):
         with use_user_language(user=user):
             subject = _(
                 # pylint: disable=line-too-long
-                "[Euphrosyne] End of %(facility_short_name)s Data Embargo for run %(run_label)s in project %(project_name)s"
+                "[Euphrosyne] End of %(facility_name)s Data Embargo for run %(run_label)s in project %(project_name)s"
             ) % {
-                "facility_short_name": branding.facility_short_name,
+                "facility_name": branding.facility_name,
                 "run_label": run.label,
                 "project_name": run.project.name,
             }
