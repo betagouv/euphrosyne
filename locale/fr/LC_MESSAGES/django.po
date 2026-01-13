@@ -851,9 +851,8 @@ msgstr "Import %s"
 msgid "On premises"
 msgstr "Sur place"
 
-#, python-format
-msgid "Is the user going to be at the %(facility_name)s facility?"
-msgstr "L'utilisateur sera-t-il présent sur le site de %(facility_name)s ?"
+msgid "Is the user going to be at the facility?"
+msgstr "L'utilisateur sera-t-il présent sur le site ?"
 
 msgid "name"
 msgstr "nom"
