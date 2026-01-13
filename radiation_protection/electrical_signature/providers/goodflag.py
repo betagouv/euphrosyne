@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 REDIRECT_URL = f"{settings.SITE_URL}/electrical_signature/webhooks/goodflag"
 
 SIGNATURE_EXPIRED_TD = timedelta(days=30)
+GOODFLAG_STEP_VALIDITY_MS = 7 * 24 * 60 * 60 * 1000
 
 
 class StepType(enum.StrEnum):
@@ -183,6 +184,7 @@ class GoodflagClient:
                         for recipient in step["recipients"]
                     ],
                     "maxInvites": 3,
+                    "validityPeriod": GOODFLAG_STEP_VALIDITY_MS,
                 }
                 for step in steps
             ],
