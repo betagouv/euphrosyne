@@ -16,7 +16,7 @@
             <img src="{% static "img/illustration-unauthorized.svg" %}" class="left-panel__illustration">
             <h2>
             {% with aglae_tag='<span class="fr-text-label--blue-cumulus">'|add:facility_name|add:'</span>' %}
-              {% blocktranslate with aglae_tag=aglae_tag trimmed %}
+              {% blocktranslate with aglae_tag=aglae_tag|safe trimmed %}
               The online board to track your {{ aglae_tag }} search projects
               {% endblocktranslate %}
             {% endwith %}
