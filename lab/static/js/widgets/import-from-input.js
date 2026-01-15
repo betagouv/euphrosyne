@@ -116,9 +116,10 @@
         console.error(error);
         displayErrorMessage(
           importFromInputEl,
-          window.gettext(
-            "An error occurred while retrieving the object. Please contact AGLAE team if the error persists.",
-          ),
+          importFromInputEl.dataset.errorMessage ||
+            window.gettext(
+              "An error occurred while retrieving the object. Please contact the team if the error persists.",
+            ),
         );
       })
       .finally(() => {

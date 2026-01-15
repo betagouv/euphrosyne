@@ -15,9 +15,11 @@
             <h1>Euphrosyne</h1>
             <img src="{% static "img/illustration-unauthorized.svg" %}" class="left-panel__illustration">
             <h2>
-            {% blocktranslate with aglae_tag='<span class="fr-text-label--blue-cumulus">New AGLAE</span>' trimmed %}
-            The online board to track your {{ aglae_tag }} search projects
-            {% endblocktranslate %}
+            {% with aglae_tag='<span class="fr-text-label--blue-cumulus">'|add:facility_name|add:'</span>' %}
+              {% blocktranslate with aglae_tag=aglae_tag|safe trimmed %}
+              The online board to track your {{ aglae_tag }} search projects
+              {% endblocktranslate %}
+            {% endwith %}
             </h2>
           </div>
       </div>

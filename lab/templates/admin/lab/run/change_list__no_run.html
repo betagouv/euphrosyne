@@ -3,7 +3,7 @@
     <div class="fr-col-12 fr-col-md-8">
         <h2>{% translate "No run yet" %}</h2>
         
-        <p>{% translate "A run is a series of analyses performed on one or multiple objects under the same experimental conditions. A starting date will be assigned to each run by a new AGLAE administrator." %}</p>
+        <p>{% blocktrans with facility_name=facility_name %}A run is a series of analyses performed on one or multiple objects under the same experimental conditions. A starting date will be assigned to each run by a new {{ facility_name }} administrator.{% endblocktrans %}</p>
         
         <a class="fr-mt-1w fr-btn fr-ml-1w" href="{% url "admin:lab_run_add" %}?project={{ project_id }}">{% translate "Create a first run" %}</a>
     </div>
