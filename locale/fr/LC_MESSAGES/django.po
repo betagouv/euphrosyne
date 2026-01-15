@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-15 16:23+0100\n"
+"POT-Creation-Date: 2026-01-15 17:05+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -648,8 +648,8 @@ msgstr ""
 "archives."
 
 #, python-format
-msgid "[Euphrosyne] Invitation to join project %s"
-msgstr "[Euphrosyne] Invitation à rejoindre le projet %s"
+msgid "Invitation to join AGLAE project %s"
+msgstr "Invitation à rejoindre le projet AGLAE %s"
 
 #, python-format
 msgid "[Euphrosyne] Alert: Long lasting VMs in project %s"
@@ -1315,17 +1315,6 @@ msgstr ""
 
 msgid "Workplace"
 msgstr "Workplace"
-
-#, python-format
-msgid "You've been invited to join %(project_name)s on Euphrosyne."
-msgstr ""
-"Vous avez été invité à rejoindre le projet %(project_name)s sur Euphrosyne"
-
-msgid "You can check the invitation there:"
-msgstr "Vous pouvez accéder à l'invitation ici :"
-
-msgid "Join project"
-msgstr "Rejoindre le projet"
 
 msgid "Country"
 msgstr "Pays"

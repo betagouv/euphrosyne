@@ -1,15 +1,57 @@
 {% load i18n %}{% autoescape off %}
-<p>{% trans "Hello" %},</p>
-<p>
-  {% blocktranslate %}You've been invited to join {{project_name}} on Euphrosyne.{% endblocktranslate %}
-  {% trans "You can check the invitation there:" %}
-</p>
+<p>Bonjour,</p>
+<p>Vous avez été invité(e) à rejoindre le projet « {{ project_name }} ».</p>
+<p>Vous pouvez accéder à l’invitation via le lien suivant :</p>
 <p>
   {% block reset_link %}
-  <a href="{{site_url}}{% url 'admin:lab_project_change' project_id  %}" rel="notrack">
-    {% trans "Join project" %}
+  <a href="{{site_url}}{% url 'admin:lab_project_change' project_id %}" rel="notrack">
+    Accéder au projet
   </a>
   {% endblock %}
 </p>
-
-{% trans "The Euphrosyne team" %} {% endautoescape %}
+<p>Par ailleurs, si vous êtes amené(e) à réaliser des manipulations sur site, nous attirons votre attention sur les points suivants :</p>
+<ul>
+  <li>
+    Conformément à la réglementation en vigueur, deux documents obligatoires vous seront transmis :
+    <ul>
+      <li>une autorisation de votre employeur</li>
+      <li>un plan de prévention.</li>
+    </ul>
+  </li>
+  <li>Ces deux documents doivent impérativement être signés par votre employeur avant toute intervention sur site.</li>
+  <li>La procédure est entièrement automatisée : les documents vous seront adressés par courriel via la plateforme Goodflag, utilisée par le ministère de la Culture. Il ne s’agit en aucun cas d’un message de phishing.</li>
+</ul>
+<p>En l’absence de réception, nous vous invitons à vérifier votre dossier de courriers indésirables (spam).</p>
+<p>Si vous ne retrouvez pas ces messages, merci de nous en informer afin que nous puissions effectuer les vérifications nécessaires.</p>
+<p>Nous restons à votre disposition pour toute question complémentaire.</p>
+<p>Cordialement,</p>
+<p>L’équipe AGLAE</p>
+<hr>
+<p>Hello,</p>
+<p>You have been invited to join the ‘{{ project_name }}’ project.</p>
+<p>You can access the invitation via the following link:</p>
+<p>
+  {% block reset_link_en %}
+  <a href="{{site_url}}{% url 'admin:lab_project_change' project_id %}" rel="notrack">
+    Access the project
+  </a>
+  {% endblock %}
+</p>
+<p>Furthermore, if you are required to carry out work on site, please note the following points:</p>
+<ul>
+  <li>
+    In accordance with current regulations, you will be sent two mandatory documents:
+    <ul>
+      <li>authorisation from your employer</li>
+      <li>a prevention plan.</li>
+    </ul>
+  </li>
+  <li>Both documents must be signed by your employer before any work can be carried out on site.</li>
+  <li>The procedure is fully automated: the documents will be sent to you by email via the Goodflag platform, used by the Ministry of Culture. This is not a phishing message.</li>
+</ul>
+<p>If you do not receive them, please check your spam folder.</p>
+<p>If you cannot find these messages, please let us know so that we can carry out the necessary checks.</p>
+<p>We remain at your disposal for any further questions.</p>
+<p>Kind regards,</p>
+<p>The AGLAE team</p>
+{% endautoescape %}
