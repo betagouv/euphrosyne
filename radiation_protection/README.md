@@ -9,6 +9,7 @@ risk prevention plans, and related notifications.
 - `RADIATION_PROTECTION_RISK_ADVISOR_EMAIL`
 - `RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME`
 - `RADIATION_PROTECTION_ADDITIONAL_NOTIFICATION_EMAILS`
+- `RADIATION_PROTECTION_ELECTRICAL_SIGNATURE_EXEMPT_ROR_IDS` (comma-separated ROR IDs)
 
 ### Electronic signature providers
 
@@ -27,5 +28,8 @@ You can override defaults via Django settings:
 RADIATION_PROTECTION_SETTINGS = {
     "RADIATION_PROTECTION_RISK_ADVISOR_EMAIL": "advisor@example.com",
     "RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME": "Jane Advisor",
+    "RADIATION_PROTECTION_ELECTRICAL_SIGNATURE_EXEMPT_ROR_IDS": [
+        "https://ror.org/123456789",
+    ],
 }
 ```
