@@ -1,12 +1,60 @@
 {% load i18n %}{% autoescape off %}
-{% blocktrans %}You've been invited to join {{ project_name }} on Euphrosyne.{% endblocktrans %}
+Bonjour,
 
-{% trans "You can check the invitation there:" %}
+Vous avez été invité(e) à rejoindre le projet « {{ project_name }} ».
+
+Vous pouvez accéder à l’invitation via le lien suivant :
+Rejoindre le projet (lien)
 {% block reset_link %}
 {{site_url}}{% url 'admin:lab_project_change' project_id %}
 {% endblock %}
 
+Par ailleurs, si vous êtes amené(e) à réaliser des manipulations sur site, nous attirons votre attention sur les points suivants :
 
-{% blocktrans %}The Euphrosyne team{% endblocktrans %}
+- Conformément à la réglementation en vigueur, deux documents obligatoires vous seront transmis :
+  - une autorisation de votre employeur
+  - un plan de prévention.
 
+- Ces deux documents doivent impérativement être signés par votre employeur avant toute intervention sur site.
+
+- La procédure est entièrement automatisée : les documents vous seront adressés par courriel via la plateforme Goodflag, utilisée par le ministère de la Culture. Il ne s’agit en aucun cas d’un message de phishing.
+
+En l’absence de réception, nous vous invitons à vérifier votre dossier de courriers indésirables (spam).
+Si vous ne retrouvez pas ces messages, merci de nous en informer afin que nous puissions effectuer les vérifications nécessaires.
+
+Nous restons à votre disposition pour toute question complémentaire.
+
+Cordialement,
+
+L’équipe AGLAE
+__________________________________________________________________________
+
+Hello,
+
+You have been invited to join the ‘{{ project_name }}’ project.
+
+You can access the invitation via the following link:
+Join the project (link)
+{% block reset_link_en %}
+{{site_url}}{% url 'admin:lab_project_change' project_id %}
+{% endblock %}
+
+Furthermore, if you are required to carry out work on site, please note the following points:
+
+- In accordance with current regulations, you will be sent two mandatory documents:
+  - authorisation from your employer
+  - a prevention plan.
+
+- Both documents must be signed by your employer before any work can be carried out on site.
+
+- The procedure is fully automated: the documents will be sent to you by email via the Goodflag platform, used by the Ministry of Culture. This is not a phishing message.
+
+If you do not receive them, please check your spam folder.
+If you cannot find these messages, please let us know so that we can carry out the necessary checks.
+
+We remain at your disposal for any further questions.
+
+Kind regards,
+
+The AGLAE team
 {% endautoescape %}

@@ -29,7 +29,7 @@ def send_project_invitation_email(email: str, project: Project):
     user = User.objects.filter(email=email).first()
 
     with use_user_language(user=user):
-        subject = _("[Euphrosyne] Invitation to join project %s") % project.name
+        subject = _("Invitation to join AGLAE project %s") % project.name
 
     send_email_with_language(
         subject=subject,

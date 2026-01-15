@@ -20,7 +20,7 @@ class TestSendProjectInvitationEmail(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(
             mail.outbox[0].subject,
-            "[Euphrosyne] Invitation à rejoindre le projet Test Project",
+            "Invitation à rejoindre le projet AGLAE Test Project",
         )
         self.assertIn(
             f"{settings.SITE_URL}/lab/project/{project.id}/change/",
