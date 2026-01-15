@@ -62,7 +62,7 @@
     "purgecss-webpack-plugin": "^7.0.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "remixicon": "^4.7.0",
+    "remixicon": "^4.8.0",
     "source-map-loader": "^5.0.0",
     "ts-loader": "^9.5.4",
     "webpack": "^5.104.1",
