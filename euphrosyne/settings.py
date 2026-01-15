@@ -63,7 +63,6 @@ CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split()
 
 SITE_URL = os.environ["SITE_URL"]
 FACILITY_NAME = os.getenv("FACILITY_NAME", "New AGLAE")
-FACILITY_SHORT_NAME = os.getenv("FACILITY_SHORT_NAME", "AGLAE")
 FACILITY_URL = os.getenv("FACILITY_URL", "https://c2rmf.fr/aglae-0")
 
 

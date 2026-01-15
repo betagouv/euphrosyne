@@ -46,7 +46,7 @@ class ImportFromInput(widgets.TextInput):
 
     def get_context(self, name: str, value: Any, attrs: dict | None) -> Dict[str, Any]:
         context = super().get_context(name, value, attrs)
-        context["facility_short_name"] = settings.FACILITY_SHORT_NAME
+        context["facility_name"] = settings.FACILITY_NAME
         context["widget"]["field_id_mapping"] = tuple(
             (
                 key,
