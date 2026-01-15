@@ -83,6 +83,55 @@ def test_send_electrical_signature_processes_command(
 @mock.patch(
     "radiation_protection.management.commands.send_electrical_signature_processes.start_electrical_signature_processes"  # pylint: disable=line-too-long
 )
+def test_send_electrical_signature_processes_command_skips_exempt(
+    mock_start_processes,
+):
+    """Test the command skips plans marked as electrical signature exempt."""
+    user = lab_factories.StaffUserFactory()
+    admin = lab_factories.StaffUserFactory()
+    project = lab_factories.ProjectFactory(admin=admin)
+    run_1 = lab_factories.RunFactory(project=project)
+    run_2 = lab_factories.RunFactory(project=project)
+    institution = lab_factories.InstitutionFactory()
+    employer = lab_factories.EmployerFactory()
+
+    participation = project.participation_set.create(
+        user=user, institution=institution, employer=employer
+    )
+
+    exempt_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation,
+        run=run_1,
+        risk_advisor_notification_sent=False,
+        electrical_signature_exempt=True,
+    )
+    non_exempt_plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation,
+        run=run_2,
+        risk_advisor_notification_sent=False,
+        electrical_signature_exempt=False,
+    )
+
+    mock_process = mock.Mock(spec=ElectricalSignatureProcess)
+    mock_process.__str__ = mock.Mock(return_value="Process")
+    mock_start_processes.return_value = [mock_process]
+
+    out = StringIO()
+    call_command("send_electrical_signature_processes", stdout=out)
+
+    assert mock_start_processes.call_count == 1
+    assert mock_start_processes.call_args_list[0][0][0] == non_exempt_plan
+
+    exempt_plan.refresh_from_db()
+    non_exempt_plan.refresh_from_db()
+    assert exempt_plan.risk_advisor_notification_sent is False
+    assert non_exempt_plan.risk_advisor_notification_sent is True
+
+
+@pytest.mark.django_db
+@mock.patch(
+    "radiation_protection.management.commands.send_electrical_signature_processes.start_electrical_signature_processes"  # pylint: disable=line-too-long
+)
 def test_send_electrical_signature_processes_command_no_plans(mock_start_processes):
     """Test the command when there are no plans to process."""
     out = StringIO()

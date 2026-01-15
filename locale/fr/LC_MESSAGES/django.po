@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-09 15:50+0100\n"
+"POT-Creation-Date: 2026-01-15 16:23+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -1490,6 +1490,12 @@ msgstr "Notification envoyée au conseiller en prévention"
 
 msgid "Indicates if the risk advisor has been notified about this plan."
 msgstr "Indique si le conseiller en prévention a été informé de ce plan."
+
+msgid "Electrical Signature Exempt"
+msgstr "Exemption de signature électronique"
+
+msgid "Indicates if this plan is exempt from electrical signature workflows."
+msgstr "Indique si ce plan est exempt des workflows de signature électronique."
 
 msgid "Run Risk Prevention Plan"
 msgstr "Plan de prévention des risques du run"

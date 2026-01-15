@@ -5,6 +5,7 @@ from lab.projects.models import Participation
 from lab.runs.models import Run
 from shared.models import TimestampedModel
 
+from .electrical_signature.policy import should_exempt_institution
 from .electrical_signature.providers.goodflag import get_status
 
 
@@ -27,6 +28,13 @@ class RiskPreventionPlan(TimestampedModel):
         verbose_name=_("Risk Advisor Notification Sent"),
         help_text=_("Indicates if the risk advisor has been notified about this plan."),
     )
+    electrical_signature_exempt = models.BooleanField(
+        default=False,
+        verbose_name=_("Electrical Signature Exempt"),
+        help_text=_(
+            "Indicates if this plan is exempt from electrical signature workflows."
+        ),
+    )
 
     class Meta:
         unique_together = ("participation", "run")
@@ -37,6 +45,15 @@ class RiskPreventionPlan(TimestampedModel):
         run_label = self.run.label
         user_email = self.participation.user.email
         return f"Risk Prevention Plan for {run_label} - {user_email}"
+
+    def save(self, *args, **kwargs):
+        if self._state.adding and not self.electrical_signature_exempt:
+            # On creation, determine if the plan should be exempt
+            # based on the institution
+            self.electrical_signature_exempt = should_exempt_institution(
+                self.participation.institution,
+            )
+        super().save(*args, **kwargs)
 
 
 class ElectricalSignatureProcess(models.Model):

@@ -22,7 +22,7 @@ class Command(BaseCommand):
 
         plans = RiskPreventionPlan.objects.filter(
             risk_advisor_notification_sent=False,
-        ).all()
+        ).exclude(electrical_signature_exempt=True)
 
         self.stdout.write(
             "[send-electrical-signature-processes] Found %d risk prevention plans to process."  # pylint: disable=line-too-long
