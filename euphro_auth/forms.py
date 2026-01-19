@@ -43,14 +43,18 @@ class UserInvitationRegistrationForm(DjangoSetPasswordForm):
     )
 
     def clean_email(self) -> str:
-        if self.user and self.user.email == self.cleaned_data["email"]:
-            return self.cleaned_data["email"]
-        if User.objects.filter(email=self.cleaned_data["email"]).exists():
+        email = self.cleaned_data["email"].lower()
+        if self.user and self.user.email and self.user.email.lower() == email:
+            return email
+        query = User.objects.filter(email__iexact=email)
+        if self.user and self.user.pk:
+            query = query.exclude(pk=self.user.pk)
+        if query.exists():
             raise ValidationError(
                 _("An account with this email already exists."),
                 code="invitation_email_already_exists",
             )
-        return self.cleaned_data["email"]
+        return email
 
     def save(self, commit: bool = True) -> AbstractBaseUser:
         self.user.email = self.cleaned_data["email"]

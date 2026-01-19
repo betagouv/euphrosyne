@@ -217,7 +217,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTHENTICATION_BACKENDS = [
     "orcid_oauth.backends.ORCIDOAuth2",
-    "django.contrib.auth.backends.ModelBackend",
+    "euphro_auth.backends.LowercaseEmailBackend",
 ]
 
 

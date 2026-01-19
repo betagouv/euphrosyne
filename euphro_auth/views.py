@@ -18,7 +18,7 @@ class UserTokenRegistrationView(PasswordResetConfirmView):
     success_url = reverse_lazy("admin:index")
     post_reset_login = True
     reset_url_token = "registration"
-    post_reset_login_backend = "django.contrib.auth.backends.ModelBackend"
+    post_reset_login_backend = "euphro_auth.backends.LowercaseEmailBackend"
 
     def get_initial(self) -> Dict[str, Any]:
         initial = super().get_initial()

@@ -10,7 +10,7 @@ def test_form_save_success():
     user = get_user_model()(email="test@test.test")
     form = UserInvitationRegistrationForm(
         data={
-            "email": "test@test.test",
+            "email": "TEST@Test.Test",
             "new_password1": "abcdef102",
             "new_password2": "abcdef102",
             "first_name": "John",
@@ -30,7 +30,7 @@ def test_email_can_be_changed():
     user = get_user_model()(email="test@test.test")
     form = UserInvitationRegistrationForm(
         data={
-            "email": "new_email@test.test",
+            "email": "New_Email@Test.Test",
             "new_password1": "abcdef102",
             "new_password2": "abcdef102",
             "first_name": "John",
