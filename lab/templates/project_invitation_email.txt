@@ -26,7 +26,7 @@ Nous restons à votre disposition pour toute question complémentaire.
 
 Cordialement,
 
-L’équipe AGLAE
+L’équipe {{ facility_name }}
 __________________________________________________________________________
 
 Hello,
@@ -56,5 +56,5 @@ We remain at your disposal for any further questions.
 
 Kind regards,
 
-The AGLAE team
+The {{ facility_name }} team
 {% endautoescape %}

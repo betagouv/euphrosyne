@@ -3,7 +3,7 @@
 
 <p>{% blocktrans with embargo_end_date_ft=embargo_end_date|date:"SHORT_DATE_FORMAT" %}We would like to inform you that the end date of the embargo on your data of run {{ run_label }} of project {{ project_name }} will be effective the {{ embargo_end_date_ft }}. After this period, your raw data will be accessible through the data catalog.{% endblocktrans %}</p>
 
-<p>{% blocktrans %}If, however, these data cannot be made publicly available at that time, please contact the AGLAE team to request an extension of the embargo, specifying:{% endblocktrans %}</p>
+<p>{% blocktrans with facility_name=facility_name %}If, however, these data cannot be made publicly available at that time, please contact the {{ facility_name }} team to request an extension of the embargo, specifying:{% endblocktrans %}</p>
 <ul>
     <li>{% blocktrans %}The reason for the request,{% endblocktrans %}</li>
     <li>{% blocktrans %}The desired extension period.{% endblocktrans %}</li>
@@ -11,4 +11,4 @@
 
 <p>{% blocktrans %}For any questions or specific requests, please feel free to contact us.{% endblocktrans %}</p>
 <p>{% blocktrans %}Best regards,{% endblocktrans %}</p>
-<p>{% blocktrans %}The AGLAE Team{% endblocktrans %}</p>
+<p>{% blocktrans with facility_name=facility_name %}The {{ facility_name }} Team{% endblocktrans %}</p>

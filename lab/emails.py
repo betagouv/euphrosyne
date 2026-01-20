@@ -6,6 +6,7 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.models import User
+from euphrosyne.branding import get_branding
 from shared.email_utils import send_email_with_language, use_user_language
 
 from .models import Project, Run
@@ -19,11 +20,13 @@ def send_project_invitation_email(email: str, project: Project):
 
     Respects user language preferences if the user exists.
     """
+    branding = get_branding()
     context = {
         "email": email,
         "site_url": settings.SITE_URL,
         "project_id": project.id,
         "project_name": project.name,
+        "facility_name": branding.facility_name,
     }
     # Try to get the user to respect their language preference if they exist
     user = User.objects.filter(email=email).first()
@@ -77,21 +80,26 @@ def send_ending_embargo_email(emails: list[str], run: Run):
 
     Respects each recipient's language preference.
     """
+    branding = get_branding()
     context = {
         "run_label": run.label,
         "project_name": run.project.name,
         "embargo_end_date": run.embargo_date,
+        "facility_name": branding.facility_name,
     }
 
     # Send individual emails to respect each user's language preference
     for email in emails:
         user = User.objects.filter(email=email).first()
-
         with use_user_language(user=user):
             subject = _(
                 # pylint: disable=line-too-long
-                "[Euphrosyne] End of AGLAE Data Embargo for run %(run_label)s in project %(project_name)s"
-            ) % {"run_label": run.label, "project_name": run.project.name}
+                "[Euphrosyne] End of %(facility_name)s Data Embargo for run %(run_label)s in project %(project_name)s"
+            ) % {
+                "facility_name": branding.facility_name,
+                "run_label": run.label,
+                "project_name": run.project.name,
+            }
 
         send_email_with_language(
             subject=subject,

@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
@@ -9,6 +10,7 @@ from django.forms import ModelForm
 from django.http.request import HttpRequest
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
 from euphro_tools.hooks import initialize_run_directory, rename_run_directory
@@ -180,9 +182,13 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         if not project:
             self.message_user(
                 request,
-                _(
-                    "You do not have permission for this project. "
-                    "If you think this is an error, please contact the New AGLAE team."
+                format_lazy(
+                    _(
+                        "You do not have permission for this project. "
+                        "If you think this is an error, please contact "
+                        "the %(facility_name)s team."
+                    ),
+                    facility_name=settings.FACILITY_NAME,
                 ),
                 messages.WARNING,
             )

@@ -4,7 +4,7 @@
         <h2>{% translate "No project yet" %}</h2>
         <p class="fr-text--lead">{% translate "We couldn't find any projects attached to your account." %}</p>
         
-        <p>{% translate "On this page you can find all of your research projects carried out at New AGLAE." %}
+        <p>{% blocktrans with facility_name=facility_name %}On this page you can find all of your research projects carried out at {{ facility_name }}.{% endblocktrans %}
         <br/>{% translate "If a project has already been created by a member of your team, they can send you an invitation link to join it." %}</p>
         
         <a class="fr-mt-3w fr-btn" href="{% url "admin:lab_project_add" %}">{% translate "Create my first project" %}</a>

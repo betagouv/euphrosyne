@@ -9,10 +9,10 @@
 </head>
 <body>
     <h1>{% trans "Data Request" %}</h1>
-    <p>{% trans "We have received your data request. A member of the New AGLAE team will review it as soon as posible and get back to you." %}</p>
+    <p>{% blocktrans with facility_name=facility_name %}We have received your data request. A member of the {{ facility_name }} team will review it as soon as posible and get back to you.{% endblocktrans %}</p>
         
     <p>{% trans "Have a good day," %}</p>
-    <p>{% trans "The New AGLAE Team" %}</p>
+    <p>{% blocktrans with facility_name=facility_name %}The {{ facility_name }} Team{% endblocktrans %}</p>
 </body>
 </html>
 {% endautoescape %}

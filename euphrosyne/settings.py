@@ -62,6 +62,8 @@ CORS_ALLOWED_ORIGINS = (
 CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split()
 
 SITE_URL = os.environ["SITE_URL"]
+FACILITY_NAME = os.getenv("FACILITY_NAME", "New AGLAE")
+FACILITY_URL = os.getenv("FACILITY_URL", "https://c2rmf.fr/aglae-0")
 
 
 # Application definition
@@ -125,6 +127,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "euphrosyne.context_processors.branding",
             ],
         },
     },
