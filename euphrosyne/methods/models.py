@@ -1,3 +1,6 @@
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
 from lab.methods.model_fields import (
     DetectorBooleanField,
     DetectorCharField,
@@ -19,6 +22,27 @@ class EuphrosyneMethodModel(MethodModel):
         # Explicitly set app_label to ensure migrations go to euphrosyne
         app_label = "euphrosyne"
         abstract = True
+
+    class ParticleType(models.TextChoices):
+        PROTON = "Proton", _("Proton")
+        ALPHA = "Alpha particle", _("Alpha particle")
+        DEUTON = "Deuton", _("Deuton")
+
+    class Beamline(models.TextChoices):
+        MICROBEAM = "Microbeam", _("Microbeam")
+
+    particle_type = models.CharField(
+        _("Particle type"), max_length=45, choices=ParticleType.choices, blank=True
+    )
+    energy_in_keV = models.IntegerField(
+        _("Energy level (in keV)"), null=True, blank=True
+    )
+    beamline = models.CharField(
+        _("Beamline"),
+        max_length=45,
+        choices=Beamline.choices,
+        default=Beamline.MICROBEAM,
+    )
 
     # Methods available at AGLAE
     method_PIXE = MethodBooleanField(Method("PIXE"))

@@ -33,11 +33,6 @@ class Run(TimestampedModel, MethodModelClass):  # type: ignore
         ONGOING = 21, _("Ongoing")
         FINISHED = 31, _("Finished")
 
-    class ParticleType(models.TextChoices):
-        PROTON = "Proton", _("Proton")
-        ALPHA = "Alpha particle", _("Alpha particle")
-        DEUTON = "Deuton", _("Deuton")
-
     objects = RunManager()
 
     project = models.ForeignKey(
@@ -60,23 +55,6 @@ class Run(TimestampedModel, MethodModelClass):  # type: ignore
     start_date = models.DateTimeField(_("Start date"), null=True, blank=True)
     end_date = models.DateTimeField(_("End date"), null=True, blank=True)
     embargo_date = models.DateField(_("Embargo date"), null=True, blank=True)
-
-    particle_type = models.CharField(
-        _("Particle type"), max_length=45, choices=ParticleType.choices, blank=True
-    )
-    energy_in_keV = models.IntegerField(
-        _("Energy level (in keV)"), null=True, blank=True
-    )
-
-    class Beamline(models.TextChoices):
-        MICROBEAM = "Microbeam", _("Microbeam")
-
-    beamline = models.CharField(
-        _("Beamline"),
-        max_length=45,
-        choices=Beamline.choices,
-        default=Beamline.MICROBEAM,
-    )
 
     run_object_groups = models.ManyToManyField(
         "lab.ObjectGroup",

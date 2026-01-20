@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 09:21+0100\n"
+"POT-Creation-Date: 2026-01-20 10:25+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -479,6 +479,27 @@ msgstr "Euphro tools n'est pas disponible."
 
 msgid "Dashboard"
 msgstr "Tableau de bord"
+
+msgid "Proton"
+msgstr "Proton"
+
+msgid "Alpha particle"
+msgstr "Particule alpha"
+
+msgid "Deuton"
+msgstr "Deuton"
+
+msgid "Microbeam"
+msgstr "Microbeam"
+
+msgid "Particle type"
+msgstr "Type de particule"
+
+msgid "Energy level (in keV)"
+msgstr "Niveau d'énergie (en keV)"
+
+msgid "Beamline"
+msgstr "Ligne de faisceau"
 
 msgid "Admin"
 msgstr "Administration"
@@ -1070,15 +1091,6 @@ msgstr "Embargo permanent"
 msgid "The end date must be after the start date"
 msgstr "La date de fin doit être après la date de début"
 
-msgid "Proton"
-msgstr "Proton"
-
-msgid "Alpha particle"
-msgstr "Particule alpha"
-
-msgid "Deuton"
-msgstr "Deuton"
-
 msgid "Run label"
 msgstr "Libellé du run"
 
@@ -1093,18 +1105,6 @@ msgstr "Date de fin"
 
 msgid "Embargo date"
 msgstr "Date d'embargo"
-
-msgid "Particle type"
-msgstr "Type de particule"
-
-msgid "Energy level (in keV)"
-msgstr "Niveau d'énergie (en keV)"
-
-msgid "Microbeam"
-msgstr "Microbeam"
-
-msgid "Beamline"
-msgstr "Ligne de faisceau"
 
 msgid "Object groups"
 msgstr "Lots d'objets"
