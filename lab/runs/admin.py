@@ -137,7 +137,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
                 (
                     str(_("Experimental conditions")),
                     {
-                        "fields": ["particle_type", "energy_in_keV", "beamline"],
+                        "fields": Run.get_experimental_condition_fieldset_fields(),
                         "classes": [*fieldset_classes],
                     },
                 ),

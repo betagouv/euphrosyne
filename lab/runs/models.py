@@ -9,6 +9,7 @@ from shared.models import TimestampedModel
 
 # Dynamically import the configured method model based on settings
 MethodModelClass = import_string(settings.METHOD_MODEL_CLASS)
+RunMetadataModelClass = import_string(settings.RUN_METADATA_MODEL_CLASS)
 
 
 class RunManager(models.Manager):
@@ -19,7 +20,7 @@ class RunManager(models.Manager):
         return super().get_queryset().filter(embargo_date__lte=timezone.now())
 
 
-class Run(TimestampedModel, MethodModelClass):  # type: ignore
+class Run(TimestampedModel, MethodModelClass, RunMetadataModelClass):  # type: ignore
     class Meta:
         constraints = [
             models.UniqueConstraint(

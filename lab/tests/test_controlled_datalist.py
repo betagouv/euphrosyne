@@ -4,7 +4,7 @@ from unittest.mock import patch
 import pytest
 from django.db.models.query import QuerySet
 
-from euphrosyne.methods.forms import AglaeRunDetailsForm as RunDetailsForm
+from euphrosyne.runs.forms import AglaeRunDetailsForm as RunDetailsForm
 
 from .factories import RunFactory
 
