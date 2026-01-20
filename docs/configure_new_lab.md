@@ -55,6 +55,19 @@ This documentation explains how to:
 - Set up filters for different detectors
 - Generate migrations for your changes
 
+### 2. Configuring Run Metadata and Run Detail Forms
+
+Run metadata fields (for example: particle type, energy, beamline) and lab-specific
+run detail forms are customizable per deployment.
+
+Please refer to the detailed guide: [Configuring Run Metadata](configuring_run_metadata.md)
+
+This documentation explains how to:
+
+- Define lab-specific run metadata fields
+- Control the "Experimental conditions" fieldset in admin
+- Configure run detail forms for members and admins
+
 ## Testing Your Configuration
 
 Run the following commands to ensure your configuration is working correctly:
