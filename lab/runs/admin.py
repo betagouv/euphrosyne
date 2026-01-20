@@ -22,9 +22,9 @@ from .admin_actions import change_state
 from .forms import (
     RunCreateAdminForm,
     RunCreateForm,
-    RunDetailsAdminForm,
-    RunDetailsForm,
     RunScheduleForm,
+    get_run_details_admin_form_class,
+    get_run_details_form_class,
 )
 from .models import Run
 from .signals import run_scheduled
@@ -92,10 +92,10 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
     ):
         if is_lab_admin(request.user):
             if obj:
-                return RunDetailsAdminForm
+                return get_run_details_admin_form_class()
             return RunCreateAdminForm
         if obj:
-            return RunDetailsForm
+            return get_run_details_form_class()
         return RunCreateForm
 
     def get_fieldsets(self, request: HttpRequest, obj: Run | None = None):

@@ -401,3 +401,5 @@ FORCE_LAST_CGU_ACCEPTANCE_DT = (
 # This should point to the concrete implementation with field definitions
 # All migrations related to these fields will be generated in the euphrosyne app
 METHOD_MODEL_CLASS = "euphrosyne.methods.models.EuphrosyneMethodModel"
+RUN_DETAILS_FORM_CLASS = "euphrosyne.methods.forms.AglaeRunDetailsForm"
+RUN_DETAILS_ADMIN_FORM_CLASS = "euphrosyne.methods.forms.AglaeRunDetailsAdminForm"
