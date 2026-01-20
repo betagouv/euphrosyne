@@ -9,6 +9,7 @@ from shared.models import TimestampedModel
 
 # Dynamically import the configured method model based on settings
 MethodModelClass = import_string(settings.METHOD_MODEL_CLASS)
+RunMetadataModelClass = import_string(settings.RUN_METADATA_MODEL_CLASS)
 
 
 class RunManager(models.Manager):
@@ -19,7 +20,7 @@ class RunManager(models.Manager):
         return super().get_queryset().filter(embargo_date__lte=timezone.now())
 
 
-class Run(TimestampedModel, MethodModelClass):  # type: ignore
+class Run(TimestampedModel, MethodModelClass, RunMetadataModelClass):  # type: ignore
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -32,11 +33,6 @@ class Run(TimestampedModel, MethodModelClass):  # type: ignore
         ASK_FOR_EXECUTION = 11, _("Ask for execution")
         ONGOING = 21, _("Ongoing")
         FINISHED = 31, _("Finished")
-
-    class ParticleType(models.TextChoices):
-        PROTON = "Proton", _("Proton")
-        ALPHA = "Alpha particle", _("Alpha particle")
-        DEUTON = "Deuton", _("Deuton")
 
     objects = RunManager()
 
@@ -60,23 +56,6 @@ class Run(TimestampedModel, MethodModelClass):  # type: ignore
     start_date = models.DateTimeField(_("Start date"), null=True, blank=True)
     end_date = models.DateTimeField(_("End date"), null=True, blank=True)
     embargo_date = models.DateField(_("Embargo date"), null=True, blank=True)
-
-    particle_type = models.CharField(
-        _("Particle type"), max_length=45, choices=ParticleType.choices, blank=True
-    )
-    energy_in_keV = models.IntegerField(
-        _("Energy level (in keV)"), null=True, blank=True
-    )
-
-    class Beamline(models.TextChoices):
-        MICROBEAM = "Microbeam", _("Microbeam")
-
-    beamline = models.CharField(
-        _("Beamline"),
-        max_length=45,
-        choices=Beamline.choices,
-        default=Beamline.MICROBEAM,
-    )
 
     run_object_groups = models.ManyToManyField(
         "lab.ObjectGroup",

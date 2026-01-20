@@ -7,7 +7,7 @@ This guide explains how to configure method definitions for different laboratory
 The Euphrosyne application uses a flexible system for defining laboratory methods, detectors, and filters.
 This allows different laboratories to customize the available methods without modifying the core application code.
 
-All method definitions are contained in the `euphrosyne.methods` package, making migrations centralized in one place.
+Method definitions live in the `euphrosyne.methods` package and are mixed into the `Run` model at runtime.
 
 ## How Method Configuration Works
 
@@ -47,11 +47,11 @@ filters_for_detector_FTIR_MCT = FiltersCharField(
 After modifying the `EuphrosyneMethodModel`, generate and apply migrations:
 
 ```bash
-python manage.py makemigrations
+python manage.py makemigrations lab
 python manage.py migrate
 ```
 
-All migrations will be created in the `euphrosyne.methods` app, keeping your customizations separate from the core code.
+These migrations target the `lab` app because the fields live on `lab.Run`.
 
 ### 3. Testing Your Configuration
 
@@ -68,7 +68,6 @@ To verify your method configuration:
 
 - `MethodModel`: Abstract base class with helper methods
 - `EuphrosyneMethodModel`: Laboratory-specific implementation with field definitions
-- `MethodsConfiguration`: Concrete model that ensures migrations are created
 
 ### Field Types
 
@@ -79,10 +78,9 @@ To verify your method configuration:
 
 ### Important Notes
 
-1. All migrations are generated in the `euphrosyne` app
-2. The concrete implementation is loaded dynamically at runtime
-3. Changes to method fields require database migrations
-4. The `OTHER_VALUE` constant allows for custom values beyond predefined options
+1. The concrete implementation is loaded dynamically at runtime
+2. Changes to method fields require database migrations
+3. The `OTHER_VALUE` constant allows for custom values beyond predefined options
 
 ## Troubleshooting
 

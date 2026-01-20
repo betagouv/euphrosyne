@@ -2,6 +2,7 @@ import datetime
 from datetime import time
 from typing import Any, Mapping
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models.base import Model
@@ -11,25 +12,13 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import Select
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
+from django.utils.module_loading import import_string
 from django.utils.translation import gettext_lazy as _
 
 from lab import widgets
-from lab.controlled_datalist import controlled_datalist_form
 from lab.methods import OTHER_VALUE, SelectWithFreeOther
 
 from . import models
-
-RECOMMENDED_ENERGY_LEVELS = {
-    models.Run.ParticleType.PROTON: [1000, 1500, 2000, 2500, 3000, 3500, 3800, 4000],
-    models.Run.ParticleType.ALPHA: [3000, 4000, 5000, 6000],
-    models.Run.ParticleType.DEUTON: [1000, 1500, 2000],
-}
-
-
-def _get_energy_levels_choices(
-    particle_type: models.Run.ParticleType,
-) -> list[tuple[int, int]]:
-    return [(level, level) for level in RECOMMENDED_ENERGY_LEVELS[particle_type]]
 
 
 class BaseRunDetailsForm(ModelForm):
@@ -90,14 +79,6 @@ class BaseRunDetailsForm(ModelForm):
         return cleaned_data, errors
 
 
-@controlled_datalist_form(
-    controller_field_name="particle_type",
-    controlled_field_name="energy_in_keV",
-    choices={
-        particle_type: _get_energy_levels_choices(particle_type)
-        for particle_type in models.Run.ParticleType
-    },
-)
 class RunDetailsForm(BaseRunDetailsForm):
     class Meta(BaseRunDetailsForm.Meta):
         fields = [
@@ -108,14 +89,6 @@ class RunDetailsForm(BaseRunDetailsForm):
         ]
 
 
-@controlled_datalist_form(
-    controller_field_name="particle_type",
-    controlled_field_name="energy_in_keV",
-    choices={
-        particle_type: _get_energy_levels_choices(particle_type)
-        for particle_type in models.Run.ParticleType
-    },
-)
 class RunDetailsAdminForm(BaseRunDetailsForm):
     class Meta(BaseRunDetailsForm.Meta):
         fields = [
@@ -125,6 +98,22 @@ class RunDetailsAdminForm(BaseRunDetailsForm):
             *[f.name for f in models.Run.get_detector_fields()],
             *[f.name for f in models.Run.get_filters_fields()],
         ]
+
+
+def get_run_details_form_class():
+    return import_string(
+        getattr(settings, "RUN_DETAILS_FORM_CLASS", "lab.runs.forms.RunDetailsForm")
+    )
+
+
+def get_run_details_admin_form_class():
+    return import_string(
+        getattr(
+            settings,
+            "RUN_DETAILS_ADMIN_FORM_CLASS",
+            "lab.runs.forms.RunDetailsAdminForm",
+        )
+    )
 
 
 class RunCreateForm(ModelForm):
