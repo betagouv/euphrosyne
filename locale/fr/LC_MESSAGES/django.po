@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 10:25+0100\n"
+"POT-Creation-Date: 2026-01-20 17:43+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -480,6 +480,9 @@ msgstr "Euphro tools n'est pas disponible."
 msgid "Dashboard"
 msgstr "Tableau de bord"
 
+msgid "Admin"
+msgstr "Administration"
+
 msgid "Proton"
 msgstr "Proton"
 
@@ -500,9 +503,6 @@ msgstr "Niveau d'énergie (en keV)"
 
 msgid "Beamline"
 msgstr "Ligne de faisceau"
-
-msgid "Admin"
-msgstr "Administration"
 
 msgid "English"
 msgstr "Anglais"
