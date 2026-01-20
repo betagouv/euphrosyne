@@ -3,7 +3,8 @@ from django.db import models
 
 class RunMetadataModel(models.Model):
     """
-    Base abstract model that provides the infrastructure for run metadata-related fields.
+    Base abstract model that provides the infrastructure
+    for run metadata-related fields.
     """
 
     class Meta:
