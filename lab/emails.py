@@ -20,11 +20,13 @@ def send_project_invitation_email(email: str, project: Project):
 
     Respects user language preferences if the user exists.
     """
+    branding = get_branding()
     context = {
         "email": email,
         "site_url": settings.SITE_URL,
         "project_id": project.id,
         "project_name": project.name,
+        "facility_name": branding.facility_name,
     }
     # Try to get the user to respect their language preference if they exist
     user = User.objects.filter(email=email).first()
