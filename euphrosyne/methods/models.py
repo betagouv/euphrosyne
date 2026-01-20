@@ -1,5 +1,3 @@
-from django.utils.translation import gettext_lazy as _
-
 from lab.methods.model_fields import (
     DetectorBooleanField,
     DetectorCharField,
