@@ -1,6 +1,7 @@
 import uuid
 
 from django.db import models
+from django.db.models import F
 from django.utils.translation import gettext_lazy as _
 
 
@@ -66,7 +67,10 @@ class RunData(models.Model):
 
     @property
     def last_lifecycle_operation(self):
-        return self.lifecycle_operations.order_by("-finished_at", "-started_at").first()
+        return self.lifecycle_operations.order_by(
+            F("finished_at").desc(nulls_last=True),
+            F("started_at").desc(nulls_last=True),
+        ).first()
 
     class Meta:
         indexes = [
