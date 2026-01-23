@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import Any
 
 import pytest
 from django.utils import timezone
@@ -7,9 +8,26 @@ from data_management.models import (
     LifecycleOperation,
     LifecycleOperationStatus,
     LifecycleOperationType,
+    LifecycleState,
     RunData,
 )
 from lab.tests.factories import RunFactory
+
+
+def create_operation(
+    run_data: RunData,
+    operation_type: LifecycleOperationType,
+    **overrides: Any,
+) -> LifecycleOperation:
+    data = {
+        "project_run_data": run_data,
+        "type": operation_type,
+        "status": LifecycleOperationStatus.SUCCEEDED,
+        "bytes_copied": run_data.run_size_bytes,
+        "files_copied": run_data.file_count,
+    }
+    data.update(overrides)
+    return LifecycleOperation.objects.create(**data)
 
 
 @pytest.mark.django_db
@@ -59,3 +77,181 @@ def test_last_lifecycle_operation_prefers_started_over_pending():
     )
 
     assert run_data.last_lifecycle_operation == running
+
+
+@pytest.mark.django_db
+def test_transition_to_cooling_requires_hot_and_eligible():
+    eligible_run_data = RunData.objects.create(
+        run=RunFactory(),
+        cooling_eligible_at=timezone.now() - timedelta(days=1),
+    )
+
+    eligible_run_data.transition_to(LifecycleState.COOLING)
+
+    assert eligible_run_data.lifecycle_state == LifecycleState.COOLING
+
+    not_eligible_run_data = RunData.objects.create(
+        run=RunFactory(),
+        cooling_eligible_at=timezone.now() + timedelta(days=1),
+    )
+
+    with pytest.raises(ValueError):
+        not_eligible_run_data.transition_to(LifecycleState.COOLING)
+
+    not_hot_run_data = RunData.objects.create(
+        run=RunFactory(),
+        lifecycle_state=LifecycleState.COOL,
+        cooling_eligible_at=timezone.now() - timedelta(days=1),
+    )
+
+    with pytest.raises(ValueError):
+        not_hot_run_data.transition_to(LifecycleState.COOLING)
+
+
+@pytest.mark.django_db
+def test_transition_to_cool_requires_succeeded_operation_and_verification():
+    run_data = RunData.objects.create(
+        run=RunFactory(),
+        lifecycle_state=LifecycleState.COOLING,
+        run_size_bytes=10,
+        file_count=2,
+    )
+    operation = create_operation(run_data, LifecycleOperationType.COOL)
+
+    run_data.transition_to(LifecycleState.COOL, operation=operation)
+
+    assert run_data.lifecycle_state == LifecycleState.COOL
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"status": LifecycleOperationStatus.FAILED},
+        {"type": LifecycleOperationType.RESTORE},
+        {"bytes_copied": 9},
+        {"files_copied": 1},
+        {"bytes_copied": None},
+    ],
+)
+def test_transition_to_cool_rejects_invalid_operation(overrides):
+    run_data = RunData.objects.create(
+        run=RunFactory(),
+        lifecycle_state=LifecycleState.COOLING,
+        run_size_bytes=10,
+        file_count=2,
+    )
+    operation = create_operation(run_data, LifecycleOperationType.COOL)
+    for key, value in overrides.items():
+        setattr(operation, key, value)
+    operation.save()
+
+    with pytest.raises(ValueError):
+        run_data.transition_to(LifecycleState.COOL, operation=operation)
+
+
+@pytest.mark.django_db
+def test_transition_to_cool_rejects_missing_operation_or_expected_totals():
+    run_data = RunData.objects.create(
+        run=RunFactory(),
+        lifecycle_state=LifecycleState.COOLING,
+        run_size_bytes=10,
+        file_count=2,
+    )
+
+    with pytest.raises(ValueError):
+        run_data.transition_to(LifecycleState.COOL, operation=None)
+
+    run_data = RunData.objects.create(
+        run=RunFactory(),
+        lifecycle_state=LifecycleState.COOLING,
+        run_size_bytes=None,
+        file_count=2,
+    )
+    operation = create_operation(run_data, LifecycleOperationType.COOL, bytes_copied=10)
+
+    with pytest.raises(ValueError):
+        run_data.transition_to(LifecycleState.COOL, operation=operation)
+
+
+@pytest.mark.django_db
+def test_transition_to_restoring_requires_cool():
+    run_data = RunData.objects.create(
+        run=RunFactory(),
+        lifecycle_state=LifecycleState.COOL,
+    )
+
+    run_data.transition_to(LifecycleState.RESTORING)
+
+    assert run_data.lifecycle_state == LifecycleState.RESTORING
+
+    not_cool_run_data = RunData.objects.create(
+        run=RunFactory(),
+        lifecycle_state=LifecycleState.HOT,
+    )
+
+    with pytest.raises(ValueError):
+        not_cool_run_data.transition_to(LifecycleState.RESTORING)
+
+
+@pytest.mark.django_db
+def test_transition_to_hot_requires_succeeded_operation_and_verification():
+    run_data = RunData.objects.create(
+        run=RunFactory(),
+        lifecycle_state=LifecycleState.RESTORING,
+        run_size_bytes=10,
+        file_count=2,
+    )
+    operation = create_operation(run_data, LifecycleOperationType.RESTORE)
+
+    run_data.transition_to(LifecycleState.HOT, operation=operation)
+
+    assert run_data.lifecycle_state == LifecycleState.HOT
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"status": LifecycleOperationStatus.FAILED},
+        {"type": LifecycleOperationType.COOL},
+        {"bytes_copied": 9},
+        {"files_copied": 1},
+        {"files_copied": None},
+    ],
+)
+def test_transition_to_hot_rejects_invalid_operation(overrides):
+    run_data = RunData.objects.create(
+        run=RunFactory(),
+        lifecycle_state=LifecycleState.RESTORING,
+        run_size_bytes=10,
+        file_count=2,
+    )
+    operation = create_operation(run_data, LifecycleOperationType.RESTORE)
+    for key, value in overrides.items():
+        setattr(operation, key, value)
+    operation.save()
+
+    with pytest.raises(ValueError):
+        run_data.transition_to(LifecycleState.HOT, operation=operation)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("state", "allowed"),
+    [
+        (LifecycleState.COOLING, True),
+        (LifecycleState.RESTORING, True),
+        (LifecycleState.HOT, False),
+        (LifecycleState.COOL, False),
+    ],
+)
+def test_transition_to_error_only_from_operation_states(state, allowed):
+    run_data = RunData.objects.create(run=RunFactory(), lifecycle_state=state)
+
+    if allowed:
+        run_data.transition_to(LifecycleState.ERROR)
+        assert run_data.lifecycle_state == LifecycleState.ERROR
+    else:
+        with pytest.raises(ValueError):
+            run_data.transition_to(LifecycleState.ERROR)
