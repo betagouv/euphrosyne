@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 17:43+0100\n"
+"POT-Creation-Date: 2026-01-22 18:55+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -130,6 +130,36 @@ msgstr "Priorité de tri : %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Changer l'ordre de tri"
+
+msgid "Hot"
+msgstr "Chaud"
+
+msgid "Cooling"
+msgstr "Refroidissement"
+
+msgid "Cool"
+msgstr "Refroidi"
+
+msgid "Restoring"
+msgstr "Restauration"
+
+msgid "Error"
+msgstr "Erreur"
+
+msgid "Restore"
+msgstr "Restaurer"
+
+msgid "Pending"
+msgstr "En attente"
+
+msgid "Running"
+msgstr "En cours"
+
+msgid "Succeeded"
+msgstr "Réussi"
+
+msgid "Failed"
+msgstr "Échec"
 
 msgid "Accept request(s) (send download links)"
 msgstr "Accepter les demandes (envoyer les liens de téléchargement)"
