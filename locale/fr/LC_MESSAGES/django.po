@@ -131,6 +131,36 @@ msgstr "Priorité de tri : %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Changer l'ordre de tri"
 
+msgid "Hot"
+msgstr "Chaud"
+
+msgid "Cooling"
+msgstr "Refroidissement"
+
+msgid "Cool"
+msgstr "Refroidi"
+
+msgid "Restoring"
+msgstr "Restauration"
+
+msgid "Error"
+msgstr "Erreur"
+
+msgid "Restore"
+msgstr "Restaurer"
+
+msgid "Pending"
+msgstr "En attente"
+
+msgid "Running"
+msgstr "En cours"
+
+msgid "Succeeded"
+msgstr "Réussi"
+
+msgid "Failed"
+msgstr "Échec"
+
 msgid "Accept request(s) (send download links)"
 msgstr "Accepter les demandes (envoyer les liens de téléchargement)"
 
