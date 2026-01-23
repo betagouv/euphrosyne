@@ -36,7 +36,7 @@ class TestDownloaldUrls(TestCase):
         assert (
             url
             # pylint: disable=line-too-long
-            == "http://example.com/data/run-data-zip?token=token&path=projects/project_slug/runs/run_label/raw_data"
+            == "http://example.com/data/run-data-zip?token=token&path=projects%2Fproject_slug%2Fruns%2Frun_label%2Fraw_data"
         )
 
     def test_fetch_token_for_run_data(self):
@@ -49,11 +49,12 @@ class TestDownloaldUrls(TestCase):
 
         assert token == "token"
         url = self.requests_get_mock.call_args[0][0]
-        assert url.startswith(
-            "http://example.com/data/project_slug/token?path="
-            "projects/project_slug/runs/run_label/raw_data"
-        )
-        assert "expiration=" in url
+        assert url == "http://example.com/data/project_slug/token"
+        params = self.requests_get_mock.call_args[1]["params"]
+        assert params == {
+            "path": "projects/project_slug/runs/run_label/raw_data",
+            "expiration": now.isoformat(),
+        }
         assert self.requests_get_mock.call_args[1]["headers"] == {
             "Authorization": "Bearer access"
         }
@@ -63,7 +64,8 @@ class TestDownloaldUrls(TestCase):
         fetch_token_for_run_data(
             "project_slug", "run_label", "raw_data", data_request_id="1"
         )
-        assert "data_request=1" in self.requests_get_mock.call_args[0][0]
+        params = self.requests_get_mock.call_args[1]["params"]
+        assert params["data_request"] == "1"
 
     def test_fetch_token_for_run_data_raise_euphro_tools_exception(
         self,

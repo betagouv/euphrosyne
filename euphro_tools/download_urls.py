@@ -2,6 +2,7 @@
 
 import typing
 from datetime import datetime
+from urllib.parse import urlencode
 
 import requests
 
@@ -16,10 +17,13 @@ def generate_download_url(
 ) -> str:
     """Generate a download URL for a run's data.
     Token can be obtained by calling fetch_token_for_run_data function."""
-    return (
-        build_tools_api_url("/data/run-data-zip")
-        + f"?token={token}&path={get_run_data_path(project_slug, run_label, data_type)}"
+    query = urlencode(
+        {
+            "token": token,
+            "path": get_run_data_path(project_slug, run_label, data_type),
+        }
     )
+    return f"{build_tools_api_url('/data/run-data-zip')}?{query}"
 
 
 def fetch_token_for_run_data(
@@ -29,15 +33,16 @@ def fetch_token_for_run_data(
     expiration: datetime | None = None,
     data_request_id: str | None = None,
 ) -> str:
-    query_params = f"?path={get_run_data_path(project_slug, run_label, data_type)}"
+    token_url = build_tools_api_url(f"/data/{project_slug}/token")
+    params = {"path": get_run_data_path(project_slug, run_label, data_type)}
     if expiration:
-        query_params += f"&expiration={expiration.isoformat()}"
-    token_url = build_tools_api_url(f"/data/{project_slug}/token") + query_params
+        params["expiration"] = expiration.isoformat()
     if data_request_id:
-        token_url += f"&data_request={data_request_id}"
+        params["data_request"] = data_request_id
     try:
         request = requests.get(
             token_url,
+            params=params,
             timeout=5,
             headers=get_tools_api_auth_header(),
         )
