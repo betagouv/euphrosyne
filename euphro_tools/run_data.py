@@ -52,8 +52,7 @@ def _list_run_data_entries(
         )
     if not response.ok:
         raise EuphroToolsException(
-            "Failed to list run data entries for %s/%s."
-            % (project_slug, run_label)
+            "Failed to list run data entries for %s/%s." % (project_slug, run_label)
         )
     payload = response.json()
     if not isinstance(payload, list):
