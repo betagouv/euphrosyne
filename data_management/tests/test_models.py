@@ -24,12 +24,12 @@ def test_last_lifecycle_operation_ignores_null_timestamps():
     )
 
     base_time = timezone.now()
-    running = LifecycleOperation.objects.create(
+    LifecycleOperation.objects.create(
         project_run_data=run_data,
         type=LifecycleOperationType.COOL,
         status=LifecycleOperationStatus.RUNNING,
         started_at=base_time - timedelta(hours=1),
-    )
+    )  # running
     finished = LifecycleOperation.objects.create(
         project_run_data=run_data,
         type=LifecycleOperationType.RESTORE,
