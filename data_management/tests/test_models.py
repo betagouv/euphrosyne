@@ -175,6 +175,26 @@ def test_transition_to_cool_rejects_missing_operation_or_expected_totals():
 
 
 @pytest.mark.django_db
+def test_transition_to_cool_rejects_operation_from_other_run_data():
+    run_data = RunData.objects.create(
+        run=RunFactory(),
+        lifecycle_state=LifecycleState.COOLING,
+        run_size_bytes=10,
+        file_count=2,
+    )
+    other_run_data = RunData.objects.create(
+        run=RunFactory(),
+        lifecycle_state=LifecycleState.COOLING,
+        run_size_bytes=10,
+        file_count=2,
+    )
+    operation = create_operation(other_run_data, LifecycleOperationType.COOL)
+
+    with pytest.raises(ValueError):
+        run_data.transition_to(LifecycleState.COOL, operation=operation)
+
+
+@pytest.mark.django_db
 def test_transition_to_restoring_requires_cool():
     run_data = RunData.objects.create(
         run=RunFactory(),
@@ -231,6 +251,26 @@ def test_transition_to_hot_rejects_invalid_operation(overrides):
     for key, value in overrides.items():
         setattr(operation, key, value)
     operation.save()
+
+    with pytest.raises(ValueError):
+        run_data.transition_to(LifecycleState.HOT, operation=operation)
+
+
+@pytest.mark.django_db
+def test_transition_to_hot_rejects_operation_from_other_run_data():
+    run_data = RunData.objects.create(
+        run=RunFactory(),
+        lifecycle_state=LifecycleState.RESTORING,
+        run_size_bytes=10,
+        file_count=2,
+    )
+    other_run_data = RunData.objects.create(
+        run=RunFactory(),
+        lifecycle_state=LifecycleState.RESTORING,
+        run_size_bytes=10,
+        file_count=2,
+    )
+    operation = create_operation(other_run_data, LifecycleOperationType.RESTORE)
 
     with pytest.raises(ValueError):
         run_data.transition_to(LifecycleState.HOT, operation=operation)

@@ -161,6 +161,8 @@ def verify_operation(
     """
     if operation is None:
         return False
+    if run_data.pk is None or operation.project_run_data_id != run_data.pk:
+        return False
     if run_data.run_size_bytes is None or run_data.file_count is None:
         return False
     if operation.bytes_copied is None or operation.files_copied is None:
