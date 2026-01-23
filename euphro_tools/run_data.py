@@ -47,15 +47,19 @@ def _list_run_data_entries(
         headers=get_tools_api_auth_header(),
     )
     if response.status_code == 404:
-        return []
+        raise EuphroToolsException(
+            "Run data not found for %s/%s." % (project_slug, run_label)
+        )
     if not response.ok:
         raise EuphroToolsException(
-            "Failed to list run data entries " f"for {project_slug}/{run_label}."
+            "Failed to list run data entries for %s/%s."
+            % (project_slug, run_label)
         )
     payload = response.json()
     if not isinstance(payload, list):
         raise EuphroToolsException(
-            "Unexpected run data listing response " f"for {project_slug}/{run_label}."
+            "Unexpected run data listing response for %s/%s."
+            % (project_slug, run_label)
         )
     return payload
 
@@ -82,8 +86,8 @@ def compute_run_data_totals(
             size = entry.get("size")
             if size is None:
                 raise EuphroToolsException(
-                    "Missing size for run data entry "
-                    f"{entry.get('path', entry.get('name', 'unknown'))}."
+                    "Missing size for run data entry %s."
+                    % (entry.get("path", entry.get("name", "unknown")),)
                 )
             bytes_total += int(size)
             files_total += 1
