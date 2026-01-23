@@ -1,14 +1,11 @@
 from types import SimpleNamespace
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 import requests
-from django.core.management import call_command
 
-from data_management.models import RunData
-from euphro_tools.run_data import RunDataTotals, compute_run_data_totals
-from lab.runs.models import Run
-from lab.tests.factories import RunFactory
+from euphro_tools.exceptions import EuphroToolsException
+from euphro_tools.run_data import compute_run_data_totals
 
 
 def build_response(payload, status_code: int = 200) -> MagicMock:
@@ -66,18 +63,16 @@ def test_compute_run_data_totals_counts_files_and_bytes(monkeypatch):
     assert totals.files_total == 2
 
 
-@pytest.mark.django_db
-def test_compute_run_data_totals_command_updates_run_data():
-    run = RunFactory(status=Run.Status.FINISHED)
-    run_data = RunData.objects.create(run=run)
+def test_compute_run_data_totals_raises_on_missing_run(monkeypatch):
+    monkeypatch.setattr(
+        "euphro_auth.jwt.tokens.EuphroToolsAPIToken.for_euphrosyne",
+        lambda: SimpleNamespace(access_token="token"),
+    )
 
-    with patch(
-        "data_management.management.commands.compute_run_data_totals.compute_run_data_totals"  # pylint: disable=line-too-long
-    ) as mock_compute:
-        mock_compute.return_value = RunDataTotals(bytes_total=10, files_total=2)
-        call_command("compute_run_data_totals")
+    get_mock = MagicMock(
+        return_value=build_response([], status_code=404),
+    )
+    monkeypatch.setattr(requests, "get", get_mock)
 
-    run_data.refresh_from_db()
-    assert run_data.run_size_bytes == 10
-    assert run_data.file_count == 2
-    mock_compute.assert_called_once_with(run.project.slug, run.label)
+    with pytest.raises(EuphroToolsException):
+        compute_run_data_totals("project-slug", "missing-run")
