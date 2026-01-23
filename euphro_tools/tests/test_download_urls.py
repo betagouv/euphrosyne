@@ -16,9 +16,7 @@ class TestDownloaldUrls(TestCase):
         self.requests_get_mock = patcher.start()
         self.addCleanup(patcher.stop)
 
-        patcher = mock.patch(
-            "euphro_tools.download_urls.EuphroToolsAPIToken.for_euphrosyne"
-        )
+        patcher = mock.patch("euphro_tools.utils.EuphroToolsAPIToken.for_euphrosyne")
         self.token_mock = patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -50,10 +48,12 @@ class TestDownloaldUrls(TestCase):
         )
 
         assert token == "token"
-        assert self.requests_get_mock.call_args[0][0] == (
-            # pylint: disable=line-too-long
-            "http://example.com/data/project_slug/token?path=projects/project_slug/runs/run_label/raw_data"
+        url = self.requests_get_mock.call_args[0][0]
+        assert url.startswith(
+            "http://example.com/data/project_slug/token?path="
+            "projects/project_slug/runs/run_label/raw_data"
         )
+        assert "expiration=" in url
         assert self.requests_get_mock.call_args[1]["headers"] == {
             "Authorization": "Bearer access"
         }

@@ -1,15 +1,12 @@
 """Everything related to getting signed download link from euphro tools."""
 
-import os
 import typing
 from datetime import datetime
 
 import requests
 
-from euphro_auth.jwt.tokens import EuphroToolsAPIToken
-
 from .exceptions import EuphroToolsException
-from .utils import get_run_data_path
+from .utils import build_tools_api_url, get_run_data_path, get_tools_api_auth_header
 
 DataType = typing.Literal["raw_data", "processed_data"]
 
@@ -20,8 +17,7 @@ def generate_download_url(
     """Generate a download URL for a run's data.
     Token can be obtained by calling fetch_token_for_run_data function."""
     return (
-        os.environ["EUPHROSYNE_TOOLS_API_URL"]
-        + "/data/run-data-zip"
+        build_tools_api_url("/data/run-data-zip")
         + f"?token={token}&path={get_run_data_path(project_slug, run_label, data_type)}"
     )
 
@@ -36,19 +32,14 @@ def fetch_token_for_run_data(
     query_params = f"?path={get_run_data_path(project_slug, run_label, data_type)}"
     if expiration:
         query_params += f"&expiration={expiration.isoformat()}"
-    token_url = (
-        os.environ["EUPHROSYNE_TOOLS_API_URL"]
-        + f"/data/{project_slug}/token"
-        + f"?path={get_run_data_path(project_slug, run_label, data_type)}"
-    )
+    token_url = build_tools_api_url(f"/data/{project_slug}/token") + query_params
     if data_request_id:
         token_url += f"&data_request={data_request_id}"
-    bearer_token = EuphroToolsAPIToken.for_euphrosyne().access_token
     try:
         request = requests.get(
             token_url,
             timeout=5,
-            headers={"Authorization": f"Bearer {bearer_token}"},
+            headers=get_tools_api_auth_header(),
         )
         request.raise_for_status()
     except (requests.HTTPError, requests.ConnectionError) as error:
@@ -65,16 +56,12 @@ def get_storage_info_for_project_images(
     project_slug: str,
 ) -> GetUrlAndTokenForProjectImagesResponse:
     """Get a download URL and token for a project's images."""
-    url = (
-        os.environ["EUPHROSYNE_TOOLS_API_URL"]
-        + f"/images/projects/{project_slug}/signed-url"
-    )
-    token = EuphroToolsAPIToken.for_euphrosyne().access_token
+    url = build_tools_api_url(f"/images/projects/{project_slug}/signed-url")
     try:
         request = requests.get(
             url,
             timeout=5,
-            headers={"Authorization": f"Bearer {token}"},
+            headers=get_tools_api_auth_header(),
         )
         request.raise_for_status()
     except (requests.HTTPError, requests.ConnectionError) as error:
