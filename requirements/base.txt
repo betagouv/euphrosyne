@@ -23,5 +23,5 @@ pyyaml==6.0.3
 reportlab==4.4.7 
 sentry-sdk==2.45.0
 social-auth-app-django==5.5.1
-wheel==0.45.1
+wheel==0.46.2
 whitenoise==6.11.0
