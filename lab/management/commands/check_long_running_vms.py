@@ -46,7 +46,7 @@ class Command(BaseCommand):
         response = requests.get(
             os.environ["EUPHROSYNE_TOOLS_API_URL"]
             + f"/vms?created_before={formatted_time}",
-            timeout=5,
+            timeout=10,
             headers={"Authorization": f"Bearer {token}"},
         )
         if not response.ok:
