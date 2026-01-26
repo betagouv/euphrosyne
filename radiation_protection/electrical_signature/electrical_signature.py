@@ -65,61 +65,90 @@ def start_electrical_signature_processes(  # pylint: disable=too-many-locals
         access_form_base_label = translation.gettext("Access authorization form")
     run_date_str = run.start_date.strftime("%d/%m/%y") if run.start_date else ""
 
-    # AUTHORIZATION ACCESS FORM
-    with tempfile.NamedTemporaryFile(suffix=".docx") as temp_file:
-        workflow_name = f"AGLAE - {access_form_base_label} - {participation.user.get_administrative_name()} - {run.project.name} - {run_date_str}"  # pylint: disable=line-too-long
-        write_authorization_access_form(
-            plan=risk_prevention_plan,
-            write_path=Path(temp_file.name),
-        )
+    access_form_workflow_name = (
+        f"AGLAE - {access_form_base_label} - "
+        f"{participation.user.get_administrative_name()} - {run.project.name} - "
+        f"{run_date_str}"
+    )
+    prevention_plan_workflow_name = (
+        f"AGLAE - {prevention_plan_base_label} - "
+        f"{participation.user.get_administrative_name()} - {run.project.name} - "
+        f"{run_date_str}"
+    )
 
-        workflow_id = start_workflow(
-            workflow_name=workflow_name,
-            steps=[
-                {
-                    "step_type": StepType.APPROVAL,
-                    "recipients": [
-                        {
-                            "email": participation.user.email,
-                            "first_name": participation.user.first_name,
-                            "last_name": participation.user.last_name,
-                            "preferred_locale": institution_locale,
-                        },
-                    ],
-                },
-                {
-                    "step_type": StepType.SIGNATURE,
-                    "recipients": [
-                        {
-                            "email": employer.email,
-                            "first_name": employer.first_name,
-                            "last_name": employer.last_name,
-                            "preferred_locale": institution_locale,
-                        },
-                    ],
-                },
-            ],
-            document_path=temp_file.name,
+    existing_processes: dict[str, ElectricalSignatureProcess] = {}
+    for process in (
+        ElectricalSignatureProcess.objects.filter(
+            risk_prevention_plan=risk_prevention_plan,
+            provider_name=ELECTRICAL_SIGNATURE_PROVIDER_NAME,
+            label__in=[access_form_workflow_name, prevention_plan_workflow_name],
         )
+        .order_by("id")
+        .all()
+    ):
+        existing_processes.setdefault(process.label, process)
+
+    # AUTHORIZATION ACCESS FORM
+    access_process = existing_processes.get(access_form_workflow_name)
+    if access_process:
+        processes.append(access_process)
+    else:
+        with tempfile.NamedTemporaryFile(suffix=".docx") as temp_file:
+            write_authorization_access_form(
+                plan=risk_prevention_plan,
+                write_path=Path(temp_file.name),
+            )
+
+            workflow_id = start_workflow(
+                workflow_name=access_form_workflow_name,
+                steps=[
+                    {
+                        "step_type": StepType.APPROVAL,
+                        "recipients": [
+                            {
+                                "email": participation.user.email,
+                                "first_name": participation.user.first_name,
+                                "last_name": participation.user.last_name,
+                                "preferred_locale": institution_locale,
+                            },
+                        ],
+                    },
+                    {
+                        "step_type": StepType.SIGNATURE,
+                        "recipients": [
+                            {
+                                "email": employer.email,
+                                "first_name": employer.first_name,
+                                "last_name": employer.last_name,
+                                "preferred_locale": institution_locale,
+                            },
+                        ],
+                    },
+                ],
+                document_path=temp_file.name,
+            )
         processes.append(
             ElectricalSignatureProcess.objects.create(
                 risk_prevention_plan=risk_prevention_plan,
-                provider_name="goodflag",
+                provider_name=ELECTRICAL_SIGNATURE_PROVIDER_NAME,
                 provider_workflow_id=workflow_id,
-                label=workflow_name,
+                label=access_form_workflow_name,
             )
         )
 
-        # RISK PREVENTION PLAN
+    # RISK PREVENTION PLAN
+    prevention_plan_process = existing_processes.get(prevention_plan_workflow_name)
+    if prevention_plan_process:
+        processes.append(prevention_plan_process)
+    else:
         with tempfile.NamedTemporaryFile(suffix=".docx") as temp_file:
-            workflow_name = f"AGLAE - {prevention_plan_base_label} - {participation.user.get_administrative_name()} - {run.project.name} - {run_date_str}"  # pylint: disable=line-too-long
             write_risk_prevention_plan(
                 plan=risk_prevention_plan,
                 write_path=Path(temp_file.name),
             )
 
             workflow_id = start_workflow(
-                workflow_name=workflow_name,
+                workflow_name=prevention_plan_workflow_name,
                 steps=[
                     {
                         "step_type": StepType.APPROVAL,
@@ -160,9 +189,10 @@ def start_electrical_signature_processes(  # pylint: disable=too-many-locals
         processes.append(
             ElectricalSignatureProcess.objects.create(
                 risk_prevention_plan=risk_prevention_plan,
-                provider_name="goodflag",
+                provider_name=ELECTRICAL_SIGNATURE_PROVIDER_NAME,
                 provider_workflow_id=workflow_id,
-                label=workflow_name,
+                label=prevention_plan_workflow_name,
             )
         )
-        return processes
+
+    return processes
