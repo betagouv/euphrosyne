@@ -88,6 +88,55 @@ def test_start_electrical_signature_processes(
 @mock.patch(
     "radiation_protection.electrical_signature.electrical_signature.start_workflow"
 )
+def test_start_electrical_signature_processes_idempotent_when_existing(
+    mock_start_workflow, risk_prevention_plan
+):
+    """Test that existing processes are reused without new workflows."""
+    mock_start_workflow.side_effect = ["workflow_auth_123", "workflow_risk_123"]
+
+    start_electrical_signature_processes(risk_prevention_plan)
+    assert ElectricalSignatureProcess.objects.count() == 2
+
+    mock_start_workflow.reset_mock()
+    mock_start_workflow.side_effect = AssertionError(
+        "start_workflow should not be called when processes exist"
+    )
+
+    processes = start_electrical_signature_processes(risk_prevention_plan)
+    assert len(processes) == 2
+    assert ElectricalSignatureProcess.objects.count() == 2
+    mock_start_workflow.assert_not_called()
+
+
+@pytest.mark.django_db
+@mock.patch(
+    "radiation_protection.electrical_signature.electrical_signature.start_workflow"
+)
+def test_start_electrical_signature_processes_retries_missing_only(
+    mock_start_workflow, risk_prevention_plan
+):
+    """Test retry only creates the missing workflow after a partial failure."""
+    mock_start_workflow.side_effect = ["workflow_auth_123", RuntimeError("boom")]
+
+    with pytest.raises(RuntimeError):
+        start_electrical_signature_processes(risk_prevention_plan)
+
+    assert ElectricalSignatureProcess.objects.count() == 1
+
+    mock_start_workflow.reset_mock()
+    mock_start_workflow.side_effect = None
+    mock_start_workflow.return_value = "workflow_risk_456"
+
+    processes = start_electrical_signature_processes(risk_prevention_plan)
+    assert mock_start_workflow.call_count == 1
+    assert ElectricalSignatureProcess.objects.count() == 2
+    assert len({process.label for process in processes}) == 2
+
+
+@pytest.mark.django_db
+@mock.patch(
+    "radiation_protection.electrical_signature.electrical_signature.start_workflow"
+)
 def test_start_electrical_signature_processes_workflow_steps(
     mock_start_workflow, risk_prevention_plan
 ):
