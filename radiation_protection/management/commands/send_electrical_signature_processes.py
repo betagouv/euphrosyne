@@ -49,6 +49,7 @@ class Command(BaseCommand):
                     str(e),
                 )
                 sentry_sdk.capture_exception(e)
+                continue
 
             # Mark the plan as sent
             plan.risk_advisor_notification_sent = True
