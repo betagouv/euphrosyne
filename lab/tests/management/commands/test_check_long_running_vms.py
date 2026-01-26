@@ -53,7 +53,7 @@ class CheckLongRunningVMsTest(TestCase):
 
         self.mock_get.assert_called_once_with(
             self._get_expected_api_call(60),
-            timeout=5,
+            timeout=10,
             headers={"Authorization": "Bearer fake_token"},
         )
 
@@ -64,7 +64,7 @@ class CheckLongRunningVMsTest(TestCase):
 
         self.mock_get.assert_called_once_with(
             self._get_expected_api_call(60),
-            timeout=5,
+            timeout=10,
             headers={"Authorization": "Bearer fake_token"},
         )
 
@@ -82,7 +82,7 @@ class CheckLongRunningVMsTest(TestCase):
 
         self.mock_get.assert_called_once_with(
             self._get_expected_api_call(60),
-            timeout=5,
+            timeout=10,
             headers={"Authorization": "Bearer fake_token"},
         )
         mock_send_email.assert_called_once_with(["admin@example.com"], project)
