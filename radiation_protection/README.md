@@ -19,6 +19,7 @@ risk prevention plans, and related notifications.
 - `GOODFLAG_USER_ID`
 - `GOODFLAG_SIGNATURE_CONSENT_PAGE_ID`
 - `GOODFLAG_SIGNATURE_PROFILE_ID`
+- `GOODFLAG_TEMPLATE_ID`
 
 ## Project overrides
 

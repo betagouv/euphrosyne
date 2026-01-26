@@ -31,6 +31,7 @@ env:
   GOODFLAG_USER_ID: user_id
   GOODFLAG_SIGNATURE_CONSENT_PAGE_ID: page_id
   GOODFLAG_SIGNATURE_PROFILE_ID: profile_id
+  GOODFLAG_TEMPLATE_ID: template_id
 
 jobs:
   python-checks:

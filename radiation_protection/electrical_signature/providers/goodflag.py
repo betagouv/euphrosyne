@@ -100,6 +100,7 @@ class GoodflagClient:
         user_id: str | None = None,
         consent_page_id: str | None = None,
         signature_profile_id: str | None = None,
+        template_id: str | None = None,
     ):
 
         self.base_url = base_url or app_settings.GOODFLAG_API_BASE  # type: ignore[misc]
@@ -111,6 +112,7 @@ class GoodflagClient:
         self.signature_profile_id = (
             signature_profile_id or app_settings.GOODFLAG_SIGNATURE_PROFILE_ID  # type: ignore[misc] # pylint: disable=line-too-long
         )
+        self.template_id = template_id or app_settings.GOODFLAG_TEMPLATE_ID  # type: ignore[misc] # pylint: disable=line-too-long
 
         if not self.base_url:
             raise ValueError("GOODFLAG_API_BASE is required")
@@ -122,7 +124,10 @@ class GoodflagClient:
             raise ValueError("GOODFLAG_SIGNATURE_CONSENT_PAGE_ID is required")
         if not self.signature_profile_id:
             raise ValueError("GOODFLAG_SIGNATURE_PROFILE_ID is required")
-
+        if not self.template_id:
+            logger.warning(
+                "GOODFLAG_TEMPLATE_ID is not set; workflow creation may fail"
+            )
         self.base_url = self.base_url.rstrip("/") + "/api"
         self.headers = {
             "Authorization": f"Bearer {self.api_token}",
@@ -322,5 +327,10 @@ class GoodflagClient:
 
     def list_signature_profiles(self):
         endpoint = "/signatureProfiles"
+        response = self._make_request("GET", endpoint, headers=self.headers)
+        return response.json()
+
+    def list_workflow_templates(self):
+        endpoint = "/templates"
         response = self._make_request("GET", endpoint, headers=self.headers)
         return response.json()
