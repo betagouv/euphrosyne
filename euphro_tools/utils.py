@@ -1,8 +1,6 @@
 import os
 from typing import Literal
 
-from euphro_auth.jwt.tokens import EuphroToolsAPIToken
-
 
 def get_run_data_path(
     project_slug: str, run_label: str, data_type: Literal["raw_data", "processed_data"]
@@ -18,6 +16,10 @@ def build_tools_api_url(path: str) -> str:
 
 
 def get_tools_api_auth_header() -> dict[str, str]:
+    from euphro_auth.jwt.tokens import (  # pylint: disable=import-outside-toplevel
+        EuphroToolsAPIToken,
+    )
+
     token = EuphroToolsAPIToken.for_euphrosyne().access_token
     return {"Authorization": f"Bearer {token}"}
 
