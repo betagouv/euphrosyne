@@ -16,7 +16,7 @@ class TestDownloaldUrls(TestCase):
         self.requests_get_mock = patcher.start()
         self.addCleanup(patcher.stop)
 
-        patcher = mock.patch("euphro_tools.utils.EuphroToolsAPIToken.for_euphrosyne")
+        patcher = mock.patch("euphro_tools.utils._get_euphrosyne_token")
         self.token_mock = patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -29,7 +29,7 @@ class TestDownloaldUrls(TestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.token_mock.return_value.access_token = "access"
+        self.token_mock.return_value = "access"
 
     def test_generate_download_url(self):
         url = generate_download_url("project_slug", "run_label", "raw_data", "token")
