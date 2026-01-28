@@ -1,8 +1,9 @@
-import { uploadFile } from "../fileshare-service";
+import { FileshareStorageClient } from "../fileshare-storage-client";
 
 describe("Test document file service", () => {
   describe("Test uploadFile", () => {
     it("uploads file in several batches", async () => {
+      const storageClient = new FileshareStorageClient();
       const fetchSpy = vi
         .spyOn(global, "fetch")
         .mockImplementation(() =>
@@ -10,7 +11,7 @@ describe("Test document file service", () => {
             new Response("body", { status: 200, statusText: "OK" }),
           ),
         );
-      const { file } = await uploadFile(
+      const { file } = await storageClient.upload(
         new File([new ArrayBuffer(6000000)], "hello", {
           type: "text/plain",
         }),

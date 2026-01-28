@@ -28,4 +28,19 @@ describe("Test document file service", () => {
       expect(uploadFileSpy).toHaveBeenCalledTimes(2);
     });
   });
+
+  describe("Test injected storage client", () => {
+    it("uses provided storage client", async () => {
+      const file = new File([], "file-1.txt");
+      const uploadHandler = vi.fn().mockResolvedValue({ file });
+      const storageClient = { upload: uploadHandler };
+      fileService = new DocumentFileService("project", "slug", {
+        storageClient,
+      });
+
+      await fileService.uploadFile(file, "https://example.com");
+
+      expect(uploadHandler).toHaveBeenCalledWith(file, "https://example.com");
+    });
+  });
 });

@@ -12,7 +12,7 @@ import { IImagewithUrl } from "../../../../../shared/js/images/types";
 import { ProjectImageServices } from "../project-image-service";
 import ImageGrid from "../../../../../shared/js/images/ImageGrid";
 import ImageWithPlaceholder from "../../../../../shared/js/images/ImageWithPlaceholder";
-import { uploadFile } from "../../../../assets/js/blob-service";
+import { BlobStorageClient } from "../../../../assets/js/blob-storage-client";
 import { useClientContext } from "../../../../../shared/js/EuphrosyneToolsClient.context";
 
 interface DocumentManagerProps {
@@ -50,6 +50,8 @@ const modalBtnStyle = css({
   float: "right",
 });
 
+const blobStorageClient = new BlobStorageClient();
+
 export default function DocumentManager({
   project,
   table,
@@ -84,7 +86,7 @@ export default function DocumentManager({
     const documentPromises = fileService.uploadFiles(documents);
     const imagePromises = images.map(async (i) => {
       const url = await imageService.getUploadSASUrl(i.name);
-      return uploadFile(i, url);
+      return blobStorageClient.upload(i, url);
     });
     return Promise.allSettled([...documentPromises, ...imagePromises]);
   };
