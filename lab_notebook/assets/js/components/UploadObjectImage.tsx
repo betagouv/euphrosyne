@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { uploadFile } from "../../../../lab/assets/js/blob-service";
+import { BlobStorageClient } from "../../../../lab/assets/js/blob-storage-client";
 import { ObjectGroupImageServices } from "../notebook-image.services";
+
+const blobStorageClient = new BlobStorageClient();
 
 interface IUploadObjectImageProps {
   onUpload: (url: string) => void;
@@ -54,7 +56,7 @@ export default function UploadObjectImage({
 
       // Then, upload to S3-like service
       try {
-        await uploadFile(file, url);
+        await blobStorageClient.upload(file, url);
       } catch (error) {
         handleError(error, t.blobUploadError);
         throw error;
