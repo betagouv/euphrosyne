@@ -1,5 +1,6 @@
+from datetime import timedelta
+
 import pytest
-from dateutil.relativedelta import relativedelta
 
 from data_management.models import ProjectData
 from lab.tests.factories import ProjectFactory
@@ -11,5 +12,5 @@ def test_project_data_created_with_initial_eligibility():
 
     project_data = ProjectData.objects.get(project=project)
 
-    expected = project.created + relativedelta(months=6)
+    expected = project.created + timedelta(days=30 * 6)
     assert project_data.cooling_eligible_at == expected

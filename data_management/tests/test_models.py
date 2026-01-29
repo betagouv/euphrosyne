@@ -20,7 +20,7 @@ def create_operation(
     **overrides: Any,
 ) -> LifecycleOperation:
     data = {
-        "project": project_data.project,
+        "project_data": project_data,
         "type": operation_type,
         "status": LifecycleOperationStatus.SUCCEEDED,
         "bytes_copied": project_data.project_size_bytes,
@@ -46,20 +46,20 @@ def test_last_lifecycle_operation_ignores_null_timestamps():
     project_data = create_project_data(project=project)
 
     LifecycleOperation.objects.create(
-        project=project,
+        project_data=project_data,
         type=LifecycleOperationType.COOL,
         status=LifecycleOperationStatus.PENDING,
     )
 
     base_time = timezone.now()
     LifecycleOperation.objects.create(
-        project=project,
+        project_data=project_data,
         type=LifecycleOperationType.COOL,
         status=LifecycleOperationStatus.RUNNING,
         started_at=base_time - timedelta(hours=1),
     )  # running
     finished = LifecycleOperation.objects.create(
-        project=project,
+        project_data=project_data,
         type=LifecycleOperationType.RESTORE,
         status=LifecycleOperationStatus.SUCCEEDED,
         finished_at=base_time,
@@ -74,13 +74,13 @@ def test_last_lifecycle_operation_prefers_started_over_pending():
     project_data = create_project_data(project=project)
 
     LifecycleOperation.objects.create(
-        project=project,
+        project_data=project_data,
         type=LifecycleOperationType.COOL,
         status=LifecycleOperationStatus.PENDING,
     )
 
     running = LifecycleOperation.objects.create(
-        project=project,
+        project_data=project_data,
         type=LifecycleOperationType.COOL,
         status=LifecycleOperationStatus.RUNNING,
         started_at=timezone.now(),

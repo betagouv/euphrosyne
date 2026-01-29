@@ -7,10 +7,9 @@ state transitions that are validated before persisting.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
-from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.db.models import F
 from django.utils import timezone
@@ -46,12 +45,10 @@ class LifecycleOperation(models.Model):
     operation_id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
     )
-    project = models.ForeignKey(
-        "lab.Project",
+    project_data = models.ForeignKey(
+        "data_management.ProjectData",
         on_delete=models.CASCADE,
         related_name="lifecycle_operations",
-        null=True,
-        blank=True,
     )
     type = models.CharField(max_length=16, choices=LifecycleOperationType.choices)
     status = models.CharField(
@@ -70,7 +67,7 @@ class LifecycleOperation(models.Model):
 
 
 def _compute_initial_cooling_eligible_at(created_at: datetime) -> datetime:
-    return created_at + relativedelta(months=6)
+    return created_at + timedelta(days=30 * 6)
 
 
 class ProjectData(models.Model):
@@ -106,7 +103,7 @@ class ProjectData(models.Model):
 
     @property
     def last_lifecycle_operation(self) -> LifecycleOperation | None:
-        return self.project.lifecycle_operations.order_by(
+        return self.lifecycle_operations.order_by(
             F("finished_at").desc(nulls_last=True),
             F("started_at").desc(nulls_last=True),
         ).first()
@@ -189,7 +186,7 @@ def verify_operation(
     """
     if operation is None:
         return False
-    if project_data.pk is None or operation.project_id != project_data.project_id:
+    if project_data.pk is None or operation.project_data.pk != project_data.pk:
         return False
     if project_data.project_size_bytes is None or project_data.file_count is None:
         return False
