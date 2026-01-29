@@ -1,15 +1,23 @@
-"""Run data lifecycle models and guards for COOL/RESTORE state changes.
+"""Project data lifecycle models and guards for COOL/RESTORE state changes.
 
 Includes eligibility checks, verification against expected totals, and
 state transitions that are validated before persisting.
 """
 
-import uuid
+from __future__ import annotations
 
+import uuid
+from datetime import datetime
+from typing import TYPE_CHECKING
+
+from dateutil.relativedelta import relativedelta
 from django.db import models
 from django.db.models import F
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+if TYPE_CHECKING:
+    from lab.projects.models import Project
 
 
 class LifecycleState(models.TextChoices):
@@ -38,10 +46,12 @@ class LifecycleOperation(models.Model):
     operation_id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
     )
-    project_run_data = models.ForeignKey(
-        "data_management.RunData",
+    project = models.ForeignKey(
+        "lab.Project",
         on_delete=models.CASCADE,
         related_name="lifecycle_operations",
+        null=True,
+        blank=True,
     )
     type = models.CharField(max_length=16, choices=LifecycleOperationType.choices)
     status = models.CharField(
@@ -59,13 +69,17 @@ class LifecycleOperation(models.Model):
     error_details = models.TextField(null=True, blank=True)
 
 
-class RunData(models.Model):
-    """Store run-level lifecycle state and expected data totals."""
+def _compute_initial_cooling_eligible_at(created_at: datetime) -> datetime:
+    return created_at + relativedelta(months=6)
 
-    run = models.OneToOneField(
-        "lab.Run",
+
+class ProjectData(models.Model):
+    """Store project-level lifecycle state and expected data totals."""
+
+    project = models.OneToOneField(
+        "lab.Project",
         on_delete=models.CASCADE,
-        related_name="project_run_data",
+        related_name="project_data",
     )
     lifecycle_state = models.CharField(
         max_length=32,
@@ -73,12 +87,26 @@ class RunData(models.Model):
         default=LifecycleState.HOT,
     )
     cooling_eligible_at = models.DateTimeField(null=True, blank=True)
-    run_size_bytes = models.PositiveBigIntegerField(null=True, blank=True)
+    project_size_bytes = models.PositiveBigIntegerField(null=True, blank=True)
     file_count = models.PositiveBigIntegerField(null=True, blank=True)
+
+    @classmethod
+    def for_project(cls, project: Project) -> "ProjectData":
+        created_at = project.created or timezone.now()
+        defaults = {
+            "cooling_eligible_at": _compute_initial_cooling_eligible_at(created_at),
+        }
+        project_data, created = cls.objects.get_or_create(
+            project=project, defaults=defaults
+        )
+        if not created and project_data.cooling_eligible_at is None:
+            project_data.cooling_eligible_at = defaults["cooling_eligible_at"]
+            project_data.save(update_fields=["cooling_eligible_at"])
+        return project_data
 
     @property
     def last_lifecycle_operation(self) -> LifecycleOperation | None:
-        return self.lifecycle_operations.order_by(
+        return self.project.lifecycle_operations.order_by(
             F("finished_at").desc(nulls_last=True),
             F("started_at").desc(nulls_last=True),
         ).first()
@@ -133,7 +161,7 @@ class RunData(models.Model):
         target_state: LifecycleState,
         *,
         operation: LifecycleOperation | None = None,
-    ) -> "RunData":
+    ) -> "ProjectData":
         """Persist a lifecycle transition after guard checks pass."""
         if not self.can_transition_to(target_state, operation=operation):
             raise ValueError(
@@ -152,29 +180,29 @@ class RunData(models.Model):
 
 
 def verify_operation(
-    run_data: "RunData",
+    project_data: "ProjectData",
     operation: "LifecycleOperation | None",
 ) -> bool:
-    """Return True when copied totals match expected run data totals.
+    """Return True when copied totals match expected project data totals.
 
     This check guards COOL/HOT transitions from accepting partial moves.
     """
     if operation is None:
         return False
-    if run_data.pk is None or operation.project_run_data_id != run_data.pk:
+    if project_data.pk is None or operation.project_id != project_data.project_id:
         return False
-    if run_data.run_size_bytes is None or run_data.file_count is None:
+    if project_data.project_size_bytes is None or project_data.file_count is None:
         return False
     if operation.bytes_copied is None or operation.files_copied is None:
         return False
     return (
-        operation.bytes_copied == run_data.run_size_bytes
-        and operation.files_copied == run_data.file_count
+        operation.bytes_copied == project_data.project_size_bytes
+        and operation.files_copied == project_data.file_count
     )
 
 
 def verify_operation_success(
-    run_data: "RunData",
+    project_data: "ProjectData",
     operation: "LifecycleOperation | None",
     operation_type: LifecycleOperationType,
 ) -> bool:
@@ -185,4 +213,4 @@ def verify_operation_success(
         return False
     if operation.status != LifecycleOperationStatus.SUCCEEDED:
         return False
-    return verify_operation(run_data, operation)
+    return verify_operation(project_data, operation)

@@ -1,4 +1,4 @@
-"""Compute run data totals (bytes + files) via tools-api listings."""
+"""Compute project data totals (bytes + files) via tools-api listings."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from .exceptions import EuphroToolsException
 from .utils import build_tools_api_url, get_tools_api_auth_header
 
 
-class RunDataListItem(TypedDict):
+class ProjectDataListItem(TypedDict):
     name: str
     path: str
     last_modified: str | None
@@ -22,23 +22,21 @@ class RunDataListItem(TypedDict):
 
 
 @dataclass(frozen=True)
-class RunDataTotals:
+class ProjectDataTotals:
     bytes_total: int
     files_total: int
 
 
-def _build_run_data_url(project_slug: str, run_label: str) -> str:
+def _build_project_data_url(project_slug: str) -> str:
     project_part = quote(project_slug, safe="")
-    run_part = quote(run_label, safe="")
-    return build_tools_api_url(f"/data/{project_part}/runs/{run_part}")
+    return build_tools_api_url(f"/data/{project_part}")
 
 
-def _list_run_data_entries(
+def _list_project_data_entries(
     project_slug: str,
-    run_label: str,
     folder: str | None = None,
-) -> list[RunDataListItem]:
-    url = _build_run_data_url(project_slug, run_label)
+) -> list[ProjectDataListItem]:
+    url = _build_project_data_url(project_slug)
     params = {"folder": folder} if folder else None
     response = requests.get(
         url,
@@ -47,18 +45,15 @@ def _list_run_data_entries(
         headers=get_tools_api_auth_header(),
     )
     if response.status_code == 404:
-        raise EuphroToolsException(
-            "Run data not found for %s/%s." % (project_slug, run_label)
-        )
+        raise EuphroToolsException("Project data not found for %s." % project_slug)
     if not response.ok:
         raise EuphroToolsException(
-            "Failed to list run data entries for %s/%s." % (project_slug, run_label)
+            "Failed to list project data entries for %s." % project_slug
         )
     payload = response.json()
     if not isinstance(payload, list):
         raise EuphroToolsException(
-            "Unexpected run data listing response for %s/%s."
-            % (project_slug, run_label)
+            "Unexpected project data listing response for %s." % project_slug
         )
     return payload
 
@@ -69,25 +64,22 @@ def _join_folder(parent: str | None, name: str) -> str:
     return name
 
 
-def compute_run_data_totals(
-    project_slug: str,
-    run_label: str,
-) -> RunDataTotals:
+def compute_project_data_totals(project_slug: str) -> ProjectDataTotals:
     bytes_total = 0
     files_total = 0
     pending_folders: deque[str | None] = deque([None])
     while pending_folders:
         folder = pending_folders.popleft()
-        for entry in _list_run_data_entries(project_slug, run_label, folder=folder):
+        for entry in _list_project_data_entries(project_slug, folder=folder):
             if entry.get("type") == "directory":
                 pending_folders.append(_join_folder(folder, entry["name"]))
                 continue
             size = entry.get("size")
             if size is None:
                 raise EuphroToolsException(
-                    "Missing size for run data entry %s."
+                    "Missing size for project data entry %s."
                     % (entry.get("path", entry.get("name", "unknown")),)
                 )
             bytes_total += int(size)
             files_total += 1
-    return RunDataTotals(bytes_total=bytes_total, files_total=files_total)
+    return ProjectDataTotals(bytes_total=bytes_total, files_total=files_total)
