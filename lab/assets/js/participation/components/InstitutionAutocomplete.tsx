@@ -29,6 +29,25 @@ interface InstitutionAutocompleteProps {
   onChange: (institution: Institution | null) => void;
 }
 
+const typeAheadStyle: React.CSSProperties = {
+  backgroundColor: "var(--background-default-grey)",
+  filter: "drop-shadow(var(--overlap-shadow))",
+  position: "absolute",
+  zIndex: 1000,
+  top: 41,
+  width: "100%",
+  maxHeight: 500,
+  overflow: "scroll",
+  left: 0,
+  right: 0,
+};
+
+const typeAheadButtonStyle: React.CSSProperties = {
+  textAlign: "left",
+  padding: ".75rem 1rem",
+  width: "100%",
+};
+
 export default function InstitutionAutocomplete({
   id,
   value,
@@ -168,11 +187,11 @@ export default function InstitutionAutocomplete({
           id={id}
         />
         {showResults && (
-          <div className="typeahead-list">
+          <div className="typeahead-list" style={typeAheadStyle}>
             {error ? (
               <div>{t.errorMessage}</div>
             ) : results.length === 0 ? (
-              <div>
+              <div style={typeAheadButtonStyle}>
                 {t.noResults}{" "}
                 <a
                   href="https://docs.google.com/forms/d/e/1FAIpQLSdJYaMTCwS7muuTa-B_CnAtCSkKzt19lkirAKG4u7umH9Nosg/viewform"
@@ -188,6 +207,7 @@ export default function InstitutionAutocomplete({
                   key={result.id}
                   type="button"
                   onClick={() => handleResultClick(result)}
+                  style={typeAheadButtonStyle}
                 >
                   {result.label}
                 </button>
