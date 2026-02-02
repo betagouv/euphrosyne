@@ -1,7 +1,7 @@
 from unittest import mock
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from lab.api_views.serializers import (
     OnPremisesParticipationSerializer,
@@ -257,6 +257,156 @@ class TestOnPremisesParticipationSerializer(TestCase):
     def test_serializer_has_employer_field(self):
         serializer = OnPremisesParticipationSerializer()
         assert "employer" in serializer.fields
+
+
+class TestEmployerFormExemption(TestCase):
+    def _build_data(self, ror_id: str):
+        return {
+            "user": {"email": "newuser@test.test"},
+            "institution": {
+                "name": "New Institution",
+                "country": "France",
+                "ror_id": ror_id,
+            },
+        }
+
+    @override_settings(
+        PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS=["https://ror.org/exempt"]
+    )
+    def test_leader_non_exempt_requires_employer(self):
+        project = factories.ProjectFactory()
+        data = self._build_data("https://ror.org/non-exempt")
+        serializer = OnPremisesParticipationSerializer(
+            data=data, context={"project": project}
+        )
+
+        assert not serializer.is_valid()
+        assert "employer" in serializer.errors
+        assert (
+            serializer.errors["employer"][0]
+            == serializer.fields["employer"].error_messages["required"]
+        )
+
+    @override_settings(
+        PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS=["https://ror.org/exempt"]
+    )
+    @mock.patch("lab.api_views.serializers.send_project_invitation_email")
+    @mock.patch("lab.api_views.serializers.send_invitation_email")
+    def test_leader_exempt_allows_missing_employer(
+        self, mock_send_invitation, mock_send_project_invitation
+    ):
+        project = factories.ProjectFactory()
+        data = self._build_data("https://ror.org/exempt")
+        serializer = OnPremisesParticipationSerializer(
+            data=data, context={"project": project}
+        )
+
+        assert serializer.is_valid()
+        participation = serializer.save(
+            project=project, is_leader=True, on_premises=True
+        )
+        assert participation.is_leader is True
+        assert participation.on_premises is True
+        assert participation.employer is None
+        mock_send_invitation.assert_called_once_with(participation.user)
+        mock_send_project_invitation.assert_called_once_with(
+            participation.user.email, project
+        )
+
+    @override_settings(
+        PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS=["https://ror.org/exempt"]
+    )
+    def test_on_premises_non_exempt_requires_employer(self):
+        project = factories.ProjectFactory()
+        data = self._build_data("https://ror.org/non-exempt")
+        serializer = OnPremisesParticipationSerializer(
+            data=data, context={"project": project}
+        )
+
+        assert not serializer.is_valid()
+        assert "employer" in serializer.errors
+        assert (
+            serializer.errors["employer"][0]
+            == serializer.fields["employer"].error_messages["required"]
+        )
+
+    @override_settings(
+        PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS=["https://ror.org/exempt"]
+    )
+    @mock.patch("lab.api_views.serializers.send_project_invitation_email")
+    @mock.patch("lab.api_views.serializers.send_invitation_email")
+    def test_on_premises_exempt_allows_missing_employer(
+        self, mock_send_invitation, mock_send_project_invitation
+    ):
+        project = factories.ProjectFactory()
+        data = self._build_data("https://ror.org/exempt")
+        serializer = OnPremisesParticipationSerializer(
+            data=data, context={"project": project}
+        )
+
+        assert serializer.is_valid()
+        participation = serializer.save(project=project, on_premises=True)
+        assert participation.is_leader is False
+        assert participation.on_premises is True
+        assert participation.employer is None
+        mock_send_invitation.assert_called_once_with(participation.user)
+        mock_send_project_invitation.assert_called_once_with(
+            participation.user.email, project
+        )
+
+    @override_settings(
+        PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS=["https://ror.org/exempt"]
+    )
+    def test_missing_ror_id_payload_falls_back_to_instance(self):
+        institution = factories.InstitutionFactory(ror_id="https://ror.org/exempt")
+        participation = factories.ParticipationFactory(
+            on_premises=True,
+            institution=institution,
+            employer=None,
+        )
+        data = {
+            "institution": {
+                "name": institution.name,
+                "country": institution.country,
+            }
+        }
+        serializer = OnPremisesParticipationSerializer(
+            instance=participation,
+            data=data,
+            partial=True,
+            context={"project": participation.project},
+        )
+
+        assert serializer.is_valid()
+
+    @override_settings(
+        PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS=["https://ror.org/exempt"]
+    )
+    def test_exempt_institution_clears_existing_employer(self):
+        institution = factories.InstitutionFactory(ror_id="https://ror.org/exempt")
+        employer = factories.EmployerFactory()
+        participation = factories.ParticipationFactory(
+            on_premises=True,
+            institution=institution,
+            employer=employer,
+        )
+        data = {
+            "institution": {
+                "name": institution.name,
+                "country": institution.country,
+                "ror_id": institution.ror_id,
+            }
+        }
+        serializer = OnPremisesParticipationSerializer(
+            instance=participation,
+            data=data,
+            partial=True,
+            context={"project": participation.project},
+        )
+
+        assert serializer.is_valid()
+        updated_participation = serializer.save()
+        assert updated_participation.employer is None
 
 
 class TestProjectUserUniqueValidator(TestCase):

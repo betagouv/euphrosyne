@@ -13,6 +13,7 @@ interface ProjectParticipationsFormProps {
   projectId: number;
   userData: UserData;
   isRadiationProtectionEnabled: boolean;
+  employerFormExemptRorIds: string[];
 }
 
 interface AddParticipationButtonProps {
@@ -84,6 +85,7 @@ export default function ProjectParticipationsForm({
   projectId,
   userData,
   isRadiationProtectionEnabled,
+  employerFormExemptRorIds,
 }: ProjectParticipationsFormProps) {
   const t = {
     leaderParticipationsTable: window.gettext("Project leader"),
@@ -151,6 +153,7 @@ export default function ProjectParticipationsForm({
         participationType="leader"
         participation={leaderParticipation}
         projectId={projectId}
+        employerFormExemptRorIds={employerFormExemptRorIds}
         onFormSubmit={() => loadParticipations()}
         modalTitle={t.leaderModalTitle}
       />
@@ -159,6 +162,7 @@ export default function ProjectParticipationsForm({
         participationType="remote"
         participation={remoteParticipationToEdit}
         projectId={projectId}
+        employerFormExemptRorIds={employerFormExemptRorIds}
         onFormSubmit={() => loadParticipations()}
       />
       <ParticipationFormModal
@@ -166,6 +170,7 @@ export default function ProjectParticipationsForm({
         participationType="on-premises"
         participation={onPremisesParticipationToEdit}
         projectId={projectId}
+        employerFormExemptRorIds={employerFormExemptRorIds}
         onFormSubmit={() => loadParticipations()}
       />
 

@@ -40,6 +40,10 @@ sentry_sdk.init(
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def _split_values(value: str) -> list[str]:
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -64,6 +68,9 @@ CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split()
 SITE_URL = os.environ["SITE_URL"]
 FACILITY_NAME = os.getenv("FACILITY_NAME", "New AGLAE")
 FACILITY_URL = os.getenv("FACILITY_URL", "https://c2rmf.fr/aglae-0")
+PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS = _split_values(
+    os.environ.get("PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS", "")
+)
 
 
 # Application definition

@@ -55,7 +55,7 @@ interface ParticipationEditData {
 interface ParticipationLeaderData {
   user: UserWithEmailData;
   institution: InstitutionData;
-  employer: EmployerData;
+  employer: EmployerData | null;
 }
 
 export type ValidationDataError<T> = {
@@ -156,6 +156,27 @@ export async function setProjectLeader(
   participationData: ParticipationLeaderData,
   change: boolean = false,
 ) {
+  const payload: Record<string, unknown> = {
+    user: {
+      email: participationData.user.email,
+    },
+    institution: {
+      name: participationData.institution.name,
+      country: participationData.institution.country,
+      ror_id: participationData.institution.rorId,
+    },
+    employer: null,
+  };
+
+  if (participationData.employer) {
+    payload.employer = {
+      first_name: participationData.employer.firstName,
+      last_name: participationData.employer.lastName,
+      email: participationData.employer.email,
+      function: participationData.employer.function,
+    };
+  }
+
   const response = await fetch(
     `/api/lab/projects/${projectId}/participations/leader`,
     {
@@ -164,22 +185,7 @@ export async function setProjectLeader(
         "Content-Type": "application/json",
         "X-CSRFToken": getCSRFToken() || "",
       },
-      body: JSON.stringify({
-        user: {
-          email: participationData.user.email,
-        },
-        institution: {
-          name: participationData.institution.name,
-          country: participationData.institution.country,
-          ror_id: participationData.institution.rorId,
-        },
-        employer: {
-          first_name: participationData.employer.firstName,
-          last_name: participationData.employer.lastName,
-          email: participationData.employer.email,
-          function: participationData.employer.function,
-        },
-      }),
+      body: JSON.stringify(payload),
     },
   );
   if (response.status === 400) {

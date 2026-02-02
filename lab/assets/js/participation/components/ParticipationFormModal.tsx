@@ -8,6 +8,7 @@ interface ParticipationFormModalProps {
   modalTitle?: string;
   participationType: ParticipationType;
   participation?: Participation | null;
+  employerFormExemptRorIds: string[];
   onFormSubmit?: () => void;
 }
 
@@ -17,6 +18,7 @@ export default function ParticipationFormModal({
   modalTitle,
   participationType,
   participation,
+  employerFormExemptRorIds,
   onFormSubmit,
 }: ParticipationFormModalProps) {
   const t = {
@@ -71,6 +73,7 @@ export default function ParticipationFormModal({
                   participation={participation}
                   projectId={projectId}
                   participationType={participationType}
+                  employerFormExemptRorIds={employerFormExemptRorIds}
                   onSuccess={() => {
                     onFormSubmit?.();
                     closeModal();
