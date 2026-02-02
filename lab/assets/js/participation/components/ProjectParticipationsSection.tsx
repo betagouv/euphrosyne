@@ -242,12 +242,12 @@ export default function ProjectParticipationsForm({
           <ParticipationTable
             participations={remoteParticipations}
             tableCaption={t.remoteParticipationsTable}
+            editModalId={remoteModalId}
             onDeleteClick={onDeleteClick}
             canDelete={isLabAdminOrProjectLeader(userData, leaderParticipation)}
             canEdit={isLabAdminOrProjectLeader(userData, leaderParticipation)}
             onEditClick={(participation) => {
               setRemoteParticipationToEdit(participation);
-              remoteModalButton.current?.click();
             }}
           />
         )}
