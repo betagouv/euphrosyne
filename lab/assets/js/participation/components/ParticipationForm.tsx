@@ -14,7 +14,7 @@ import {
   setProjectLeader,
   ValidationDataError,
 } from "../participation.service";
-import FieldError from "./FieldError";
+import FieldError, { ErrorMessage } from "./FieldError";
 import { useFormStatus } from "react-dom";
 
 interface ParticipationFormProps {
@@ -61,6 +61,9 @@ export default function ParticipationForm({
     employerFormExemptInfo: window.gettext(
       "Employer information is not required for the selected institution.",
     ),
+    sameEmailError: window.gettext(
+      "Employer email must be different from member email.",
+    ),
   };
 
   const [email, setEmail] = useState("");
@@ -87,6 +90,11 @@ export default function ParticipationForm({
     !!institution.rorId && employerFormExemptRorIds.includes(institution.rorId);
   const shouldSendEmployer =
     participationType !== "remote" && !isEmployerFormExempt;
+  const hasSameEmail =
+    shouldSendEmployer &&
+    email &&
+    employer.email &&
+    email.toLowerCase() === employer.email.toLowerCase();
 
   const resetForm = () => {
     setEmail("");
@@ -107,6 +115,9 @@ export default function ParticipationForm({
 
   const onSubmit = async () => {
     if (!institution.country) {
+      return;
+    }
+    if (hasSameEmail) {
       return;
     }
     try {
@@ -283,6 +294,12 @@ export default function ParticipationForm({
                 firstKey="employer"
                 secondKey="email"
               />
+              {hasSameEmail && (
+                <ErrorMessage
+                  id="participation-employer-email-messages"
+                  errors={[t.sameEmailError]}
+                />
+              )}
             </div>
           </div>
           <div className="fr-fieldset__element">
