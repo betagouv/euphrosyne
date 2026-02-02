@@ -6,6 +6,7 @@ from django.db.models.constraints import UniqueConstraint
 from django.utils.translation import gettext_lazy as _
 
 from shared.models import TimestampedModel
+from shared.names import normalize_person_name
 
 
 class Participation(TimestampedModel):
@@ -87,6 +88,20 @@ class Employer(models.Model):
     first_name = models.CharField(_("first name"), max_length=150, blank=False)
     last_name = models.CharField(_("last name"), max_length=150, blank=False)
     function = models.CharField(_("function"), max_length=150, blank=False)
+
+    def save(self, *args, **kwargs):
+        update_fields = kwargs.get("update_fields")
+        if update_fields is None:
+            # Normalize both fields when saving all fields
+            self.first_name = normalize_person_name(self.first_name)
+            self.last_name = normalize_person_name(self.last_name)
+        else:
+            # Only normalize fields that are actually being updated
+            if "first_name" in update_fields:
+                self.first_name = normalize_person_name(self.first_name)
+            if "last_name" in update_fields:
+                self.last_name = normalize_person_name(self.last_name)
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name}"

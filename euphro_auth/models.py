@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from shared.names import normalize_person_name
+
 from .managers import UserManager
 
 
@@ -38,6 +40,20 @@ class User(AbstractUser):
     def delete(self, *_):
         self.is_active = False
         self.save()
+
+    def save(self, *args, **kwargs):
+        update_fields = kwargs.get("update_fields")
+        if update_fields is None:
+            # Full save: normalize both names.
+            self.first_name = normalize_person_name(self.first_name)
+            self.last_name = normalize_person_name(self.last_name)
+        else:
+            # Partial update: only normalize fields that will be saved.
+            if "first_name" in update_fields:
+                self.first_name = normalize_person_name(self.first_name)
+            if "last_name" in update_fields:
+                self.last_name = normalize_person_name(self.last_name)
+        super().save(*args, **kwargs)
 
     def get_administrative_name(self) -> str:
         full_name = "%s %s" % (self.last_name.upper(), self.first_name)

@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.auth import get_user_model
 
 from euphro_auth.tests import factories
 
@@ -38,3 +39,39 @@ def test_user_get_administrative_name_with_spaces():
         first_name="Jean Pierre", last_name="De La Fontaine"
     )
     assert user.get_administrative_name() == "DE LA FONTAINE Jean Pierre"
+
+
+@pytest.mark.django_db
+def test_user_name_normalization_lowercase():
+    user = get_user_model().objects.create(
+        email="user@test.test",
+        password="password",
+        first_name="jean-pierre",
+        last_name="o'neill",
+    )
+    assert user.first_name == "Jean-Pierre"
+    assert user.last_name == "O'Neill"
+
+
+@pytest.mark.django_db
+def test_user_name_normalization_uppercase():
+    user = get_user_model().objects.create(
+        email="user2@test.test",
+        password="password",
+        first_name="JEAN PIERRE",
+        last_name="O'NEILL",
+    )
+    assert user.first_name == "Jean Pierre"
+    assert user.last_name == "O'Neill"
+
+
+@pytest.mark.django_db
+def test_user_name_normalization_mixed_case_unchanged():
+    user = get_user_model().objects.create(
+        email="user3@test.test",
+        password="password",
+        first_name="McDonald",
+        last_name="van Helsing",
+    )
+    assert user.first_name == "McDonald"
+    assert user.last_name == "van Helsing"
