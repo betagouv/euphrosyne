@@ -21,6 +21,7 @@ interface ParticipationFormProps {
   projectId: number;
   participationType: ParticipationType;
   participation?: Participation | null;
+  employerFormExemptRorIds: string[];
   onSuccess?: () => void;
 }
 
@@ -40,6 +41,7 @@ export default function ParticipationForm({
   projectId,
   participation,
   participationType,
+  employerFormExemptRorIds,
   onSuccess,
 }: ParticipationFormProps) {
   const t = {
@@ -55,6 +57,9 @@ export default function ParticipationForm({
     associatedRor: window.gettext("Associated ROR page"),
     disabledReason: window.gettext(
       "Email cannot be edited after creation. Delete this participation and invite a new member.",
+    ),
+    employerFormExemptInfo: window.gettext(
+      "Employer information is not required for the selected institution.",
     ),
   };
 
@@ -77,6 +82,11 @@ export default function ParticipationForm({
 
   const [errors, setErrors] =
     useState<ValidationDataError<ParticipationAddData> | null>(null);
+
+  const isEmployerFormExempt =
+    !!institution.rorId && employerFormExemptRorIds.includes(institution.rorId);
+  const shouldSendEmployer =
+    participationType !== "remote" && !isEmployerFormExempt;
 
   const resetForm = () => {
     setEmail("");
@@ -110,7 +120,7 @@ export default function ParticipationForm({
               country: institution.country,
               rorId: institution.rorId,
             },
-            employer,
+            employer: shouldSendEmployer ? employer : null,
           },
           !!participationId,
         );
@@ -125,7 +135,7 @@ export default function ParticipationForm({
             country: institution.country,
             rorId: institution.rorId,
           },
-          employer: participationType === "remote" ? undefined : employer,
+          employer: shouldSendEmployer ? employer : null,
         });
       } else {
         await addParticipation(projectId, participationType, {
@@ -138,7 +148,7 @@ export default function ParticipationForm({
             country: institution.country,
             rorId: institution.rorId,
           },
-          employer: participationType === "remote" ? null : employer,
+          employer: shouldSendEmployer ? employer : null,
         });
       }
 
@@ -237,10 +247,18 @@ export default function ParticipationForm({
         <fieldset
           className={`fr-fieldset ${errors && errors.employer ? "fr-fieldset--error" : ""}`}
           aria-labelledby="participation-employer-messages"
+          disabled={isEmployerFormExempt}
         >
           <legend className="fr-fieldset__legend" id="employer-text-legend">
             {t.employerFieldsetLegend}
           </legend>
+          <div className="fr-messages-group" aria-live="polite">
+            {isEmployerFormExempt && (
+              <p className="fr-message fr-message--info">
+                {t.employerFormExemptInfo}
+              </p>
+            )}
+          </div>
           <div className="fr-fieldset__element">
             <div className="fr-input-group">
               <label
@@ -258,7 +276,7 @@ export default function ParticipationForm({
                   setEmployer({ ...employer, email: e.target.value })
                 }
                 aria-describedby="participation-employer-email-messages"
-                required
+                required={!isEmployerFormExempt}
               />
               <FieldError
                 errors={errors}
@@ -284,7 +302,7 @@ export default function ParticipationForm({
                 onChange={(e) =>
                   setEmployer({ ...employer, firstName: e.target.value })
                 }
-                required
+                required={!isEmployerFormExempt}
               />
               <FieldError
                 errors={errors}
@@ -310,7 +328,7 @@ export default function ParticipationForm({
                 onChange={(e) =>
                   setEmployer({ ...employer, lastName: e.target.value })
                 }
-                required
+                required={!isEmployerFormExempt}
               />
               <FieldError
                 errors={errors}
@@ -335,7 +353,7 @@ export default function ParticipationForm({
                 onChange={(e) =>
                   setEmployer({ ...employer, function: e.target.value })
                 }
-                required
+                required={!isEmployerFormExempt}
               />
               <FieldError
                 errors={errors}

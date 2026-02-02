@@ -1,6 +1,7 @@
 import json
 from typing import Any, Optional
 
+from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
@@ -298,7 +299,16 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                 "show_save_as_new": False,
                 "show_save_and_add_another": False,
                 "json_data": json.dumps(
-                    {"projectId": object_id} if object_id else None
+                    (
+                        {
+                            "projectId": object_id,
+                            "participationEmployerFormExemptRorIds": (
+                                settings.PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS
+                            ),
+                        }
+                        if object_id
+                        else None
+                    )
                 ),
             },
         )

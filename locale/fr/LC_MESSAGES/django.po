@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-20 17:43+0100\n"
+"POT-Creation-Date: 2026-02-02 17:19+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -665,6 +665,9 @@ msgstr "Projet"
 
 msgid "This user is already a participant in the project."
 msgstr "Cet utilisateur est déjà un participant du projet."
+
+msgid "This field is required."
+msgstr "Ce champ est requis."
 
 msgid "Upload documents"
 msgstr "Téléverser des documents"

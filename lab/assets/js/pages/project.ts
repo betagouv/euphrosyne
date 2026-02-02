@@ -11,6 +11,7 @@ import { getUserData } from "../../../../euphrosyne/assets/js/main";
 
 interface ProjectPageData {
   projectId: number;
+  participationEmployerFormExemptRorIds: string[];
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -50,6 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (projectPageData && projectPageData.projectId) {
     const userData = getUserData();
+    const employerFormExemptRorIds =
+      projectPageData.participationEmployerFormExemptRorIds || [];
     renderComponent(
       "project-participations-form",
       createElement(ProjectParticipationsSection, {
@@ -57,6 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
         userData,
         isRadiationProtectionEnabled:
           featureFlags.radiation_protection ?? false,
+        employerFormExemptRorIds,
       }),
     );
   }

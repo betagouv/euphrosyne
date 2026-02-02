@@ -1,6 +1,7 @@
 import datetime
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -340,11 +341,22 @@ class ParticipationSerializer(serializers.ModelSerializer):
 
 
 class OnPremisesParticipationSerializer(ParticipationSerializer):
-    employer = _EmployerParticipationSerializer()
+    employer = _EmployerParticipationSerializer(required=False, allow_null=True)
 
     def __init__(self, instance=None, data=empty, **kwargs):
         self.Meta.fields = [*self.Meta.fields, "employer"]
         super().__init__(instance, data, **kwargs)
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if self._is_employer_form_exempt(attrs):
+            return attrs
+        if self._is_employer_data_missing(attrs):
+            required_message = self.fields["employer"].error_messages.get(
+                "required", _("This field is required.")
+            )
+            raise serializers.ValidationError({"employer": [required_message]})
+        return attrs
 
     def create(self, validated_data):
         employer = None
@@ -367,19 +379,56 @@ class OnPremisesParticipationSerializer(ParticipationSerializer):
             validated_data["user"] = user
 
         employer_data = validated_data.pop("employer", None)
-        if employer_data:
-            employer_instance = instance.employer
-            if employer_instance:
-                Employer.objects.filter(id=employer_instance.id).update(**employer_data)
-            else:
-                employer = Employer.objects.create(**employer_data)
-                instance.employer = employer
-                instance.save()
+        if (
+            self._get_institution_ror_id(validated_data)
+            in settings.PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS
+            and instance.employer
+        ):
+            # If the institution changed to one that is exempt, remove employer
+            instance.employer = None
+        else:
+            if employer_data:
+                employer_instance = instance.employer
+                if employer_instance:
+                    Employer.objects.filter(id=employer_instance.id).update(
+                        **employer_data
+                    )
+                else:
+                    employer = Employer.objects.create(**employer_data)
+                    instance.employer = employer
         instance = super().update(instance, validated_data)
         if user_has_changed:
             send_project_invitation_email(instance.user.email, instance.project)
             self._handle_user_change(instance)
         return instance
+
+    def _is_employer_data_missing(self, attrs: dict) -> bool:
+        if self.partial and "employer" not in attrs:
+            return False
+        if attrs.get("employer") is not None:
+            return False
+        if self.instance and self.instance.employer:
+            return False
+        return True
+
+    def _is_employer_form_exempt(self, attrs: dict) -> bool:
+        ror_id = self._get_institution_ror_id(attrs)
+        if not ror_id:
+            return False
+        return ror_id in settings.PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS
+
+    def _get_institution_ror_id(self, attrs: dict) -> str | None:
+        institution_data = attrs.get("institution")
+        if institution_data:
+            ror_id = institution_data.get("ror_id")
+            if ror_id:
+                return ror_id
+            if self.instance and self.instance.institution:
+                return self.instance.institution.ror_id
+            return None
+        if self.instance and self.instance.institution:
+            return self.instance.institution.ror_id
+        return None
 
     def _handle_user_change(self, instance: Participation | None = None):
         if apps.is_installed("radiation_protection") and instance:
