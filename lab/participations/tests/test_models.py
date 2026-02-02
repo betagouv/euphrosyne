@@ -77,6 +77,36 @@ class TestEmployerModel(TestCase):
         assert employer.last_name == "Doe"
         assert employer.function == "Manager"
 
+    def test_employer_name_normalization_lowercase(self):
+        employer = Employer.objects.create(
+            email="employer2@test.test",
+            first_name="jean-pierre",
+            last_name="o'neill",
+            function="Manager",
+        )
+        assert employer.first_name == "Jean-Pierre"
+        assert employer.last_name == "O'Neill"
+
+    def test_employer_name_normalization_uppercase(self):
+        employer = Employer.objects.create(
+            email="employer3@test.test",
+            first_name="JEAN PIERRE",
+            last_name="O'NEILL",
+            function="Manager",
+        )
+        assert employer.first_name == "Jean Pierre"
+        assert employer.last_name == "O'Neill"
+
+    def test_employer_name_normalization_mixed_case_unchanged(self):
+        employer = Employer.objects.create(
+            email="employer4@test.test",
+            first_name="McDonald",
+            last_name="van Helsing",
+            function="Manager",
+        )
+        assert employer.first_name == "McDonald"
+        assert employer.last_name == "van Helsing"
+
     def test_employer_str_method(self):
         employer = Employer.objects.create(
             email="employer@test.test",

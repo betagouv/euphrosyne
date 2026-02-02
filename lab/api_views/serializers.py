@@ -390,9 +390,9 @@ class OnPremisesParticipationSerializer(ParticipationSerializer):
             if employer_data:
                 employer_instance = instance.employer
                 if employer_instance:
-                    Employer.objects.filter(id=employer_instance.id).update(
-                        **employer_data
-                    )
+                    for field, value in employer_data.items():
+                        setattr(employer_instance, field, value)
+                    employer_instance.save()
                 else:
                     employer = Employer.objects.create(**employer_data)
                     instance.employer = employer
