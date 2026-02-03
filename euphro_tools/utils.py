@@ -17,7 +17,12 @@ def get_run_data_path(
 
 
 def build_tools_api_url(path: str) -> str:
-    base_url = os.environ["EUPHROSYNE_TOOLS_API_URL"]
+    base_url = os.environ.get("EUPHROSYNE_TOOLS_API_URL")
+    if base_url is None:
+        raise RuntimeError(
+            "Environment variable 'EUPHROSYNE_TOOLS_API_URL' is not set. "
+            "Please configure it to point to the Euphrosyne Tools API base URL."
+        )
     if not path.startswith("/"):
         path = f"/{path}"
     return f"{base_url}{path}"
