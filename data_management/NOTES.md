@@ -1,1 +1,1 @@
-- We should make a script in RunData migrations to populate existing Run instances with corresponding RunData records.
+- We should make a script in ProjectData migrations to populate existing Project instances with corresponding ProjectData records.
