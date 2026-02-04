@@ -41,6 +41,20 @@ def create_project_data(**overrides: Any) -> ProjectData:
 
 
 @pytest.mark.django_db
+def test_for_project_backfills_missing_cooling_eligible_at():
+    project = ProjectFactory()
+    project_data = ProjectData.for_project(project)
+    expected = project_data.cooling_eligible_at
+
+    project_data.cooling_eligible_at = None
+    project_data.save(update_fields=["cooling_eligible_at"])
+
+    reloaded = ProjectData.for_project(project)
+
+    assert reloaded.cooling_eligible_at == expected
+
+
+@pytest.mark.django_db
 def test_last_lifecycle_operation_ignores_null_timestamps():
     project = ProjectFactory()
     project_data = create_project_data(project=project)
