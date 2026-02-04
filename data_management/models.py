@@ -90,14 +90,15 @@ class ProjectData(models.Model):
     @classmethod
     def for_project(cls, project: Project) -> "ProjectData":
         created_at = project.created or timezone.now()
-        defaults = {
-            "cooling_eligible_at": _compute_initial_cooling_eligible_at(created_at),
-        }
-        project_data, created = cls.objects.get_or_create(
-            project=project, defaults=defaults
-        )
-        if not created and project_data.cooling_eligible_at is None:
-            project_data.cooling_eligible_at = defaults["cooling_eligible_at"]
+        cooling_default = _compute_initial_cooling_eligible_at(created_at)
+        try:
+            project_data = project.project_data
+        except cls.DoesNotExist:
+            project_data, _ = cls.objects.get_or_create(
+                project=project, defaults={"cooling_eligible_at": cooling_default}
+            )
+        if project_data.cooling_eligible_at is None:
+            project_data.cooling_eligible_at = cooling_default
             project_data.save(update_fields=["cooling_eligible_at"])
         return project_data
 
