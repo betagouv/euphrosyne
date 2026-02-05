@@ -171,6 +171,7 @@ class GoodflagClient:
 
         workflow_data = {
             "name": name,
+            "templateId": self.template_id,
             "steps": [
                 {
                     "stepType": step["step_type"].value,
