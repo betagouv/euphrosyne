@@ -59,7 +59,7 @@
     "lodash.debounce": "^4.0.8",
     "mini-css-extract-plugin": "^2.9.4",
     "promise-polyfill": "8.3.0",
-    "purgecss-webpack-plugin": "^7.0.2",
+    "purgecss-webpack-plugin": "^8.0.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.3",
     "remixicon": "^4.9.1",
