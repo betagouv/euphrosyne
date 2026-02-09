@@ -264,3 +264,19 @@ ul li {
 fieldset .inline-heading {
   color: var(--text-title-grey) !important;
 }
+
+/* django overides */
+a:not([role="button"], #header a, #nav-sidebar a, #content-main.app-list a, .object-tools a) {
+  text-decoration: none !important;
+}
+
+/* django overides */
+#changelist .changelist-form-container {
+  display: inherit !important;
+}
+
+/* django overides */
+#changelist .changelist-form-container:has(#changelist-filter) > div {
+  width: 100%;
+  max-width: none !important;
+}
