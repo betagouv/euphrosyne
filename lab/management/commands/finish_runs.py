@@ -17,7 +17,7 @@ def finish_runs_task():
 
 
 class Command(BaseCommand):
-    help = "Set run status to finish for the ones with end dates from the privous week."
+    help = "Set run status to finish for the ones with end dates from the previous week."
 
     def handle(self, *args, **options):
         result = finish_runs_task.enqueue()

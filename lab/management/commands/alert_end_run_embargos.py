@@ -91,7 +91,7 @@ def alert_end_run_embargos_task():
 
 
 class Command(BaseCommand):
-    help = "Alert project leaders of ending run emabrgo."
+    help = "Alert project leaders of ending run embargo."
 
     def handle(self, *args, **options):
         result = alert_end_run_embargos_task.enqueue()
