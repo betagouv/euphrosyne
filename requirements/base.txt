@@ -5,7 +5,7 @@ django-cors-headers==4.9.0
 dj-database-url==3.0.1
 django-debug-toolbar==6.0.0
 django-filter==25.2
-Django==5.2.9
+Django==5.2.11
 djangorestframework==3.16.1
 djangorestframework-simplejwt==5.5.1
 django-storages[azure]==1.14.6
