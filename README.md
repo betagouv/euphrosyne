@@ -65,13 +65,14 @@ You can copy this file to a new `.env` file to easily set up your environment.
 | PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS          | Comma-separated list of ROR IDs for institutions exempt from the employer form requirement for project leaders and on-site members                                                                                                                |
 | SITE_URL                                            | The URL of this Euphrosyne instance                                                                                                                                                                                                               |
 | SENTRY_DSN                                          | Optional. Sentry DSN. If omitted, Sentry will not be used                                                                                                                                                                                         |
+| SENTRY_DSN_FRONTEND                                 | Optional. Sentry DSN for javascript. If omitted, Sentry will not be used                                                                                                                                                                          |
 | SENTRY_ENVIRONMENT                                  | Tag used to filter Sentry events. Possible choices: 'production', 'staging' or 'dev'                                                                                                                                                              |
 | SOCIAL_AUTH_ORCID_KEY                               | ORCID application credentials for user authentication                                                                                                                                                                                             |
 | SOCIAL_AUTH_ORCID_SECRET                            | ORCID application credentials for user authentication                                                                                                                                                                                             |
 
 ### Optional modules
 
-Euphrosyne ships optional modules that can be enabled per instance. By default all optional modules are enabled. 
+Euphrosyne ships optional modules that can be enabled per instance. By default all optional modules are enabled.
 
 To enable specific modules, set `EUPHROSYNE_FEATURES` to a comma-separated list:
 
@@ -79,7 +80,8 @@ To enable specific modules, set `EUPHROSYNE_FEATURES` to a comma-separated list:
 EUPHROSYNE_FEATURES=data_request,lab_notebook,radiation_protection
 ```
 
-**Note**: 
+**Note**:
+
 - If `EUPHROSYNE_FEATURES` is **not set**: all optional modules are enabled by default
 - If `EUPHROSYNE_FEATURES` is **set to an empty value** (e.g., `EUPHROSYNE_FEATURES=""`): all optional modules are disabled
 - To enable only specific modules, explicitly list them in a comma-separated format
