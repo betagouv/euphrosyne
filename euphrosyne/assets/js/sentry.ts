@@ -44,7 +44,8 @@ function sendFeedback(feedback: IFeedbackForm) {
 }
 
 Sentry.init({
-  dsn: process.env.SENTRY_DSN,
+  dsn: process.env.SENTRY_DSN_FRONTEND,
+  environment: process.env.SENTRY_ENVIRONMENT,
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration(),

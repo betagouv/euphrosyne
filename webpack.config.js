@@ -126,6 +126,8 @@ export default {
       GEONAMES_USERNAME: "",
       HDF5_ENABLE: "false",
       SENTRY_DSN: null,
+      SENTRY_DSN_FRONTEND: null,
+      SENTRY_ENVIRONMENT: null,
     }),
     new MiniCssExtractPlugin(),
     new PurgeCSSPlugin({
