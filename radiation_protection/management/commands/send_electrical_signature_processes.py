@@ -21,7 +21,7 @@ def send_electrical_signature_processes_task():
 
     plans = RiskPreventionPlan.objects.filter(
         risk_advisor_notification_sent=False,
-    ).all()
+    )
 
     messages.append(
         "[send-electrical-signature-processes] Found %d risk prevention plans to process."
