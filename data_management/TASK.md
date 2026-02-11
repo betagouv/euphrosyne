@@ -1,98 +1,103 @@
-## [TASK] Implement automatic cooling scheduler (daily)
+## Context
 
-### Context
+PRD – API specs + FR1/FR2/FR5
 
-PRD – Cooling eligibility and workflow (project-level, immutable COOL).
-Cooling is executed by `euphrosyne-tools-api` via a long-running operation; Euphrosyne is the source of truth for lifecycle state.
+- tools-api COOL / RESTORE endpoints are already implemented and integrated.
+- `lifecycle_operation` creation and scheduler logic are already implemented.
+- tools-api sends a **terminal callback** (SUCCEEDED / FAILED) once the async AzCopy job completes.
+- We must update:
+  - `lifecycle_operation` status
+  - project lifecycle state
+- Lifecycle transitions must occur **only if success + verification** (bytes/files match expected totals).
 
----
+Out of scope:
 
-### Description
-
-Implement a **daily scheduler job** that:
-
-1. **Is gated by a feature flag**
-
-   * Environment variable: `PROJECT_COOLING_ENABLED`
-   * Defaults to **false** (disabled unless explicitly enabled)
-   * If disabled: job exits without doing anything (logs “disabled”)
-
-2. **Selects eligible projects (project-level)**
-
-   * Only projects with:
-
-     * `lifecycle_state = HOT`
-     * `cooling_eligible_at <= now()`
-   * Ignores all others (`COOLING`, `COOL`, `RESTORING`, `ERROR`, or non-eligible HOT)
-
-3. **Applies a daily throughput limit**
-
-   * Enqueue **at most 3 projects per daily run**
-   * Selection order: `cooling_eligible_at ASC` (oldest eligible first)
-
-4. **Enqueues cooling as a lifecycle operation**
-   For each selected project:
-
-   * Create `LifecycleOperation`:
-
-     * `type = COOL`
-     * `status = PENDING`
-     * `operation_id = UUID`
-     * `bytes_total = project_size_bytes` (expected)
-     * `files_total = file_count` (expected)
-     * timestamps initialized
-   * Call tools-api:
-
-     * `POST /data/projects/{project_slug}/cool`
-     * include `operation_id` (idempotency key)
-
-5. **Transitions lifecycle state only if tools-api accepts**
-
-   * If tools-api responds **ACCEPTED** (e.g. HTTP 202):
-
-     * Update `LifecycleOperation` → `RUNNING` (or keep `PENDING` if that’s your model, but it must be “in progress”)
-     * Transition project lifecycle `HOT → COOLING`
-     * Set `last_lifecycle_operation_id = operation_id`
-   * If tools-api call fails (timeout/network/5xx) or returns non-accepted:
-
-     * Update `LifecycleOperation` → `FAILED` with error details
-     * Project lifecycle **stays `HOT`** (no read-only lock since cooling wasn’t accepted)
+- COOL / RESTORE starter logic
+- Idempotency mechanisms
+- tools-api enqueue endpoint implementation
 
 ---
 
-### Idempotency requirements
+## Description
 
-The scheduler must be safe to run multiple times:
+Implement the backend callback endpoint:
 
-* Projects not in `HOT` must never be enqueued
-* A project must not produce multiple COOL operations due to concurrent scheduler runs
-* Implementation must use an atomic/locking strategy, e.g.:
+`POST /api/data-management/operations/callback`
 
-  * row locking with `SELECT … FOR UPDATE SKIP LOCKED`, and/or
-  * atomic “claim” update before calling tools-api (recommended)
+### Authentication
 
-**Important:** the “claim” must ensure two scheduler instances do not enqueue the same project.
+- Protect as backend-to-backend endpoint (shared token / existing backend auth mechanism).
+- Return `401/403` if unauthorized.
+
+### Payload (minimum expected fields)
+
+- `operation_id` (UUID, required)
+- `status`: `SUCCEEDED` | `FAILED` (required)
+- `bytes_copied` (optional)
+- `files_copied` (optional)
+- `error` (optional, present on FAILED)
+
+### Processing logic
+
+1. Retrieve `lifecycle_operation` by `operation_id`.
+   - If not found → return 404 (or consistent error handling decision).
+   - If already terminal (`SUCCEEDED` / `FAILED`) → return 200 (idempotent handling).
+
+2. If `status == FAILED`:
+   - Set:
+     - `lifecycle_operation.status = FAILED`
+     - persist `error` details
+
+   - Transition project lifecycle → `ERROR`
+   - Return 200.
+
+3. If `status == SUCCEEDED`:
+   - Store received stats:
+     - `bytes_copied`
+     - `files_copied`
+
+   - Compute verification:
+     - `bytes_copied == bytes_total`
+     - `files_copied == files_total`
+
+   - If verification passes:
+     - Set `lifecycle_operation.status = SUCCEEDED`
+     - Transition project lifecycle:
+       - `COOL` if operation type is COOL
+       - `HOT` if operation type is RESTORE
+
+   - If verification fails:
+     - Treat as failure:
+       - `lifecycle_operation.status = FAILED`
+       - store structured verification error
+
+     - Transition project lifecycle → `ERROR`
+
+   - Return 200.
+
+### Concurrency considerations
+
+- Ensure safe handling of duplicate or concurrent callbacks.
+- Avoid double lifecycle transitions.
+- Use transaction and row-level locking if necessary.
 
 ---
 
-### Operational behavior
+## Acceptance criteria
 
-* Runs **once per day**
-* Processes up to **3 projects** per execution
-* Logs:
+- Callback endpoint is authenticated and rejects unauthorized requests.
+- `operation_id` is used to locate and update the correct `lifecycle_operation`.
+- On `FAILED`:
+  - lifecycle_operation → FAILED
+  - project lifecycle → ERROR
 
-  * run start/end
-  * whether flag is enabled
-  * number of eligible projects found
-  * number enqueued (≤3)
-  * per-project: project_id/slug, operation_id, tools-api result
+- On `SUCCEEDED` + verified:
+  - lifecycle_operation → SUCCEEDED
+  - project lifecycle → COOL (COOL op) or HOT (RESTORE op)
 
----
+- On `SUCCEEDED` + verification mismatch:
+  - lifecycle_operation → FAILED
+  - project lifecycle → ERROR
 
-### Acceptance criteria
-
-* ✅ Eligible `HOT` projects (eligible_at <= now) are enqueued, up to **3 per day**
-* ✅ Non-eligible projects are ignored
-* ✅ If `PROJECT_COOLING_ENABLED` is unset/false → scheduler does nothing
-* ✅ Idempotent: repeated runs do not duplicate operations or enqueue the same project twice
-* ✅ If tools-api call is not accepted → operation is `FAILED` and project remains `HOT`
+- Duplicate callbacks do not cause inconsistent state transitions.
+- Lifecycle state transitions occur **only** after successful verification.
