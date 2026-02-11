@@ -78,7 +78,7 @@ def _dispatch_cooling_operation(
             error_details=str(error),
             finished_at=timezone.now(),
         )
-        logger.warning(
+        logger.error(
             "Cooling scheduler project=%s slug=%s operation=%s accepted=%s status=%s error=%s",  # pylint: disable=line-too-long
             project_data.project_id,
             project_data.project.slug,
