@@ -9,6 +9,7 @@ from django.views.generic import TemplateView
 
 from ..models import Project
 from ..permissions import ProjectMembershipRequiredMixin, is_lab_admin
+from ..project_immutability import is_project_data_immutable
 
 
 class WorkplaceView(ProjectMembershipRequiredMixin, TemplateView):
@@ -23,6 +24,9 @@ class WorkplaceView(ProjectMembershipRequiredMixin, TemplateView):
         return super().dispatch(request, project_id, *args, **kwargs)
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        can_delete_files = is_lab_admin(
+            self.request.user
+        ) and not is_project_data_immutable(self.project)
         runs = tuple(
             {
                 "id": id,
@@ -48,10 +52,10 @@ class WorkplaceView(ProjectMembershipRequiredMixin, TemplateView):
                             "id": run["id"],
                             "label": run["label"],
                             "rawDataTable": {
-                                "canDelete": is_lab_admin(self.request.user),
+                                "canDelete": can_delete_files,
                             },
                             "processedDataTable": {
-                                "canDelete": is_lab_admin(self.request.user),
+                                "canDelete": can_delete_files,
                             },
                         }
                         for run in runs
