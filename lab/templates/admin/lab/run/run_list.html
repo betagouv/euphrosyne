@@ -50,9 +50,15 @@
   {% endfor %}
   <div class="fr-col-6 fr-col-lg-4">
     <div class="card-add-run">
+      {% if can_create_run %}
       <a class="fr-btn fr-btn--icon-left fr-icon-add-line" href="{% url "admin:lab_run_add" %}?project={{ project_id }}">
         {% trans "Create new run" %}
       </a>
+      {% else %}
+      <button class="fr-btn fr-btn--icon-left fr-icon-add-line" type="button" disabled>
+        {% trans "Create new run" %}
+      </button>
+      {% endif %}
     </div>
   </div>
 
