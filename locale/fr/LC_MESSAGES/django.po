@@ -131,6 +131,13 @@ msgstr "Priorité de tri : %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Changer l'ordre de tri"
 
+msgid ""
+"Project is read-only while lifecycle_state is COOL or COOLING. Restore the "
+"project to HOT to modify files or create runs."
+msgstr ""
+"Le projet est en lecture seule lorsque lifecycle_state est COOL ou COOLING. "
+"Restaurez le projet vers HOT pour modifier des fichiers ou créer des runs."
+
 msgid "Hot"
 msgstr "Chaud"
 
