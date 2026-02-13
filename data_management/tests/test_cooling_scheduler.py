@@ -30,8 +30,6 @@ class DummyResponse:
 def test_scheduler_disabled_does_nothing():
     project_data = ProjectDataFactory(
         cooling_eligible_at=timezone.now() - timedelta(days=1),
-        project_size_bytes=10,
-        file_count=2,
     )
 
     enqueued = run_cooling_scheduler()
@@ -51,23 +49,15 @@ def test_scheduler_enqueues_oldest_three(monkeypatch):
     now = timezone.now()
     project_data_oldest = ProjectDataFactory(
         cooling_eligible_at=now - timedelta(days=4),
-        project_size_bytes=100,
-        file_count=5,
     )
     project_data_second = ProjectDataFactory(
         cooling_eligible_at=now - timedelta(days=3),
-        project_size_bytes=200,
-        file_count=6,
     )
     project_data_third = ProjectDataFactory(
         cooling_eligible_at=now - timedelta(days=2),
-        project_size_bytes=300,
-        file_count=7,
     )
     project_data_newest = ProjectDataFactory(
         cooling_eligible_at=now - timedelta(days=1),
-        project_size_bytes=400,
-        file_count=8,
     )
 
     with mock.patch(
@@ -100,8 +90,6 @@ def test_scheduler_marks_failed_when_tools_api_rejects():
 
     project_data = ProjectDataFactory(
         cooling_eligible_at=timezone.now() - timedelta(days=1),
-        project_size_bytes=10,
-        file_count=2,
     )
 
     with mock.patch(
@@ -124,8 +112,6 @@ def test_scheduler_marks_failed_when_tools_api_rejects():
 def test_scheduler_marks_failed_when_tools_api_raises_request_exception():
     project_data = ProjectDataFactory(
         cooling_eligible_at=timezone.now() - timedelta(days=1),
-        project_size_bytes=10,
-        file_count=2,
     )
 
     with mock.patch(
@@ -148,8 +134,6 @@ def test_scheduler_marks_failed_when_tools_api_raises_request_exception():
 def test_scheduler_skips_projects_with_active_pending_cool_operation():
     project_data_claimed = ProjectDataFactory(
         cooling_eligible_at=timezone.now() - timedelta(days=2),
-        project_size_bytes=10,
-        file_count=2,
     )
     LifecycleOperation.objects.create(
         project_data=project_data_claimed,
@@ -159,8 +143,6 @@ def test_scheduler_skips_projects_with_active_pending_cool_operation():
 
     project_data_fresh = ProjectDataFactory(
         cooling_eligible_at=timezone.now() - timedelta(days=1),
-        project_size_bytes=10,
-        file_count=2,
     )
 
     with mock.patch(
@@ -182,8 +164,6 @@ def test_scheduler_skips_projects_with_active_pending_cool_operation():
 def test_scheduler_skips_projects_with_active_running_cool_operation():
     project_data_claimed = ProjectDataFactory(
         cooling_eligible_at=timezone.now() - timedelta(days=2),
-        project_size_bytes=10,
-        file_count=2,
     )
     LifecycleOperation.objects.create(
         project_data=project_data_claimed,
@@ -193,8 +173,6 @@ def test_scheduler_skips_projects_with_active_running_cool_operation():
 
     project_data_fresh = ProjectDataFactory(
         cooling_eligible_at=timezone.now() - timedelta(days=1),
-        project_size_bytes=10,
-        file_count=2,
     )
 
     with mock.patch(
