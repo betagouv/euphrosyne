@@ -24,6 +24,7 @@ interface DocumentManagerProps {
     canDelete: boolean;
   };
   form: {
+    canUpload: boolean;
     hintText: string;
   };
 }
@@ -111,6 +112,7 @@ export default function DocumentManager({
         data-fr-opened="false"
         aria-controls={uploadModalId}
         css={modalBtnStyle}
+        disabled={!form.canUpload}
       >
         {t["Add a document"]}
       </button>
@@ -147,6 +149,7 @@ export default function DocumentManager({
         onUploadError={(fileName: string) => fileService.deleteFile(fileName)}
         onAnyUploadSucccess={fetchFiles}
         hintText={form.hintText}
+        disabled={!form.canUpload}
       />
     </div>
   );

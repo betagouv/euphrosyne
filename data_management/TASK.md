@@ -1,103 +1,207 @@
-## Context
+# [TASK] Enforce immutability for COOL and COOLING runs in app layer
 
-PRD – API specs + FR1/FR2/FR5
-
-- tools-api COOL / RESTORE endpoints are already implemented and integrated.
-- `lifecycle_operation` creation and scheduler logic are already implemented.
-- tools-api sends a **terminal callback** (SUCCEEDED / FAILED) once the async AzCopy job completes.
-- We must update:
-  - `lifecycle_operation` status
-  - project lifecycle state
-- Lifecycle transitions must occur **only if success + verification** (bytes/files match expected totals).
-
-Out of scope:
-
-- COOL / RESTORE starter logic
-- Idempotency mechanisms
-- tools-api enqueue endpoint implementation
+Based on PRD – Project immutability rules.
 
 ---
 
-## Description
+# Functional Goal
 
-Implement the backend callback endpoint:
+When a project has:
 
-`POST /api/data-management/operations/callback`
+```
+lifecycle_state ∈ {COOL, COOLING}
+```
 
-### Authentication
+the application must behave as **strictly read-only** at the project level.
 
-- Protect as backend-to-backend endpoint (shared token / existing backend auth mechanism).
-- Return `401/403` if unauthorized.
+This means:
 
-### Payload (minimum expected fields)
+- ❌ Block document uploads
+- ❌ Block document edits
+- ❌ Block document deletes
+- ❌ Block run creation
+- ❌ Block run planning/scheduling
+- ❌ Block run outputs / artifact writes
+- ❌ Block rename operations
+- ❌ Block delete operations
 
-- `operation_id` (UUID, required)
-- `status`: `SUCCEEDED` | `FAILED` (required)
-- `bytes_copied` (optional)
-- `files_copied` (optional)
-- `error` (optional, present on FAILED)
+Reads remain allowed.
 
-### Processing logic
-
-1. Retrieve `lifecycle_operation` by `operation_id`.
-   - If not found → return 404 (or consistent error handling decision).
-   - If already terminal (`SUCCEEDED` / `FAILED`) → return 200 (idempotent handling).
-
-2. If `status == FAILED`:
-   - Set:
-     - `lifecycle_operation.status = FAILED`
-     - persist `error` details
-
-   - Transition project lifecycle → `ERROR`
-   - Return 200.
-
-3. If `status == SUCCEEDED`:
-   - Store received stats:
-     - `bytes_copied`
-     - `files_copied`
-
-   - Compute verification:
-     - `bytes_copied == bytes_total`
-     - `files_copied == files_total`
-
-   - If verification passes:
-     - Set `lifecycle_operation.status = SUCCEEDED`
-     - Transition project lifecycle:
-       - `COOL` if operation type is COOL
-       - `HOT` if operation type is RESTORE
-
-   - If verification fails:
-     - Treat as failure:
-       - `lifecycle_operation.status = FAILED`
-       - store structured verification error
-
-     - Transition project lifecycle → `ERROR`
-
-   - Return 200.
-
-### Concurrency considerations
-
-- Ensure safe handling of duplicate or concurrent callbacks.
-- Avoid double lifecycle transitions.
-- Use transaction and row-level locking if necessary.
+The PRD explicitly states that COOL is immutable and restore is required before modification.
 
 ---
 
-## Acceptance criteria
+# Architectural Strategy
 
-- Callback endpoint is authenticated and rejects unauthorized requests.
-- `operation_id` is used to locate and update the correct `lifecycle_operation`.
-- On `FAILED`:
-  - lifecycle_operation → FAILED
-  - project lifecycle → ERROR
+## 1. Centralize the rule
 
-- On `SUCCEEDED` + verified:
-  - lifecycle_operation → SUCCEEDED
-  - project lifecycle → COOL (COOL op) or HOT (RESTORE op)
+Create a single authoritative check, e.g.:
 
-- On `SUCCEEDED` + verification mismatch:
-  - lifecycle_operation → FAILED
-  - project lifecycle → ERROR
+- `project.is_immutable?`
+- or `ensure_project_writable!(project)`
+- or a reusable policy / guard
 
-- Duplicate callbacks do not cause inconsistent state transitions.
-- Lifecycle state transitions occur **only** after successful verification.
+Definition:
+
+```
+immutable if lifecycle_state in {COOL, COOLING}
+```
+
+The rule must exist in **one place only**, reused everywhere.
+
+Goal: prevent drift or forgotten endpoints.
+
+---
+
+## 2. Apply the guard to ALL write entry points
+
+The rule must be enforced at application layer entrypoints (controllers, services, commands).
+
+You must audit the repo and apply it consistently.
+
+---
+
+# Areas That Must Be Blocked
+
+## A. Documents
+
+Block:
+
+- Upload
+- Metadata edits
+- Content edits
+- Delete
+
+Expected behavior:
+
+- Return 403 Forbidden or 409 Conflict
+- Clear error message
+- No side effects
+
+---
+
+## B. Runs (creation & planning)
+
+PRD explicitly states:
+
+> A project in COOL or COOLING must not allow new runs to be planned.
+
+Therefore block:
+
+- Run creation
+- Run scheduling / planning endpoints
+
+---
+
+## C. Run outputs / artifacts
+
+Any operation that writes files as run outputs must be blocked.
+
+Important edge case:
+
+Even if a run was created before COOLING, once lifecycle_state changes to COOLING:
+
+- Output writes must fail
+- No new artifacts should be persisted
+
+This prevents corruption during migration.
+
+---
+
+## D. Rename / delete operations
+
+Block any mutation of project storage:
+
+- Rename files/folders
+- Delete files/folders
+- Any filesystem-level mutation
+
+---
+
+# HTTP Behavior
+
+## Recommended Status Codes
+
+Choose one consistently:
+
+- **409 Conflict** → state makes operation invalid
+- **403 Forbidden** → business rule prohibits it
+
+Either is acceptable if consistent.
+
+---
+
+## Error Response (clear & actionable)
+
+Example:
+
+```json
+{
+  "error": "PROJECT_IMMUTABLE",
+  "message": "Project is read-only while lifecycle_state is COOL or COOLING. Restore the project to HOT to modify files or create runs.",
+  "lifecycle_state": "COOL"
+}
+```
+
+Must clearly explain:
+
+- Why it failed
+- What to do (restore)
+
+PRD explicitly requires restore before modification.
+
+---
+
+# Required Test Coverage
+
+Acceptance criteria require tests for blocked operations.
+
+## 1. Documents
+
+- COOLING → upload → rejected
+- COOL → edit → rejected
+- COOL → delete → rejected
+
+## 2. Runs
+
+- COOLING → create run → rejected
+- COOL → plan run → rejected
+
+## 3. Outputs
+
+- COOLING → attempt artifact write → rejected
+- COOL → attempt artifact write → rejected
+
+## 4. Rename/Delete
+
+- COOL/COOLING → rename → rejected
+- COOL/COOLING → delete → rejected
+
+## 5. Control tests
+
+- HOT → all operations still succeed
+
+---
+
+# Important Behavioral Distinction
+
+### COOLING
+
+- Transitional state (migration in progress)
+- Must block writes to avoid divergence between source and destination
+
+### COOL
+
+- Terminal immutable state
+- No writes allowed
+- Restore required before modification
+
+---
+
+# Definition of Done
+
+- All project-level write operations blocked when lifecycle_state ∈ {COOL, COOLING}
+- Run creation/planning explicitly prevented
+- Clear and consistent error responses
+- Full test coverage of blocked paths
+- No regression for HOT projects

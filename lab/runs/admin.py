@@ -16,6 +16,10 @@ from django.utils.translation import gettext_lazy as _
 from euphro_tools.hooks import initialize_run_directory, rename_run_directory
 from lab.admin.mixins import LabPermission, LabPermissionMixin
 from lab.permissions import LabRole, is_lab_admin
+from lab.project_immutability import (
+    ensure_project_data_writable,
+    is_project_data_immutable,
+)
 from lab.projects.models import Project
 
 from .admin_actions import change_state
@@ -82,6 +86,14 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
 
     def has_module_permission(self, request: HttpRequest) -> bool:
         return False
+
+    def get_readonly_fields(
+        self, request: HttpRequest, obj: Run | None = None  # type: ignore[override]
+    ):
+        readonly_fields = super().get_readonly_fields(request, obj)
+        if obj and obj.project_id and is_project_data_immutable(obj.project):
+            readonly_fields = (*readonly_fields, "label")
+        return readonly_fields
 
     def get_form(
         self,
@@ -239,6 +251,8 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         return super().save_form(request, form, change)
 
     def save_model(self, request: Any, obj: Run, form: ModelForm, change: bool) -> None:
+        if not change or "label" in form.changed_data:
+            ensure_project_data_writable(obj.project)
         super().save_model(request, obj, form, change)
         if not change:
             initialize_run_directory(obj.project.name, obj.label)
@@ -259,6 +273,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         return None
 
     def _schedule_action(self, request: HttpRequest, obj: Run):
+        ensure_project_data_writable(obj.project)
         schedule_form = RunScheduleForm(
             data=request.POST,
             files=request.FILES,
