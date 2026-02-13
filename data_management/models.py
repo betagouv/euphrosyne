@@ -71,7 +71,7 @@ def _compute_initial_cooling_eligible_at(created_at: datetime) -> datetime:
 
 
 class ProjectData(models.Model):
-    """Store project-level lifecycle state and expected data totals."""
+    """Store project-level lifecycle state and eligibility metadata."""
 
     project = models.OneToOneField(
         "lab.Project",
@@ -84,8 +84,6 @@ class ProjectData(models.Model):
         default=LifecycleState.HOT,
     )
     cooling_eligible_at = models.DateTimeField(null=True, blank=True)
-    project_size_bytes = models.PositiveBigIntegerField(null=True, blank=True)
-    file_count = models.PositiveBigIntegerField(null=True, blank=True)
 
     @classmethod
     def for_project(cls, project: Project) -> "ProjectData":
@@ -134,18 +132,18 @@ class ProjectData(models.Model):
         if target_state == LifecycleState.COOL:
             return (
                 self.lifecycle_state == LifecycleState.COOLING
-                and verify_operation_success(
-                    self, operation, LifecycleOperationType.COOL
-                )
+                and operation is not None
+                and operation.project_data_id == self.pk
+                and verify_operation_success(operation, LifecycleOperationType.COOL)
             )
         if target_state == LifecycleState.RESTORING:
             return self.lifecycle_state == LifecycleState.COOL
         if target_state == LifecycleState.HOT:
             return (
                 self.lifecycle_state == LifecycleState.RESTORING
-                and verify_operation_success(
-                    self, operation, LifecycleOperationType.RESTORE
-                )
+                and operation is not None
+                and operation.project_data_id == self.pk
+                and verify_operation_success(operation, LifecycleOperationType.RESTORE)
             )
         if target_state == LifecycleState.ERROR:
             return self.lifecycle_state in (
@@ -178,30 +176,28 @@ class ProjectData(models.Model):
 
 
 def verify_operation(
-    project_data: "ProjectData",
-    operation: "LifecycleOperation | None",
+    operation: "LifecycleOperation",
 ) -> bool:
-    """Return True when copied totals match expected project data totals.
+    """Return True when copied totals match expected operation totals.
 
     This check guards COOL/HOT transitions from accepting partial moves.
     """
-    if operation is None:
-        return False
-    if project_data.pk is None or operation.project_data.pk != project_data.pk:
-        return False
-    if project_data.project_size_bytes is None or project_data.file_count is None:
-        return False
-    if operation.bytes_copied is None or operation.files_copied is None:
+
+    if (
+        operation.bytes_copied is None
+        or operation.files_copied is None
+        or operation.bytes_total is None
+        or operation.files_total is None
+    ):
         return False
     return (
-        operation.bytes_copied == project_data.project_size_bytes
-        and operation.files_copied == project_data.file_count
+        operation.bytes_copied == operation.bytes_total
+        and operation.files_copied == operation.files_total
     )
 
 
 def verify_operation_success(
-    project_data: "ProjectData",
-    operation: "LifecycleOperation | None",
+    operation: "LifecycleOperation",
     operation_type: LifecycleOperationType,
 ) -> bool:
     """Return True when the operation succeeded and verification matches."""
@@ -211,4 +207,4 @@ def verify_operation_success(
         return False
     if operation.status != LifecycleOperationStatus.SUCCEEDED:
         return False
-    return verify_operation(project_data, operation)
+    return verify_operation(operation)

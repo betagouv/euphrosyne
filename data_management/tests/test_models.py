@@ -23,8 +23,10 @@ def create_operation(
         "project_data": project_data,
         "type": operation_type,
         "status": LifecycleOperationStatus.SUCCEEDED,
-        "bytes_copied": project_data.project_size_bytes,
-        "files_copied": project_data.file_count,
+        "bytes_total": 10,
+        "files_total": 2,
+        "bytes_copied": 10,
+        "files_copied": 2,
     }
     data.update(overrides)
     return LifecycleOperation.objects.create(**data)
@@ -133,8 +135,6 @@ def test_transition_to_cooling_requires_hot_and_eligible():
 def test_transition_to_cool_requires_succeeded_operation_and_verification():
     project_data = create_project_data(
         lifecycle_state=LifecycleState.COOLING,
-        project_size_bytes=10,
-        file_count=2,
     )
     operation = create_operation(project_data, LifecycleOperationType.COOL)
 
@@ -157,8 +157,6 @@ def test_transition_to_cool_requires_succeeded_operation_and_verification():
 def test_transition_to_cool_rejects_invalid_operation(overrides):
     project_data = create_project_data(
         lifecycle_state=LifecycleState.COOLING,
-        project_size_bytes=10,
-        file_count=2,
     )
     operation = create_operation(project_data, LifecycleOperationType.COOL)
     for key, value in overrides.items():
@@ -170,23 +168,16 @@ def test_transition_to_cool_rejects_invalid_operation(overrides):
 
 
 @pytest.mark.django_db
-def test_transition_to_cool_rejects_missing_operation_or_expected_totals():
+def test_transition_to_cool_rejects_missing_operation_or_operation_totals():
     project_data = create_project_data(
         lifecycle_state=LifecycleState.COOLING,
-        project_size_bytes=10,
-        file_count=2,
     )
 
     with pytest.raises(ValueError):
         project_data.transition_to(LifecycleState.COOL, operation=None)
 
-    project_data = create_project_data(
-        lifecycle_state=LifecycleState.COOLING,
-        project_size_bytes=None,
-        file_count=2,
-    )
     operation = create_operation(
-        project_data, LifecycleOperationType.COOL, bytes_copied=10
+        project_data, LifecycleOperationType.COOL, bytes_total=None
     )
 
     with pytest.raises(ValueError):
@@ -197,13 +188,9 @@ def test_transition_to_cool_rejects_missing_operation_or_expected_totals():
 def test_transition_to_cool_rejects_operation_from_other_project_data():
     project_data = create_project_data(
         lifecycle_state=LifecycleState.COOLING,
-        project_size_bytes=10,
-        file_count=2,
     )
     other_project_data = create_project_data(
         lifecycle_state=LifecycleState.COOLING,
-        project_size_bytes=10,
-        file_count=2,
     )
     operation = create_operation(other_project_data, LifecycleOperationType.COOL)
 
@@ -233,8 +220,6 @@ def test_transition_to_restoring_requires_cool():
 def test_transition_to_hot_requires_succeeded_operation_and_verification():
     project_data = create_project_data(
         lifecycle_state=LifecycleState.RESTORING,
-        project_size_bytes=10,
-        file_count=2,
     )
     operation = create_operation(project_data, LifecycleOperationType.RESTORE)
 
@@ -257,8 +242,6 @@ def test_transition_to_hot_requires_succeeded_operation_and_verification():
 def test_transition_to_hot_rejects_invalid_operation(overrides):
     project_data = create_project_data(
         lifecycle_state=LifecycleState.RESTORING,
-        project_size_bytes=10,
-        file_count=2,
     )
     operation = create_operation(project_data, LifecycleOperationType.RESTORE)
     for key, value in overrides.items():
@@ -273,13 +256,9 @@ def test_transition_to_hot_rejects_invalid_operation(overrides):
 def test_transition_to_hot_rejects_operation_from_other_project_data():
     project_data = create_project_data(
         lifecycle_state=LifecycleState.RESTORING,
-        project_size_bytes=10,
-        file_count=2,
     )
     other_project_data = create_project_data(
         lifecycle_state=LifecycleState.RESTORING,
-        project_size_bytes=10,
-        file_count=2,
     )
     operation = create_operation(other_project_data, LifecycleOperationType.RESTORE)
 

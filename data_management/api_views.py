@@ -44,6 +44,8 @@ class LifecycleOperationCallbackSerializer(serializers.Serializer):
     files_copied = serializers.IntegerField(
         required=False, allow_null=True, min_value=0
     )
+    bytes_total = serializers.IntegerField(required=False, allow_null=True, min_value=0)
+    files_total = serializers.IntegerField(required=False, allow_null=True, min_value=0)
     error_message = serializers.CharField(
         required=False, allow_blank=True, allow_null=True
     )
@@ -54,6 +56,43 @@ class LifecycleOperationCallbackSerializer(serializers.Serializer):
 
     def update(self, instance: Any, validated_data: dict[str, Any]) -> Any:
         raise NotImplementedError("LifecycleOperationCallbackSerializer is read-only.")
+
+
+class LifecycleOperationCallbackAPIView(APIView):
+    authentication_classes = [EuphrosyneAdminJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        callback_data = self._validated_callback_data(request)
+        operation_id = callback_data["operation_id"]
+
+        with transaction.atomic():
+            operation = _get_locked_operation(operation_id)
+            if operation is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+            project_data = ProjectData.objects.select_for_update().get(
+                pk=operation.project_data_id
+            )
+
+            if operation.status in TERMINAL_OPERATION_STATUSES:
+                return Response(status=status.HTTP_200_OK)
+
+            callback_status = cast(str, callback_data["status"])
+            if callback_status == LifecycleOperationStatus.FAILED:
+                _handle_failed_callback(operation, project_data, callback_data)
+            else:
+                _handle_success_callback(operation, project_data, callback_data)
+
+        return Response(status=status.HTTP_200_OK)
+
+    @staticmethod
+    def _validated_callback_data(request: Request) -> dict[str, Any]:
+        serializer = LifecycleOperationCallbackSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = dict(serializer.validated_data)
+        data["finished_at"] = timezone.now()
+        return data
 
 
 def _serialize_error_details(error_payload: Any) -> str | None:
@@ -83,113 +122,137 @@ def _verified_target_state(operation_type: str) -> LifecycleState:
     return LifecycleState.HOT
 
 
-class LifecycleOperationCallbackAPIView(APIView):
-    authentication_classes = [EuphrosyneAdminJWTAuthentication]
-    permission_classes = [IsAuthenticated]
+def _get_locked_operation(operation_id: Any) -> LifecycleOperation | None:
+    try:
+        return (
+            LifecycleOperation.objects.select_for_update()
+            .select_related("project_data")
+            .get(operation_id=operation_id)
+        )
+    except LifecycleOperation.DoesNotExist:
+        return None
 
-    def post(self, request: Request) -> Response:
-        serializer = LifecycleOperationCallbackSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
 
-        operation_id = serializer.validated_data["operation_id"]
-        callback_status = cast(str, serializer.validated_data["status"])
-        bytes_copied = cast(int | None, serializer.validated_data.get("bytes_copied"))
-        files_copied = cast(int | None, serializer.validated_data.get("files_copied"))
-        error_message = cast(str | None, serializer.validated_data.get("error_message"))
-        error_details_payload = serializer.validated_data.get("error_details")
-        finished_at = timezone.now()
+def _handle_failed_callback(
+    operation: LifecycleOperation,
+    project_data: ProjectData,
+    callback_data: dict[str, Any],
+) -> None:
+    error_message = cast(str | None, callback_data.get("error_message"))
+    error_details_payload = callback_data.get("error_details")
 
-        with transaction.atomic():
-            try:
-                operation = (
-                    LifecycleOperation.objects.select_for_update()
-                    .select_related("project_data")
-                    .get(operation_id=operation_id)
-                )
-            except LifecycleOperation.DoesNotExist:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+    operation.status = LifecycleOperationStatus.FAILED
+    operation.error_message = error_message or "Tools API reported operation failure."
+    operation.error_details = _serialize_error_details(error_details_payload)
+    operation.finished_at = callback_data["finished_at"]
+    operation.save(
+        update_fields=[
+            "status",
+            "error_message",
+            "error_details",
+            "finished_at",
+        ]
+    )
+    _transition_project_to_error(project_data)
 
-            project_data = ProjectData.objects.select_for_update().get(
-                pk=operation.project_data_id
-            )
 
-            if operation.status in TERMINAL_OPERATION_STATUSES:
-                return Response(status=status.HTTP_200_OK)
+def _handle_success_callback(
+    operation: LifecycleOperation,
+    project_data: ProjectData,
+    callback_data: dict[str, Any],
+) -> None:
+    bytes_copied = cast(int | None, callback_data.get("bytes_copied"))
+    files_copied = cast(int | None, callback_data.get("files_copied"))
+    bytes_total = cast(int | None, callback_data.get("bytes_total"))
+    files_total = cast(int | None, callback_data.get("files_total"))
 
-            if callback_status == LifecycleOperationStatus.FAILED:
-                operation.status = LifecycleOperationStatus.FAILED
-                operation.error_message = (
-                    error_message or "Tools API reported operation failure."
-                )
-                operation.error_details = _serialize_error_details(
-                    error_details_payload
-                )
-                operation.finished_at = finished_at
-                operation.save(
-                    update_fields=[
-                        "status",
-                        "error_message",
-                        "error_details",
-                        "finished_at",
-                    ]
-                )
-                _transition_project_to_error(project_data)
-                return Response(status=status.HTTP_200_OK)
+    operation.bytes_copied = bytes_copied
+    operation.files_copied = files_copied
+    if files_total is not None:
+        operation.files_total = files_total
+    if bytes_total is not None:
+        operation.bytes_total = bytes_total
 
-            operation.bytes_copied = bytes_copied
-            operation.files_copied = files_copied
+    if verify_operation(operation):
+        _handle_verified_success(operation, project_data, callback_data)
+        return
 
-            if verify_operation(project_data, operation):
-                operation.status = LifecycleOperationStatus.SUCCEEDED
-                operation.error_message = None
-                operation.error_details = None
-                operation.finished_at = finished_at
-                try:
-                    project_data.transition_to(
-                        _verified_target_state(operation.type), operation=operation
-                    )
-                except ValueError as error:
-                    operation.status = LifecycleOperationStatus.FAILED
-                    operation.error_message = "Project lifecycle transition failed."
-                    operation.error_details = str(error)
-                    _transition_project_to_error(project_data)
+    _handle_verification_failure(
+        operation,
+        project_data,
+        bytes_copied=bytes_copied,
+        files_copied=files_copied,
+        finished_at=callback_data["finished_at"],
+    )
 
-                operation.save(
-                    update_fields=[
-                        "status",
-                        "bytes_copied",
-                        "files_copied",
-                        "error_message",
-                        "error_details",
-                        "finished_at",
-                    ]
-                )
-                return Response(status=status.HTTP_200_OK)
 
-            verification_error = {
-                "reason": "verification_mismatch",
-                "expected": {
-                    "bytes_total": project_data.project_size_bytes,
-                    "files_total": project_data.file_count,
-                },
-                "received": {
-                    "bytes_copied": bytes_copied,
-                    "files_copied": files_copied,
-                },
-            }
-            operation.status = LifecycleOperationStatus.FAILED
-            operation.error_message = "Verification failed."
-            operation.error_details = json.dumps(verification_error, sort_keys=True)
-            operation.finished_at = finished_at
-            operation.save(
-                update_fields=[
-                    "status",
-                    "bytes_copied",
-                    "files_copied",
-                    "error_message",
-                    "error_details",
-                    "finished_at",
-                ]
-            )
-            _transition_project_to_error(project_data)
-            return Response(status=status.HTTP_200_OK)
+def _handle_verified_success(
+    operation: LifecycleOperation,
+    project_data: ProjectData,
+    callback_data: dict[str, Any],
+) -> None:
+    operation.status = LifecycleOperationStatus.SUCCEEDED
+    operation.error_message = None
+    operation.error_details = None
+    operation.finished_at = callback_data["finished_at"]
+
+    try:
+        project_data.transition_to(
+            _verified_target_state(operation.type), operation=operation
+        )
+    except ValueError as error:
+        operation.status = LifecycleOperationStatus.FAILED
+        operation.error_message = "Project lifecycle transition failed."
+        operation.error_details = str(error)
+        _transition_project_to_error(project_data)
+
+    operation.save(
+        update_fields=[
+            "status",
+            "bytes_total",
+            "files_total",
+            "bytes_copied",
+            "files_copied",
+            "error_message",
+            "error_details",
+            "finished_at",
+        ]
+    )
+
+
+def _handle_verification_failure(
+    operation: LifecycleOperation,
+    project_data: ProjectData,
+    *,
+    bytes_copied: int | None,
+    files_copied: int | None,
+    finished_at: Any,
+) -> None:
+    verification_error = {
+        "reason": "verification_mismatch",
+        "expected": {
+            "bytes_total": operation.bytes_total,
+            "files_total": operation.files_total,
+        },
+        "received": {
+            "bytes_copied": bytes_copied,
+            "files_copied": files_copied,
+        },
+    }
+    operation.status = LifecycleOperationStatus.FAILED
+    operation.error_message = "Verification failed."
+    operation.error_details = json.dumps(verification_error, sort_keys=True)
+    operation.finished_at = finished_at
+    operation.save(
+        update_fields=[
+            "status",
+            "bytes_total",
+            "files_total",
+            "bytes_copied",
+            "files_copied",
+            "error_message",
+            "error_details",
+            "finished_at",
+        ]
+    )
+    _transition_project_to_error(project_data)
