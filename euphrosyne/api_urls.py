@@ -16,6 +16,9 @@ urlpatterns = [
 if apps.is_installed("data_request"):
     urlpatterns.append(path("data-request/", include("data_request.api_urls")))
 
+if apps.is_installed("data_management"):
+    urlpatterns.append(path("data-management/", include("data_management.api_urls")))
+
 if apps.is_installed("lab_notebook"):
     urlpatterns.append(path("notebook/", include("lab_notebook.api.urls")))
 

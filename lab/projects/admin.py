@@ -21,6 +21,10 @@ from euphro_tools.hooks import (
 from lab.admin.mixins import LabPermission, LabPermissionMixin, LabRole
 from lab.participations.models import Employer
 from lab.permissions import is_lab_admin
+from lab.project_immutability import (
+    ensure_project_data_writable,
+    is_project_data_immutable,
+)
 
 from . import admin_filters, inlines
 from .forms import (
@@ -228,6 +232,8 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
             readonly_fields = (*readonly_fields, "admin", "run_date")
             if obj:
                 readonly_fields = (*readonly_fields, "name")
+        elif obj and is_project_data_immutable(obj):
+            readonly_fields = (*readonly_fields, "name")
         return readonly_fields
 
     def get_queryset(self, request: HttpRequest):
@@ -255,6 +261,7 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
             obj.admin_id = request.user.id  # type: ignore[assignment]
 
         if change and "name" in form.changed_data:
+            ensure_project_data_writable(obj)
             try:
                 rename_project_directory(form.initial["name"], obj.name)
             except RenameFailedError as error:

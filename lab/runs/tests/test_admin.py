@@ -9,8 +9,8 @@ from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 
+from data_management.models import LifecycleState, ProjectData
 from euphro_auth.tests import factories as auth_factories
-from lab.projects.models import Project
 from lab.tests import factories
 
 from .. import forms
@@ -162,6 +162,17 @@ class TestRunAdminParams(TestCase):
         # pylint: disable=protected-access
         assert self.run_admin._get_project(request) == project
 
+    def test_label_is_readonly_when_project_is_immutable(self):
+        project_data = ProjectData.for_project(self.run.project)
+        project_data.lifecycle_state = LifecycleState.COOL
+        project_data.save(update_fields=["lifecycle_state"])
+        request = RequestFactory().get(
+            reverse("admin:lab_run_change", args=[self.run.id])
+        )
+        request.user = self.lab_admin_user
+
+        assert "label" in self.run_admin.get_readonly_fields(request, self.run)
+
 
 class TestRunAdminViewAsLeader(TestCase):
     def setUp(self):
@@ -178,7 +189,7 @@ class TestRunAdminViewAsLeader(TestCase):
         request = self.request_factory.post(reverse("admin:lab_run_add"))
         request.user = self.staff_user
         run = Run(label="Run 1")
-        run.project = Project(name="Le projet du Run 1")
+        run.project = factories.ProjectFactory(name="Le projet du Run 1")
         with patch.object(run, "save"):
             RunAdmin(Run, admin_site=AdminSite()).save_model(
                 request,
@@ -187,6 +198,24 @@ class TestRunAdminViewAsLeader(TestCase):
                 change=False,
             )
         init_run_dir_mock.assert_called_once_with(run.project.name, run.label)
+
+    @patch("lab.runs.admin.initialize_run_directory")
+    def test_create_run_is_forbidden_when_project_is_cooling(
+        self, init_run_dir_mock: MagicMock
+    ):
+        project_data = ProjectData.for_project(self.project)
+        project_data.lifecycle_state = LifecycleState.COOLING
+        project_data.save(update_fields=["lifecycle_state"])
+
+        self.client.force_login(self.project_leader_user)
+        response = self.client.post(
+            reverse("admin:lab_run_add") + f"?project={self.project.id}",
+            data={"label": "Run 1"},
+        )
+
+        assert response.status_code == 403
+        assert not Run.objects.filter(project=self.project, label="Run 1").exists()
+        init_run_dir_mock.assert_not_called()
 
     def test_change_list_view_with_project_lookup_when_project_member(self):
         """Calling changelist_view with a project member should return ok"""
@@ -221,6 +250,42 @@ class TestRunAdminViewAsLeader(TestCase):
         response = admin.changeform_view(request, None)
 
         assert response.status_code == 302
+
+    def test_run_creation_button_is_disabled_when_project_is_immutable(self):
+        project_data = ProjectData.for_project(self.project)
+        project_data.lifecycle_state = LifecycleState.COOLING
+        project_data.save(update_fields=["lifecycle_state"])
+        self.client.force_login(self.project_leader_user)
+
+        response = self.client.get(
+            reverse("admin:lab_run_changelist") + f"?project={self.project.id}"
+        )
+        html = response.content.decode()
+
+        assert response.status_code == 200
+        assert 'type="button" disabled' in html
+        assert (
+            reverse("admin:lab_run_add") + f"?project={self.project.id}"
+        ) not in html
+
+    def test_run_creation_button_is_disabled_when_project_is_immutable_with_runs(self):
+        run = factories.RunFactory(project=self.project)
+        project_data = ProjectData.for_project(self.project)
+        project_data.lifecycle_state = LifecycleState.COOLING
+        project_data.save(update_fields=["lifecycle_state"])
+        self.client.force_login(self.project_leader_user)
+
+        response = self.client.get(
+            reverse("admin:lab_run_changelist") + f"?project={self.project.id}"
+        )
+        html = response.content.decode()
+
+        assert response.status_code == 200
+        assert run.label in html
+        assert 'type="button" disabled' in html
+        assert (
+            reverse("admin:lab_run_add") + f"?project={self.project.id}"
+        ) not in html
 
     @patch("django.middleware.csrf.CsrfViewMiddleware._check_token", lambda *args: None)
     def test_changing_run(self):
@@ -345,6 +410,47 @@ class TestRunAdminViewAsAdmin(TestCase):
             run.project.name, form.initial["label"], "new-run-name"
         )
 
+    @patch("lab.runs.admin.rename_run_directory")
+    def test_change_run_label_is_forbidden_when_project_is_cool(
+        self, rename_run_dir_mock: MagicMock
+    ):
+        run = factories.RunFactory()
+        project_data = ProjectData.for_project(run.project)
+        project_data.lifecycle_state = LifecycleState.COOL
+        project_data.save(update_fields=["lifecycle_state"])
+        request = self.request_factory.post(
+            reverse("admin:lab_run_change", args=[run.id]),
+            data={
+                "label": "new-run-name",
+                "particle_type": "",
+                "energy_in_keV_Proton": "",
+                "energy_in_keV_Alpha particle": "",
+                "energy_in_keV_Deuton": "",
+                "beamline": "Microbeam",
+                "filters_for_detector_LE0": "",
+                "filters_for_detector_HE1": "",
+                "filters_for_detector_HE2": "",
+                "filters_for_detector_HE3": "",
+                "filters_for_detector_HE4": "",
+                "detector_IBIL_other": "",
+                "detector_FORS_other": "",
+                "detector_ERDA": "",
+                "detector_NRA": "",
+                "Run_run_object_groups-TOTAL_FORMS": "0",
+                "Run_run_object_groups-INITIAL_FORMS": "0",
+            },
+        )
+        request.user = self.admin_user
+        run_admin = RunAdmin(Run, admin_site=AdminSite())
+        form_class = run_admin.get_form(request, obj=run, change=True)
+        form = form_class(request.POST, request.FILES, instance=run)
+        assert form.is_valid()
+
+        with pytest.raises(PermissionDenied):
+            run_admin.save_model(request, run, form=form, change=True)
+
+        rename_run_dir_mock.assert_not_called()
+
 
 class TestRunAdminMethodFieldset(TestCase):
     def setUp(self):
@@ -458,3 +564,23 @@ class TestRunAdminScheduleAction(TestCase):
 
         with pytest.raises(PermissionDenied):
             self.run_admin.changeform_view(request, str(self.run.id))
+
+    def test_schedule_action_is_forbidden_when_project_is_cool(self):
+        project_data = ProjectData.for_project(self.project)
+        project_data.lifecycle_state = LifecycleState.COOL
+        project_data.save(update_fields=["lifecycle_state"])
+        old_start_date = self.run.start_date
+        old_end_date = self.run.end_date
+
+        request = RequestFactory().post(
+            reverse("admin:lab_run_change", args=[self.run.id]),
+            data=self.correct_data,
+        )
+        request.user = self.admin_user
+
+        with pytest.raises(PermissionDenied):
+            self.run_admin.changeform_view(request, str(self.run.id))
+
+        self.run.refresh_from_db()
+        assert self.run.start_date == old_start_date
+        assert self.run.end_date == old_end_date

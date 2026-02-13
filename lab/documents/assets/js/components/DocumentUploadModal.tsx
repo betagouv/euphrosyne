@@ -5,6 +5,7 @@ import { getFileInputCustomValidity } from "../document-upload-form";
 interface DocumentUploadModalProps {
   id: string;
   hintText?: string;
+  disabled?: boolean;
   onUploadFile: (files: File[]) => Promise<
     PromiseSettledResult<{
       file: File;
@@ -25,6 +26,7 @@ const validateFileInput = (event: React.FormEvent<HTMLInputElement>) => {
 export default function DocumentUploadModal({
   id,
   hintText,
+  disabled = false,
   onAnyUploadSucccess,
   onUploadFile,
   onUploadError,
@@ -45,6 +47,9 @@ export default function DocumentUploadModal({
 
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (disabled) {
+      return;
+    }
     uploadFiles();
   };
 
@@ -138,6 +143,7 @@ export default function DocumentUploadModal({
                         multiple
                         required
                         onChange={validateFileInput}
+                        disabled={disabled || isSubmitting}
                       />
                     </div>
                     <input
@@ -145,7 +151,7 @@ export default function DocumentUploadModal({
                       className="button fr-mt-2w"
                       type="submit"
                       id="upload-button"
-                      disabled={isSubmitting}
+                      disabled={disabled || isSubmitting}
                     />
                   </div>
                 </form>

@@ -5,6 +5,10 @@
         
         <p>{% blocktrans with facility_name=facility_name %}A run is a series of analyses performed on one or multiple objects under the same experimental conditions. A starting date will be assigned to each run by a new {{ facility_name }} administrator.{% endblocktrans %}</p>
         
+        {% if can_create_run %}
         <a class="fr-mt-1w fr-btn fr-ml-1w" href="{% url "admin:lab_run_add" %}?project={{ project_id }}">{% translate "Create a first run" %}</a>
+        {% else %}
+        <button class="fr-mt-1w fr-btn fr-ml-1w" type="button" disabled>{% translate "Create a first run" %}</button>
+        {% endif %}
     </div>
 <div>
