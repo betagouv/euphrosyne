@@ -193,8 +193,6 @@ def run_cooling_scheduler(
                 project_data=project_data,
                 type=LifecycleOperationType.COOL,
                 status=LifecycleOperationStatus.PENDING,
-                bytes_total=project_data.project_size_bytes,
-                files_total=project_data.file_count,
                 started_at=now,
             )
             claimed.append((project_data, operation))

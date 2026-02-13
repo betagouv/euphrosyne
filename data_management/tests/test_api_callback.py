@@ -32,18 +32,12 @@ def _create_operation(  # pylint: disable=too-many-arguments
     status: str = LifecycleOperationStatus.RUNNING,
     bytes_total: int = 10,
     files_total: int = 2,
-    project_size_bytes: int | None = None,
-    project_file_count: int | None = None,
     bytes_copied: int | None = None,
     files_copied: int | None = None,
     error_message: str | None = None,
 ) -> LifecycleOperation:
-    expected_bytes = bytes_total if project_size_bytes is None else project_size_bytes
-    expected_files = files_total if project_file_count is None else project_file_count
     project_data = ProjectDataFactory(
         lifecycle_state=lifecycle_state,
-        project_size_bytes=expected_bytes,
-        file_count=expected_files,
     )
     return LifecycleOperation.objects.create(
         project_data=project_data,
@@ -125,6 +119,8 @@ def test_callback_succeeded_verified_transitions_cool_operation_to_cool():
         data={
             "operation_id": str(operation.operation_id),
             "status": "SUCCEEDED",
+            "bytes_total": 10,
+            "files_total": 2,
             "bytes_copied": 10,
             "files_copied": 2,
         },
@@ -155,6 +151,8 @@ def test_callback_succeeded_verified_transitions_restore_operation_to_hot():
         data={
             "operation_id": str(operation.operation_id),
             "status": "SUCCEEDED",
+            "bytes_total": 10,
+            "files_total": 2,
             "bytes_copied": 10,
             "files_copied": 2,
         },
@@ -180,6 +178,8 @@ def test_callback_succeeded_with_mismatch_marks_failed_and_project_error():
         data={
             "operation_id": str(operation.operation_id),
             "status": "SUCCEEDED",
+            "bytes_total": 10,
+            "files_total": 2,
             "bytes_copied": 9,
             "files_copied": 2,
         },
@@ -203,13 +203,11 @@ def test_callback_succeeded_with_mismatch_marks_failed_and_project_error():
 
 
 @pytest.mark.django_db
-def test_callback_verification_uses_project_data_totals_not_operation_totals():
+def test_callback_succeeded_without_totals_marks_failed_and_project_error():
     operation = _create_operation(
         lifecycle_state=LifecycleState.COOLING,
         bytes_total=1000,
         files_total=200,
-        project_size_bytes=10,
-        project_file_count=2,
     )
 
     response = Client().post(
@@ -217,8 +215,8 @@ def test_callback_verification_uses_project_data_totals_not_operation_totals():
         data={
             "operation_id": str(operation.operation_id),
             "status": "SUCCEEDED",
-            "bytes_copied": 10,
-            "files_copied": 2,
+            "bytes_copied": None,
+            "files_copied": None,
         },
         headers=_backend_headers(),
         content_type="application/json",
@@ -229,8 +227,16 @@ def test_callback_verification_uses_project_data_totals_not_operation_totals():
     project_data.refresh_from_db()
 
     assert response.status_code == 200
-    assert operation.status == LifecycleOperationStatus.SUCCEEDED
-    assert project_data.lifecycle_state == LifecycleState.COOL
+    assert operation.status == LifecycleOperationStatus.FAILED
+    assert operation.error_message == "Verification failed."
+    assert operation.bytes_total == 1000
+    assert operation.files_total == 200
+    assert json.loads(operation.error_details or "{}") == {
+        "expected": {"bytes_total": 1000, "files_total": 200},
+        "reason": "verification_mismatch",
+        "received": {"bytes_copied": None, "files_copied": None},
+    }
+    assert project_data.lifecycle_state == LifecycleState.ERROR
 
 
 @pytest.mark.django_db
