@@ -14,14 +14,23 @@ import downloadRunData from "../../../../assets/js/run-data-downloader.js";
 import WorkplaceRunTabs, {
   WorkplaceRunTabsProps,
 } from "../components/WorkplaceRunTabs";
+import ProjectLifecyclePanel from "../components/ProjectLifecyclePanel";
+import ProjectLifecycleNoticeBanner from "../components/ProjectLifecycleNoticeBanner";
 import { RawDataFileService } from "../raw-data/raw-data-file-service";
 import { ProcessedDataFileService } from "../processed-data/processed-data-file-service";
 import toolsFetch from "../../../../../shared/js/euphrosyne-tools-client";
+import { dispatchLifecycleStateChanged } from "../lifecycle-state";
 
-export type WorkplacePageData = Omit<
-  WorkplaceRunTabsProps,
+type WorkplaceRunData = Omit<
+  WorkplaceRunTabsProps["runs"][number],
   "rawDataFileService" | "processedDataFileService"
 >;
+
+export interface WorkplacePageData {
+  project: WorkplaceRunTabsProps["project"];
+  runs: WorkplaceRunData[];
+  isLabAdmin: boolean;
+}
 
 VirtualOfficeButton.init();
 VirtualOfficeDeleteButton.init();
@@ -35,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
     throw new Error("Workplace data not found in workplace-data script tag.");
   }
 
-  const { project, runs } = workplacePageData;
+  const { project, runs, isLabAdmin } = workplacePageData;
 
   renderComponent(
     "workplace-run-tabs",
@@ -56,6 +65,26 @@ document.addEventListener("DOMContentLoaded", () => {
       })),
     }),
   );
+
+  if (isLabAdmin) {
+    renderComponent(
+      "project-lifecycle-notice-banner",
+      createElement(ProjectLifecycleNoticeBanner, {
+        lifecycleState: project.lifecycleState,
+      }),
+    );
+
+    renderComponent(
+      "project-lifecycle-panel",
+      createElement(ProjectLifecyclePanel, {
+        projectSlug: project.slug,
+        lifecycleState: project.lifecycleState,
+        lastLifecycleOperationId: project.lastLifecycleOperationId,
+        lastLifecycleOperationType: project.lastLifecycleOperationType,
+        onLifecycleStateChange: dispatchLifecycleStateChanged,
+      }),
+    );
+  }
 
   renderComponent(
     "project-config-image-definitions",

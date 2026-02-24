@@ -14,9 +14,11 @@ export interface WorkplaceRunTabProps {
     label: string;
     rawDataTable: {
       canDelete: boolean;
+      canDeleteWhenHot?: boolean;
     };
     processedDataTable: {
       canDelete: boolean;
+      canDeleteWhenHot?: boolean;
     };
     rawDataFileService: RawDataFileService;
     processedDataFileService: ProcessedDataFileService;

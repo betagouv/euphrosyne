@@ -11,16 +11,19 @@ from lab.workplace.views import WorkplaceView
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    ("state", "expected_can_delete"),
+    ("state", "expected_can_delete", "expected_can_delete_when_hot"),
     [
-        (LifecycleState.HOT, True),
-        (LifecycleState.COOL, False),
-        (LifecycleState.COOLING, False),
+        (LifecycleState.HOT, True, True),
+        (LifecycleState.COOL, False, True),
+        (LifecycleState.COOLING, False, True),
+        (LifecycleState.RESTORING, False, True),
+        (LifecycleState.ERROR, False, True),
     ],
 )
 def test_workplace_view_delete_flags_follow_project_lifecycle(
     state: LifecycleState,
     expected_can_delete: bool,
+    expected_can_delete_when_hot: bool,
 ):
     project = ProjectFactory()
     RunFactory(project=project)
@@ -40,3 +43,15 @@ def test_workplace_view_delete_flags_follow_project_lifecycle(
     assert len(data["runs"]) == 1
     assert data["runs"][0]["rawDataTable"]["canDelete"] is expected_can_delete
     assert data["runs"][0]["processedDataTable"]["canDelete"] is expected_can_delete
+    assert (
+        data["runs"][0]["rawDataTable"]["canDeleteWhenHot"]
+        is expected_can_delete_when_hot
+    )
+    assert (
+        data["runs"][0]["processedDataTable"]["canDeleteWhenHot"]
+        is expected_can_delete_when_hot
+    )
+    assert data["isLabAdmin"] is True
+    assert data["project"]["lifecycleState"] == state
+    assert data["project"]["lastLifecycleOperationId"] is None
+    assert data["project"]["lastLifecycleOperationType"] is None

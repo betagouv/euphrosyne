@@ -18,10 +18,12 @@ def post_cool_project(
     operation_id: str,
     timeout: int,
 ) -> requests.Response:
-    url = _build_project_cool_url(project_slug)
+    url = (
+        _build_project_cool_url(project_slug)
+        + f"?operation_id={quote(operation_id, safe='')}"
+    )
     return requests.post(
         url,
-        json={"operation_id": operation_id},
         timeout=timeout,
         headers=get_tools_api_auth_header(),
     )
