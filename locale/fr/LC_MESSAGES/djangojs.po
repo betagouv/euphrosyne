@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-12 16:50+0100\n"
+"POT-Creation-Date: 2026-02-13 15:17+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -328,6 +328,82 @@ msgstr ""
 msgid "An error occurred while setting project image definition"
 msgstr ""
 "Une erreur s'est produite en paramétrant la définition d'image du projet."
+
+msgid "Project lifecycle"
+msgstr "Cycle de vie du projet"
+
+msgid "Lifecycle"
+msgstr "Cycle de vie"
+
+msgid "HOT"
+msgstr "HOT"
+
+msgid "COOLING"
+msgstr "COOLING"
+
+msgid "COOL"
+msgstr "COOL"
+
+msgid "RESTORING"
+msgstr "RESTORING"
+
+msgid "ERROR"
+msgstr "ERROR"
+
+msgid "Restore project"
+msgstr "Restaurer le projet"
+
+msgid "Retry operation"
+msgstr "Réessayer l'opération"
+
+msgid "Lifecycle operation failed"
+msgstr "L'opération de cycle de vie a échoué"
+
+msgid "Operation type"
+msgstr "Type d'opération"
+
+msgid "Status"
+msgstr "Statut"
+
+msgid "Started at"
+msgstr "Démarré le"
+
+msgid "Finished at"
+msgstr "Terminé le"
+
+msgid "Files copied / total"
+msgstr "Fichiers copiés / total"
+
+msgid "Bytes copied / total"
+msgstr "Octets copiés / total"
+
+msgid "Error title"
+msgstr "Titre de l'erreur"
+
+msgid "Project is currently in Cool storage. Restore to modify."
+msgstr ""
+"Le projet est actuellement en stockage Cool. Restaurez-le pour le modifier."
+
+msgid "Lifecycle details"
+msgstr "Détails du cycle de vie"
+
+msgid "Pending"
+msgstr "En attente"
+
+msgid "Running"
+msgstr "En cours"
+
+msgid "Succeeded"
+msgstr "Réussie"
+
+msgid "Failed"
+msgstr "Échouée"
+
+msgid "No lifecycle operation available."
+msgstr "Aucune opération de cycle de vie disponible."
+
+msgid "Could not update lifecycle state."
+msgstr "Impossible de mettre à jour l'état du cycle de vie."
 
 msgid "Runs data"
 msgstr "Données des runs"

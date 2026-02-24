@@ -9,7 +9,7 @@ from django.views.generic import TemplateView
 
 from ..models import Project
 from ..permissions import ProjectMembershipRequiredMixin, is_lab_admin
-from ..project_immutability import is_project_data_immutable
+from data_management.models import LifecycleState, ProjectData
 
 
 class WorkplaceView(ProjectMembershipRequiredMixin, TemplateView):
@@ -24,9 +24,13 @@ class WorkplaceView(ProjectMembershipRequiredMixin, TemplateView):
         return super().dispatch(request, project_id, *args, **kwargs)
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
-        can_delete_files = is_lab_admin(
-            self.request.user
-        ) and not is_project_data_immutable(self.project)
+        project_data = ProjectData.for_project(self.project)
+        user_is_lab_admin = is_lab_admin(self.request.user)
+        can_delete_files = (
+            user_is_lab_admin and project_data.lifecycle_state == LifecycleState.HOT
+        )
+        can_delete_files_when_hot = user_is_lab_admin
+        last_lifecycle_operation = project_data.last_lifecycle_operation
         runs = tuple(
             {
                 "id": id,
@@ -46,16 +50,30 @@ class WorkplaceView(ProjectMembershipRequiredMixin, TemplateView):
                         "name": self.project.name,
                         "slug": self.project.slug,
                         "id": self.project.id,
+                        "lifecycleState": project_data.lifecycle_state,
+                        "lastLifecycleOperationId": (
+                            str(last_lifecycle_operation.operation_id)
+                            if last_lifecycle_operation
+                            else None
+                        ),
+                        "lastLifecycleOperationType": (
+                            last_lifecycle_operation.type
+                            if last_lifecycle_operation
+                            else None
+                        ),
                     },
+                    "isLabAdmin": user_is_lab_admin,
                     "runs": [
                         {
                             "id": run["id"],
                             "label": run["label"],
                             "rawDataTable": {
                                 "canDelete": can_delete_files,
+                                "canDeleteWhenHot": can_delete_files_when_hot,
                             },
                             "processedDataTable": {
                                 "canDelete": can_delete_files,
+                                "canDeleteWhenHot": can_delete_files_when_hot,
                             },
                         }
                         for run in runs

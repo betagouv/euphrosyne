@@ -26,7 +26,9 @@
     </div>
     {% if user.is_lab_admin %}
     <fieldset class="module aligned fr-mt-3w">
+        <div id="project-lifecycle-notice-banner"></div>
         <h2>{% trans "Administration" %}</h2>
+        <h3>{% trans "VMs" %}</h3>
         <div class="form-row fr-grid-row">
             <div class="fr-select-group fr-col-12 fr-col-md-6">   
                 <label for="vm-size-select">{% trans "Project type" %}</label>
@@ -48,6 +50,8 @@
                 {% trans "Delete virtual office"%}
             </button>
         </div>
+        <h3 class="fr-mt-3w">{% trans "Data management" %}</h3>
+        <div id="project-lifecycle-panel"></div>
     </fieldset>
     {% endif %}
 

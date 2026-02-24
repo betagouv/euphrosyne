@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-12 16:54+0100\n"
+"POT-Creation-Date: 2026-02-13 15:27+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -1395,6 +1395,9 @@ msgstr "Modifier l’objet %(model)s sélectionné"
 msgid "Administration"
 msgstr "Administration"
 
+msgid "VMs"
+msgstr "Machines virtuelles"
+
 msgid "Project type"
 msgstr "Type de projet"
 
@@ -1412,6 +1415,9 @@ msgstr "Utilisé pour déterminer la taille de la machine virtuelle."
 
 msgid "Delete virtual office"
 msgstr "Supprimer le bureau virtuel"
+
+msgid "Data management"
+msgstr "Gestion des données"
 
 msgid "Download run data"
 msgstr "Télécharger les données du run"

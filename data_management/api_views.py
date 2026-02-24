@@ -4,6 +4,7 @@ import json
 import logging
 from typing import Any, cast
 
+from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers, status
@@ -13,6 +14,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from euphro_auth.jwt.authentication import EuphrosyneAdminJWTAuthentication
+from lab.models import Project
+from lab.permissions import is_lab_admin
 
 from .models import (
     LifecycleOperation,
@@ -60,7 +63,6 @@ class LifecycleOperationCallbackSerializer(serializers.Serializer):
 
 class LifecycleOperationCallbackAPIView(APIView):
     authentication_classes = [EuphrosyneAdminJWTAuthentication]
-    permission_classes = [IsAuthenticated]
 
     def post(self, request: Request) -> Response:
         callback_data = self._validated_callback_data(request)
@@ -93,6 +95,29 @@ class LifecycleOperationCallbackAPIView(APIView):
         data = dict(serializer.validated_data)
         data["finished_at"] = timezone.now()
         return data
+
+
+class ProjectLifecycleAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request, project_slug: str) -> Response:
+        if not is_lab_admin(request.user):
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        project = get_object_or_404(Project, slug=project_slug)
+        project_data = ProjectData.for_project(project)
+        last_operation = project_data.last_lifecycle_operation
+
+        return Response(
+            data={
+                "lifecycle_state": project_data.lifecycle_state,
+                "last_operation_id": (
+                    str(last_operation.operation_id) if last_operation else None
+                ),
+                "last_operation_type": last_operation.type if last_operation else None,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 def _serialize_error_details(error_payload: Any) -> str | None:

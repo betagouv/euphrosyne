@@ -1,207 +1,216 @@
-# [TASK] Enforce immutability for COOL and COOLING runs in app layer
+# [TASK] UI — Show lifecycle badge + restore/retry actions (admin-only)
 
-Based on PRD – Project immutability rules.
+## Context
 
----
+Project data lifecycle is tracked at the **project level**:
 
-# Functional Goal
+`HOT → COOLING → COOL → RESTORING → ERROR`
 
-When a project has:
+Lifecycle operations (`COOL` / `RESTORE`) are long-running and verified.
 
-```
-lifecycle_state ∈ {COOL, COOLING}
-```
-
-the application must behave as **strictly read-only** at the project level.
-
-This means:
-
-- ❌ Block document uploads
-- ❌ Block document edits
-- ❌ Block document deletes
-- ❌ Block run creation
-- ❌ Block run planning/scheduling
-- ❌ Block run outputs / artifact writes
-- ❌ Block rename operations
-- ❌ Block delete operations
-
-Reads remain allowed.
-
-The PRD explicitly states that COOL is immutable and restore is required before modification.
+We must expose lifecycle visibility and actions in the **Workplace view**, using **DSFR components**, implemented in **React (.tsx)**.
 
 ---
 
-# Architectural Strategy
+## Goal
 
-## 1. Centralize the rule
+In Workplace:
 
-Create a single authoritative check, e.g.:
+- Display lifecycle badge
+- Allow **admin-only restore**
+- Allow **admin-only retry on error**
+- Display last operation metadata
+- Poll operation endpoint while running
+- Disable writes when project ≠ HOT
 
-- `project.is_immutable?`
-- or `ensure_project_writable!(project)`
-- or a reusable policy / guard
-
-Definition:
-
-```
-immutable if lifecycle_state in {COOL, COOLING}
-```
-
-The rule must exist in **one place only**, reused everywhere.
-
-Goal: prevent drift or forgotten endpoints.
+This UI is visible **only to lab admins**.
 
 ---
 
-## 2. Apply the guard to ALL write entry points
+## Scope
 
-The rule must be enforced at application layer entrypoints (controllers, services, commands).
+### In scope
 
-You must audit the repo and apply it consistently.
+- Lifecycle badge (admin-only)
+- Restore button (COOL only, admin-only)
+- Error banner + retry (ERROR only, admin-only)
+- Operation metadata card (last operation only)
+- Polling during COOLING / RESTORING
+- Disable mutation UI when state ≠ HOT
+- Implementation in `.tsx`
+- Use DSFR components only
+
+### Out of scope
+
+- Operation history list
+- Eligibility date display
+- Non-admin lifecycle UI
 
 ---
 
-# Areas That Must Be Blocked
+## Functional Requirements
 
-## A. Documents
+### 1️⃣ Lifecycle badge (Workplace)
 
-Block:
+Display DSFR badge based on `project.lifecycle_state`:
+
+| State     | Badge severity |
+| --------- | -------------- |
+| HOT       | success        |
+| COOLING   | info           |
+| COOL      | default        |
+| RESTORING | info           |
+| ERROR     | error          |
+
+Requirements:
+
+- Must reflect backend state only
+- No optimistic state changes
+- Updates after polling
+
+---
+
+### 2️⃣ Restore (admin-only)
+
+When:
+
+```
+
+lifecycle_state == COOL
+
+```
+
+Show button:
+
+> “Restore project”
+
+Call:
+
+```
+
+POST /data/projects/{project_slug}/restore
+
+```
+
+After click:
+
+- Disable button
+- Wait for backend to transition to `RESTORING`
+- Start polling operation endpoint
+
+Only lab admins can see/use this.
+
+---
+
+### 3️⃣ Error banner + retry (admin-only)
+
+When:
+
+```
+
+lifecycle_state == ERROR
+
+```
+
+Display DSFR error alert with:
+
+- Last operation type
+- Raw tools-api error **title message**
+- Timestamp
+- Files/bytes copied vs expected (if available)
+
+Retry button:
+
+- If last op = COOL → `POST /data/projects/{project_slug}/cool`
+- If last op = RESTORE → `POST /data/projects/{project_slug}/restore`
+
+Retry must create new `operation_id` (backend responsibility).
+
+---
+
+### 4️⃣ Operation metadata
+
+When state ∈ `{COOLING, RESTORING, COOL, ERROR}`:
+
+Display “Lifecycle details” card showing:
+
+- Operation type
+- Status
+- Started at
+- Finished at
+- Files total / copied
+- Bytes total / copied
+
+Data from:
+
+```
+
+GET /data/operations/{operation_id}
+
+```
+
+(No history list — last operation only.)
+
+---
+
+### 5️⃣ Polling
+
+When state ∈ `{COOLING, RESTORING}`:
+
+Poll:
+
+```
+
+GET /data/operations/{operation_id}
+
+```
+
+- Interval: ~5 seconds
+- Stop when status ∈ `{SUCCEEDED, FAILED}`
+- Refetch project lifecycle state
+- Update badge accordingly
+
+No WebSocket required.
+
+---
+
+### 6️⃣ Immutability UI
+
+When state ≠ HOT:
+
+Disable:
 
 - Upload
-- Metadata edits
-- Content edits
 - Delete
-
-Expected behavior:
-
-- Return 403 Forbidden or 409 Conflict
-- Clear error message
-- No side effects
-
----
-
-## B. Runs (creation & planning)
-
-PRD explicitly states:
-
-> A project in COOL or COOLING must not allow new runs to be planned.
-
-Therefore block:
-
+- Rename
 - Run creation
-- Run scheduling / planning endpoints
+
+Add DSFR notice:
+
+> “Project is currently in Cool storage. Restore to modify.”
+
+Backend remains authoritative for write enforcement.
 
 ---
 
-## C. Run outputs / artifacts
+## API Dependencies
 
-Any operation that writes files as run outputs must be blocked.
-
-Important edge case:
-
-Even if a run was created before COOLING, once lifecycle_state changes to COOLING:
-
-- Output writes must fail
-- No new artifacts should be persisted
-
-This prevents corruption during migration.
+- `POST /data/projects/{project_slug}/restore`
+- `POST /data/projects/{project_slug}/cool` (retry)
+- `GET /data/operations/{operation_id}`
 
 ---
 
-## D. Rename / delete operations
+## Acceptance Criteria
 
-Block any mutation of project storage:
-
-- Rename files/folders
-- Delete files/folders
-- Any filesystem-level mutation
-
----
-
-# HTTP Behavior
-
-## Recommended Status Codes
-
-Choose one consistently:
-
-- **409 Conflict** → state makes operation invalid
-- **403 Forbidden** → business rule prohibits it
-
-Either is acceptable if consistent.
-
----
-
-## Error Response (clear & actionable)
-
-Example:
-
-```json
-{
-  "error": "PROJECT_IMMUTABLE",
-  "message": "Project is read-only while lifecycle_state is COOL or COOLING. Restore the project to HOT to modify files or create runs.",
-  "lifecycle_state": "COOL"
-}
-```
-
-Must clearly explain:
-
-- Why it failed
-- What to do (restore)
-
-PRD explicitly requires restore before modification.
-
----
-
-# Required Test Coverage
-
-Acceptance criteria require tests for blocked operations.
-
-## 1. Documents
-
-- COOLING → upload → rejected
-- COOL → edit → rejected
-- COOL → delete → rejected
-
-## 2. Runs
-
-- COOLING → create run → rejected
-- COOL → plan run → rejected
-
-## 3. Outputs
-
-- COOLING → attempt artifact write → rejected
-- COOL → attempt artifact write → rejected
-
-## 4. Rename/Delete
-
-- COOL/COOLING → rename → rejected
-- COOL/COOLING → delete → rejected
-
-## 5. Control tests
-
-- HOT → all operations still succeed
-
----
-
-# Important Behavioral Distinction
-
-### COOLING
-
-- Transitional state (migration in progress)
-- Must block writes to avoid divergence between source and destination
-
-### COOL
-
-- Terminal immutable state
-- No writes allowed
-- Restore required before modification
-
----
-
-# Definition of Done
-
-- All project-level write operations blocked when lifecycle_state ∈ {COOL, COOLING}
-- Run creation/planning explicitly prevented
-- Clear and consistent error responses
-- Full test coverage of blocked paths
-- No regression for HOT projects
+- Lifecycle badge visible in Workplace (admin-only).
+- Restore visible only when COOL.
+- Retry visible only when ERROR.
+- Raw tools-api error title displayed.
+- Operation metadata displayed correctly.
+- Polling active during COOLING/RESTORING.
+- Polling stops on terminal state.
+- Badge updates after operation completion.
+- All mutation UI disabled when state ≠ HOT.
+- Implemented in `.tsx` with DSFR components.
+- No operation history implemented.
