@@ -3,7 +3,7 @@ from datetime import time
 from typing import Any, Mapping
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models.base import Model
 from django.forms.fields import BooleanField, SplitDateTimeField
@@ -299,6 +299,9 @@ class RunScheduleForm(ModelForm):
         errors = {}
 
         cleaned_data, errors = self._clean_dates(cleaned_data, errors)
+        cleaned_data, errors = self._clean_first_schedule_participations(
+            cleaned_data, errors
+        )
 
         if errors:
             raise ValidationError(errors)
@@ -317,6 +320,37 @@ class RunScheduleForm(ModelForm):
             errors["end_date"] = ValidationError(
                 _("The end date must be after the start date"),
                 code="start_date_after_end_date",
+            )
+
+        return cleaned_data, errors
+
+    def _clean_first_schedule_participations(self, cleaned_data, errors):
+        if (
+            not self.instance
+            or self.instance.start_date
+            or not self.instance.project_id
+            or not cleaned_data.get("start_date")
+        ):
+            return cleaned_data, errors
+
+        missing_employer_participation = (
+            self.instance.project.participation_set.filter(
+                on_premises=True, employer__isnull=True
+            )
+            .exclude(
+                institution__ror_id__in=(
+                    settings.PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS
+                )
+            )
+            .first()
+        )
+        if missing_employer_participation:
+            errors[NON_FIELD_ERRORS] = ValidationError(
+                _(
+                    "All on-site participations must have an employer before "
+                    "scheduling this run for the first time."
+                ),
+                code="missing_participation_employer",
             )
 
         return cleaned_data, errors
