@@ -3,6 +3,7 @@ import { FileProvider } from "./FileContext";
 import { EuphrosyneFile } from "../file-service";
 import { css } from "@emotion/react";
 import { loadingDivStyle } from "./style";
+import ExtensionTags from "./ExtensionTags";
 
 export interface Col<T> {
   label: string;
@@ -59,14 +60,30 @@ export default function FileTable({
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [filterText, setFilterText] = useState("");
+  const [filterExtensions, setFilterExtensions] = useState<string[]>([]);
+
+  const onExtensionTagClick = (extension: string) => {
+    if (filterExtensions.includes(extension)) {
+      setFilterExtensions(filterExtensions.filter((ext) => ext !== extension));
+    } else {
+      setFilterExtensions([...filterExtensions, extension]);
+    }
+  };
 
   const numCols = actionCell ? cols.length + 1 : cols.length;
 
-  const filteredRows = rows.filter((row) =>
-    filterText !== ""
-      ? row.name.toLowerCase().includes(filterText.toLowerCase())
-      : true,
-  );
+  const filteredRows = rows
+    .filter((row) =>
+      filterText !== ""
+        ? row.name.toLowerCase().includes(filterText.toLowerCase())
+        : true,
+    )
+    .filter((row) =>
+      filterExtensions.length > 0
+        ? row.isDir ||
+          filterExtensions.includes(row.name.split(".").pop() || "")
+        : true,
+    );
 
   const displayedRows = isExpanded
     ? filteredRows
@@ -104,6 +121,15 @@ export default function FileTable({
             ])}
           </p>
         </div>
+      )}
+      {isSearchable && (
+        <ExtensionTags
+          files={rows.filter((row) => !row.isDir).map((row) => row.name)}
+          selectedExtensions={filterExtensions}
+          onExtensionClick={(extension) => {
+            onExtensionTagClick(extension);
+          }}
+        />
       )}
       {folder && folder.length > 0 && (
         <div

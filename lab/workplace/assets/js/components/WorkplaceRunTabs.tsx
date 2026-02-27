@@ -56,7 +56,7 @@ export default function WorkplaceRunTabs({
       </ul>
       {runs.map((run, index) => (
         <div
-          id="tabpanel-run-{{ run.id }}-panel"
+          id={`tabpanel-run-${run.id}-panel`}
           key={`run-tab-panel-${run.id}`}
           className={`fr-tabs__panel ${
             selectedTabIndex === index && "fr-tabs__panel--selected"
