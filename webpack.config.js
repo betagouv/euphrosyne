@@ -125,7 +125,6 @@ export default {
       MATOMO_SITE_ID: null,
       EUPHROSYNE_TOOLS_API_URL: null,
       GEONAMES_USERNAME: "",
-      HDF5_ENABLE: "false",
       SENTRY_DSN: null,
       SENTRY_DSN_FRONTEND: null,
       SENTRY_ENVIRONMENT: null,
