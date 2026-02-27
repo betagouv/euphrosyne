@@ -6,6 +6,7 @@ import { FileContext } from "./FileContext";
 import { fileTableRowActionCellBtnStyle } from "./style";
 
 interface BaseFileActionCellProps {
+  projectId: string;
   fileService: FileService;
   canDelete: boolean;
   onDeleteSuccess?: (fileName: string) => void;
@@ -16,7 +17,13 @@ const cellStyle = css({
   width: "150px",
 });
 
+const isHDF5File = (file: { name: string }) => {
+  const hdf5Extensions = [".h5", ".hdf5"];
+  return hdf5Extensions.some((ext) => file.name.toLowerCase().endsWith(ext));
+};
+
 export default function BaseFileActionCell({
+  projectId,
   fileService,
   canDelete,
   onDeleteSuccess,
@@ -30,6 +37,7 @@ export default function BaseFileActionCell({
     "File %s has been removed.": window.gettext("File %s has been removed."),
     "Download file": window.gettext("Download file"),
     "Delete file": window.gettext("Delete file"),
+    "View file": window.gettext("View file"),
   };
   const file = useContext(FileContext);
 
@@ -75,6 +83,16 @@ export default function BaseFileActionCell({
               {t["Download file"]}
             </button>
           </li>
+          {isHDF5File(file) && (
+            <li>
+              <a
+                className="fr-btn fr-icon-eye-line fr-btn--secondary"
+                href={`/lab/project/${projectId}/hdf5-viewer?file=${file.path}`}
+              >
+                {t["View file"]}
+              </a>
+            </li>
+          )}
           {canDelete && (
             <li>
               <button

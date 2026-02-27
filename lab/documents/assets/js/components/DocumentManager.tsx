@@ -17,6 +17,7 @@ import { useClientContext } from "../../../../../shared/js/EuphrosyneToolsClient
 
 interface DocumentManagerProps {
   project: {
+    id: string;
     name: string;
     slug: string;
   };
@@ -123,6 +124,7 @@ export default function DocumentManager({
         isLoading={isLoading}
         actionCell={
           <BaseFileActionCell
+            projectId={project.id}
             canDelete={table.canDelete}
             onDeleteSuccess={fetchFiles}
             fileService={fileService}

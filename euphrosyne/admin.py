@@ -6,6 +6,7 @@ from django.urls.resolvers import URLPattern, URLResolver
 from django.utils.translation import gettext_lazy as _
 
 from lab.documents.views import ProjectDocumentsView
+from lab.hdf5.views import HDF5View
 from lab.objects.views import ObjectImportErosView, ObjectImportPOPView
 from lab.workplace.views import WorkplaceView
 
@@ -45,6 +46,13 @@ class AdminSite(admin.AdminSite):
         if apps.is_installed("lab_notebook"):
             urls.append(path("", include("lab_notebook.urls")))
 
+        urls.append(
+            path(
+                "lab/project/<project_id>/hdf5-viewer",
+                self.admin_view(HDF5View.as_view()),  # type: ignore[type-var]
+                name="lab_project_hdf5_viewer",
+            )
+        )
         return [*urls, *super().get_urls()]  # type: ignore[list-item]
 
     def get_app_list(self, request, app_label=None):

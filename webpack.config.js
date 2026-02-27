@@ -42,6 +42,7 @@ export default {
       "@gouvfr/dsfr/dist/utility/colors/colors.min.css",
       "remixicon/fonts/remixicon.css",
     ],
+    hdf5: ["@witoldw/h5web-app/styles.css"],
     // js/ts page files
     ...Object.assign(
       {},
@@ -124,7 +125,6 @@ export default {
       MATOMO_SITE_ID: null,
       EUPHROSYNE_TOOLS_API_URL: null,
       GEONAMES_USERNAME: "",
-      HDF5_ENABLE: "false",
       SENTRY_DSN: null,
       SENTRY_DSN_FRONTEND: null,
       SENTRY_ENVIRONMENT: null,
