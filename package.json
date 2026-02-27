@@ -15,9 +15,10 @@
     "format": "npm run prettier:fix && npm run lint:fix"
   },
   "engines": {
-    "node": "20.19.6",
-    "npm": "10.8.2"
+    "node": ">=24 <25",
+    "npm": ">=11 <12"
   },
+  "engineStrict": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/betagouv/euphrosyne.git"
