@@ -1,7 +1,7 @@
-import { App, H5GroveProvider } from "@h5web/app";
+import { App, H5GroveProvider, createAxiosFetcher } from "@witoldw/h5web-app";
 import { getToken } from "../../../../../shared/js/jwt";
 import { useEffect, useState } from "react";
-import { Axios } from "axios";
+import axios, { Axios } from "axios";
 
 function createAxiosResponseInterceptor(axiosInstance: Axios) {
   // When response code is 401, try to refresh the token. Eject the interceptor so it doesn't loop in case
@@ -18,9 +18,8 @@ function createAxiosResponseInterceptor(axiosInstance: Axios) {
       return getToken(false)
         .then((token) => {
           error.response.config.headers["Authorization"] = "Bearer " + token;
-          // Retry the initial call, but with the updated token in the headers.
-          // Resolves the promise if successful
-          return new Axios(error.response.config);
+          // Retry the initial call with updated headers.
+          return axiosInstance.request(error.response.config);
         })
         .finally(() => createAxiosResponseInterceptor(axiosInstance)); // Re-attach the interceptor by running the method
     },
@@ -43,16 +42,24 @@ export default function HDF5Viewer() {
 
   const file = new URLSearchParams(search).get("file");
 
+  const axiosInstance = axios.create({
+    headers: { Authorization: `Bearer ${token}` },
+    params: { file },
+  });
+
+  createAxiosResponseInterceptor(axiosInstance);
+
+  const fetcher = createAxiosFetcher(
+    // Bridge axios' dual ESM/CJS declaration mismatch in axios@1.13.x.
+    axiosInstance as unknown as Parameters<typeof createAxiosFetcher>[0],
+  );
+
   const Provider = H5GroveProvider({
     url: `${process.env.EUPHROSYNE_TOOLS_API_URL}/hdf5`,
     filepath: file || "",
-    axiosConfig: {
-      params: { file },
-      headers: { Authorization: `Bearer ${token}` },
-    },
+    fetcher,
     children: h5webApp,
   });
-  createAxiosResponseInterceptor(Provider.props.api.client);
 
   return token ? Provider : <></>;
 }

@@ -50,6 +50,8 @@
     "@sentry/browser": "^10.38.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@witoldw/h5web-app": "^0.0.7",
+    "axios": "^1.13.2",
     "cropperjs": "^2.1.0",
     "css-loader": "^7.1.4",
     "css-minimizer-webpack-plugin": "^7.0.4",

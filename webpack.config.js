@@ -42,7 +42,7 @@ export default {
       "@gouvfr/dsfr/dist/utility/colors/colors.min.css",
       "remixicon/fonts/remixicon.css",
     ],
-    hdf5: ["@h5web/app/styles.css"],
+    hdf5: ["@witoldw/h5web-app/styles.css"],
     // js/ts page files
     ...Object.assign(
       {},
