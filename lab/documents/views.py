@@ -33,6 +33,7 @@ class ProjectDocumentsView(ProjectMembershipRequiredMixin, TemplateView):
             "json_data": json.dumps(
                 {
                     "project": {
+                        "id": str(self.project.id),
                         "name": self.project.name,
                         "slug": self.project.slug,
                     },

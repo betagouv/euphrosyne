@@ -2,6 +2,7 @@ import { RawDataFileService } from "../raw-data/raw-data-file-service";
 import { ProcessedDataFileService } from "../processed-data/processed-data-file-service";
 import HDF5FileTable from "../../../../hdf5/assets/js/components/HDF5FileTable";
 import WorkplaceDataTypeDisplay from "./WorkplaceDataTypeDisplay";
+import { WorkplaceContext } from "./WorkplaceContext";
 
 export interface WorkplaceRunTabProps {
   project: {
@@ -34,37 +35,41 @@ export default function WorkplaceRunTab({
   };
 
   return (
-    <div>
-      {process.env.HDF5_ENABLE === "true" && (
-        <div className="fr-grid-row fr-grid-row--gutters">
-          <div className="fr-col-12">
-            <div className="fr-background-default--grey fr-p-3v">
-              <h3>HDF5</h3>
-              <HDF5FileTable
-                projectId={project.id}
-                projectSlug={project.slug}
-                runName={run.label}
-              />
+    <WorkplaceContext.Provider value={{ project }}>
+      <div>
+        {process.env.HDF5_ENABLE === "true" && (
+          <div className="fr-grid-row fr-grid-row--gutters">
+            <div className="fr-col-12">
+              <div className="fr-background-default--grey fr-p-3v">
+                <h3>HDF5</h3>
+                <HDF5FileTable
+                  projectId={project.id}
+                  projectSlug={project.slug}
+                  runName={run.label}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      )}
-      <div className="fr-grid-row fr-grid-row--gutters">
-        <div className="fr-col-12 fr-col-lg-6">
-          <WorkplaceDataTypeDisplay
-            dataLabel={t["Raw data"]}
-            fileService={run.rawDataFileService}
-            isSearchable={true}
-          />
-        </div>
-        <div className="fr-col-12 fr-col-lg-6">
-          <WorkplaceDataTypeDisplay
-            dataLabel={t["Processed data"]}
-            fileService={run.processedDataFileService}
-            isSearchable={true}
-          />
+        )}
+        <div className="fr-grid-row fr-grid-row--gutters">
+          <div className="fr-col-12 fr-col-lg-6">
+            <WorkplaceDataTypeDisplay
+              projectId={project.id}
+              dataLabel={t["Raw data"]}
+              fileService={run.rawDataFileService}
+              isSearchable={true}
+            />
+          </div>
+          <div className="fr-col-12 fr-col-lg-6">
+            <WorkplaceDataTypeDisplay
+              projectId={project.id}
+              dataLabel={t["Processed data"]}
+              fileService={run.processedDataFileService}
+              isSearchable={true}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </WorkplaceContext.Provider>
   );
 }

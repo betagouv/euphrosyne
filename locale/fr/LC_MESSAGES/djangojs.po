@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-02 19:34+0100\n"
+"POT-Creation-Date: 2026-02-27 11:36+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -108,6 +108,9 @@ msgstr "Télécharger le fichier"
 
 msgid "Delete file"
 msgstr "Supprimer le fichier"
+
+msgid "View file"
+msgstr "Voir le fichier"
 
 msgid "Filter"
 msgstr "Filtrer"
@@ -256,9 +259,6 @@ msgstr "Choisissez un fichier"
 #, javascript-format
 msgid "The following file formats are not accepted : %s"
 msgstr "Ces formats de fichier ne sont pas acceptés : %s"
-
-msgid "View file"
-msgstr "Voir le fichier"
 
 msgid "No object in this run yet"
 msgstr "Aucun objet dans ce run"

@@ -8,6 +8,7 @@ import DocumentManager from "../components/DocumentManager";
 
 interface ProjectDocumentsPageData {
   project: {
+    id: string;
     name: string;
     slug: string;
   };

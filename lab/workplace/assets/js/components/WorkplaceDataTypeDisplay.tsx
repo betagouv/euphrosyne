@@ -6,8 +6,10 @@ import {
   FileService,
 } from "../../../../assets/js/file-service";
 import { workplaceTableCols } from "../../../../assets/js/components/FileTableCols";
+import { useWorkplaceContext } from "./WorkplaceContext";
 
 interface WorkplaceDataTypeDisplayProps {
+  projectId: string;
   dataLabel: string;
   fileService: FileService;
   isSearchable?: boolean;
@@ -24,6 +26,8 @@ export default function WorkplaceDataTypeDisplay({
   actionCell,
   canDelete,
 }: WorkplaceDataTypeDisplayProps) {
+  const { project } = useWorkplaceContext();
+
   const [dataRows, setDataRows]: [
     EuphrosyneFile[],
     React.Dispatch<React.SetStateAction<EuphrosyneFile[]>>,
@@ -68,6 +72,7 @@ export default function WorkplaceDataTypeDisplay({
         actionCell={
           actionCell || (
             <BaseTableActionCell
+              projectId={project.id}
               canDelete={!!canDelete}
               onDeleteSuccess={(fileName) =>
                 setDataRows(dataRows.filter((file) => file.name !== fileName))

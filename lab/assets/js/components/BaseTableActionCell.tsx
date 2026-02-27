@@ -5,6 +5,7 @@ import BaseFileActionCell from "./BaseFileActionCell";
 import BaseDirectoryActionCell from "./BaseDirectoryActionCell";
 
 interface BaseTableActionCellProps {
+  projectId: string;
   fileService: FileService;
   canDelete: boolean;
   onDeleteSuccess?: (fileName: string) => void;
@@ -13,6 +14,7 @@ interface BaseTableActionCellProps {
 }
 
 export default function BaseTableActionCell({
+  projectId,
   fileService,
   canDelete,
   onDeleteSuccess,
@@ -27,6 +29,7 @@ export default function BaseTableActionCell({
           <BaseDirectoryActionCell onOpen={onFolderOpen} />
         ) : (
           <BaseFileActionCell
+            projectId={projectId}
             fileService={fileService}
             canDelete={canDelete}
             onDeleteSuccess={onDeleteSuccess}
