@@ -34,7 +34,7 @@
     "@typescript-eslint/parser": "^8.53.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",
-    "jsdom": "^27.4.0",
+    "jsdom": "^28.1.0",
     "prettier": "3.8.1",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
