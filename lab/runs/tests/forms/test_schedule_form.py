@@ -1,9 +1,12 @@
 from unittest.mock import patch
 
 import pytest
+from django.core.exceptions import NON_FIELD_ERRORS
 from django.db.models import QuerySet
+from django.test import override_settings
 from django.utils import timezone
 
+from ....tests import factories
 from ... import forms, models
 
 
@@ -70,3 +73,74 @@ def test_embargo_widget():
     form = forms.RunScheduleForm()
     assert form.fields["embargo_date"].widget.format == "%Y-%m-%d"
     assert form.fields["embargo_date"].widget.input_type == "date"
+
+
+def _get_schedule_data():
+    return {
+        "start_date_0": "2021-01-01",
+        "start_date_1": "00:00:00",
+        "end_date_0": "2021-01-02",
+        "end_date_1": "00:00:00",
+        "embargo_date": "2021-01-10",
+    }
+
+
+@pytest.mark.django_db
+def test_first_schedule_requires_employer_for_on_premises_participations():
+    run = factories.RunFactory(start_date=None, end_date=None)
+    factories.ParticipationFactory(
+        project=run.project,
+        on_premises=True,
+        employer=None,
+    )
+
+    form = forms.RunScheduleForm(data=_get_schedule_data(), instance=run)
+
+    assert form.has_error(NON_FIELD_ERRORS, code="missing_participation_employer")
+
+
+@pytest.mark.django_db
+def test_reschedule_does_not_require_employer_for_on_premises_participations():
+    run = factories.RunFactory()
+    factories.ParticipationFactory(
+        project=run.project,
+        on_premises=True,
+        employer=None,
+    )
+
+    form = forms.RunScheduleForm(data=_get_schedule_data(), instance=run)
+
+    assert form.is_valid()
+
+
+@pytest.mark.django_db
+def test_first_schedule_allows_missing_employer_for_remote_participations():
+    run = factories.RunFactory(start_date=None, end_date=None)
+    factories.ParticipationFactory(
+        project=run.project,
+        on_premises=False,
+        employer=None,
+    )
+
+    form = forms.RunScheduleForm(data=_get_schedule_data(), instance=run)
+
+    assert form.is_valid()
+
+
+@pytest.mark.django_db
+@override_settings(
+    PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS=["https://ror.org/exempt"]
+)
+def test_first_schedule_allows_missing_employer_for_exempt_institution():
+    run = factories.RunFactory(start_date=None, end_date=None)
+    institution = factories.InstitutionFactory(ror_id="https://ror.org/exempt")
+    factories.ParticipationFactory(
+        project=run.project,
+        institution=institution,
+        on_premises=True,
+        employer=None,
+    )
+
+    form = forms.RunScheduleForm(data=_get_schedule_data(), instance=run)
+
+    assert form.is_valid()
