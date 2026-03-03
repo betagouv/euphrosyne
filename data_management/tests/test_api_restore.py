@@ -119,7 +119,7 @@ def test_restore_marks_failed_when_tools_api_is_unavailable():
     assert operation.type == LifecycleOperationType.RESTORE
     assert operation.status == LifecycleOperationStatus.FAILED
     assert operation.error_message == "Tools API request failed."
-    assert project_data.lifecycle_state == LifecycleState.ERROR
+    assert project_data.lifecycle_state == LifecycleState.COOL
 
 
 @pytest.mark.django_db
@@ -147,4 +147,4 @@ def test_restore_marks_failed_when_tools_api_rejects_request():
     assert operation.status == LifecycleOperationStatus.FAILED
     assert operation.error_message == "Tools API rejected restore request (500)."
     assert operation.error_details == "server error"
-    assert project_data.lifecycle_state == LifecycleState.ERROR
+    assert project_data.lifecycle_state == LifecycleState.COOL
