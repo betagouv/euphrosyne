@@ -68,7 +68,6 @@ class ProjectRestoreTriggerAPIView(APIView):
                 status=LifecycleOperationStatus.PENDING,
                 started_at=timezone.now(),
             )
-            project_data.transition_to(LifecycleState.RESTORING)
 
         try:
             response = post_restore_project(
@@ -106,9 +105,13 @@ class ProjectRestoreTriggerAPIView(APIView):
             )
 
         with transaction.atomic():
+            locked_project_data = ProjectData.objects.select_for_update().get(
+                pk=project_data.pk
+            )
             locked_operation = LifecycleOperation.objects.select_for_update().get(
                 operation_id=operation.operation_id
             )
+            locked_project_data.transition_to(LifecycleState.RESTORING)
             locked_operation.status = LifecycleOperationStatus.RUNNING
             locked_operation.save(update_fields=["status"])
 
@@ -241,7 +244,6 @@ def _mark_restore_start_failed(
                 "finished_at",
             ]
         )
-        _transition_project_to_error(operation.project_data)
 
 
 def _get_locked_operation(operation_id: Any) -> LifecycleOperation | None:
