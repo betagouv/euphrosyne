@@ -1,207 +1,79 @@
-# [TASK] Enforce immutability for COOL and COOLING runs in app layer
+## [TASK] Implement Euphrosyne RESTORE endpoint (admin-triggered) that starts tools-api restore operation
 
-Based on PRD – Project immutability rules.
+### Context
 
----
+Project data lifecycle is tracked at **project level** with states `HOT / COOLING / COOL / RESTORING / ERROR`, and **RESTORE** copies data from **Blob Cool → Azure Files** via `euphrosyne-tools-api` (AzCopy).
 
-# Functional Goal
-
-When a project has:
-
-```
-lifecycle_state ∈ {COOL, COOLING}
-```
-
-the application must behave as **strictly read-only** at the project level.
-
-This means:
-
-- ❌ Block document uploads
-- ❌ Block document edits
-- ❌ Block document deletes
-- ❌ Block run creation
-- ❌ Block run planning/scheduling
-- ❌ Block run outputs / artifact writes
-- ❌ Block rename operations
-- ❌ Block delete operations
-
-Reads remain allowed.
-
-The PRD explicitly states that COOL is immutable and restore is required before modification.
+This task is specifically about adding the **Euphrosyne backend endpoint** used by the **admin panel** to trigger a restore (UI work is out of scope).
 
 ---
 
-# Architectural Strategy
+### Scope
 
-## 1. Centralize the rule
+**In scope**
 
-Create a single authoritative check, e.g.:
+- Euphrosyne backend **RESTORE endpoint** implementation (admin-triggered)
+- Create a `RESTORE` lifecycle operation in Euphrosyne DB
+- Call `euphrosyne-tools-api` `POST /data/projects/{project_slug}/restore` (returns `202`)
+- Return `202 ACCEPTED` from Euphrosyne
 
-- `project.is_immutable?`
-- or `ensure_project_writable!(project)`
-- or a reusable policy / guard
+**Out of scope**
 
-Definition:
-
-```
-immutable if lifecycle_state in {COOL, COOLING}
-```
-
-The rule must exist in **one place only**, reused everywhere.
-
-Goal: prevent drift or forgotten endpoints.
+- UI integration / frontend
+- Operation callback handling / reconciliation (handled by other tasks/components)
 
 ---
 
-## 2. Apply the guard to ALL write entry points
+### Description
 
-The rule must be enforced at application layer entrypoints (controllers, services, commands).
+Implement an admin-only endpoint in **Euphrosyne** (route name/path should match existing API conventions in the repo) that:
 
-You must audit the repo and apply it consistently.
+1. **Authorizes** the caller as an **admin** (admin panel use-case).
+2. **Validates** project lifecycle state:
+   - Allowed: `COOL` (restore makes sense)
+   - Optional: allow `ERROR` if last op failed and we want to let admins restore anyway (still creates a new `operation_id`)
+   - Reject: `HOT` (nothing to restore), and typically reject `COOLING/RESTORING` (operation already running)
 
----
+3. **Creates a new lifecycle operation** row:
+   - `type = RESTORE`
+   - `operation_id = uuid`
+   - status set to initial value used by the existing state machine (e.g. `PENDING` or `RUNNING`, depending on current conventions)
+   - stores expected totals if available (`bytes_total/files_total`) from project lifecycle fields (if those are already computed and stored)
 
-# Areas That Must Be Blocked
+4. **Moves the project to `RESTORING`** in DB and sets `last_lifecycle_operation_id` accordingly (again, following existing model conventions).
+5. **Calls tools-api**:
+   - `POST /data/projects/{project_slug}/restore` (empty body)
+   - Treat tools-api response as “accepted and running async” (it returns `202`)
 
-## A. Documents
+6. **Returns `202 ACCEPTED`** from Euphrosyne with a payload that includes at least:
+   - `operation_id`
+   - current `lifecycle_state` (should now be `RESTORING`)
+   - optionally: a URL to fetch operation status (if such endpoint exists in Euphrosyne)
 
-Block:
+**Error handling**
 
-- Upload
-- Metadata edits
-- Content edits
-- Delete
+- If tools-api call fails (network/5xx/unexpected), persist a meaningful error on:
+  - the lifecycle operation (mark failed if your workflow does that immediately), and/or
+  - project `last_lifecycle_error`
+  - and return an appropriate HTTP error to the caller (while keeping DB consistent).
 
-Expected behavior:
-
-- Return 403 Forbidden or 409 Conflict
-- Clear error message
-- No side effects
-
----
-
-## B. Runs (creation & planning)
-
-PRD explicitly states:
-
-> A project in COOL or COOLING must not allow new runs to be planned.
-
-Therefore block:
-
-- Run creation
-- Run scheduling / planning endpoints
+- Do **not** reuse `operation_id` for retries: each trigger creates a new operation id.
 
 ---
 
-## C. Run outputs / artifacts
+### Acceptance criteria
 
-Any operation that writes files as run outputs must be blocked.
+- Admin-only RESTORE endpoint exists in Euphrosyne backend and is reachable by the admin panel (UI not implemented here).
+- When called on a `COOL` project:
+  - Creates a new `RESTORE` lifecycle operation (`operation_id` generated)
+  - Transitions project lifecycle state to `RESTORING`
+  - Calls `euphrosyne-tools-api` `POST /data/projects/{project_slug}/restore` and handles its `202` response
+  - Returns `202 ACCEPTED` with `operation_id`
 
-Important edge case:
-
-Even if a run was created before COOLING, once lifecycle_state changes to COOLING:
-
-- Output writes must fail
-- No new artifacts should be persisted
-
-This prevents corruption during migration.
-
----
-
-## D. Rename / delete operations
-
-Block any mutation of project storage:
-
-- Rename files/folders
-- Delete files/folders
-- Any filesystem-level mutation
-
----
-
-# HTTP Behavior
-
-## Recommended Status Codes
-
-Choose one consistently:
-
-- **409 Conflict** → state makes operation invalid
-- **403 Forbidden** → business rule prohibits it
-
-Either is acceptable if consistent.
-
----
-
-## Error Response (clear & actionable)
-
-Example:
-
-```json
-{
-  "error": "PROJECT_IMMUTABLE",
-  "message": "Project is read-only while lifecycle_state is COOL or COOLING. Restore the project to HOT to modify files or create runs.",
-  "lifecycle_state": "COOL"
-}
-```
-
-Must clearly explain:
-
-- Why it failed
-- What to do (restore)
-
-PRD explicitly requires restore before modification.
-
----
-
-# Required Test Coverage
-
-Acceptance criteria require tests for blocked operations.
-
-## 1. Documents
-
-- COOLING → upload → rejected
-- COOL → edit → rejected
-- COOL → delete → rejected
-
-## 2. Runs
-
-- COOLING → create run → rejected
-- COOL → plan run → rejected
-
-## 3. Outputs
-
-- COOLING → attempt artifact write → rejected
-- COOL → attempt artifact write → rejected
-
-## 4. Rename/Delete
-
-- COOL/COOLING → rename → rejected
-- COOL/COOLING → delete → rejected
-
-## 5. Control tests
-
-- HOT → all operations still succeed
-
----
-
-# Important Behavioral Distinction
-
-### COOLING
-
-- Transitional state (migration in progress)
-- Must block writes to avoid divergence between source and destination
-
-### COOL
-
-- Terminal immutable state
-- No writes allowed
-- Restore required before modification
-
----
-
-# Definition of Done
-
-- All project-level write operations blocked when lifecycle_state ∈ {COOL, COOLING}
-- Run creation/planning explicitly prevented
-- Clear and consistent error responses
-- Full test coverage of blocked paths
-- No regression for HOT projects
+- When called on invalid states (`HOT`, `COOLING`, `RESTORING`), the endpoint returns a clear `4xx` response and does not start a new operation.
+- Automated tests cover:
+  - authorization (admin required)
+  - state validation
+  - DB rows created / state transition performed
+  - tools-api client invoked
+  - failure path when tools-api is unavailable
