@@ -71,8 +71,10 @@ class ProjectRestoreTriggerAPIView(APIView):
             )
 
         try:
+            operation_id = str(operation.operation_id)
             response = post_restore_project(
                 project_slug=project_data.project.slug,
+                operation_id=operation_id,
                 timeout=TOOLS_API_TIMEOUT_SECONDS,
             )
         except requests.RequestException as error:
