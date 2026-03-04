@@ -27,6 +27,7 @@ from .models import (
     ProjectData,
     verify_operation,
 )
+from .serializers import LifecycleOperationDetailSerializer
 
 logger = logging.getLogger(__name__)
 TOOLS_API_TIMEOUT_SECONDS = 10
@@ -122,6 +123,21 @@ class ProjectRestoreTriggerAPIView(APIView):
             },
             status=status.HTTP_202_ACCEPTED,
         )
+
+
+class LifecycleOperationDetailAPIView(APIView):
+    permission_classes = [IsLabAdminUser]
+
+    def get(self, request: Request, operation_id: uuid.UUID) -> Response:
+        operation = (
+            LifecycleOperation.objects.select_related("project_data")
+            .filter(operation_id=operation_id)
+            .first()
+        )
+        if operation is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = LifecycleOperationDetailSerializer(operation)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class LifecycleOperationCallbackSerializer(serializers.Serializer):

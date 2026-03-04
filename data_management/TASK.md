@@ -1,10 +1,18 @@
-## [TASK] Implement Euphrosyne RESTORE endpoint (admin-triggered) that starts tools-api restore operation
+## [TASK] Implement `GET /data/operations/{operation_id}` (operation status + stats + errors)
 
 ### Context
 
-Project data lifecycle is tracked at **project level** with states `HOT / COOLING / COOL / RESTORING / ERROR`, and **RESTORE** copies data from **Blob Cool → Azure Files** via `euphrosyne-tools-api` (AzCopy).
+The Hot→Cool feature tracks long-running **lifecycle operations** (`COOL`, `RESTORE`) in Euphrosyne DB with:
 
-This task is specifically about adding the **Euphrosyne backend endpoint** used by the **admin panel** to trigger a restore (UI work is out of scope).
+- `operation_id` (uuid)
+- `project_id`
+- `type` (`COOL` / `RESTORE`)
+- `status` (`PENDING` / `RUNNING` / `SUCCEEDED` / `FAILED`)
+- timestamps
+- `bytes_total/files_total`, `bytes_copied/files_copied`
+- error details
+
+This endpoint is needed to expose **operation status, progress, stats, and errors** for admin observability (admin panel), without involving frontend changes.
 
 ---
 
@@ -12,68 +20,68 @@ This task is specifically about adding the **Euphrosyne backend endpoint** used 
 
 **In scope**
 
-- Euphrosyne backend **RESTORE endpoint** implementation (admin-triggered)
-- Create a `RESTORE` lifecycle operation in Euphrosyne DB
-- Call `euphrosyne-tools-api` `POST /data/projects/{project_slug}/restore` (returns `202`)
-- Return `202 ACCEPTED` from Euphrosyne
+- Implement Euphrosyne backend endpoint: `GET /data/operations/{operation_id}`
+- Return operation status + progress + stats + error info
+- Enforce access control
 
 **Out of scope**
 
 - UI integration / frontend
-- Operation callback handling / reconciliation (handled by other tasks/components)
+- Polling logic in UI
+- tools-api proxy endpoints (this is Euphrosyne DB read, unless already designed otherwise)
 
 ---
 
 ### Description
 
-Implement an admin-only endpoint in **Euphrosyne** (route name/path should match existing API conventions in the repo) that:
+Add a new read endpoint that retrieves a lifecycle operation by `operation_id` and returns a normalized payload with:
 
-1. **Authorizes** the caller as an **admin** (admin panel use-case).
-2. **Validates** project lifecycle state:
-   - Allowed: `COOL` (restore makes sense)
-   - Optional: allow `ERROR` if last op failed and we want to let admins restore anyway (still creates a new `operation_id`)
-   - Reject: `HOT` (nothing to restore), and typically reject `COOLING/RESTORING` (operation already running)
+**Required fields**
 
-3. **Creates a new lifecycle operation** row:
-   - `type = RESTORE`
-   - `operation_id = uuid`
-   - status set to initial value used by the existing state machine (e.g. `PENDING` or `RUNNING`, depending on current conventions)
-   - stores expected totals if available (`bytes_total/files_total`) from project lifecycle fields (if those are already computed and stored)
+- `operation_id`
+- `project_id` (or `project_slug` if that’s the canonical public identifier)
+- `type` (`COOL` / `RESTORE`)
+- `status` (`PENDING` / `RUNNING` / `SUCCEEDED` / `FAILED`)
+- `created_at`, `started_at`, `finished_at` (whatever timestamps exist in the model)
 
-4. **Moves the project to `RESTORING`** in DB and sets `last_lifecycle_operation_id` accordingly (again, following existing model conventions).
-5. **Calls tools-api**:
-   - `POST /data/projects/{project_slug}/restore` (empty body)
-   - Treat tools-api response as “accepted and running async” (it returns `202`)
+**Stats / progress**
 
-6. **Returns `202 ACCEPTED`** from Euphrosyne with a payload that includes at least:
-   - `operation_id`
-   - current `lifecycle_state` (should now be `RESTORING`)
-   - optionally: a URL to fetch operation status (if such endpoint exists in Euphrosyne)
+- `bytes_total`, `files_total`
+- `bytes_copied`, `files_copied`
+- `progress` (0..1 or 0..100) computed server-side when totals are present:
+  - if `bytes_total > 0`: `bytes_copied / bytes_total`
+  - else if `files_total > 0`: `files_copied / files_total`
+  - else: `null`
 
-**Error handling**
+**Errors**
 
-- If tools-api call fails (network/5xx/unexpected), persist a meaningful error on:
-  - the lifecycle operation (mark failed if your workflow does that immediately), and/or
-  - project `last_lifecycle_error`
-  - and return an appropriate HTTP error to the caller (while keeping DB consistent).
+- `error` object (or equivalent existing structure), including:
+  - `title` / `message` (stored raw if available)
+  - optional `details` / `code`
 
-- Do **not** reuse `operation_id` for retries: each trigger creates a new operation id.
+**Access control**
+
+- Only **lab admins** can access this endpoint (consistent with “admin visibility” scope).
+- Return `404` if not found (and do not leak existence to unauthorized users).
+
+**Edge cases**
+
+- If some fields are not known yet (e.g. totals), return `null` rather than faking `0`.
+- If the operation exists but timestamps are partially filled (e.g. started not set), return what you have.
 
 ---
 
 ### Acceptance criteria
 
-- Admin-only RESTORE endpoint exists in Euphrosyne backend and is reachable by the admin panel (UI not implemented here).
-- When called on a `COOL` project:
-  - Creates a new `RESTORE` lifecycle operation (`operation_id` generated)
-  - Transitions project lifecycle state to `RESTORING`
-  - Calls `euphrosyne-tools-api` `POST /data/projects/{project_slug}/restore` and handles its `202` response
-  - Returns `202 ACCEPTED` with `operation_id`
+- `GET /data/operations/{operation_id}` exists and returns `200` with:
+  - `status` + computed `progress`
+  - `bytes/files` totals and copied
+  - timestamps
+  - error info when `FAILED`
 
-- When called on invalid states (`HOT`, `COOLING`, `RESTORING`), the endpoint returns a clear `4xx` response and does not start a new operation.
-- Automated tests cover:
-  - authorization (admin required)
-  - state validation
-  - DB rows created / state transition performed
-  - tools-api client invoked
-  - failure path when tools-api is unavailable
+- Access control is enforced (non-admins get `403` or `404` per project conventions).
+- Tests cover:
+  - happy path (existing operation)
+  - not found
+  - access control
+  - progress computation (bytes-based, files-based, and `null` when no totals)
