@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import json
 import logging
+import uuid
+from http import HTTPStatus
 from typing import Any, cast
 
+import requests
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import serializers, status
@@ -13,6 +16,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from euphro_auth.jwt.authentication import EuphrosyneAdminJWTAuthentication
+from euphro_tools.project_data import post_restore_project
+from lab.api_views.permissions import IsLabAdminUser
 
 from .models import (
     LifecycleOperation,
@@ -24,6 +29,7 @@ from .models import (
 )
 
 logger = logging.getLogger(__name__)
+TOOLS_API_TIMEOUT_SECONDS = 10
 
 TERMINAL_OPERATION_STATUSES = (
     LifecycleOperationStatus.SUCCEEDED,
@@ -33,6 +39,89 @@ CALLBACK_STATUS_CHOICES = (
     LifecycleOperationStatus.SUCCEEDED,
     LifecycleOperationStatus.FAILED,
 )
+
+ALLOWED_RESTORE_SOURCE_STATES = (LifecycleState.COOL,)
+
+
+class ProjectRestoreTriggerAPIView(APIView):
+    permission_classes = [IsLabAdminUser]
+
+    def post(self, request: Request, project_id: int) -> Response:
+        with transaction.atomic():
+            project_data = _get_locked_project_data(project_id)
+            if project_data is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+            if project_data.lifecycle_state not in ALLOWED_RESTORE_SOURCE_STATES:
+                return Response(
+                    {
+                        "detail": "Project lifecycle state does not allow restore.",
+                        "lifecycle_state": project_data.lifecycle_state,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            operation = LifecycleOperation.objects.create(
+                operation_id=uuid.uuid4(),
+                project_data=project_data,
+                type=LifecycleOperationType.RESTORE,
+                status=LifecycleOperationStatus.PENDING,
+                started_at=timezone.now(),
+            )
+
+        try:
+            response = post_restore_project(
+                project_slug=project_data.project.slug,
+                timeout=TOOLS_API_TIMEOUT_SECONDS,
+            )
+        except requests.RequestException as error:
+            _mark_restore_start_failed(
+                operation_id=operation.operation_id,
+                error_message="Tools API request failed.",
+                error_details=str(error),
+            )
+            return Response(
+                {
+                    "detail": "Restore request failed while calling tools API.",
+                    "operation_id": str(operation.operation_id),
+                },
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
+
+        if response.status_code != HTTPStatus.ACCEPTED:
+            _mark_restore_start_failed(
+                operation_id=operation.operation_id,
+                error_message=(
+                    f"Tools API rejected restore request ({response.status_code})."
+                ),
+                error_details=response.text,
+            )
+            return Response(
+                {
+                    "detail": "Restore request was rejected by tools API.",
+                    "operation_id": str(operation.operation_id),
+                },
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
+
+        with transaction.atomic():
+            locked_project_data = ProjectData.objects.select_for_update().get(
+                pk=project_data.pk
+            )
+            locked_operation = LifecycleOperation.objects.select_for_update().get(
+                operation_id=operation.operation_id
+            )
+            locked_project_data.transition_to(LifecycleState.RESTORING)
+            locked_operation.status = LifecycleOperationStatus.RUNNING
+            locked_operation.save(update_fields=["status"])
+
+        return Response(
+            {
+                "operation_id": str(operation.operation_id),
+                "lifecycle_state": LifecycleState.RESTORING,
+            },
+            status=status.HTTP_202_ACCEPTED,
+        )
 
 
 class LifecycleOperationCallbackSerializer(serializers.Serializer):
@@ -120,6 +209,41 @@ def _verified_target_state(operation_type: str) -> LifecycleState:
     if operation_type == LifecycleOperationType.COOL:
         return LifecycleState.COOL
     return LifecycleState.HOT
+
+
+def _get_locked_project_data(project_id: int) -> ProjectData | None:
+    return (
+        ProjectData.objects.select_for_update()
+        .select_related("project")
+        .filter(project_id=project_id)
+        .first()
+    )
+
+
+def _mark_restore_start_failed(
+    *,
+    operation_id: Any,
+    error_message: str,
+    error_details: str | None,
+) -> None:
+    with transaction.atomic():
+        operation = (
+            LifecycleOperation.objects.select_for_update()
+            .select_related("project_data")
+            .get(operation_id=operation_id)
+        )
+        operation.status = LifecycleOperationStatus.FAILED
+        operation.error_message = error_message
+        operation.error_details = error_details
+        operation.finished_at = timezone.now()
+        operation.save(
+            update_fields=[
+                "status",
+                "error_message",
+                "error_details",
+                "finished_at",
+            ]
+        )
 
 
 def _get_locked_operation(operation_id: Any) -> LifecycleOperation | None:
