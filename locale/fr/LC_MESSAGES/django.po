@@ -1405,8 +1405,11 @@ msgstr "Importer avec un numéro Eros"
 msgid "Delete selected %(model)s"
 msgstr "Modifier l’objet %(model)s sélectionné"
 
-msgid "Administration"
-msgstr "Administration"
+msgid "Data management"
+msgstr "Gestion des données"
+
+msgid "VMs"
+msgstr "Machines virtuelles"
 
 msgid "Project type"
 msgstr "Type de projet"
@@ -1439,6 +1442,9 @@ msgstr "Télécharger les données travaillées du run %(label)s"
 
 msgid "Run(s)"
 msgstr "Run(s)"
+
+msgid "Administration"
+msgstr "Administration"
 
 msgid "Prevention plans"
 msgstr "Plans de prévention"
