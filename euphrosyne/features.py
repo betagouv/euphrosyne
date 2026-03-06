@@ -8,6 +8,9 @@ import os
 from typing import Iterable, List
 
 FEATURE_APPS = {
+    "data_management": [
+        "data_management.apps.DataManagementConfig",
+    ],
     "data_request": [
         "data_request",
     ],
