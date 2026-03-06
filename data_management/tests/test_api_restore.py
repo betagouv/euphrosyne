@@ -91,8 +91,59 @@ def test_restore_from_cool_creates_operation_and_calls_tools_api():
     assert project_data.lifecycle_state == LifecycleState.RESTORING
     restore_mock.assert_called_once_with(
         project_slug=project_data.project.slug,
+        operation_id=payload["operation_id"],
         timeout=10,
     )
+
+
+@pytest.mark.django_db
+def test_restore_retry_from_error_with_restore_last_operation_is_allowed():
+    project_data = ProjectDataFactory(lifecycle_state=LifecycleState.ERROR)
+    LifecycleOperation.objects.create(
+        project_data=project_data,
+        type=LifecycleOperationType.RESTORE,
+        status=LifecycleOperationStatus.FAILED,
+    )
+    client = Client()
+    client.force_login(auth_factories.LabAdminUserFactory())
+
+    with mock.patch(
+        "data_management.api_views.post_restore_project",
+        return_value=DummyResponse(status_code=202),
+    ):
+        response = client.post(
+            _restore_url(project_data.project_id),
+            content_type="application/json",
+        )
+
+    project_data.refresh_from_db()
+    payload = response.json()
+    operation = LifecycleOperation.objects.get(operation_id=payload["operation_id"])
+
+    assert response.status_code == 202
+    assert payload["lifecycle_state"] == LifecycleState.RESTORING
+    assert project_data.lifecycle_state == LifecycleState.RESTORING
+    assert operation.type == LifecycleOperationType.RESTORE
+    assert operation.status == LifecycleOperationStatus.RUNNING
+
+
+@pytest.mark.django_db
+def test_restore_retry_from_error_requires_restore_last_operation_type():
+    project_data = ProjectDataFactory(lifecycle_state=LifecycleState.ERROR)
+    LifecycleOperation.objects.create(
+        project_data=project_data,
+        type=LifecycleOperationType.COOL,
+        status=LifecycleOperationStatus.FAILED,
+    )
+    client = Client()
+    client.force_login(auth_factories.LabAdminUserFactory())
+
+    response = client.post(
+        _restore_url(project_data.project_id), content_type="application/json"
+    )
+
+    assert response.status_code == 400
+    assert response.json()["lifecycle_state"] == LifecycleState.ERROR
 
 
 @pytest.mark.django_db
