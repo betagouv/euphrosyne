@@ -1,87 +1,216 @@
-## [TASK] Implement `GET /data/operations/{operation_id}` (operation status + stats + errors)
+# [TASK] UI — Show lifecycle badge + restore/retry actions (admin-only)
 
-### Context
+## Context
 
-The Hot→Cool feature tracks long-running **lifecycle operations** (`COOL`, `RESTORE`) in Euphrosyne DB with:
+Project data lifecycle is tracked at the **project level**:
 
-- `operation_id` (uuid)
-- `project_id`
-- `type` (`COOL` / `RESTORE`)
-- `status` (`PENDING` / `RUNNING` / `SUCCEEDED` / `FAILED`)
-- timestamps
-- `bytes_total/files_total`, `bytes_copied/files_copied`
-- error details
+`HOT → COOLING → COOL → RESTORING → ERROR`
 
-This endpoint is needed to expose **operation status, progress, stats, and errors** for admin observability (admin panel), without involving frontend changes.
+Lifecycle operations (`COOL` / `RESTORE`) are long-running and verified.
+
+We must expose lifecycle visibility and actions in the **Workplace view**, using **DSFR components**, implemented in **React (.tsx)**.
 
 ---
 
-### Scope
+## Goal
 
-**In scope**
+In Workplace:
 
-- Implement Euphrosyne backend endpoint: `GET /data/operations/{operation_id}`
-- Return operation status + progress + stats + error info
-- Enforce access control
+- Display lifecycle badge
+- Allow **admin-only restore**
+- Allow **admin-only retry on error**
+- Display last operation metadata
+- Poll operation endpoint while running
+- Disable writes when project ≠ HOT
 
-**Out of scope**
-
-- UI integration / frontend
-- Polling logic in UI
-- tools-api proxy endpoints (this is Euphrosyne DB read, unless already designed otherwise)
-
----
-
-### Description
-
-Add a new read endpoint that retrieves a lifecycle operation by `operation_id` and returns a normalized payload with:
-
-**Required fields**
-
-- `operation_id`
-- `project_id` (or `project_slug` if that’s the canonical public identifier)
-- `type` (`COOL` / `RESTORE`)
-- `status` (`PENDING` / `RUNNING` / `SUCCEEDED` / `FAILED`)
-- `created_at`, `started_at`, `finished_at` (whatever timestamps exist in the model)
-
-**Stats / progress**
-
-- `bytes_total`, `files_total`
-- `bytes_copied`, `files_copied`
-- `progress` (0..1 or 0..100) computed server-side when totals are present:
-  - if `bytes_total > 0`: `bytes_copied / bytes_total`
-  - else if `files_total > 0`: `files_copied / files_total`
-  - else: `null`
-
-**Errors**
-
-- `error` object (or equivalent existing structure), including:
-  - `title` / `message` (stored raw if available)
-  - optional `details` / `code`
-
-**Access control**
-
-- Only **lab admins** can access this endpoint (consistent with “admin visibility” scope).
-- Return `404` if not found (and do not leak existence to unauthorized users).
-
-**Edge cases**
-
-- If some fields are not known yet (e.g. totals), return `null` rather than faking `0`.
-- If the operation exists but timestamps are partially filled (e.g. started not set), return what you have.
+This UI is visible **only to lab admins**.
 
 ---
 
-### Acceptance criteria
+## Scope
 
-- `GET /data/operations/{operation_id}` exists and returns `200` with:
-  - `status` + computed `progress`
-  - `bytes/files` totals and copied
-  - timestamps
-  - error info when `FAILED`
+### In scope
 
-- Access control is enforced (non-admins get `403` or `404` per project conventions).
-- Tests cover:
-  - happy path (existing operation)
-  - not found
-  - access control
-  - progress computation (bytes-based, files-based, and `null` when no totals)
+- Lifecycle badge (admin-only)
+- Restore button (COOL only, admin-only)
+- Error banner + retry (ERROR only, admin-only)
+- Operation metadata card (last operation only)
+- Polling during COOLING / RESTORING
+- Disable mutation UI when state ≠ HOT
+- Implementation in `.tsx`
+- Use DSFR components only
+
+### Out of scope
+
+- Operation history list
+- Eligibility date display
+- Non-admin lifecycle UI
+
+---
+
+## Functional Requirements
+
+### 1️⃣ Lifecycle badge (Workplace)
+
+Display DSFR badge based on `project.lifecycle_state`:
+
+| State     | Badge severity |
+| --------- | -------------- |
+| HOT       | success        |
+| COOLING   | info           |
+| COOL      | default        |
+| RESTORING | info           |
+| ERROR     | error          |
+
+Requirements:
+
+- Must reflect backend state only
+- No optimistic state changes
+- Updates after polling
+
+---
+
+### 2️⃣ Restore (admin-only)
+
+When:
+
+```
+
+lifecycle_state == COOL
+
+```
+
+Show button:
+
+> “Restore project”
+
+Call:
+
+```
+
+POST /data/projects/{project_slug}/restore
+
+```
+
+After click:
+
+- Disable button
+- Wait for backend to transition to `RESTORING`
+- Start polling operation endpoint
+
+Only lab admins can see/use this.
+
+---
+
+### 3️⃣ Error banner + retry (admin-only)
+
+When:
+
+```
+
+lifecycle_state == ERROR
+
+```
+
+Display DSFR error alert with:
+
+- Last operation type
+- Raw tools-api error **title message**
+- Timestamp
+- Files/bytes copied vs expected (if available)
+
+Retry button:
+
+- If last op = COOL → `POST /data/projects/{project_slug}/cool`
+- If last op = RESTORE → `POST /data/projects/{project_slug}/restore`
+
+Retry must create new `operation_id` (backend responsibility).
+
+---
+
+### 4️⃣ Operation metadata
+
+When state ∈ `{COOLING, RESTORING, COOL, ERROR}`:
+
+Display “Lifecycle details” card showing:
+
+- Operation type
+- Status
+- Started at
+- Finished at
+- Files total / copied
+- Bytes total / copied
+
+Data from:
+
+```
+
+GET /data/operations/{operation_id}
+
+```
+
+(No history list — last operation only.)
+
+---
+
+### 5️⃣ Polling
+
+When state ∈ `{COOLING, RESTORING}`:
+
+Poll:
+
+```
+
+GET /data/operations/{operation_id}
+
+```
+
+- Interval: ~5 seconds
+- Stop when status ∈ `{SUCCEEDED, FAILED}`
+- Refetch project lifecycle state
+- Update badge accordingly
+
+No WebSocket required.
+
+---
+
+### 6️⃣ Immutability UI
+
+When state ≠ HOT:
+
+Disable:
+
+- Upload
+- Delete
+- Rename
+- Run creation
+
+Add DSFR notice:
+
+> “Project is currently in Cool storage. Restore to modify.”
+
+Backend remains authoritative for write enforcement.
+
+---
+
+## API Dependencies
+
+- `POST /data/projects/{project_slug}/restore`
+- `POST /data/projects/{project_slug}/cool` (retry)
+- `GET /data/operations/{operation_id}`
+
+---
+
+## Acceptance Criteria
+
+- Lifecycle badge visible in Workplace (admin-only).
+- Restore visible only when COOL.
+- Retry visible only when ERROR.
+- Raw tools-api error title displayed.
+- Operation metadata displayed correctly.
+- Polling active during COOLING/RESTORING.
+- Polling stops on terminal state.
+- Badge updates after operation completion.
+- All mutation UI disabled when state ≠ HOT.
+- Implemented in `.tsx` with DSFR components.
+- No operation history implemented.

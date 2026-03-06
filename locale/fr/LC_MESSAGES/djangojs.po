@@ -339,6 +339,72 @@ msgid "An error occurred while setting project image definition"
 msgstr ""
 "Une erreur s'est produite en paramétrant la définition d'image du projet."
 
+msgid "Project is currently archived. Restore to modify."
+msgstr "Le projet est actuellement archivé. Restaurez-le pour le modifier."
+
+msgid "Project data is currently being archived."
+msgstr "Les données du projet sont en cours d'archivage."
+
+msgid "Project data is currently being restored."
+msgstr "Les données du projet sont en cours de restauration."
+
+msgid ""
+"An error occurred while processing project data. You can retry the operation."
+msgstr ""
+"Une erreur s'est produite lors du traitement des données du projet. Vous "
+"pouvez réessayer l'opération."
+
+msgid "Data availability"
+msgstr "Disponibilité des données"
+
+msgid "Lifecycle"
+msgstr "Cycle de vie"
+
+msgid "available"
+msgstr "disponible"
+
+msgid "archived"
+msgstr "archivé"
+
+msgid "archiving"
+msgstr "archivage"
+
+msgid "restoring"
+msgstr "restauration"
+
+msgid "error"
+msgstr "erreur"
+
+msgid "Archive project data"
+msgstr "Archiver les données du projet"
+
+msgid "Restore project data"
+msgstr "Restaurer les données du projet"
+
+msgid "Retry operation"
+msgstr "Réessayer l'opération"
+
+msgid "Lifecycle operation failed"
+msgstr "L'opération de cycle de vie a échoué"
+
+msgid "Operation type"
+msgstr "Type d'opération"
+
+msgid "Finished at"
+msgstr "Terminé le"
+
+msgid "Files copied / total"
+msgstr "Fichiers copiés / total"
+
+msgid "Bytes copied / total"
+msgstr "Octets copiés / total"
+
+msgid "Error title"
+msgstr "Titre de l'erreur"
+
+msgid "Could not update lifecycle state."
+msgstr "Impossible de mettre à jour l'état du cycle de vie."
+
 msgid "Runs data"
 msgstr "Données des runs"
 
