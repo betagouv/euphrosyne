@@ -257,6 +257,7 @@ class LifecycleOperationCallbackSerializer(serializers.Serializer):
 
 class LifecycleOperationCallbackAPIView(APIView):
     authentication_classes = [EuphrosyneAdminJWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request: Request) -> Response:
         callback_data = self._validated_callback_data(request)
