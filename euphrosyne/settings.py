@@ -417,7 +417,7 @@ def _get_nav_items(request: HttpRequest) -> list:
     return get_nav_items(request)
 
 
-NAV_GET_NAV_ITEMS = _get_nav_items
+NAV_GET_NAV_ITEMS = _get_nav_items  # pylint: disable=invalid-name
 
 
 FORCE_LAST_CGU_ACCEPTANCE_DT = (

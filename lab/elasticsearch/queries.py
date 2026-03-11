@@ -90,7 +90,7 @@ class Query:
             if query:
                 self.must.append(query)
 
-    # pylint: disable=too-many-return-statements
+    # pylint: disable=too-many-return-statements, too-many-branches
     def _match_param_to_query(
         self,
         key: str,

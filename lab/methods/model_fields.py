@@ -18,7 +18,7 @@ class MethodBooleanField(models.BooleanField):
         )
 
     def deconstruct(self):
-        name, path, args, kwargs = super().deconstruct()
+        name, path, args, kwargs = super().deconstruct()  # pylint: disable=no-member
         del kwargs["verbose_name"]
         del kwargs["help_text"]
         del kwargs["default"]
@@ -110,7 +110,7 @@ class FiltersCharField(models.CharField):
         )
 
     def deconstruct(self):
-        name, path, args, kwargs = super().deconstruct()
+        name, path, args, kwargs = super().deconstruct()  # pylint: disable=no-member
         args = [self.method, self.detector, self.filters, *args]
         del kwargs["verbose_name"]
         del kwargs["help_text"]
