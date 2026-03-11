@@ -2,10 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { formatBytes } from "../../../../assets/js/utils";
 import {
-  LIFECYCLE_STATE_CHANGED_EVENT,
   LifecycleOperationType,
   LifecycleState,
-  isLifecycleState,
 } from "../lifecycle-state";
 import {
   LifecycleOperationDetails,
@@ -20,10 +18,11 @@ import {
 interface ProjectLifecyclePanelProps {
   projectId: string;
   projectSlug: string;
-  lifecycleState: LifecycleState;
+  lifecycleState: LifecycleState | null;
   lastLifecycleOperationId: string | null;
   lastLifecycleOperationType: LifecycleOperationType | null;
   onLifecycleStateChange: (state: LifecycleState) => void;
+  loadingLabel: string;
 }
 
 const POLLING_INTERVAL_MS = 5000;
@@ -95,6 +94,7 @@ export default function ProjectLifecyclePanel({
   lastLifecycleOperationId,
   lastLifecycleOperationType,
   onLifecycleStateChange,
+  loadingLabel,
 }: ProjectLifecyclePanelProps) {
   const t = {
     "Data availability": window.gettext("Data availability"),
@@ -131,7 +131,7 @@ export default function ProjectLifecyclePanel({
   const [operationId, setOperationId] = useState<string | null>(
     lastLifecycleOperationId,
   );
-  const [lifecycleState, setLifecycleState] = useState<LifecycleState>(
+  const [lifecycleState, setLifecycleState] = useState<LifecycleState | null>(
     initialLifecycleState,
   );
   const [operationType, setOperationType] =
@@ -142,26 +142,13 @@ export default function ProjectLifecyclePanel({
   const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
-    const handler = (event: Event): void => {
-      const customEvent = event as CustomEvent<unknown>;
-      if (isLifecycleState(customEvent.detail)) {
-        setLifecycleState(customEvent.detail);
-      }
-    };
-
-    window.addEventListener(LIFECYCLE_STATE_CHANGED_EVENT, handler);
-    return () => {
-      window.removeEventListener(LIFECYCLE_STATE_CHANGED_EVENT, handler);
-    };
-  }, []);
-
-  useEffect(() => {
     setLifecycleState(initialLifecycleState);
   }, [initialLifecycleState]);
 
   const refreshLifecycle =
     useCallback(async (): Promise<ProjectLifecycleSnapshot> => {
       const snapshot = await fetchProjectLifecycle(projectSlug);
+      setLifecycleState(snapshot.lifecycleState);
       onLifecycleStateChange(snapshot.lifecycleState);
       setOperationId(snapshot.lastOperationId);
       setOperationType(snapshot.lastOperationType);
@@ -264,7 +251,7 @@ export default function ProjectLifecyclePanel({
   }, [operationId, fetchOperationDetails]);
 
   useEffect(() => {
-    if (!operationId || !isRunningLifecycleState(lifecycleState)) {
+    if (!operationId || !lifecycleState || !isRunningLifecycleState(lifecycleState)) {
       return;
     }
 
@@ -333,12 +320,22 @@ export default function ProjectLifecyclePanel({
     <section className="fr-mb-3w">
       <h2 className="fr-h5 fr-mb-1w">{t["Data availability"]}</h2>
       <div className="fr-mb-2w">
-        <p>
-          <span className={BADGE_CLASS_BY_STATE[lifecycleState]}>
-            {t[lifecycleState]}
-          </span>
-        </p>
-        <p>{t.availabilityDescription[lifecycleState]}</p>
+        {lifecycleState ? (
+          <>
+            <p>
+              <span className={BADGE_CLASS_BY_STATE[lifecycleState]}>
+                {t[lifecycleState]}
+              </span>
+            </p>
+            <p>{t.availabilityDescription[lifecycleState]}</p>
+          </>
+        ) : (
+          <p>
+            <span className="fr-badge fr-badge--info fr-badge--no-icon">
+              {loadingLabel}
+            </span>
+          </p>
+        )}
       </div>
 
       {lifecycleState === "HOT" && (

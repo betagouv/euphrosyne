@@ -1405,9 +1405,6 @@ msgstr "Importer avec un numéro Eros"
 msgid "Delete selected %(model)s"
 msgstr "Modifier l’objet %(model)s sélectionné"
 
-msgid "Data management"
-msgstr "Gestion des données"
-
 msgid "VMs"
 msgstr "Machines virtuelles"
 
@@ -1456,6 +1453,12 @@ msgid "Only alphanumeric, underscore, hyphen and space characters are allowed"
 msgstr ""
 "Seuls les lettres, chiffres, tirets bas, traits d'union et espaces sont des "
 "caractères valides"
+
+msgid "Data management"
+msgstr "Gestion des données"
+
+msgid "Loading"
+msgstr "Chargement"
 
 #, python-format
 msgid "Project: %s"

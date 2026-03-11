@@ -1,10 +1,4 @@
-import { useEffect, useState } from "react";
-
-import {
-  LIFECYCLE_STATE_CHANGED_EVENT,
-  LifecycleState,
-  isLifecycleState,
-} from "../lifecycle-state";
+import { LifecycleState } from "../lifecycle-state";
 import ProjectLifecycleNotice from "./ProjectLifecycleNotice";
 
 interface ProjectLifecycleNoticeBannerProps {
@@ -12,27 +6,7 @@ interface ProjectLifecycleNoticeBannerProps {
 }
 
 export default function ProjectLifecycleNoticeBanner({
-  lifecycleState: initialLifecycleState,
+  lifecycleState,
 }: ProjectLifecycleNoticeBannerProps) {
-  const [lifecycleState, setLifecycleState] = useState<LifecycleState>(
-    initialLifecycleState,
-  );
-
-  useEffect(() => {
-    const handler = (event: Event) => {
-      const customEvent = event as CustomEvent<unknown>;
-      if (isLifecycleState(customEvent.detail)) {
-        setLifecycleState(customEvent.detail);
-      }
-    };
-
-    window.addEventListener(LIFECYCLE_STATE_CHANGED_EVENT, handler);
-    return () => {
-      window.removeEventListener(LIFECYCLE_STATE_CHANGED_EVENT, handler);
-    };
-  }, []);
-
-  return (
-    <ProjectLifecycleNotice lifecycleState={lifecycleState} />
-  );
+  return <ProjectLifecycleNotice lifecycleState={lifecycleState} />;
 }

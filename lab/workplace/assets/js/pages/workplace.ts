@@ -14,12 +14,10 @@ import downloadRunData from "../../../../assets/js/run-data-downloader.js";
 import WorkplaceRunTabs, {
   WorkplaceRunTabsProps,
 } from "../components/WorkplaceRunTabs";
-import ProjectLifecyclePanel from "../components/ProjectLifecyclePanel";
-import ProjectLifecycleNoticeBanner from "../components/ProjectLifecycleNoticeBanner";
+import ProjectLifecycleRoot from "../components/ProjectLifecycleRoot";
 import { RawDataFileService } from "../raw-data/raw-data-file-service";
 import { ProcessedDataFileService } from "../processed-data/processed-data-file-service";
 import toolsFetch from "../../../../../shared/js/euphrosyne-tools-client";
-import { dispatchLifecycleStateChanged } from "../lifecycle-state";
 
 type WorkplaceRunData = Omit<
   WorkplaceRunTabsProps["runs"][number],
@@ -30,6 +28,11 @@ export interface WorkplacePageData {
   project: WorkplaceRunTabsProps["project"];
   runs: WorkplaceRunData[];
   isLabAdmin: boolean;
+  isDataManagementEnabled: boolean;
+  labels: {
+    dataManagementTitle: string;
+    loading: string;
+  };
 }
 
 VirtualOfficeButton.init();
@@ -44,12 +47,14 @@ document.addEventListener("DOMContentLoaded", () => {
     throw new Error("Workplace data not found in workplace-data script tag.");
   }
 
-  const { project, runs, isLabAdmin } = workplacePageData;
+  const { project, runs, isLabAdmin, isDataManagementEnabled, labels } =
+    workplacePageData;
 
   renderComponent(
     "workplace-run-tabs",
     createElement(WorkplaceRunTabs, {
       project,
+      isDataManagementEnabled: isDataManagementEnabled && isLabAdmin,
       runs: runs.map((run) => ({
         ...run,
         rawDataFileService: new RawDataFileService(
@@ -66,23 +71,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }),
   );
 
-  if (isLabAdmin) {
+  if (isLabAdmin && isDataManagementEnabled) {
     renderComponent(
-      "project-lifecycle-notice-banner",
-      createElement(ProjectLifecycleNoticeBanner, {
-        lifecycleState: project.lifecycleState,
-      }),
-    );
-
-    renderComponent(
-      "project-lifecycle-panel",
-      createElement(ProjectLifecyclePanel, {
+      "project-lifecycle-root",
+      createElement(ProjectLifecycleRoot, {
         projectId: String(project.id),
         projectSlug: project.slug,
-        lifecycleState: project.lifecycleState,
-        lastLifecycleOperationId: project.lastLifecycleOperationId,
-        lastLifecycleOperationType: project.lastLifecycleOperationType,
-        onLifecycleStateChange: dispatchLifecycleStateChanged,
+        title: labels.dataManagementTitle,
+        loadingLabel: labels.loading,
       }),
     );
   }

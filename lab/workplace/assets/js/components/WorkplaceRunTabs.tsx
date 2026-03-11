@@ -3,7 +3,6 @@ import { RawDataFileService } from "../raw-data/raw-data-file-service";
 import { ProcessedDataFileService } from "../processed-data/processed-data-file-service";
 import WorkplaceRunTab from "./WorkplaceRunTab";
 import {
-  LifecycleOperationType,
   LifecycleState,
   LIFECYCLE_STATE_CHANGED_EVENT,
   isLifecycleState,
@@ -14,10 +13,8 @@ export interface WorkplaceRunTabsProps {
     name: string;
     slug: string;
     id: string;
-    lifecycleState: LifecycleState;
-    lastLifecycleOperationId: string | null;
-    lastLifecycleOperationType: LifecycleOperationType | null;
   };
+  isDataManagementEnabled: boolean;
   runs: {
     id: string;
     label: string;
@@ -47,6 +44,7 @@ function canDeleteWhenHot(table: {
 export default function WorkplaceRunTabs({
   runs,
   project,
+  isDataManagementEnabled,
 }: WorkplaceRunTabsProps) {
   const t = {
     "Runs data": window.gettext("Runs data"),
@@ -55,11 +53,13 @@ export default function WorkplaceRunTabs({
   };
 
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
-  const [lifecycleState, setLifecycleState] = useState<LifecycleState>(
-    project.lifecycleState,
-  );
+  const [lifecycleState, setLifecycleState] = useState<LifecycleState | null>(null);
 
   useEffect(() => {
+    if (!isDataManagementEnabled) {
+      return;
+    }
+
     const handler = (event: Event) => {
       const customEvent = event as CustomEvent<unknown>;
       if (isLifecycleState(customEvent.detail)) {
@@ -71,9 +71,9 @@ export default function WorkplaceRunTabs({
     return () => {
       window.removeEventListener(LIFECYCLE_STATE_CHANGED_EVENT, handler);
     };
-  }, []);
+  }, [isDataManagementEnabled]);
 
-  const mutationsEnabled = lifecycleState === "HOT";
+  const mutationsEnabled = !isDataManagementEnabled || lifecycleState === "HOT";
 
   return (
     <div className="fr-tabs">
