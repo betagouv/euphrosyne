@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 from django.db import models
 from django.db.models import F
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -102,10 +103,16 @@ class ProjectData(models.Model):
 
     @property
     def last_lifecycle_operation(self) -> LifecycleOperation | None:
-        return self.lifecycle_operations.order_by(
-            F("finished_at").desc(nulls_last=True),
-            F("started_at").desc(nulls_last=True),
-        ).first()
+        return (
+            self.lifecycle_operations.annotate(
+                operation_sort_ts=Coalesce("started_at", "finished_at")
+            )
+            .order_by(
+                F("operation_sort_ts").desc(nulls_last=True),
+                F("finished_at").desc(nulls_last=True),
+            )
+            .first()
+        )
 
     def is_cooling_eligible(self) -> bool:
         """Return True when cooling_eligible_at is set and in the past."""

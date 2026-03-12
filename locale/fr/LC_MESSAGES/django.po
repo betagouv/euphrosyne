@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-27 15:13+0100\n"
+"POT-Creation-Date: 2026-03-11 15:45+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -1405,8 +1405,8 @@ msgstr "Importer avec un numéro Eros"
 msgid "Delete selected %(model)s"
 msgstr "Modifier l’objet %(model)s sélectionné"
 
-msgid "Administration"
-msgstr "Administration"
+msgid "VMs"
+msgstr "Machines virtuelles"
 
 msgid "Project type"
 msgstr "Type de projet"
@@ -1440,6 +1440,9 @@ msgstr "Télécharger les données travaillées du run %(label)s"
 msgid "Run(s)"
 msgstr "Run(s)"
 
+msgid "Administration"
+msgstr "Administration"
+
 msgid "Prevention plans"
 msgstr "Plans de prévention"
 
@@ -1450,6 +1453,12 @@ msgid "Only alphanumeric, underscore, hyphen and space characters are allowed"
 msgstr ""
 "Seuls les lettres, chiffres, tirets bas, traits d'union et espaces sont des "
 "caractères valides"
+
+msgid "Data management"
+msgstr "Gestion des données"
+
+msgid "Loading"
+msgstr "Chargement"
 
 #, python-format
 msgid "Project: %s"

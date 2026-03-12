@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-27 11:36+0100\n"
+"POT-Creation-Date: 2026-03-11 16:14+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -338,6 +338,69 @@ msgstr ""
 msgid "An error occurred while setting project image definition"
 msgstr ""
 "Une erreur s'est produite en paramétrant la définition d'image du projet."
+
+msgid "Lifecycle operation failed"
+msgstr "L'opération de cycle de vie a échoué"
+
+msgid "Operation type"
+msgstr "Type d'opération"
+
+msgid "Error title"
+msgstr "Titre de l'erreur"
+
+msgid "Finished at"
+msgstr "Terminé le"
+
+msgid "Files copied / total"
+msgstr "Fichiers copiés / total"
+
+msgid "Bytes copied / total"
+msgstr "Octets copiés / total"
+
+msgid "Retry operation"
+msgstr "Réessayer l'opération"
+
+msgid "Project is currently archived. Restore to modify."
+msgstr "Le projet est actuellement archivé. Restaurez-le pour le modifier."
+
+msgid "Project data is currently being archived."
+msgstr "Les données du projet sont en cours d'archivage."
+
+msgid "Project data is currently being restored."
+msgstr "Les données du projet sont en cours de restauration."
+
+msgid ""
+"An error occurred while processing project data. You can retry the operation."
+msgstr ""
+"Une erreur s'est produite lors du traitement des données du projet. Vous "
+"pouvez réessayer l'opération."
+
+msgid "Data availability"
+msgstr "Disponibilité des données"
+
+msgid "Archive project data"
+msgstr "Archiver les données du projet"
+
+msgid "Restore project data"
+msgstr "Restaurer les données du projet"
+
+msgid "Could not update lifecycle state."
+msgstr "Impossible de mettre à jour l'état du cycle de vie."
+
+msgid "available"
+msgstr "disponible"
+
+msgid "archived"
+msgstr "archivé"
+
+msgid "archiving"
+msgstr "archivage"
+
+msgid "restoring"
+msgstr "restauration"
+
+msgid "error"
+msgstr "erreur"
 
 msgid "Runs data"
 msgstr "Données des runs"

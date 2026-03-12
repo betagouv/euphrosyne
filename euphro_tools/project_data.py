@@ -14,10 +14,12 @@ def post_cool_project(
     timeout: int,
 ) -> requests.Response:
     project_part = quote(project_slug, safe="")
-    url = build_tools_api_url(f"data/projects/{project_part}/cool")
+    url = build_tools_api_url(
+        f"data/projects/{project_part}/cool"
+        f"?operation_id={quote(operation_id, safe='')}"
+    )
     return requests.post(
         url,
-        json={"operation_id": operation_id},
         timeout=timeout,
         headers=get_tools_api_auth_header(),
     )
@@ -26,10 +28,14 @@ def post_cool_project(
 def post_restore_project(
     *,
     project_slug: str,
+    operation_id: str,
     timeout: int,
 ) -> requests.Response:
     project_part = quote(project_slug, safe="")
-    url = build_tools_api_url(f"data/projects/{project_part}/restore")
+    url = build_tools_api_url(
+        f"data/projects/{project_part}/restore"
+        f"?operation_id={quote(operation_id, safe='')}"
+    )
     return requests.post(
         url,
         timeout=timeout,
