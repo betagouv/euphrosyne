@@ -16,7 +16,7 @@ markdown==3.9
 opensearch-py==3.1.0
 pillow==12.1.1 
 psycopg2==2.9.10
-python-dotenv==1.1.1
+python-dotenv==1.2.2
 python3-openid==3.2.0
 python-slugify==8.0.4
 pyyaml==6.0.3
