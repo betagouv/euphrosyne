@@ -2,21 +2,8 @@
 
 import django.db.models.deletion
 import uuid
+
 from django.db import migrations, models
-from datetime import timedelta
-
-
-def backfill_project_data(apps, schema_editor):
-    Project = apps.get_model("lab", "Project")
-    ProjectData = apps.get_model("data_management", "ProjectData")
-
-    for project in Project.objects.all().only("id", "created"):
-        ProjectData.objects.get_or_create(
-            project_id=project.id,
-            defaults={
-                "cooling_eligible_at": project.created + timedelta(days=30 * 6),
-            },
-        )
 
 
 class Migration(migrations.Migration):
@@ -131,8 +118,5 @@ class Migration(migrations.Migration):
             index=models.Index(
                 fields=["cooling_eligible_at"], name="data_manage_cooling_eecf2e_idx"
             ),
-        ),
-        migrations.RunPython(
-            backfill_project_data, reverse_code=migrations.RunPython.noop
         ),
     ]
