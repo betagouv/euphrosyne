@@ -166,7 +166,7 @@ def run_cooling_scheduler(
     eligible_qs = (
         ProjectData.objects.filter(
             lifecycle_state=LifecycleState.HOT,
-            cooling_eligible_at__lte=now,
+            cooling_eligible_at__lte=timezone.localdate(),
         )
         .annotate(has_active_cool=Exists(active_cool_ops))
         .filter(has_active_cool=False)

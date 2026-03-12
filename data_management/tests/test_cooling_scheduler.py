@@ -29,7 +29,7 @@ class DummyResponse:
 @override_settings(DATA_COOLING_ENABLE=False)
 def test_scheduler_disabled_does_nothing():
     project_data = ProjectDataFactory(
-        cooling_eligible_at=timezone.now() - timedelta(days=1),
+        cooling_eligible_at=timezone.localdate() - timedelta(days=1),
     )
 
     enqueued = run_cooling_scheduler()
@@ -46,7 +46,7 @@ def test_scheduler_disabled_does_nothing():
 def test_scheduler_enqueues_oldest_three(monkeypatch):
     monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "http://tools.example.com")
 
-    now = timezone.now()
+    now = timezone.localdate()
     project_data_oldest = ProjectDataFactory(
         cooling_eligible_at=now - timedelta(days=4),
     )
@@ -89,7 +89,7 @@ def test_scheduler_enqueues_oldest_three(monkeypatch):
 def test_scheduler_marks_failed_when_tools_api_rejects():
 
     project_data = ProjectDataFactory(
-        cooling_eligible_at=timezone.now() - timedelta(days=1),
+        cooling_eligible_at=timezone.localdate() - timedelta(days=1),
     )
 
     with mock.patch(
@@ -111,7 +111,7 @@ def test_scheduler_marks_failed_when_tools_api_rejects():
 @override_settings(DATA_COOLING_ENABLE=True)
 def test_scheduler_marks_failed_when_tools_api_raises_request_exception():
     project_data = ProjectDataFactory(
-        cooling_eligible_at=timezone.now() - timedelta(days=1),
+        cooling_eligible_at=timezone.localdate() - timedelta(days=1),
     )
 
     with mock.patch(
@@ -133,7 +133,7 @@ def test_scheduler_marks_failed_when_tools_api_raises_request_exception():
 @override_settings(DATA_COOLING_ENABLE=True)
 def test_scheduler_skips_projects_with_active_pending_cool_operation():
     project_data_claimed = ProjectDataFactory(
-        cooling_eligible_at=timezone.now() - timedelta(days=2),
+        cooling_eligible_at=timezone.localdate() - timedelta(days=2),
     )
     LifecycleOperation.objects.create(
         project_data=project_data_claimed,
@@ -142,7 +142,7 @@ def test_scheduler_skips_projects_with_active_pending_cool_operation():
     )
 
     project_data_fresh = ProjectDataFactory(
-        cooling_eligible_at=timezone.now() - timedelta(days=1),
+        cooling_eligible_at=timezone.localdate() - timedelta(days=1),
     )
 
     with mock.patch(
@@ -163,7 +163,7 @@ def test_scheduler_skips_projects_with_active_pending_cool_operation():
 @override_settings(DATA_COOLING_ENABLE=True)
 def test_scheduler_skips_projects_with_active_running_cool_operation():
     project_data_claimed = ProjectDataFactory(
-        cooling_eligible_at=timezone.now() - timedelta(days=2),
+        cooling_eligible_at=timezone.localdate() - timedelta(days=2),
     )
     LifecycleOperation.objects.create(
         project_data=project_data_claimed,
@@ -172,7 +172,7 @@ def test_scheduler_skips_projects_with_active_running_cool_operation():
     )
 
     project_data_fresh = ProjectDataFactory(
-        cooling_eligible_at=timezone.now() - timedelta(days=1),
+        cooling_eligible_at=timezone.localdate() - timedelta(days=1),
     )
 
     with mock.patch(
