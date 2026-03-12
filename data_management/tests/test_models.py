@@ -108,7 +108,7 @@ def test_last_lifecycle_operation_prefers_started_over_pending():
 @pytest.mark.django_db
 def test_transition_to_cooling_requires_hot_and_eligible():
     eligible_project_data = create_project_data(
-        cooling_eligible_at=timezone.now() - timedelta(days=1),
+        cooling_eligible_at=timezone.localdate() - timedelta(days=1),
     )
 
     eligible_project_data.transition_to(LifecycleState.COOLING)
@@ -116,7 +116,7 @@ def test_transition_to_cooling_requires_hot_and_eligible():
     assert eligible_project_data.lifecycle_state == LifecycleState.COOLING
 
     not_eligible_project_data = create_project_data(
-        cooling_eligible_at=timezone.now() + timedelta(days=1),
+        cooling_eligible_at=timezone.localdate() + timedelta(days=1),
     )
 
     with pytest.raises(ValueError):
@@ -124,7 +124,7 @@ def test_transition_to_cooling_requires_hot_and_eligible():
 
     not_hot_project_data = create_project_data(
         lifecycle_state=LifecycleState.COOL,
-        cooling_eligible_at=timezone.now() - timedelta(days=1),
+        cooling_eligible_at=timezone.localdate() - timedelta(days=1),
     )
 
     with pytest.raises(ValueError):

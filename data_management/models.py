@@ -7,7 +7,6 @@ state transitions that are validated before persisting.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -15,6 +14,8 @@ from django.db.models import F
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+from .eligibility import compute_cooling_eligible_at
 
 if TYPE_CHECKING:
     from lab.projects.models import Project
@@ -67,10 +68,6 @@ class LifecycleOperation(models.Model):
     error_details = models.TextField(null=True, blank=True)
 
 
-def _compute_initial_cooling_eligible_at(created_at: datetime) -> datetime:
-    return created_at + timedelta(days=30 * 6)
-
-
 class ProjectData(models.Model):
     """Store project-level lifecycle state and eligibility metadata."""
 
@@ -84,12 +81,11 @@ class ProjectData(models.Model):
         choices=LifecycleState.choices,
         default=LifecycleState.HOT,
     )
-    cooling_eligible_at = models.DateTimeField(null=True, blank=True)
+    cooling_eligible_at = models.DateField(null=True, blank=True)
 
     @classmethod
     def for_project(cls, project: Project) -> "ProjectData":
-        created_at = project.created or timezone.now()
-        cooling_default = _compute_initial_cooling_eligible_at(created_at)
+        cooling_default = compute_cooling_eligible_at(project)
         try:
             project_data = project.project_data
         except cls.DoesNotExist:
@@ -118,7 +114,7 @@ class ProjectData(models.Model):
         """Return True when cooling_eligible_at is set and in the past."""
         if self.cooling_eligible_at is None:
             return False
-        return self.cooling_eligible_at <= timezone.now()
+        return self.cooling_eligible_at <= timezone.localdate()
 
     def can_transition_to(
         self,

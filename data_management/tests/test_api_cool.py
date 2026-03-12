@@ -49,7 +49,7 @@ def test_cool_retry_requires_lab_admin():
 @pytest.mark.django_db
 def test_cool_from_hot_when_eligible_calls_tools_api_and_transitions_to_cooling():
     project_data = ProjectDataFactory(lifecycle_state=LifecycleState.HOT)
-    project_data.cooling_eligible_at = timezone.now() - timezone.timedelta(days=1)
+    project_data.cooling_eligible_at = timezone.localdate() - timezone.timedelta(days=1)
     project_data.save(update_fields=["cooling_eligible_at"])
     client = Client()
     client.force_login(auth_factories.LabAdminUserFactory())
