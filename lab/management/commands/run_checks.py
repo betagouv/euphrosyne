@@ -10,3 +10,4 @@ class Command(BaseCommand):
         management.call_command("check_project_data_availability")
         management.call_command("check_synced_project_folders")
         management.call_command("check_long_running_vms", "1440", "--send-alerts")
+        management.call_command("schedule_project_cooling")

@@ -1,6 +1,7 @@
 import json
 from typing import Any, Dict
 
+from django.apps import apps
 from django.contrib.admin import site
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
@@ -23,6 +24,9 @@ class WorkplaceView(ProjectMembershipRequiredMixin, TemplateView):
         return super().dispatch(request, project_id, *args, **kwargs)
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        user_is_lab_admin = is_lab_admin(self.request.user)
+        can_delete_files = user_is_lab_admin
+        can_delete_files_when_hot = user_is_lab_admin
         runs = tuple(
             {
                 "id": id,
@@ -43,15 +47,23 @@ class WorkplaceView(ProjectMembershipRequiredMixin, TemplateView):
                         "slug": self.project.slug,
                         "id": self.project.id,
                     },
+                    "isLabAdmin": user_is_lab_admin,
+                    "isDataManagementEnabled": apps.is_installed("data_management"),
+                    "labels": {
+                        "dataManagementTitle": str(_("Data management")),
+                        "loading": str(_("Loading")),
+                    },
                     "runs": [
                         {
                             "id": run["id"],
                             "label": run["label"],
                             "rawDataTable": {
-                                "canDelete": is_lab_admin(self.request.user),
+                                "canDelete": can_delete_files,
+                                "canDeleteWhenHot": can_delete_files_when_hot,
                             },
                             "processedDataTable": {
-                                "canDelete": is_lab_admin(self.request.user),
+                                "canDelete": can_delete_files,
+                                "canDeleteWhenHot": can_delete_files_when_hot,
                             },
                         }
                         for run in runs

@@ -73,7 +73,7 @@ def test_nav_items_json_when_admin():
     assert data["items"][3]["item"]["badge"] == 0
 
     assert data["items"][4]["title"] == str(_("Administration"))
-    assert len(data["items"][4]["items"]) == 3
+    assert len(data["items"][4]["items"]) == 4
     assert data["items"][4]["items"][0]["title"] == str(_("Certifications"))
     assert data["items"][4]["items"][0]["item"]["href"] == reverse(
         "admin:certification_certification_changelist"
@@ -87,11 +87,17 @@ def test_nav_items_json_when_admin():
     )
     assert data["items"][4]["items"][1]["item"]["exactPath"] is False
     assert data["items"][4]["items"][1]["item"]["extraPath"] is None
-    assert data["items"][4]["items"][2]["title"] == str(_("Email logs"))
+    assert data["items"][4]["items"][2]["title"] == str(_("Project data lifecycle"))
     assert data["items"][4]["items"][2]["item"]["href"] == reverse(
-        "admin:log_email_emaillog_changelist"
+        "admin:data_management_projectdata_changelist"
     )
     assert data["items"][4]["items"][2]["item"]["exactPath"] is False
     assert data["items"][4]["items"][2]["item"]["extraPath"] == []
+    assert data["items"][4]["items"][3]["title"] == str(_("Email logs"))
+    assert data["items"][4]["items"][3]["item"]["href"] == reverse(
+        "admin:log_email_emaillog_changelist"
+    )
+    assert data["items"][4]["items"][3]["item"]["exactPath"] is False
+    assert data["items"][4]["items"][3]["item"]["extraPath"] == []
 
     assert data["currentPath"] == "/path"
