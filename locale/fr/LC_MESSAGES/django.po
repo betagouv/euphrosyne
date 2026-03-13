@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-11 15:45+0100\n"
+"POT-Creation-Date: 2026-03-13 14:10+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -131,6 +131,61 @@ msgstr "Priorité de tri : %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Changer l'ordre de tri"
 
+msgid "available"
+msgstr "disponible"
+
+msgid "archived"
+msgstr "archivé"
+
+msgid "archiving"
+msgstr "archivage"
+
+msgid "restoring"
+msgstr "restauration"
+
+msgid "error"
+msgstr "erreur"
+
+msgid "eligible for cooling"
+msgstr "éligible au refroidissement"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "No"
+msgstr "Non"
+
+msgid "lifecycle state"
+msgstr "état du cycle de vie"
+
+msgid "project"
+msgstr "projet"
+
+msgid "Project data lifecycle"
+msgstr "Cycle de vie des données"
+
+msgid "Project"
+msgstr "Projet"
+
+msgid "Last operation lifecycle"
+msgstr "Dernière transition du cycle de vie"
+
+#, python-format
+msgid "%(old_state)s to %(new_state)s"
+msgstr "%(old_state)s vers %(new_state)s"
+
+msgid "Last operation"
+msgstr "Dernière opération"
+
+msgid "Bytes moved"
+msgstr "Octets déplacés"
+
+msgid "Files moved"
+msgstr "Fichiers déplacés"
+
+msgid "Error details"
+msgstr "Détails de l'erreur"
+
 msgid ""
 "Project is read-only while lifecycle_state is COOL or COOLING. Restore the "
 "project to HOT to modify files or create runs."
@@ -168,6 +223,37 @@ msgstr "Réussi"
 msgid "Failed"
 msgstr "Échec"
 
+msgid "Project lifecycle state does not allow cool."
+msgstr "L'état du cycle de vie du projet n'autorise pas le refroidissement."
+
+msgid "Project lifecycle state does not allow restore."
+msgstr "L'état du cycle de vie du projet n'autorise pas la restauration."
+
+msgid "Cool retry request failed while calling tools API."
+msgstr ""
+"La relance du refroidissement a échoué lors de l'appel à l'API des outils."
+
+msgid "Restore request failed while calling tools API."
+msgstr ""
+"La requête de restauration a échoué lors de l'appel à l'API des outils."
+
+msgid "Cool retry request was rejected by tools API."
+msgstr "La relance du refroidissement a été rejetée par l'API des outils."
+
+msgid "Restore request was rejected by tools API."
+msgstr "La requête de restauration a été rejetée par l'API des outils."
+
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Merci de corriger l'erreur ci-dessous"
+msgstr[1] "Merci de corriger les erreurs ci-dessous"
+
+msgid "Please correct the errors below."
+msgstr "Merci de corriger les erreurs ci-dessous"
+
+msgid "Save"
+msgstr "Enregistrer"
+
 msgid "Accept request(s) (send download links)"
 msgstr "Accepter les demandes (envoyer les liens de téléchargement)"
 
@@ -179,12 +265,6 @@ msgstr ""
 
 msgid "has been sent"
 msgstr "envoyé"
-
-msgid "Yes"
-msgstr "Oui"
-
-msgid "No"
-msgstr "Non"
 
 msgid "Data requests"
 msgstr "Demandes de données"
@@ -584,9 +664,6 @@ msgstr "Montrer tout"
 msgid "Delete"
 msgstr "Supprimer"
 
-msgid "Save"
-msgstr "Enregistrer"
-
 msgid "Save as new"
 msgstr "Sauvegarder comme nouveau"
 
@@ -688,17 +765,6 @@ msgstr "Email"
 #, python-format
 msgid "The online board to track your %(aglae_tag)s search projects"
 msgstr "L'outil en ligne pour gérer vos projets de recherche %(aglae_tag)s"
-
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Merci de corriger l'erreur ci-dessous"
-msgstr[1] "Merci de corriger les erreurs ci-dessous"
-
-msgid "Please correct the errors below."
-msgstr "Merci de corriger les erreurs ci-dessous"
-
-msgid "Project"
-msgstr "Projet"
 
 msgid "This user is already a participant in the project."
 msgstr "Cet utilisateur est déjà un participant du projet."

@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.http import HttpRequest
+from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from certification.nav import get_nav_items as certification_get_nav_items
@@ -30,6 +31,18 @@ def get_nav_items(request: HttpRequest) -> list[NavElementJson]:
         )
 
         admin_nav_items["items"] += radiation_protection_get_nav_items(request)
+
+    if apps.is_installed("data_management"):
+        admin_nav_items["items"].append(
+            {
+                "title": str(_("Project data lifecycle")),
+                "item": {
+                    "href": reverse("admin:data_management_projectdata_changelist"),
+                    "exactPath": False,
+                    "extraPath": [],
+                },
+            }
+        )
 
     admin_nav_items["items"] += log_email_get_nav_items(request)
 
