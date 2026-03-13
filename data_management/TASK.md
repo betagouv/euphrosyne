@@ -1,92 +1,72 @@
-## [TASK] Update cooling eligibility computation to support embargo date
+## [TASK] Django admin: lifecycle filters, operations list, retry/restore actions
 
 ### Context
 
-Project cooling eligibility is currently derived from lifecycle rules tied to project creation and planned runs.
+PRD – FR4 Admin visibility.
 
-We need to revise this logic to support an explicit `embargo_date` while keeping automatic cooling scheduling based on a single computed field (`cooling_eligible_at`).
+Admins must be able to inspect project lifecycle status, cooling eligibility, lifecycle operation outcomes, and errors, and trigger corrective actions when needed.
 
----
+Lifecycle state is tracked at the **project level**, and lifecycle operations are stored as auditable records.
+
+This must be implemented in the **Django admin**, following the design and interaction patterns already used by existing admin views, and accessible only to **`lab_admin`** users.
 
 ## Description
 
-Update the computation rules for `cooling_eligible_at` so that embargo dates take precedence over run-based eligibility.
+Extend existing Django admin views to expose project lifecycle visibility and actions.
 
-### Eligibility rules
+Implementation must reuse the structure and conventions of existing admin views/screens rather than introducing a separate custom interface.
 
-1. **Default value**
+### Access control
 
-When a project is created:
+- views and actions accessible only to users with **`lab_admin`** permissions
 
-```
-cooling_eligible_at = project.created + 24 months
-```
+### Filters
 
-2. **Embargo-based eligibility**
+Add admin filters on **projects**:
 
-When `embargo_date` is set or modified:
+- `lifecycle_state`
+- **eligible for cooling** (`cooling_eligible_at <= now`)
 
-```
-cooling_eligible_at = embargo_date
-```
+### Lifecycle information
 
-Embargo date always takes priority over run-based eligibility.
+Display in the project admin view:
 
-3. **Run-based eligibility**
+- `lifecycle_state`
+- `cooling_eligible_at`
+- last lifecycle operation
+- operation timestamps
+- bytes/files moved
+- last lifecycle error / error details
 
-When a run is planned:
+### Lifecycle operations
 
-```
-cooling_eligible_at = run.end_date + 24 months
-```
+- show the **list of lifecycle operations** for a project using the same presentation approach as other related admin views
 
-but **only if the project has no embargo_date**.
+### Admin actions
 
-If `embargo_date` exists, planning runs must **not override** embargo-based eligibility.
+Provide actions/buttons, consistent with existing admin patterns, for:
 
----
+- **retry** failed lifecycle operation
+- **restore** cooled project
 
-## Scheduler behavior
+Retry behavior:
 
-The automatic cooling scheduler must continue to rely **only on `cooling_eligible_at`** when selecting projects eligible for cooling.
+- retry must create a **new `operation_id`**
+- failed operation ids are never reused
 
-No embargo-specific logic should be added to the scheduler itself.
+Permissions:
 
----
+- retry and restore actions are **`lab_admin` only**
 
 ## Acceptance criteria
 
-- New projects get `cooling_eligible_at = project.created + 24 months`.
-- Setting `embargo_date` sets `cooling_eligible_at = embargo_date`.
-- Updating `embargo_date` recomputes `cooling_eligible_at`.
-- Planning a run recomputes `cooling_eligible_at = run.end_date + 24 months` **only when no embargo_date exists**.
-- Planning runs does not override embargo-based eligibility.
-- The scheduler continues to select projects based solely on `cooling_eligible_at`.
-- Tests cover:
-  - project creation
-  - setting embargo date
-  - updating embargo date
-  - planning a run without embargo
-  - planning a run with embargo present
-
----
-
-## Small implementation advice (important)
-
-When implementing, **centralize the computation** in a single function/service like:
-
-```
-compute_cooling_eligible_at(project)
-```
-
-and call it from:
-
-- project creation
-- embargo_date update
-- run planning
-
-This avoids spreading lifecycle logic across multiple places — which will otherwise become fragile very quickly.
-
----
-
-If you want, I can also show you a **very common edge case in lifecycle systems** that your current rule might trigger (it’s subtle but happens a lot with embargo + runs).
+- Only **`lab_admin`** users can access lifecycle admin views and actions.
+- Lifecycle views are implemented **consistently with existing admin view design/patterns**.
+- Admin can filter projects by `lifecycle_state`.
+- Admin can filter projects **eligible for cooling**.
+- Admin can view lifecycle state, eligibility date, last operation details, bytes/files moved, and error details.
+- Admin can identify projects in `ERROR` or transitional states (`COOLING`, `RESTORING`).
+- Admin can trigger **retry**, creating a new `operation_id`.
+- Admin can trigger **restore** when permitted.
+- Admin can view the **list of lifecycle operations** for a project.
+- Non-`lab_admin` users do not see lifecycle actions.
