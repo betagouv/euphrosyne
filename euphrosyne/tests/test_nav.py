@@ -71,6 +71,14 @@ def test_get_nav_items_for_admin():
                     },
                 },
                 {
+                    "title": "Cycle de vie des données",
+                    "item": {
+                        "href": "/data_management/projectdata/",
+                        "exactPath": False,
+                        "extraPath": [],
+                    },
+                },
+                {
                     "title": "Journaux des emails",
                     "item": {
                         "href": "/log_email/emaillog/",
@@ -127,6 +135,14 @@ def test_get_nav_items_for_admin_without_optional_features(mock_is_installed):
                     "title": "Certifications",
                     "item": {
                         "href": "/certification/certification/",
+                        "exactPath": False,
+                        "extraPath": [],
+                    },
+                },
+                {
+                    "title": "Cycle de vie des données",
+                    "item": {
+                        "href": "/data_management/projectdata/",
                         "exactPath": False,
                         "extraPath": [],
                     },

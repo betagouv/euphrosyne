@@ -12,8 +12,10 @@ from data_management.models import (
     LifecycleOperationStatus,
     LifecycleOperationType,
     LifecycleState,
+    ProjectData,
 )
 from euphro_auth.tests import factories as auth_factories
+from lab.tests.factories import ProjectFactory
 
 from .factories import ProjectDataFactory
 
@@ -86,6 +88,45 @@ def test_cool_from_hot_when_not_eligible_is_rejected():
 
     assert response.status_code == 400
     assert response.json()["lifecycle_state"] == LifecycleState.HOT
+
+
+@pytest.mark.django_db
+def test_cool_recreates_missing_project_data_with_for_project():
+    project = ProjectFactory()
+    project.project_data.delete()
+
+    client = Client()
+    client.force_login(auth_factories.LabAdminUserFactory())
+
+    def create_project_data(_project):
+        return ProjectData.objects.create(
+            project=_project,
+            cooling_eligible_at=timezone.now() - timezone.timedelta(days=1),
+        )
+
+    with mock.patch(
+        "data_management.api_views.post_cool_project",
+        return_value=DummyResponse(status_code=202),
+    ) as cool_mock, mock.patch(
+        "data_management.operations.ProjectData.for_project",
+        side_effect=create_project_data,
+    ) as for_project_mock:
+        response = client.post(_cool_url(project.id))
+
+    project_data = ProjectData.objects.get(project=project)
+    payload = response.json()
+    operation = LifecycleOperation.objects.get(operation_id=payload["operation_id"])
+
+    assert response.status_code == 202
+    assert payload["lifecycle_state"] == LifecycleState.COOLING
+    assert project_data.lifecycle_state == LifecycleState.COOLING
+    assert operation.project_data_id == project_data.pk
+    for_project_mock.assert_called_once()
+    cool_mock.assert_called_once_with(
+        project_slug=project.slug,
+        operation_id=payload["operation_id"],
+        timeout=10,
+    )
 
 
 @pytest.mark.django_db
