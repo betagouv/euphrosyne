@@ -9,7 +9,7 @@ export class ProjectImageServices extends UploadSasUrlMixin {
     super(fetchFn);
     this.projectSlug = projectSlug;
     this.uploadSasUrl =
-      `/images/upload/signed-url` + `?project_name=${projectSlug}`;
+      `/images/upload/signed-url` + `?project_slug=${projectSlug}`;
   }
 
   async listProjectImages(sasToken?: string): Promise<IImagewithUrl[]> {
