@@ -12,11 +12,12 @@ from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.settings import api_settings as rf_api_settings
 from rest_framework.views import APIView
 
 from euphro_auth.jwt.authentication import EuphrosyneAdminJWTAuthentication
 from euphro_tools.project_data import post_cool_project, post_restore_project
-from lab.api_views.permissions import IsLabAdminUser
+from lab.api_views.permissions import IsLabAdminOrEuphrosyneBackend, IsLabAdminUser
 from lab.models import Project
 
 from .models import (
@@ -198,7 +199,11 @@ class LifecycleOperationCallbackAPIView(APIView):
 
 
 class ProjectLifecycleAPIView(APIView):
-    permission_classes = [IsLabAdminUser]
+    permission_classes = [IsLabAdminOrEuphrosyneBackend]
+    authentication_classes = [
+        EuphrosyneAdminJWTAuthentication,
+        *rf_api_settings.DEFAULT_AUTHENTICATION_CLASSES,
+    ]
 
     def get(self, request: Request, project_slug: str) -> Response:
 
