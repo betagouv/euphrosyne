@@ -18,7 +18,6 @@ from euphro_auth.jwt.authentication import EuphrosyneAdminJWTAuthentication
 from euphro_tools.project_data import post_cool_project, post_restore_project
 from lab.api_views.permissions import IsLabAdminUser
 from lab.models import Project
-from lab.permissions import is_lab_admin
 
 from .models import (
     LifecycleOperation,
@@ -199,11 +198,9 @@ class LifecycleOperationCallbackAPIView(APIView):
 
 
 class ProjectLifecycleAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsLabAdminUser]
 
     def get(self, request: Request, project_slug: str) -> Response:
-        if not is_lab_admin(request.user):
-            return Response(status=status.HTTP_403_FORBIDDEN)
 
         project = get_object_or_404(Project, slug=project_slug)
         project_data = ProjectData.for_project(project)
