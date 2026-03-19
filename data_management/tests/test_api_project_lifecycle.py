@@ -13,9 +13,14 @@ from data_management.models import (
     LifecycleOperationType,
     LifecycleState,
 )
+from euphro_auth.jwt.tokens import EuphroToolsAPIToken
 from euphro_auth.tests.factories import LabAdminUserFactory, StaffUserFactory
 
 from .factories import ProjectDataFactory
+
+
+def _backend_headers(token: str | None = None) -> dict[str, str]:
+    return {"Authorization": f"Bearer {token or EuphroToolsAPIToken.for_euphrosyne()}"}
 
 
 @pytest.mark.django_db
@@ -44,6 +49,29 @@ def test_project_lifecycle_api_returns_project_lifecycle_snapshot_for_lab_admin(
 
 
 @pytest.mark.django_db
+def test_project_lifecycle_api_returns_project_lifecycle_snapshot_for_backend_token():
+    project_data = ProjectDataFactory(lifecycle_state=LifecycleState.COOLING)
+    operation = LifecycleOperation.objects.create(
+        project_data=project_data,
+        type=LifecycleOperationType.COOL,
+        status=LifecycleOperationStatus.RUNNING,
+        started_at=timezone.now(),
+    )
+
+    response = Client().get(
+        f"/api/data-management/projects/{project_data.project.slug}/lifecycle",
+        headers=_backend_headers(),
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "lifecycle_state": LifecycleState.COOLING,
+        "last_operation_id": str(operation.operation_id),
+        "last_operation_type": LifecycleOperationType.COOL,
+    }
+
+
+@pytest.mark.django_db
 def test_project_lifecycle_api_is_forbidden_for_non_lab_admin_users():
     project_data = ProjectDataFactory(lifecycle_state=LifecycleState.HOT)
     client = Client()
@@ -54,6 +82,19 @@ def test_project_lifecycle_api_is_forbidden_for_non_lab_admin_users():
     )
 
     assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_project_lifecycle_api_rejects_non_backend_jwt_user():
+    project_data = ProjectDataFactory(lifecycle_state=LifecycleState.HOT)
+    token = EuphroToolsAPIToken.for_user(StaffUserFactory())
+
+    response = Client().get(
+        f"/api/data-management/projects/{project_data.project.slug}/lifecycle",
+        headers=_backend_headers(str(token)),
+    )
+
+    assert response.status_code == 401
 
 
 @pytest.mark.django_db
