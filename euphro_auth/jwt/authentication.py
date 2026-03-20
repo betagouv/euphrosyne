@@ -20,9 +20,6 @@ class EuphrosyneBackendToken(Token):
     token_type = "euphrosyne_backend"
     lifetime = timedelta(minutes=5)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def verify(self) -> None:
         # Subclass to remove JTI_CLAIM and token type check
         self.check_exp()
@@ -50,7 +47,7 @@ class EuphrosyneAdminJWTAuthentication(JWTAuthentication):
     def get_validated_token(self, raw_token: bytes) -> Token:
         messages = []
         try:
-            return EuphrosyneBackendToken(raw_token)
+            return EuphrosyneBackendToken(raw_token)  # type: ignore
         except TokenError as e:
             messages.append(
                 {

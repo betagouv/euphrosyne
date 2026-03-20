@@ -16,6 +16,15 @@ class IsLabAdminUser(IsAdminUser):
         return super().has_permission(request, view) and is_lab_admin(request.user)
 
 
+class IsLabAdminOrEuphrosyneBackend(IsLabAdminUser):
+    """Check user is lab admin or is euphrosyne backend."""
+
+    def has_permission(self, request, view):
+        return super().has_permission(request, view) or (
+            request.user.is_authenticated and request.user.email == "euphrosyne"
+        )
+
+
 class ProjectMembershipRequiredMixin(Generic[T], IsAdminUser):
     def get_related_project(self, obj: T | None = None) -> Optional[Project]:
         raise NotImplementedError()
