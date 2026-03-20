@@ -16,6 +16,7 @@ interface ProjectDocumentsPageData {
     canDelete: boolean;
   };
   form: {
+    canUpload: boolean;
     hintText: string;
   };
 }

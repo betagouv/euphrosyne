@@ -14,14 +14,26 @@ import downloadRunData from "../../../../assets/js/run-data-downloader.js";
 import WorkplaceRunTabs, {
   WorkplaceRunTabsProps,
 } from "../components/WorkplaceRunTabs";
+import ProjectLifecycleRoot from "../components/ProjectLifecycleRoot";
 import { RawDataFileService } from "../raw-data/raw-data-file-service";
 import { ProcessedDataFileService } from "../processed-data/processed-data-file-service";
 import toolsFetch from "../../../../../shared/js/euphrosyne-tools-client";
 
-export type WorkplacePageData = Omit<
-  WorkplaceRunTabsProps,
+type WorkplaceRunData = Omit<
+  WorkplaceRunTabsProps["runs"][number],
   "rawDataFileService" | "processedDataFileService"
 >;
+
+export interface WorkplacePageData {
+  project: WorkplaceRunTabsProps["project"];
+  runs: WorkplaceRunData[];
+  isLabAdmin: boolean;
+  isDataManagementEnabled: boolean;
+  labels: {
+    dataManagementTitle: string;
+    loading: string;
+  };
+}
 
 VirtualOfficeButton.init();
 VirtualOfficeDeleteButton.init();
@@ -35,12 +47,14 @@ document.addEventListener("DOMContentLoaded", () => {
     throw new Error("Workplace data not found in workplace-data script tag.");
   }
 
-  const { project, runs } = workplacePageData;
+  const { project, runs, isLabAdmin, isDataManagementEnabled, labels } =
+    workplacePageData;
 
   renderComponent(
     "workplace-run-tabs",
     createElement(WorkplaceRunTabs, {
       project,
+      isDataManagementEnabled: isDataManagementEnabled && isLabAdmin,
       runs: runs.map((run) => ({
         ...run,
         rawDataFileService: new RawDataFileService(
@@ -56,6 +70,18 @@ document.addEventListener("DOMContentLoaded", () => {
       })),
     }),
   );
+
+  if (isLabAdmin && isDataManagementEnabled) {
+    renderComponent(
+      "project-lifecycle-root",
+      createElement(ProjectLifecycleRoot, {
+        projectId: String(project.id),
+        projectSlug: project.slug,
+        title: labels.dataManagementTitle,
+        loadingLabel: labels.loading,
+      }),
+    );
+  }
 
   renderComponent(
     "project-config-image-definitions",

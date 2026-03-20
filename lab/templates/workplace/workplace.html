@@ -25,30 +25,41 @@
         <virtual-office-button project-slug="{{ project.slug }}"></virtual-office-button>
     </div>
     {% if user.is_lab_admin %}
-    <fieldset class="module aligned fr-mt-3w">
-        <h2>{% trans "Administration" %}</h2>
-        <div class="form-row fr-grid-row">
-            <div class="fr-select-group fr-col-12 fr-col-md-6">   
-                <label for="vm-size-select">{% trans "Project type" %}</label>
-                <select name="vm_size" id="vm-size-select" is="vm-size-select" project-name="{{ project.name }}" class="fr-select">
-                    <option selected value="">{% trans "Default" %}</option>
-                    <option value="IMAGERY">{% trans "Imagery" %}</option>
-                    <option value="IMAGERY_LARGE">{% trans "Imagery (High-memory)" %}</option>
-                </select>
-                <div class="help">{% trans "Used to determine the virtual machine size." %}</div>
-            </div>
+
+    <div class="fr-grid-row fr-grid-row--gutters fr-mt-3w">
+        <div class="fr-col-12 fr-col-lg-6">
+            <fieldset class="module aligned">
+                <div id="project-lifecycle-root"></div>
+            </fieldset>
         </div>
-        <div class="form-row fr-grid-row">
-            <div class="fr-col-12 fr-col-md-6">
-                <div id="project-config-image-definitions"></div>
-            </div>
+        <div class="fr-col-12 fr-col-lg-6">
+            <fieldset class="module aligned">
+                <h2>{% trans "VMs" %}</h2>
+                <div class="form-row fr-grid-row">
+                    <div class="fr-select-group fr-col-12 fr-col-md-6">   
+                        <label for="vm-size-select">{% trans "Project type" %}</label>
+                        <select name="vm_size" id="vm-size-select" is="vm-size-select" project-name="{{ project.name }}" class="fr-select">
+                            <option selected value="">{% trans "Default" %}</option>
+                            <option value="IMAGERY">{% trans "Imagery" %}</option>
+                            <option value="IMAGERY_LARGE">{% trans "Imagery (High-memory)" %}</option>
+                        </select>
+                        <div class="help">{% trans "Used to determine the virtual machine size." %}</div>
+                    </div>
+                </div>
+                <div class="form-row fr-grid-row">
+                    <div class="fr-col-12 fr-col-md-6">
+                        <div id="project-config-image-definitions"></div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <button is="virtual-office-delete-button" project-slug="{{ project.slug }}" class="fr-btn fr-btn--tertiary fr-btn--sm">
+                        {% trans "Delete virtual office"%}
+                    </button>
+                </div>
+            </fieldset>
         </div>
-        <div class="form-row">
-            <button is="virtual-office-delete-button" project-slug="{{ project.slug }}" class="fr-btn fr-btn--tertiary fr-btn--sm">
-                {% trans "Delete virtual office"%}
-            </button>
-        </div>
-    </fieldset>
+    </div>
+
     {% endif %}
 
     <div id="workplace-run-tabs"></div>

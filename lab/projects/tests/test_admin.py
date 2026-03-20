@@ -1,8 +1,10 @@
 from http import HTTPStatus
 from unittest.mock import MagicMock, patch
 
+import pytest
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
 from django.template.response import TemplateResponse
 from django.test import Client, TestCase
 from django.test.client import RequestFactory
@@ -11,6 +13,7 @@ from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.translation import gettext_lazy as _
 
+from data_management.models import LifecycleState, ProjectData
 from euphro_auth.tests.factories import LabAdminUserFactory
 from lab.models import Institution
 from lab.tests.factories import (
@@ -112,6 +115,15 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         fieldsets = self.project_admin.get_fieldsets(self.add_request)
         assert len(fieldsets) == 1
 
+    def test_name_is_readonly_for_admin_when_project_is_immutable(self):
+        project_data = ProjectData.for_project(self.change_project)
+        project_data.lifecycle_state = LifecycleState.COOL
+        project_data.save(update_fields=["lifecycle_state"])
+
+        assert "name" in self.project_admin.get_readonly_fields(
+            self.change_request, self.change_project
+        )
+
     @patch("lab.projects.admin.rename_project_directory")
     def test_change_project_name_calls_hook(self, rename_project_dir_mock):
         project = ProjectFactory(name="project a")
@@ -130,6 +142,32 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
             assert form.is_valid()
             project_admin.save_model(request, project, form=form, change=True)
         rename_project_dir_mock.assert_called_once_with("project a", "project b")
+
+    @patch("lab.projects.admin.rename_project_directory")
+    def test_change_project_name_is_forbidden_when_project_is_cool(
+        self, rename_project_dir_mock: MagicMock
+    ):
+        project = ProjectFactory(name="project a")
+        project_data = ProjectData.for_project(project)
+        project_data.lifecycle_state = LifecycleState.COOL
+        project_data.save(update_fields=["lifecycle_state"])
+        request = self.request_factory.post(
+            reverse("admin:lab_project_change", args=[project.id]),
+            data={
+                "name": "project b",
+            },
+        )
+        request.user = self.admin_user
+        project_admin = ProjectAdmin(Project, admin_site=AdminSite())
+        project.name = "project b"
+        form = MagicMock()
+        form.changed_data = ["name"]
+        form.initial = {"name": "project a"}
+
+        with pytest.raises(PermissionDenied):
+            project_admin.save_model(request, project, form=form, change=True)
+
+        rename_project_dir_mock.assert_not_called()
 
 
 class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):

@@ -7,13 +7,15 @@ state transitions that are validated before persisting.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 from django.db import models
 from django.db.models import F
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+from .eligibility import compute_cooling_eligible_at
 
 if TYPE_CHECKING:
     from lab.projects.models import Project
@@ -66,12 +68,8 @@ class LifecycleOperation(models.Model):
     error_details = models.TextField(null=True, blank=True)
 
 
-def _compute_initial_cooling_eligible_at(created_at: datetime) -> datetime:
-    return created_at + timedelta(days=30 * 6)
-
-
 class ProjectData(models.Model):
-    """Store project-level lifecycle state and expected data totals."""
+    """Store project-level lifecycle state and eligibility metadata."""
 
     project = models.OneToOneField(
         "lab.Project",
@@ -83,14 +81,11 @@ class ProjectData(models.Model):
         choices=LifecycleState.choices,
         default=LifecycleState.HOT,
     )
-    cooling_eligible_at = models.DateTimeField(null=True, blank=True)
-    project_size_bytes = models.PositiveBigIntegerField(null=True, blank=True)
-    file_count = models.PositiveBigIntegerField(null=True, blank=True)
+    cooling_eligible_at = models.DateField(null=True, blank=True)
 
     @classmethod
     def for_project(cls, project: Project) -> "ProjectData":
-        created_at = project.created or timezone.now()
-        cooling_default = _compute_initial_cooling_eligible_at(created_at)
+        cooling_default = compute_cooling_eligible_at(project)
         try:
             project_data = project.project_data
         except cls.DoesNotExist:
@@ -104,16 +99,22 @@ class ProjectData(models.Model):
 
     @property
     def last_lifecycle_operation(self) -> LifecycleOperation | None:
-        return self.lifecycle_operations.order_by(
-            F("finished_at").desc(nulls_last=True),
-            F("started_at").desc(nulls_last=True),
-        ).first()
+        return (
+            self.lifecycle_operations.annotate(
+                operation_sort_ts=Coalesce("started_at", "finished_at")
+            )
+            .order_by(
+                F("operation_sort_ts").desc(nulls_last=True),
+                F("finished_at").desc(nulls_last=True),
+            )
+            .first()
+        )
 
     def is_cooling_eligible(self) -> bool:
         """Return True when cooling_eligible_at is set and in the past."""
         if self.cooling_eligible_at is None:
             return False
-        return self.cooling_eligible_at <= timezone.now()
+        return self.cooling_eligible_at <= timezone.localdate()
 
     def can_transition_to(
         self,
@@ -134,18 +135,18 @@ class ProjectData(models.Model):
         if target_state == LifecycleState.COOL:
             return (
                 self.lifecycle_state == LifecycleState.COOLING
-                and verify_operation_success(
-                    self, operation, LifecycleOperationType.COOL
-                )
+                and operation is not None
+                and operation.project_data_id == self.pk
+                and verify_operation_success(operation, LifecycleOperationType.COOL)
             )
         if target_state == LifecycleState.RESTORING:
             return self.lifecycle_state == LifecycleState.COOL
         if target_state == LifecycleState.HOT:
             return (
                 self.lifecycle_state == LifecycleState.RESTORING
-                and verify_operation_success(
-                    self, operation, LifecycleOperationType.RESTORE
-                )
+                and operation is not None
+                and operation.project_data_id == self.pk
+                and verify_operation_success(operation, LifecycleOperationType.RESTORE)
             )
         if target_state == LifecycleState.ERROR:
             return self.lifecycle_state in (
@@ -178,30 +179,28 @@ class ProjectData(models.Model):
 
 
 def verify_operation(
-    project_data: "ProjectData",
-    operation: "LifecycleOperation | None",
+    operation: "LifecycleOperation",
 ) -> bool:
-    """Return True when copied totals match expected project data totals.
+    """Return True when copied totals match expected operation totals.
 
     This check guards COOL/HOT transitions from accepting partial moves.
     """
-    if operation is None:
-        return False
-    if project_data.pk is None or operation.project_data.pk != project_data.pk:
-        return False
-    if project_data.project_size_bytes is None or project_data.file_count is None:
-        return False
-    if operation.bytes_copied is None or operation.files_copied is None:
+
+    if (
+        operation.bytes_copied is None
+        or operation.files_copied is None
+        or operation.bytes_total is None
+        or operation.files_total is None
+    ):
         return False
     return (
-        operation.bytes_copied == project_data.project_size_bytes
-        and operation.files_copied == project_data.file_count
+        operation.bytes_copied == operation.bytes_total
+        and operation.files_copied == operation.files_total
     )
 
 
 def verify_operation_success(
-    project_data: "ProjectData",
-    operation: "LifecycleOperation | None",
+    operation: "LifecycleOperation",
     operation_type: LifecycleOperationType,
 ) -> bool:
     """Return True when the operation succeeded and verification matches."""
@@ -211,4 +210,4 @@ def verify_operation_success(
         return False
     if operation.status != LifecycleOperationStatus.SUCCEEDED:
         return False
-    return verify_operation(project_data, operation)
+    return verify_operation(operation)
