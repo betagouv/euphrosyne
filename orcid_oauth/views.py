@@ -44,6 +44,7 @@ class UserCompleteAccountView(UpdateView):
 
     def form_valid(self, form: ModelForm) -> HttpResponse:
         self.object.invitation_completed_at = timezone.now()
+        self.object.is_staff = True
         response = super().form_valid(form)
         return response
 
