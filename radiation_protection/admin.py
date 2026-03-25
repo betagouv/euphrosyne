@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.db.models import Model
+from django.http.request import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
 from lab.admin.mixins import LabAdminAllowedMixin
@@ -19,6 +21,16 @@ class ElectricalSignatureProcessInline(admin.TabularInline):
     def has_view_permission(self, request, obj=None):
         return is_lab_admin(request.user) or super().has_view_permission(request, obj)
 
+    def has_change_permission(
+        self, request: HttpRequest, obj: RiskPreventionPlan | None = None
+    ) -> bool:
+        return False
+
+    def has_add_permission(
+        self, request: HttpRequest, obj: RiskPreventionPlan | None = None
+    ) -> bool:
+        return False
+
 
 @admin.register(RiskPreventionPlan)
 class RiskPreventionPlanAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
@@ -28,18 +40,24 @@ class RiskPreventionPlanAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
         "run",
         "created",
         "risk_advisor_notification_sent",
+        "electrical_signature_exempt",
     )
-    readonly_fields = ("created",)
+    readonly_fields = (
+        "created",
+        "participation",
+        "run",
+        "risk_advisor_notification_sent",
+    )
 
     def changelist_view(self, request, extra_context: dict | None = None):
         extra_context = extra_context or {}
         extra_context["title"] = _("Latest published risk prevention plans")
         return super().changelist_view(request, extra_context)
 
-    def has_change_permission(self, *args, **kwargs):
-        return False
-
     def get_inlines(self, request, obj):
         if obj:
-            return [ElectricalSignatureProcessInline]
+            return (ElectricalSignatureProcessInline,)
         return super().get_inlines(request, obj)
+
+    def has_add_permission(self, request: HttpRequest, obj: Model | None = None):
+        return super().has_add_permission(request, obj)

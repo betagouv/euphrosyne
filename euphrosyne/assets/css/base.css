@@ -153,10 +153,6 @@ label.required:after {
   content: " *" !important;
 }
 
-.change-list .object-tools {
-  margin-top: -128px;
-}
-
 #changelist .actions {
   padding: 0 !important;
 }
