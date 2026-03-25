@@ -25,8 +25,7 @@ class RiskPreventionPlan(TimestampedModel):
 
     risk_advisor_notification_sent = models.BooleanField(
         default=False,
-        verbose_name=_("Risk Advisor Notification Sent"),
-        help_text=_("Indicates if the risk advisor has been notified about this plan."),
+        verbose_name=_("Prevention plan sent"),
     )
     electrical_signature_exempt = models.BooleanField(
         default=False,
