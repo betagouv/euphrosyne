@@ -227,7 +227,13 @@ class UserAdmin(DjangoUserAdmin):
                 (
                     _("Permissions"),
                     {
-                        "fields": ("is_staff", "is_lab_admin", "is_active", "groups"),
+                        "fields": (
+                            "is_staff",
+                            "is_lab_admin",
+                            "is_active",
+                            "invitation_completed_at",
+                            "groups",
+                        ),
                         "classes": [*fieldset_classes],
                     },
                 ),
