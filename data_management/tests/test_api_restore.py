@@ -5,6 +5,7 @@ from unittest import mock
 import pytest
 import requests
 from django.test import Client
+from django.utils import timezone
 
 from data_management.models import (
     LifecycleOperation,
@@ -199,3 +200,37 @@ def test_restore_marks_failed_when_tools_api_rejects_request():
     assert operation.error_message == "Tools API rejected restore request (500)."
     assert operation.error_details == "server error"
     assert project_data.lifecycle_state == LifecycleState.COOL
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "active_status",
+    [
+        LifecycleOperationStatus.PENDING,
+        LifecycleOperationStatus.RUNNING,
+    ],
+)
+def test_restore_rejects_when_active_restore_operation_exists(active_status: str):
+    project_data = ProjectDataFactory(lifecycle_state=LifecycleState.COOL)
+    LifecycleOperation.objects.create(
+        project_data=project_data,
+        type=LifecycleOperationType.RESTORE,
+        status=active_status,
+        started_at=timezone.now(),
+    )
+    client = Client()
+    client.force_login(auth_factories.LabAdminUserFactory())
+
+    with mock.patch("data_management.api_views.post_restore_project") as restore_mock:
+        response = client.post(
+            _restore_url(project_data.project_id),
+            content_type="application/json",
+        )
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Project already has an active lifecycle operation.",
+        "lifecycle_state": LifecycleState.COOL,
+    }
+    assert LifecycleOperation.objects.count() == 1
+    restore_mock.assert_not_called()

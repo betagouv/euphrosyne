@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-13 14:10+0100\n"
+"POT-Creation-Date: 2026-03-27 18:58+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -222,6 +222,9 @@ msgstr "Réussi"
 
 msgid "Failed"
 msgstr "Échec"
+
+msgid "Project already has an active lifecycle operation."
+msgstr "Ce projet a déjà une opération en cours."
 
 msgid "Project lifecycle state does not allow cool."
 msgstr "L'état du cycle de vie du projet n'autorise pas le refroidissement."
