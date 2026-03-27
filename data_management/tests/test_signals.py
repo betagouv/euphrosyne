@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from datetime import timezone as dt_timezone
-from unittest import mock
 
 import pytest
 from django.utils import timezone
@@ -37,9 +36,14 @@ def test_setting_embargo_date_sets_project_eligibility():
 
 @pytest.mark.django_db
 def test_updating_embargo_date_recomputes_project_eligibility():
+    project = ProjectFactory()
     initial_embargo_date = timezone.localdate() + timedelta(days=10)
     updated_embargo_date = initial_embargo_date + timedelta(days=7)
-    run = RunFactory(end_date=None, embargo_date=initial_embargo_date)
+    run = RunFactory(
+        project=project,
+        end_date=None,
+        embargo_date=initial_embargo_date,
+    )
     project_data = ProjectData.objects.get(project=run.project)
 
     run.embargo_date = updated_embargo_date
@@ -66,16 +70,18 @@ def test_run_scheduled_updates_project_eligibility_without_embargo():
 
 
 @pytest.mark.django_db
-def test_run_scheduled_does_not_override_embargo_based_eligibility():
+def test_run_scheduled_uses_later_non_embargo_candidate_over_embargo_date():
     project = ProjectFactory()
     embargo_date = timezone.localdate() + timedelta(days=10)
+    late_end_date = timezone.now() + timedelta(days=20)
+    RunFactory(project=project, end_date=None, embargo_date=embargo_date)
     run = RunFactory(
         project=project,
-        end_date=timezone.now() + timedelta(days=7),
-        embargo_date=embargo_date,
+        end_date=late_end_date,
+        embargo_date=None,
     )
     project_data = ProjectData.objects.get(project=project)
-    expected = embargo_date
+    expected = timezone.localdate(late_end_date + timedelta(days=30 * 24))
 
     run_scheduled.send(sender=Run, instance=run)
 
@@ -99,15 +105,38 @@ def test_run_scheduled_uses_latest_end_date_even_when_instance_missing_end_date(
 
 
 @pytest.mark.django_db
-def test_run_save_skips_recomputing_when_embargo_matches_project_eligibility():
+def test_run_scheduled_keeps_later_embargo_candidate_over_non_embargo_date():
+    project = ProjectFactory()
+    embargo_date = timezone.localdate() + timedelta(days=40)
+    end_date = timezone.now() - timedelta(days=700)
+    RunFactory(project=project, end_date=end_date, embargo_date=None)
+    run = RunFactory(project=project, end_date=None, embargo_date=embargo_date)
+    project_data = ProjectData.objects.get(project=project)
+
+    run_scheduled.send(sender=Run, instance=run)
+
+    project_data.refresh_from_db()
+    assert project_data.cooling_eligible_at == embargo_date
+
+
+@pytest.mark.django_db
+def test_run_save_recomputes_stale_embargo_based_project_eligibility():
+    project = ProjectFactory()
     embargo_date = timezone.localdate() + timedelta(days=10)
-    run = RunFactory(embargo_date=embargo_date)
+    later_end_date = timezone.now() + timedelta(days=20)
+    run = RunFactory(project=project, end_date=None, embargo_date=embargo_date)
+    RunFactory(project=project, end_date=later_end_date, embargo_date=None)
+    project_data = ProjectData.objects.get(project=project)
+    project_data.cooling_eligible_at = embargo_date
+    project_data.save(update_fields=["cooling_eligible_at"])
+    run.refresh_from_db()
 
-    with mock.patch("data_management.signals.sync_project_cooling_eligible_at") as sync:
-        run.label = f"{run.label}-updated"
-        run.save(update_fields=["label"])
+    run.label = f"{run.label}-updated"
+    run.save(update_fields=["label"])
 
-    sync.assert_not_called()
+    project_data.refresh_from_db()
+    expected = timezone.localdate(later_end_date + timedelta(days=30 * 24))
+    assert project_data.cooling_eligible_at == expected
 
 
 @pytest.mark.django_db
