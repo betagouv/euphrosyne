@@ -98,6 +98,16 @@ SECURE_CSP_REPORT_ONLY = {
 SECURE_CSP = SECURE_CSP_REPORT_ONLY if CSP_ENFORCE else None
 
 
+def _get_bool_env(name: str, default: bool = False) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+DATA_COOLING_ENABLE = _get_bool_env("DATA_COOLING_ENABLE", default=False)
+
+
 # Application definition
 
 CORE_INSTALLED_APPS = [

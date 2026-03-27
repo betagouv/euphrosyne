@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RawDataFileService } from "../raw-data/raw-data-file-service";
 import { ProcessedDataFileService } from "../processed-data/processed-data-file-service";
 import WorkplaceRunTab from "./WorkplaceRunTab";
+import { LifecycleState, onLifecycleStateChanged } from "../lifecycle-state";
+import { ProjectLifecycleSnapshot } from "../project-lifecycle-service";
 
 export interface WorkplaceRunTabsProps {
   project: {
@@ -9,6 +11,7 @@ export interface WorkplaceRunTabsProps {
     slug: string;
     id: string;
   };
+  isDataManagementEnabled: boolean;
   runs: {
     id: string;
     label: string;
@@ -21,11 +24,14 @@ export interface WorkplaceRunTabsProps {
     rawDataFileService: RawDataFileService;
     processedDataFileService: ProcessedDataFileService;
   }[];
+  fetchProjectLifecyclePromise: Promise<ProjectLifecycleSnapshot>;
 }
 
 export default function WorkplaceRunTabs({
   runs,
   project,
+  isDataManagementEnabled,
+  fetchProjectLifecyclePromise,
 }: WorkplaceRunTabsProps) {
   const t = {
     "Runs data": window.gettext("Runs data"),
@@ -34,6 +40,39 @@ export default function WorkplaceRunTabs({
   };
 
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  const [lifecycleState, setLifecycleState] = useState<LifecycleState | null>(
+    null,
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchProjectLifecyclePromise
+      .then((state) => {
+        if (!cancelled) {
+          setLifecycleState(state.lifecycleState);
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          console.error(error);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchProjectLifecyclePromise]);
+
+  useEffect(() => {
+    if (!isDataManagementEnabled) {
+      return;
+    }
+
+    return onLifecycleStateChanged(setLifecycleState);
+  }, [isDataManagementEnabled]);
+
+  const mutationsEnabled = !isDataManagementEnabled || lifecycleState === "HOT";
 
   return (
     <div className="fr-tabs">
@@ -65,7 +104,20 @@ export default function WorkplaceRunTabs({
           aria-labelledby={`tabpanel-run-${run.id}`}
           tabIndex={index}
         >
-          <WorkplaceRunTab run={run} project={project} />
+          <WorkplaceRunTab
+            run={{
+              ...run,
+              rawDataTable: {
+                ...run.rawDataTable,
+                canDelete: run.rawDataTable.canDelete && mutationsEnabled,
+              },
+              processedDataTable: {
+                ...run.processedDataTable,
+                canDelete: run.processedDataTable.canDelete && mutationsEnabled,
+              },
+            }}
+            project={project}
+          />
         </div>
       ))}
     </div>
