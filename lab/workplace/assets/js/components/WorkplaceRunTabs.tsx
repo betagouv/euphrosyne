@@ -20,11 +20,9 @@ export interface WorkplaceRunTabsProps {
     label: string;
     rawDataTable: {
       canDelete: boolean;
-      canDeleteWhenHot?: boolean;
     };
     processedDataTable: {
       canDelete: boolean;
-      canDeleteWhenHot?: boolean;
     };
     rawDataFileService: RawDataFileService;
     processedDataFileService: ProcessedDataFileService;
@@ -33,11 +31,7 @@ export interface WorkplaceRunTabsProps {
 
 function canDeleteWhenHot(table: {
   canDelete: boolean;
-  canDeleteWhenHot?: boolean;
 }): boolean {
-  if (table.canDeleteWhenHot !== undefined) {
-    return table.canDeleteWhenHot;
-  }
   return table.canDelete;
 }
 
@@ -53,7 +47,9 @@ export default function WorkplaceRunTabs({
   };
 
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
-  const [lifecycleState, setLifecycleState] = useState<LifecycleState | null>(null);
+  const [lifecycleState, setLifecycleState] = useState<LifecycleState | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!isDataManagementEnabled) {

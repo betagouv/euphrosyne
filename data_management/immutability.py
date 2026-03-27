@@ -16,6 +16,8 @@ IMMUTABLE_LIFECYCLE_STATES = frozenset(
     {
         LifecycleState.COOL,
         LifecycleState.COOLING,
+        LifecycleState.ERROR,
+        LifecycleState.RESTORING,
     }
 )
 PROJECT_IMMUTABLE_ERROR = "PROJECT_IMMUTABLE"
