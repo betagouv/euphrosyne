@@ -58,6 +58,26 @@ describe("project-lifecycle-service", () => {
     );
   });
 
+  it("returns a hot snapshot when the lifecycle endpoint is unavailable", async () => {
+    fetchMock.mockResolvedValueOnce(createJSONResponse({}, 404));
+
+    const snapshot = await fetchProjectLifecycle("project slug");
+
+    expect(snapshot).toEqual({
+      lifecycleState: "HOT",
+      lastOperationId: null,
+      lastOperationType: null,
+    });
+  });
+
+  it("throws when the lifecycle endpoint rejects access", async () => {
+    fetchMock.mockResolvedValueOnce(createJSONResponse({}, 403));
+
+    await expect(fetchProjectLifecycle("project slug")).rejects.toThrow(
+      "Failed to fetch project lifecycle (status: 403)",
+    );
+  });
+
   it("returns normalized operation details", async () => {
     fetchMock.mockResolvedValueOnce(
       createJSONResponse({

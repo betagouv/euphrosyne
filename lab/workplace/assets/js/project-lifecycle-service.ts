@@ -103,6 +103,15 @@ export async function fetchProjectLifecycle(
     },
   );
 
+  if (response.status === 404) {
+    // endpoint is deactivated : treat all project data as hot
+    return {
+      lifecycleState: "HOT",
+      lastOperationId: null,
+      lastOperationType: null,
+    };
+  }
+
   if (!response.ok) {
     throw new Error(
       `Failed to fetch project lifecycle (status: ${response.status})`,

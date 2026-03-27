@@ -15,6 +15,7 @@ from data_management.models import (
 )
 from euphro_auth.jwt.tokens import EuphroToolsAPIToken
 from euphro_auth.tests.factories import LabAdminUserFactory, StaffUserFactory
+from lab.tests.factories import ParticipationFactory
 
 from .factories import ProjectDataFactory
 
@@ -72,7 +73,27 @@ def test_project_lifecycle_api_returns_project_lifecycle_snapshot_for_backend_to
 
 
 @pytest.mark.django_db
-def test_project_lifecycle_api_is_forbidden_for_non_lab_admin_users():
+def test_project_lifecycle_api_returns_project_lifecycle_snapshot_for_project_member():
+    project_data = ProjectDataFactory(lifecycle_state=LifecycleState.HOT)
+    member = StaffUserFactory()
+    ParticipationFactory(project=project_data.project, user=member)
+    client = Client()
+    client.force_login(member)
+
+    response = client.get(
+        f"/api/data-management/projects/{project_data.project.slug}/lifecycle"
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "lifecycle_state": LifecycleState.HOT,
+        "last_operation_id": None,
+        "last_operation_type": None,
+    }
+
+
+@pytest.mark.django_db
+def test_project_lifecycle_api_is_forbidden_for_non_member_staff_users():
     project_data = ProjectDataFactory(lifecycle_state=LifecycleState.HOT)
     client = Client()
     client.force_login(StaffUserFactory())

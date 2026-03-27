@@ -45,7 +45,7 @@ export default function ProjectLifecycleRoot({
     return () => {
       cancelled = true;
     };
-  }, [projectSlug]);
+  }, [projectSlug, fetchProjectLifecyclePromise]);
 
   function handleLifecycleStateChange(nextState: LifecycleState): void {
     setSnapshot((currentSnapshot) => {

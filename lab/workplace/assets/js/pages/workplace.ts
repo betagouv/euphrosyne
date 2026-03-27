@@ -51,7 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const { project, runs, isLabAdmin, isDataManagementEnabled, labels } =
     workplacePageData;
-
   const fetchProjectLifecyclePromise = fetchProjectLifecycle(project.slug);
 
   renderComponent(
