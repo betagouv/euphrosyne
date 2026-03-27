@@ -2,7 +2,7 @@ import "../../../js_tests/_jsdom_mocks/gettext";
 import euphrosyneToolsService from "../../assets/js/euphrosyne-tools-service";
 import VirtualOfficeButton from "../../assets/js/components/virtual-office-button";
 
-import utils from "../../../assets/js/utils";
+import utils from "../../../assets/js/utils.js";
 import euphrosyneToolsFetch from "../../../../shared/js/euphrosyne-tools-client";
 
 describe("Test VirtualOfficeButton", () => {
@@ -88,7 +88,7 @@ describe("Test VirtualOfficeButton", () => {
 
       expect(fetchVMMock).toHaveBeenCalledTimes(1);
       expect(voButton.buttonEl.disabled).toBeFalsy();
-      expect(voButton.checkDeploymentIntervalId).toBeNull();
+      expect(voButton.checkDeploymentIntervalId).toBeUndefined();
     });
 
     it("handles failed deployment correctly", async () => {
@@ -102,7 +102,7 @@ describe("Test VirtualOfficeButton", () => {
       await voButton.checkDeploymentProgress();
 
       expect(voButton.onFailedDeployment).toHaveBeenCalledTimes(1);
-      expect(voButton.checkDeploymentIntervalId).toBeNull();
+      expect(voButton.checkDeploymentIntervalId).toBeUndefined();
       expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
 
       VirtualOfficeButton.prototype.onFailedDeployment.mockRestore();
