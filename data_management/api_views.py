@@ -17,7 +17,10 @@ from rest_framework.views import APIView
 
 from euphro_auth.jwt.authentication import EuphrosyneAdminJWTAuthentication
 from euphro_tools.project_data import post_cool_project, post_restore_project
-from lab.api_views.permissions import IsLabAdminOrEuphrosyneBackend, IsLabAdminUser
+from lab.api_views.permissions import (
+    IsLabAdminUser,
+    IsProjectMemberOrLabAdminOrEuphrosyneBackend,
+)
 from lab.models import Project
 
 from .models import (
@@ -199,7 +202,7 @@ class LifecycleOperationCallbackAPIView(APIView):
 
 
 class ProjectLifecycleAPIView(APIView):
-    permission_classes = [IsLabAdminOrEuphrosyneBackend]
+    permission_classes = [IsProjectMemberOrLabAdminOrEuphrosyneBackend]
     authentication_classes = [
         EuphrosyneAdminJWTAuthentication,
         *rf_api_settings.DEFAULT_AUTHENTICATION_CLASSES,

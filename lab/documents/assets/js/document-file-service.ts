@@ -39,7 +39,7 @@ export class DocumentFileService extends FileService {
       `/data/documents/shared_access_signature`,
       options.fetchFn,
     );
-    this.uploadPresignURL = `/data/${projectName}/documents/upload/shared_access_signature`;
+    this.uploadPresignURL = `/data/${projectSlug}/documents/upload/shared_access_signature`;
     this.storageClient = options.storageClient ?? new FileshareStorageClient();
   }
 

@@ -6,7 +6,7 @@ import "@gouvfr/dsfr/dist/component/tab/tab.module.js";
 import { renderComponent } from "../../../../../euphrosyne/assets/js/react";
 import { getTemplateJSONData } from "../../../../../shared/js/utils";
 
-import VirtualOfficeButton from "../components/virtual-office-button.js";
+import VirtualOfficeButton from "../components/virtual-office-button";
 import VirtualOfficeDeleteButton from "../components/virtual-office-delete-button.js";
 import VMSizeSelect from "../components/vm-size-select.js";
 import ProjectImageDefinitionSelect from "../components/ProjectImageDefinitionSelect";
@@ -18,6 +18,8 @@ import ProjectLifecycleRoot from "../components/ProjectLifecycleRoot";
 import { RawDataFileService } from "../raw-data/raw-data-file-service";
 import { ProcessedDataFileService } from "../processed-data/processed-data-file-service";
 import toolsFetch from "../../../../../shared/js/euphrosyne-tools-client";
+import { fetchProjectLifecycle } from "../project-lifecycle-service";
+import ProjectLifecycleNoticeBanner from "../components/ProjectLifecycleNoticeBanner";
 
 type WorkplaceRunData = Omit<
   WorkplaceRunTabsProps["runs"][number],
@@ -49,11 +51,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const { project, runs, isLabAdmin, isDataManagementEnabled, labels } =
     workplacePageData;
+  const fetchProjectLifecyclePromise = fetchProjectLifecycle(project.slug);
 
   renderComponent(
     "workplace-run-tabs",
     createElement(WorkplaceRunTabs, {
       project,
+      fetchProjectLifecyclePromise,
       isDataManagementEnabled: isDataManagementEnabled && isLabAdmin,
       runs: runs.map((run) => ({
         ...run,
@@ -71,6 +75,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }),
   );
 
+  fetchProjectLifecyclePromise.then((snapshot) => {
+    renderComponent(
+      "project-lifecycle-banner",
+      createElement(ProjectLifecycleNoticeBanner, {
+        lifecycleState: snapshot.lifecycleState,
+      }),
+    );
+  });
+
   if (isLabAdmin && isDataManagementEnabled) {
     renderComponent(
       "project-lifecycle-root",
@@ -79,6 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
         projectSlug: project.slug,
         title: labels.dataManagementTitle,
         loadingLabel: labels.loading,
+        fetchProjectLifecyclePromise,
       }),
     );
   }

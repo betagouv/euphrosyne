@@ -21,7 +21,15 @@ def test_ensure_project_writable_allows_hot_project():
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("state", [LifecycleState.COOL, LifecycleState.COOLING])
+@pytest.mark.parametrize(
+    "state",
+    [
+        LifecycleState.COOL,
+        LifecycleState.COOLING,
+        LifecycleState.RESTORING,
+        LifecycleState.ERROR,
+    ],
+)
 def test_ensure_project_writable_rejects_immutable_project(state: LifecycleState):
     project = ProjectFactory()
     project_data = ProjectData.for_project(project)
@@ -41,8 +49,8 @@ def test_ensure_project_writable_rejects_immutable_project(state: LifecycleState
     ("state", "expected"),
     [
         (LifecycleState.HOT, False),
-        (LifecycleState.RESTORING, False),
-        (LifecycleState.ERROR, False),
+        (LifecycleState.RESTORING, True),
+        (LifecycleState.ERROR, True),
         (LifecycleState.COOL, True),
         (LifecycleState.COOLING, True),
     ],

@@ -2,7 +2,7 @@ from typing import Generic, Optional, TypeVar
 
 from django.core.exceptions import PermissionDenied
 from django.db import models
-from rest_framework.permissions import SAFE_METHODS, IsAdminUser
+from rest_framework.permissions import SAFE_METHODS, BasePermission, IsAdminUser
 
 from lab.projects.models import Project
 
@@ -23,6 +23,26 @@ class IsLabAdminOrEuphrosyneBackend(IsLabAdminUser):
         return super().has_permission(request, view) or (
             request.user.is_authenticated and request.user.email == "euphrosyne"
         )
+
+
+class IsProjectMemberOrLabAdminOrEuphrosyneBackend(BasePermission):
+    """Allow project members, lab admins, or the backend service account."""
+
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        if request.user.email == "euphrosyne" or is_lab_admin(request.user):
+            return True
+
+        project_slug = view.kwargs.get("project_slug")
+        if not project_slug:
+            return False
+
+        matching_projects = Project.objects.filter(slug=project_slug)
+        if not matching_projects.exists():
+            return True
+
+        return matching_projects.filter(members__id=request.user.id).exists()
 
 
 class ProjectMembershipRequiredMixin(Generic[T], IsAdminUser):

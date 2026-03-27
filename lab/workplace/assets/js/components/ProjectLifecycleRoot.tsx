@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { dispatchLifecycleStateChanged, LifecycleState } from "../lifecycle-state";
 import {
-  fetchProjectLifecycle,
-  ProjectLifecycleSnapshot,
-} from "../project-lifecycle-service";
-import ProjectLifecycleNoticeBanner from "./ProjectLifecycleNoticeBanner";
+  dispatchLifecycleStateChanged,
+  LifecycleState,
+} from "../lifecycle-state";
+import { ProjectLifecycleSnapshot } from "../project-lifecycle-service";
 import ProjectLifecyclePanel from "./ProjectLifecyclePanel";
 
 interface ProjectLifecycleRootProps {
@@ -13,6 +12,7 @@ interface ProjectLifecycleRootProps {
   projectSlug: string;
   title: string;
   loadingLabel: string;
+  fetchProjectLifecyclePromise: Promise<ProjectLifecycleSnapshot>;
 }
 
 export default function ProjectLifecycleRoot({
@@ -20,19 +20,21 @@ export default function ProjectLifecycleRoot({
   projectSlug,
   title,
   loadingLabel,
+  fetchProjectLifecyclePromise,
 }: ProjectLifecycleRootProps) {
-  const [snapshot, setSnapshot] = useState<ProjectLifecycleSnapshot | null>(null);
+  const [snapshot, setSnapshot] = useState<ProjectLifecycleSnapshot | null>(
+    null,
+  );
 
   useEffect(() => {
     let cancelled = false;
 
-    void fetchProjectLifecycle(projectSlug)
+    fetchProjectLifecyclePromise
       .then((nextSnapshot) => {
         if (cancelled) {
           return;
         }
         setSnapshot(nextSnapshot);
-        dispatchLifecycleStateChanged(nextSnapshot.lifecycleState);
       })
       .catch((error) => {
         if (!cancelled) {
@@ -43,7 +45,7 @@ export default function ProjectLifecycleRoot({
     return () => {
       cancelled = true;
     };
-  }, [projectSlug]);
+  }, [projectSlug, fetchProjectLifecyclePromise]);
 
   function handleLifecycleStateChange(nextState: LifecycleState): void {
     setSnapshot((currentSnapshot) => {
@@ -60,9 +62,6 @@ export default function ProjectLifecycleRoot({
 
   return (
     <div>
-      {snapshot && (
-        <ProjectLifecycleNoticeBanner lifecycleState={snapshot.lifecycleState} />
-      )}
       <h3>{title}</h3>
       <ProjectLifecyclePanel
         projectId={projectId}

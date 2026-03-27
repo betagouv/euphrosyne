@@ -2,11 +2,8 @@ import { useEffect, useState } from "react";
 import { RawDataFileService } from "../raw-data/raw-data-file-service";
 import { ProcessedDataFileService } from "../processed-data/processed-data-file-service";
 import WorkplaceRunTab from "./WorkplaceRunTab";
-import {
-  LifecycleState,
-  LIFECYCLE_STATE_CHANGED_EVENT,
-  isLifecycleState,
-} from "../lifecycle-state";
+import { LifecycleState, onLifecycleStateChanged } from "../lifecycle-state";
+import { ProjectLifecycleSnapshot } from "../project-lifecycle-service";
 
 export interface WorkplaceRunTabsProps {
   project: {
@@ -20,31 +17,21 @@ export interface WorkplaceRunTabsProps {
     label: string;
     rawDataTable: {
       canDelete: boolean;
-      canDeleteWhenHot?: boolean;
     };
     processedDataTable: {
       canDelete: boolean;
-      canDeleteWhenHot?: boolean;
     };
     rawDataFileService: RawDataFileService;
     processedDataFileService: ProcessedDataFileService;
   }[];
-}
-
-function canDeleteWhenHot(table: {
-  canDelete: boolean;
-  canDeleteWhenHot?: boolean;
-}): boolean {
-  if (table.canDeleteWhenHot !== undefined) {
-    return table.canDeleteWhenHot;
-  }
-  return table.canDelete;
+  fetchProjectLifecyclePromise: Promise<ProjectLifecycleSnapshot>;
 }
 
 export default function WorkplaceRunTabs({
   runs,
   project,
   isDataManagementEnabled,
+  fetchProjectLifecyclePromise,
 }: WorkplaceRunTabsProps) {
   const t = {
     "Runs data": window.gettext("Runs data"),
@@ -53,24 +40,36 @@ export default function WorkplaceRunTabs({
   };
 
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
-  const [lifecycleState, setLifecycleState] = useState<LifecycleState | null>(null);
+  const [lifecycleState, setLifecycleState] = useState<LifecycleState | null>(
+    null,
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchProjectLifecyclePromise
+      .then((state) => {
+        if (!cancelled) {
+          setLifecycleState(state.lifecycleState);
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          console.error(error);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchProjectLifecyclePromise]);
 
   useEffect(() => {
     if (!isDataManagementEnabled) {
       return;
     }
 
-    const handler = (event: Event) => {
-      const customEvent = event as CustomEvent<unknown>;
-      if (isLifecycleState(customEvent.detail)) {
-        setLifecycleState(customEvent.detail);
-      }
-    };
-
-    window.addEventListener(LIFECYCLE_STATE_CHANGED_EVENT, handler);
-    return () => {
-      window.removeEventListener(LIFECYCLE_STATE_CHANGED_EVENT, handler);
-    };
+    return onLifecycleStateChanged(setLifecycleState);
   }, [isDataManagementEnabled]);
 
   const mutationsEnabled = !isDataManagementEnabled || lifecycleState === "HOT";
@@ -110,12 +109,11 @@ export default function WorkplaceRunTabs({
               ...run,
               rawDataTable: {
                 ...run.rawDataTable,
-                canDelete: canDeleteWhenHot(run.rawDataTable) && mutationsEnabled,
+                canDelete: run.rawDataTable.canDelete && mutationsEnabled,
               },
               processedDataTable: {
                 ...run.processedDataTable,
-                canDelete:
-                  canDeleteWhenHot(run.processedDataTable) && mutationsEnabled,
+                canDelete: run.processedDataTable.canDelete && mutationsEnabled,
               },
             }}
             project={project}

@@ -2,11 +2,30 @@
 
 import euphrosyneToolsService from "../euphrosyne-tools-service.js";
 import utils from "../../../../assets/js/utils.js";
-import euphrosyneToolsFetch from "../../../../../shared/js/euphrosyne-tools-client.ts";
+import euphrosyneToolsFetch from "../../../../../shared/js/euphrosyne-tools-client";
+
+type DeploymentStatus =
+  | "NotSpecified"
+  | "Accepted"
+  | "Running"
+  | "Ready"
+  | "Creating"
+  | "Created"
+  | "Canceled"
+  | "Failed"
+  | "Succeeded"
+  | "Updating";
 
 export default class VirtualOfficeButton extends HTMLElement {
-  connectionUrl = null;
-  buttonEl = null;
+  connectionUrl: string | null = null;
+  buttonEl: HTMLButtonElement;
+  fetchFn: typeof fetch = euphrosyneToolsFetch;
+
+  deploymentStatus: DeploymentStatus | null = null;
+
+  checkDeploymentIntervalId?: number;
+  checkDeletingIntervalId?: number;
+  checkConnectionLinkIntervalId?: number;
 
   static init() {
     customElements.define("virtual-office-button", VirtualOfficeButton);
@@ -16,18 +35,30 @@ export default class VirtualOfficeButton extends HTMLElement {
     return this.getAttribute("project-slug");
   }
 
+  get canStartVm() {
+    const canStart = this.getAttribute("can-start-vm") || "true";
+    return canStart === "true";
+  }
+
   constructor() {
     super();
     this.createButton();
-    this.buttonEl = this.querySelector("button");
+    const buttonEl = this.querySelector("button");
+    if (!buttonEl) {
+      throw new Error(
+        "virtual office button component must have a button element inside.",
+      );
+    }
+    this.buttonEl = buttonEl;
+
     this.buttonEl.addEventListener(
       "click",
-      function () {
+      () => {
         this.onButtonClick();
-      }.bind(this),
+      },
       false,
     );
-    this.fetchFn = euphrosyneToolsFetch;
+
     window.addEventListener("vm-deleted", () => {
       this.buttonEl.disabled = false;
       this.buttonEl.innerText = window.gettext("Create virtual office");
@@ -36,7 +67,7 @@ export default class VirtualOfficeButton extends HTMLElement {
   }
 
   connectedCallback() {
-    this.buttonEl.disabled = true;
+    this.disableButton();
     this.initButton();
   }
 
@@ -44,11 +75,11 @@ export default class VirtualOfficeButton extends HTMLElement {
     if (this.connectionUrl) {
       window.open(this.connectionUrl, "_blank");
     } else {
-      this.buttonEl.disabled = true;
+      this.disableButton();
       try {
         await euphrosyneToolsService.deployVM(this.projectSlug, this.fetchFn);
       } catch (error) {
-        this.buttonEl.disabled = false;
+        this.enableButton();
         utils.displayMessage(
           window.gettext(
             "An error occurred while creating the virtual office. Please contact an administrator or try again later.",
@@ -70,21 +101,32 @@ export default class VirtualOfficeButton extends HTMLElement {
 
   waitForDeploymentComplete() {
     this.checkDeploymentProgress();
-    this.checkDeploymentIntervalId = setInterval(
+    this.checkDeploymentIntervalId = window.setInterval(
       this.checkDeploymentProgress.bind(this),
       10000,
     );
   }
 
+  enableButton() {
+    this.buttonEl.disabled = false;
+  }
+
+  disableButton() {
+    this.buttonEl.disabled = true;
+  }
+
   async initButton() {
+    if (!this.canStartVm) {
+      return;
+    }
     const vmStatus = await euphrosyneToolsService.fetchVMProvisioningState(
       this.projectSlug,
       this.fetchFn,
     );
     if (vmStatus === "Deleting") {
-      this.buttonEl.disabled = true;
+      this.disableButton();
       this.buttonEl.innerText = window.gettext("Deleting virtual office...");
-      this.checkDeletingIntervalId = setInterval(
+      this.checkDeletingIntervalId = window.setInterval(
         () => this.checkDeletingProgress(),
         10000,
       );
@@ -95,7 +137,7 @@ export default class VirtualOfficeButton extends HTMLElement {
       );
       if (url) {
         this.connectionUrl = url;
-        this.buttonEl.disabled = false;
+        this.enableButton();
         this.onConnectReady();
       } else {
         const deploymentStatus =
@@ -120,7 +162,7 @@ export default class VirtualOfficeButton extends HTMLElement {
             this.waitForDeploymentComplete();
           }
         } else {
-          this.buttonEl.disabled = false;
+          this.enableButton();
           this.buttonEl.innerText = window.gettext("Create virtual office");
         }
       }
@@ -128,15 +170,16 @@ export default class VirtualOfficeButton extends HTMLElement {
   }
 
   async checkDeploymentProgress() {
-    const deploymentStatus = await euphrosyneToolsService.fetchDeploymentStatus(
-      this.projectSlug,
-      this.fetchFn,
-    );
+    const deploymentStatus =
+      (await euphrosyneToolsService.fetchDeploymentStatus(
+        this.projectSlug,
+        this.fetchFn,
+      )) as DeploymentStatus | null;
     if (deploymentStatus === "Failed") {
       this.onFailedDeployment();
       clearInterval(this.checkDeploymentIntervalId);
-      this.checkDeploymentIntervalId = null;
-    } else if (!deploymentStatus | (deploymentStatus === "Succeeded")) {
+      this.checkDeploymentIntervalId = undefined;
+    } else if (!deploymentStatus || deploymentStatus === "Succeeded") {
       utils.displayMessage(
         window.gettext(
           "The virtual machine has been deployed and is being configured.",
@@ -144,8 +187,8 @@ export default class VirtualOfficeButton extends HTMLElement {
         "info",
       );
       clearInterval(this.checkDeploymentIntervalId);
-      this.checkDeploymentIntervalId = null;
-      this.checkConnectionLinkIntervalId = setInterval(
+      this.checkDeploymentIntervalId = undefined;
+      this.checkConnectionLinkIntervalId = window.setInterval(
         () => this.waitForConnectionLink(),
         10000,
       );
@@ -162,10 +205,10 @@ export default class VirtualOfficeButton extends HTMLElement {
       this.fetchFn,
     );
     if (!vmStatus) {
-      this.buttonEl.disabled = false;
+      this.enableButton();
       this.buttonEl.innerText = window.gettext("Create virtual office");
       clearInterval(this.checkDeletingIntervalId);
-      this.checkDeletingIntervalId = null;
+      this.checkDeletingIntervalId = undefined;
     }
   }
 
@@ -177,8 +220,8 @@ export default class VirtualOfficeButton extends HTMLElement {
     if (url) {
       this.connectionUrl = url;
       clearInterval(this.checkConnectionLinkIntervalId);
-      this.checkConnectionLinkIntervalId = null;
-      this.buttonEl.disabled = false;
+      this.checkConnectionLinkIntervalId = undefined;
+      this.enableButton();
       this.buttonEl.innerText = window.gettext("Access virtual office");
       utils.displayMessage(
         window.gettext(
@@ -193,8 +236,8 @@ export default class VirtualOfficeButton extends HTMLElement {
   async reportNoConnectionLinkTimeoutError() {
     if (!this.connectionUrl) {
       clearInterval(this.checkConnectionLinkIntervalId);
-      this.checkConnectionLinkIntervalId = null;
-      this.buttonEl.disabled = false;
+      this.checkConnectionLinkIntervalId = undefined;
+      this.enableButton();
       this.buttonEl.innerText = window.gettext("Create virtual office");
       utils.displayMessage(
         window.gettext(
