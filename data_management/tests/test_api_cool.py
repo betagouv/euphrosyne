@@ -235,3 +235,65 @@ def test_cool_retry_marks_operation_failed_when_tools_api_rejects_request():
     assert operation.error_message == "Tools API rejected cool request (500)."
     assert operation.error_details == "server error"
     assert project_data.lifecycle_state == LifecycleState.ERROR
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "active_status",
+    [
+        LifecycleOperationStatus.PENDING,
+        LifecycleOperationStatus.RUNNING,
+    ],
+)
+def test_cool_rejects_when_active_cool_operation_exists(active_status: str):
+    project_data = ProjectDataFactory(lifecycle_state=LifecycleState.HOT)
+    project_data.cooling_eligible_at = timezone.localdate() - timezone.timedelta(days=1)
+    project_data.save(update_fields=["cooling_eligible_at"])
+    LifecycleOperation.objects.create(
+        project_data=project_data,
+        type=LifecycleOperationType.COOL,
+        status=active_status,
+        started_at=timezone.now(),
+    )
+    client = Client()
+    client.force_login(auth_factories.LabAdminUserFactory())
+
+    with mock.patch("data_management.api_views.post_cool_project") as cool_mock:
+        response = client.post(_cool_url(project_data.project_id))
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Project already has an active lifecycle operation.",
+        "lifecycle_state": LifecycleState.HOT,
+    }
+    assert LifecycleOperation.objects.count() == 1
+    cool_mock.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_cool_retry_rejects_when_another_active_operation_exists():
+    project_data = ProjectDataFactory(lifecycle_state=LifecycleState.ERROR)
+    LifecycleOperation.objects.create(
+        project_data=project_data,
+        type=LifecycleOperationType.RESTORE,
+        status=LifecycleOperationStatus.PENDING,
+    )
+    LifecycleOperation.objects.create(
+        project_data=project_data,
+        type=LifecycleOperationType.COOL,
+        status=LifecycleOperationStatus.FAILED,
+        started_at=timezone.now(),
+    )
+    client = Client()
+    client.force_login(auth_factories.LabAdminUserFactory())
+
+    with mock.patch("data_management.api_views.post_cool_project") as cool_mock:
+        response = client.post(_cool_url(project_data.project_id))
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Project already has an active lifecycle operation.",
+        "lifecycle_state": LifecycleState.ERROR,
+    }
+    assert LifecycleOperation.objects.count() == 2
+    cool_mock.assert_not_called()

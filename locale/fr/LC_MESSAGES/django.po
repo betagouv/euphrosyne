@@ -223,6 +223,9 @@ msgstr "Réussi"
 msgid "Failed"
 msgstr "Échec"
 
+msgid "Project already has an active lifecycle operation."
+msgstr "Ce projet a déjà une opération en cours."
+
 msgid "Project lifecycle state does not allow cool."
 msgstr "L'état du cycle de vie du projet n'autorise pas le refroidissement."
 

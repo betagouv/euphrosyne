@@ -90,6 +90,11 @@ def _trigger_operation(
                 _not_allowed_detail(operation_type),
                 lifecycle_state=project_data.lifecycle_state,
             )
+        if _has_active_operation(project_data):
+            raise LifecycleOperationNotAllowedError(
+                _("Project already has an active lifecycle operation."),
+                lifecycle_state=project_data.lifecycle_state,
+            )
 
         operation = LifecycleOperation.objects.create(
             operation_id=uuid.uuid4(),
@@ -193,6 +198,16 @@ def _is_error_retry_for_operation(
     if last_operation is None:
         return False
     return last_operation.type == operation_type
+
+
+def _has_active_operation(project_data: ProjectData) -> bool:
+    return LifecycleOperation.objects.filter(
+        project_data=project_data,
+        status__in=[
+            LifecycleOperationStatus.PENDING,
+            LifecycleOperationStatus.RUNNING,
+        ],
+    ).exists()
 
 
 def _transition_project_to_running_state(
