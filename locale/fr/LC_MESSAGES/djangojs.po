@@ -281,9 +281,6 @@ msgstr "Importer avec une référence POP"
 msgid "An error occurred."
 msgstr "Une erreur s'est produite."
 
-msgid "POP is disabled but will be available soon."
-msgstr "POP est désactivé mais sera bientôt disponible."
-
 msgid "Import an object group or object from project"
 msgstr "Importer un groupe d'objets ou un objet du projet"
 
