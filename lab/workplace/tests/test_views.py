@@ -26,8 +26,8 @@ def test_workplace_view_exposes_data_management_feature_flag_for_lab_admin():
     assert len(data["runs"]) == 1
     assert data["runs"][0]["rawDataTable"]["canDelete"] is True
     assert data["runs"][0]["processedDataTable"]["canDelete"] is True
-    assert data["runs"][0]["rawDataTable"]["canDeleteWhenHot"] is True
-    assert data["runs"][0]["processedDataTable"]["canDeleteWhenHot"] is True
+    assert "canDeleteWhenHot" not in data["runs"][0]["rawDataTable"]
+    assert "canDeleteWhenHot" not in data["runs"][0]["processedDataTable"]
     assert data["isLabAdmin"] is True
     assert data["isDataManagementEnabled"] is True
     assert data["labels"]["dataManagementTitle"] == _("Data management")
@@ -35,6 +35,7 @@ def test_workplace_view_exposes_data_management_feature_flag_for_lab_admin():
     assert "lifecycleState" not in data["project"]
     assert "lastLifecycleOperationId" not in data["project"]
     assert "lastLifecycleOperationType" not in data["project"]
+    assert context["can_start_vm"] is True
 
 
 @pytest.mark.django_db
@@ -66,3 +67,4 @@ def test_workplace_view_uses_feature_flag_when_data_management_is_disabled(
     assert "lifecycleState" not in data["project"]
     assert "lastLifecycleOperationId" not in data["project"]
     assert "lastLifecycleOperationType" not in data["project"]
+    assert context["can_start_vm"] is True
