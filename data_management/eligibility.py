@@ -3,7 +3,6 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING
 
-from django.db.models import Max
 from django.utils import timezone
 
 if TYPE_CHECKING:
@@ -21,19 +20,36 @@ def _datetime_to_date(value: datetime) -> date:
     return timezone.localdate(value)
 
 
-def compute_cooling_eligible_at(project: Project) -> date:
-    """Compute cooling eligibility with embargo dates taking precedence."""
-    run_dates = project.runs.aggregate(
-        latest_embargo_date=Max("embargo_date"),
-        latest_end_date=Max("end_date"),
-    )
-    latest_embargo_date: date | None = run_dates["latest_embargo_date"]
-    if latest_embargo_date is not None:
-        return latest_embargo_date
+def _run_cooling_eligible_at(
+    *, end_date: datetime | None, embargo_date: date | None
+) -> date | None:
+    if embargo_date is not None:
+        return embargo_date
+    if end_date is not None:
+        return _datetime_to_date(end_date + COOLING_DELAY_DELTA)
+    return None
 
-    latest_end_date: datetime | None = run_dates["latest_end_date"]
-    if latest_end_date is not None:
-        return _datetime_to_date(latest_end_date + COOLING_DELAY_DELTA)
+
+def compute_cooling_eligible_at(project: Project) -> date:
+    """Compute cooling eligibility from the latest per-run eligibility date."""
+    cooling_eligible_at = max(
+        (
+            candidate
+            for end_date, embargo_date in project.runs.values_list(
+                "end_date", "embargo_date"
+            )
+            if (
+                candidate := _run_cooling_eligible_at(
+                    end_date=end_date,
+                    embargo_date=embargo_date,
+                )
+            )
+            is not None
+        ),
+        default=None,
+    )
+    if cooling_eligible_at is not None:
+        return cooling_eligible_at
 
     created_at = project.created or timezone.now()
     return _datetime_to_date(created_at + COOLING_DELAY_DELTA)
