@@ -12,6 +12,7 @@ This means that setting `EUPHROSYNE_FEATURES` to an empty string (`EUPHROSYNE_FE
 
 ## Available features
 
+- `data_management` — project data lifecycle management (archive, restore, and cool-storage immutability)
 - `data_request` — data access workflow
 - `lab_notebook` — digital lab notebook
 - `radiation_protection` — radiation protection certification and prevention plans
@@ -23,11 +24,14 @@ Core apps (always enabled): `lab`, `euphro_auth`, `objectstorage`, `standard`, `
 Example:
 
 ```
-EUPHROSYNE_FEATURES=data_request,lab_notebook
+EUPHROSYNE_FEATURES=data_management,data_request,lab_notebook
 ```
 
 Feature-specific settings (when the feature is enabled):
 
+- `data_management`:
+  - `DATA_COOLING_ENABLE`
+  - See [project_data_lifecycle.md](project_data_lifecycle.md) for lifecycle flows, API contracts, and operational details.
 - `radiation_protection`:
   - `RADIATION_PROTECTION_TALLY_SECRET_KEY`
   - `RADIATION_PROTECTION_RISK_ADVISOR_EMAIL`

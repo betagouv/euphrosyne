@@ -55,6 +55,7 @@ You can copy this file to a new `.env` file to easily set up your environment.
 | EMAIL_HOST_USER                                     | Email service configuration                                                                                                                                                                                                                       |
 | EMAIL_HOST_PASSWORD                                 | Email service configuration                                                                                                                                                                                                                       |
 | EUPHROSYNE_TOOLS_API_URL                            | URL to Euphrosyne Tools API                                                                                                                                                                                                                       |
+| DATA_COOLING_ENABLE                                 | Optional. Enables automatic scheduling of eligible project cooling when the `data_management` feature is enabled                                                                                                                                  |
 | DEFAULT_FROM_EMAIL                                  | Default sender email address                                                                                                                                                                                                                      |
 | CGU_ACCEPTANCE_DATE                                 | Optional. Deadline from which users must accept the new Terms of Use. If a user has not accepted by this date, they will be redirected to the acceptance page                                                                                     |
 | FACILITY_NAME                                       | Optional. Full name of the facility. Used in templates, emails, and admin messages for branding                                                                                                                                                   |
@@ -78,7 +79,7 @@ Euphrosyne ships optional modules that can be enabled per instance. By default a
 To enable specific modules, set `EUPHROSYNE_FEATURES` to a comma-separated list:
 
 ```
-EUPHROSYNE_FEATURES=data_request,lab_notebook,radiation_protection
+EUPHROSYNE_FEATURES=data_management,data_request,lab_notebook,radiation_protection
 ```
 
 **Note**:
@@ -89,9 +90,13 @@ EUPHROSYNE_FEATURES=data_request,lab_notebook,radiation_protection
 
 Available optional modules:
 
+- `data_management` — project data lifecycle management for archiving inactive project data to cool storage and restoring it on demand (`docs/project_data_lifecycle.md`)
 - `data_request` — data access workflow and approvals
 - `lab_notebook` — digital lab notebook features
 - `radiation_protection` — radiation protection certification and prevention plans (`radiation_protection/README.md`)
+
+For implementation and operational details of project archive/restore flows, see
+[`docs/project_data_lifecycle.md`](docs/project_data_lifecycle.md).
 
 Optional project overrides can be provided as a dict in settings:
 
