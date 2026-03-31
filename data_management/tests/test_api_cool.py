@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import timedelta
 from unittest import mock
 
 import pytest
@@ -51,7 +52,7 @@ def test_cool_retry_requires_lab_admin():
 @pytest.mark.django_db
 def test_cool_from_hot_when_eligible_calls_tools_api_and_transitions_to_cooling():
     project_data = ProjectDataFactory(lifecycle_state=LifecycleState.HOT)
-    project_data.cooling_eligible_at = timezone.localdate() - timezone.timedelta(days=1)
+    project_data.cooling_eligible_at = timezone.localdate() - timedelta(days=1)
     project_data.save(update_fields=["cooling_eligible_at"])
     client = Client()
     client.force_login(auth_factories.LabAdminUserFactory())
@@ -101,7 +102,7 @@ def test_cool_recreates_missing_project_data_with_for_project():
     def create_project_data(_project):
         return ProjectData.objects.create(
             project=_project,
-            cooling_eligible_at=timezone.now() - timezone.timedelta(days=1),
+            cooling_eligible_at=timezone.now() - timedelta(days=1),
         )
 
     with mock.patch(
@@ -247,7 +248,7 @@ def test_cool_retry_marks_operation_failed_when_tools_api_rejects_request():
 )
 def test_cool_rejects_when_active_cool_operation_exists(active_status: str):
     project_data = ProjectDataFactory(lifecycle_state=LifecycleState.HOT)
-    project_data.cooling_eligible_at = timezone.localdate() - timezone.timedelta(days=1)
+    project_data.cooling_eligible_at = timezone.localdate() - timedelta(days=1)
     project_data.save(update_fields=["cooling_eligible_at"])
     LifecycleOperation.objects.create(
         project_data=project_data,

@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta
 
 from django.db import migrations
-from django.db.models import Max
+from django.db.models import Max, Q
 from django.utils import timezone
 
 COOLING_DELAY_DAYS = 30 * 24
@@ -22,17 +22,26 @@ def _datetime_to_date(value):
 def _compute_cooling_eligible_at(project, Run):
     run_dates = Run.objects.filter(project_id=project.id).aggregate(
         latest_embargo_date=Max("embargo_date"),
-        latest_end_date=Max("end_date"),
+        latest_non_embargo_end_date=Max(
+            "end_date",
+            filter=Q(embargo_date__isnull=True),
+        ),
     )
+
+    candidates = []
+
     latest_embargo_date = run_dates["latest_embargo_date"]
     if latest_embargo_date is not None:
-        return latest_embargo_date
+        candidates.append(latest_embargo_date)
 
-    latest_end_date = run_dates["latest_end_date"]
+    latest_end_date = run_dates["latest_non_embargo_end_date"]
     if latest_end_date is not None:
         if isinstance(latest_end_date, str):
             latest_end_date = datetime.fromisoformat(latest_end_date)
-        return _datetime_to_date(latest_end_date + _cooling_delay())
+        candidates.append(_datetime_to_date(latest_end_date + _cooling_delay()))
+
+    if candidates:
+        return max(candidates)
 
     created_at = project.created
     if isinstance(created_at, str):
