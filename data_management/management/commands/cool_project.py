@@ -1,6 +1,6 @@
 import uuid
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
 from data_management.models import (
@@ -22,10 +22,15 @@ class Command(BaseCommand):
     def handle(self, *args, **options) -> None:
         project_slug = options["project_slug"]
 
-        project_data = ProjectData.objects.get(
-            project__slug=project_slug,
-            lifecycle_state__in=[LifecycleState.HOT, LifecycleState.ERROR],
-        )
+        try:
+            project_data = ProjectData.objects.get(
+                project__slug=project_slug,
+                lifecycle_state=LifecycleState.HOT,
+            )
+        except ProjectData.DoesNotExist as error:
+            raise CommandError(
+                "Project %s does not exist or is not currently HOT." % project_slug
+            ) from error
 
         operation = LifecycleOperation.objects.create(
             operation_id=uuid.uuid4(),

@@ -327,3 +327,4 @@ operator-facing entrypoint for automatic cooling.
 
 Use this for targeted manual dispatch of a cooling operation for one project.
 It is useful for operational intervention or testing a specific project flow.
+The command only dispatches projects currently in `HOT`.
