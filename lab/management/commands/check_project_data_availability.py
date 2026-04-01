@@ -25,7 +25,7 @@ class Command(BaseCommand):
             try:
                 response = requests.get(
                     os.environ["EUPHROSYNE_TOOLS_API_URL"]
-                    + f"/data/available/{project.name}",
+                    + f"/data/available/{project.slug}",
                     timeout=10,
                     headers={"Authorization": f"Bearer {token}"},
                 )
@@ -34,7 +34,7 @@ class Command(BaseCommand):
                         "[data availability] Failed to check project %s.\
                             \n\tReason : [%s] %s"
                         % (
-                            project.name,
+                            project.slug,
                             response.status_code,
                             response.text,
                         ),
