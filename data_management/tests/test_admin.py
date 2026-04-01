@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from unittest import mock
+
 import pytest
 from django.contrib import admin
+from django.contrib.admin import helpers
+from django.contrib.messages import get_messages
 from django.test import Client, RequestFactory
 from django.urls import reverse
 from django.utils import timezone
@@ -11,6 +15,7 @@ from django.utils.translation import gettext
 
 from data_management.admin import ProjectDataAdmin
 from data_management.models import (
+    FromDataDeletionStatus,
     LifecycleOperation,
     LifecycleOperationStatus,
     LifecycleOperationType,
@@ -20,6 +25,12 @@ from data_management.models import (
 from euphro_auth.tests.factories import LabAdminUserFactory, StaffUserFactory
 
 from .factories import ProjectDataFactory
+
+
+class DummyResponse:
+    def __init__(self, status_code: int, text: str = "") -> None:
+        self.status_code = status_code
+        self.text = text
 
 
 @pytest.mark.django_db
@@ -327,3 +338,171 @@ def test_lifecycle_operation_admin_change_view_is_accessible_to_lab_admin():
 
     assert response.status_code == 200
     assert str(operation.operation_id) in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_lifecycle_operation_admin_change_view_displays_from_data_deletion_fields():
+    operation = LifecycleOperation.objects.create(
+        project_data=ProjectDataFactory(),
+        type=LifecycleOperationType.COOL,
+        status=LifecycleOperationStatus.SUCCEEDED,
+        from_data_deletion_status=FromDataDeletionStatus.FAILED,
+        from_data_deleted_at=timezone.now(),
+        from_data_deletion_error="delete failed",
+    )
+    client = Client()
+    client.force_login(LabAdminUserFactory())
+
+    response = client.get(
+        reverse(
+            "admin:data_management_lifecycleoperation_change",
+            args=[operation.operation_id],
+        )
+    )
+
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert "from_data_deletion_status" in content
+    assert "from_data_deleted_at" in content
+    assert "from_data_deletion_error" in content
+    assert "delete failed" in content
+
+
+@pytest.mark.django_db
+def test_lifecycle_operation_admin_exposes_delete_source_data_action_to_lab_admin():
+    request = RequestFactory().get(
+        reverse("admin:data_management_lifecycleoperation_changelist"),
+    )
+    request.user = LabAdminUserFactory()
+    # pylint: disable=protected-access
+    model_admin = admin.site._registry[LifecycleOperation]
+
+    actions = model_admin.get_actions(request)
+
+    assert "delete_source_data" in actions
+
+
+@pytest.mark.django_db
+def test_lifecycle_operation_admin_delete_source_data_action_renders_confirmation():
+    operation = LifecycleOperation.objects.create(
+        project_data=ProjectDataFactory(lifecycle_state=LifecycleState.COOL),
+        type=LifecycleOperationType.COOL,
+        status=LifecycleOperationStatus.SUCCEEDED,
+    )
+    client = Client()
+    client.force_login(LabAdminUserFactory())
+
+    response = client.post(
+        reverse("admin:data_management_lifecycleoperation_changelist"),
+        data={
+            "action": "delete_source_data",
+            "index": 0,
+            helpers.ACTION_CHECKBOX_NAME: [str(operation.operation_id)],
+        },
+    )
+
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert str(operation.operation_id) in content
+    assert 'name="post" value="yes"' in content
+    assert 'name="action" value="delete_source_data"' in content
+
+
+@pytest.mark.django_db
+def test_lifecycle_operation_admin_delete_source_data_action_triggers_deletion():
+    operation = LifecycleOperation.objects.create(
+        project_data=ProjectDataFactory(lifecycle_state=LifecycleState.COOL),
+        type=LifecycleOperationType.COOL,
+        status=LifecycleOperationStatus.SUCCEEDED,
+    )
+    client = Client()
+    client.force_login(LabAdminUserFactory())
+
+    with mock.patch(
+        "data_management.operations.post_delete_project_source_data",
+        return_value=DummyResponse(status_code=202),
+    ):
+        response = client.post(
+            reverse("admin:data_management_lifecycleoperation_changelist"),
+            data={
+                "action": "delete_source_data",
+                helpers.ACTION_CHECKBOX_NAME: [str(operation.operation_id)],
+                "post": "yes",
+            },
+            follow=True,
+        )
+
+    operation.refresh_from_db()
+
+    assert response.status_code == 200
+    assert operation.from_data_deletion_status == FromDataDeletionStatus.RUNNING
+    assert operation.from_data_deletion_error is None
+    assert operation.from_data_deleted_at is None
+    assert (
+        "Suppression des données source lancée pour 1 opération(s)."
+        in response.content.decode()
+    )
+
+
+@pytest.mark.django_db
+def test_lifecycle_operation_admin_delete_source_data_action_skips_ineligible_rows():
+    eligible_operation = LifecycleOperation.objects.create(
+        project_data=ProjectDataFactory(lifecycle_state=LifecycleState.COOL),
+        type=LifecycleOperationType.COOL,
+        status=LifecycleOperationStatus.SUCCEEDED,
+    )
+    ineligible_operation = LifecycleOperation.objects.create(
+        project_data=ProjectDataFactory(lifecycle_state=LifecycleState.COOL),
+        type=LifecycleOperationType.RESTORE,
+        status=LifecycleOperationStatus.SUCCEEDED,
+    )
+    client = Client()
+    client.force_login(LabAdminUserFactory())
+
+    with mock.patch(
+        "data_management.operations.post_delete_project_source_data",
+        return_value=DummyResponse(status_code=202),
+    ):
+        response = client.post(
+            reverse("admin:data_management_lifecycleoperation_changelist"),
+            data={
+                "action": "delete_source_data",
+                helpers.ACTION_CHECKBOX_NAME: [
+                    str(eligible_operation.operation_id),
+                    str(ineligible_operation.operation_id),
+                ],
+                "post": "yes",
+            },
+            follow=True,
+        )
+
+    eligible_operation.refresh_from_db()
+    ineligible_operation.refresh_from_db()
+    # pylint: disable=line-too-long
+    response_messages = [
+        str(message) for message in get_messages(response.wsgi_request)
+    ]
+
+    assert response.status_code == 200
+    assert (
+        eligible_operation.from_data_deletion_status == FromDataDeletionStatus.RUNNING
+    )
+    assert (
+        ineligible_operation.from_data_deletion_status
+        == FromDataDeletionStatus.NOT_REQUESTED
+    )
+    # pylint: disable=line-too-long
+    assert (
+        "Suppression des données source lancée pour 1 opération(s)."
+        in response_messages
+    )
+
+    expected_message = gettext(
+        "Could not delete source data for operation %(operation_id)s: %(detail)s"
+    ) % {
+        "operation_id": ineligible_operation.operation_id,
+        "detail": gettext("Only cool operations can delete source data."),
+    }
+    assert expected_message in response_messages

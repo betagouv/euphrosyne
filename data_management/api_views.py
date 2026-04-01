@@ -8,6 +8,7 @@ from typing import Any, cast
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -24,6 +25,7 @@ from lab.api_views.permissions import (
 from lab.models import Project
 
 from .models import (
+    FromDataDeletionStatus,
     LifecycleOperation,
     LifecycleOperationStatus,
     LifecycleOperationType,
@@ -49,6 +51,12 @@ TERMINAL_OPERATION_STATUSES = (
 CALLBACK_STATUS_CHOICES = (
     LifecycleOperationStatus.SUCCEEDED,
     LifecycleOperationStatus.FAILED,
+)
+FROM_DATA_DELETION_PHASE = "FROM_DATA_DELETION"
+CALLBACK_PHASE_CHOICES = (FROM_DATA_DELETION_PHASE,)
+FROM_DATA_DELETION_STATUS_CHOICES = (
+    FromDataDeletionStatus.SUCCEEDED,
+    FromDataDeletionStatus.FAILED,
 )
 
 
@@ -143,7 +151,11 @@ class LifecycleOperationDetailAPIView(APIView):
 
 class LifecycleOperationCallbackSerializer(serializers.Serializer):
     operation_id = serializers.UUIDField()
-    status = serializers.ChoiceField(choices=CALLBACK_STATUS_CHOICES)
+    phase = serializers.ChoiceField(
+        choices=CALLBACK_PHASE_CHOICES,
+        required=False,
+    )
+    status = serializers.ChoiceField(choices=CALLBACK_STATUS_CHOICES, required=False)
     bytes_copied = serializers.IntegerField(
         required=False, allow_null=True, min_value=0
     )
@@ -156,6 +168,28 @@ class LifecycleOperationCallbackSerializer(serializers.Serializer):
         required=False, allow_blank=True, allow_null=True
     )
     error_details = serializers.JSONField(required=False, allow_null=True)
+    from_data_deletion_status = serializers.ChoiceField(
+        choices=FROM_DATA_DELETION_STATUS_CHOICES,
+        required=False,
+    )
+    error = serializers.JSONField(required=False, allow_null=True)
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        phase = attrs.get("phase")
+        if phase == FROM_DATA_DELETION_PHASE:
+            if "from_data_deletion_status" not in attrs:
+                raise serializers.ValidationError(
+                    {
+                        "from_data_deletion_status": _(
+                            "This field is required for deletion callbacks."
+                        )
+                    }
+                )
+            return attrs
+
+        if "status" not in attrs:
+            raise serializers.ValidationError({"status": _("This field is required.")})
+        return attrs
 
     def create(self, validated_data: dict[str, Any]) -> dict[str, Any]:
         raise NotImplementedError("LifecycleOperationCallbackSerializer is read-only.")
@@ -177,6 +211,10 @@ class LifecycleOperationCallbackAPIView(APIView):
             if operation is None:
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
+            if callback_data.get("phase") == FROM_DATA_DELETION_PHASE:
+                _handle_from_data_deletion_callback(operation, callback_data)
+                return Response(status=status.HTTP_200_OK)
+
             project_data = ProjectData.objects.select_for_update().get(
                 pk=operation.project_data_id
             )
@@ -197,7 +235,10 @@ class LifecycleOperationCallbackAPIView(APIView):
         serializer = LifecycleOperationCallbackSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.validated_data)
-        data["finished_at"] = timezone.now()
+        received_at = timezone.now()
+        data["received_at"] = received_at
+        if data.get("phase") != FROM_DATA_DELETION_PHASE:
+            data["finished_at"] = received_at
         return data
 
 
@@ -262,6 +303,42 @@ def _get_locked_operation(operation_id: Any) -> LifecycleOperation | None:
         )
     except LifecycleOperation.DoesNotExist:
         return None
+
+
+def _handle_from_data_deletion_callback(
+    operation: LifecycleOperation,
+    callback_data: dict[str, Any],
+) -> None:
+    if operation.from_data_deletion_status == FromDataDeletionStatus.NOT_REQUESTED:
+        return
+
+    if operation.from_data_deletion_status in (
+        FromDataDeletionStatus.SUCCEEDED,
+        FromDataDeletionStatus.FAILED,
+    ):
+        return
+
+    deletion_status = cast(str, callback_data["from_data_deletion_status"])
+    if deletion_status == FromDataDeletionStatus.SUCCEEDED:
+        operation.from_data_deletion_status = FromDataDeletionStatus.SUCCEEDED
+        operation.from_data_deleted_at = callback_data["received_at"]
+        operation.from_data_deletion_error = None
+    else:
+        error_payload = callback_data.get("error")
+        operation.from_data_deletion_status = FromDataDeletionStatus.FAILED
+        operation.from_data_deleted_at = None
+        operation.from_data_deletion_error = (
+            _serialize_error_details(error_payload)
+            or "Tools API reported source data deletion failure."
+        )
+
+    operation.save(
+        update_fields=[
+            "from_data_deletion_status",
+            "from_data_deleted_at",
+            "from_data_deletion_error",
+        ]
+    )
 
 
 def _handle_failed_callback(

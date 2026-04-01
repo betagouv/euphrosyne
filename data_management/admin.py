@@ -1,7 +1,8 @@
 from datetime import datetime
 from uuid import UUID
 
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.contrib.admin import helpers
 from django.core.exceptions import PermissionDenied
 from django.db.models import (
     CharField,
@@ -14,6 +15,7 @@ from django.db.models import (
 )
 from django.db.models.functions import Coalesce
 from django.http import Http404, HttpRequest, HttpResponseRedirect
+from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
@@ -29,6 +31,11 @@ from .models import (
     LifecycleOperationType,
     LifecycleState,
     ProjectData,
+)
+from .operations import (
+    FromDataDeletionNotAllowedError,
+    FromDataDeletionStartError,
+    trigger_from_data_deletion,
 )
 
 BADGE_CLASS_BY_STATE: dict[str, str] = {
@@ -55,6 +62,74 @@ def _workplace_url(project_id: int) -> str:
 def _lifecycle_operation_change_url(operation_id: str) -> str:
     return reverse(
         "admin:data_management_lifecycleoperation_change", args=[operation_id]
+    )
+
+
+@admin.action(permissions=["view"], description=_("Delete source data"))
+def delete_source_data(
+    modeladmin: "LifecycleOperationAdmin",
+    request: HttpRequest,
+    queryset: QuerySet[LifecycleOperation],
+):
+    if request.POST.get("post"):
+        started_count = 0
+        for operation in queryset:
+            try:
+                trigger_from_data_deletion(operation.operation_id)
+            except FromDataDeletionNotAllowedError as error:
+                modeladmin.message_user(
+                    request,
+                    _(
+                        "Could not delete source data for operation "
+                        "%(operation_id)s: %(detail)s"
+                    )
+                    % {
+                        "operation_id": error.operation.operation_id,
+                        "detail": error.detail,
+                    },
+                    level=messages.ERROR,
+                )
+                continue
+            except FromDataDeletionStartError as error:
+                modeladmin.message_user(
+                    request,
+                    _(
+                        "Could not start source data deletion for operation "
+                        "%(operation_id)s: %(detail)s"
+                    )
+                    % {
+                        "operation_id": error.operation.operation_id,
+                        "detail": error.detail,
+                    },
+                    level=messages.ERROR,
+                )
+                continue
+
+            started_count += 1
+
+        if started_count:
+            modeladmin.message_user(
+                request,
+                _("Started source data deletion for %(count)d operation(s).")
+                % {"count": started_count},
+                level=messages.SUCCESS,
+            )
+        return None
+
+    context = {
+        **modeladmin.admin_site.each_context(request),
+        "title": _("Delete source data"),
+        "subtitle": None,
+        "opts": modeladmin.model._meta,
+        "queryset": queryset,
+        "action_checkbox_name": helpers.ACTION_CHECKBOX_NAME,
+        "media": modeladmin.media,
+    }
+    request.current_app = modeladmin.admin_site.name
+    return TemplateResponse(
+        request,
+        modeladmin.delete_source_data_confirmation_template,
+        context,
     )
 
 
@@ -283,6 +358,10 @@ class ProjectDataAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
 
 @admin.register(LifecycleOperation)
 class LifecycleOperationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
+    actions = [delete_source_data]
+    delete_source_data_confirmation_template = (
+        "admin/data_management/lifecycleoperation/delete_source_data_confirmation.html"
+    )
     list_display = (
         "operation_id",
         "project_link",
@@ -290,6 +369,8 @@ class LifecycleOperationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
         "status",
         "started_at",
         "finished_at",
+        "from_data_deletion_status",
+        "from_data_deleted_at",
         "bytes_progress",
         "files_progress",
     )
@@ -315,6 +396,9 @@ class LifecycleOperationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
         "files_total",
         "bytes_copied",
         "files_copied",
+        "from_data_deletion_status",
+        "from_data_deleted_at",
+        "from_data_deletion_error",
         "error_message",
         "formatted_error_details",
     )
