@@ -2,6 +2,7 @@ import os
 
 import requests
 import sentry_sdk
+from django.apps import apps
 from django.core.management.base import BaseCommand
 
 from euphro_auth.jwt.tokens import EuphroToolsAPIToken
@@ -14,6 +15,17 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         projects = Project.objects.only_finished().filter(is_data_available=False)
+
+        # If cooling project data is enable, we just check HOT projects
+        # because euphro-tools can call write methods during this check
+        # whick is not permited for non HOT data
+        if apps.is_installed("data_management"):
+            # pylint: disable=import-outside-toplevel
+            from data_management.models import (
+                LifecycleState,
+            )
+
+            projects = projects.filter(project_data__lifecycle_state=LifecycleState.HOT)
         if not projects:
             return
         token = EuphroToolsAPIToken.for_euphrosyne().access_token
