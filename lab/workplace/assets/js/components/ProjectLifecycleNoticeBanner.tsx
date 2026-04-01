@@ -30,7 +30,7 @@ function shouldDisplayNotice(lifecycleState: LifecycleState): boolean {
 function getNoticeMessage(lifecycleState: LifecycleState): string {
   if (lifecycleState === "COOL") {
     return window.gettext(
-      "Project is currently archived. Contact an administrator to restore it.",
+      "This project is archived and read-only. Contact an administrator to restore it and make changes.",
     );
   }
   if (lifecycleState === "COOLING") {
