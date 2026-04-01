@@ -41,6 +41,13 @@ class LifecycleOperationStatus(models.TextChoices):
     FAILED = "FAILED", _("Failed")
 
 
+class FromDataDeletionStatus(models.TextChoices):
+    NOT_REQUESTED = "NOT_REQUESTED", _("Not requested")
+    RUNNING = "RUNNING", _("Running")
+    SUCCEEDED = "SUCCEEDED", _("Succeeded")
+    FAILED = "FAILED", _("Failed")
+
+
 class LifecycleOperation(models.Model):
     """Track cooling/restore operations and their verification metrics."""
 
@@ -66,6 +73,13 @@ class LifecycleOperation(models.Model):
     files_copied = models.PositiveBigIntegerField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
     error_details = models.TextField(null=True, blank=True)
+    from_data_deletion_status = models.CharField(
+        max_length=16,
+        choices=FromDataDeletionStatus.choices,
+        default=FromDataDeletionStatus.NOT_REQUESTED,
+    )
+    from_data_deleted_at = models.DateTimeField(null=True, blank=True)
+    from_data_deletion_error = models.TextField(null=True, blank=True)
 
 
 class ProjectData(models.Model):

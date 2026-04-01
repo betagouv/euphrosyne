@@ -8,6 +8,7 @@ from django.test import Client
 from django.utils import timezone
 
 from data_management.models import (
+    FromDataDeletionStatus,
     LifecycleOperation,
     LifecycleOperationStatus,
     LifecycleOperationType,
@@ -297,3 +298,160 @@ def test_callback_failed_does_not_bypass_invalid_transition_to_error():
     assert operation.status == LifecycleOperationStatus.FAILED
     assert operation.error_message == "Tools failure."
     assert project_data.lifecycle_state == LifecycleState.HOT
+
+
+@pytest.mark.django_db
+def test_callback_from_data_deletion_succeeded_updates_only_deletion_fields():
+    operation = _create_operation(
+        lifecycle_state=LifecycleState.COOL,
+        status=LifecycleOperationStatus.SUCCEEDED,
+        error_message="keep me",
+    )
+    operation.from_data_deletion_status = FromDataDeletionStatus.RUNNING
+    operation.save(update_fields=["from_data_deletion_status"])
+
+    response = Client().post(
+        CALLBACK_URL,
+        data={
+            "operation_id": str(operation.operation_id),
+            "phase": "FROM_DATA_DELETION",
+            "from_data_deletion_status": "SUCCEEDED",
+        },
+        headers=_backend_headers(),
+        content_type="application/json",
+    )
+
+    operation.refresh_from_db()
+    project_data = operation.project_data
+    project_data.refresh_from_db()
+
+    assert response.status_code == 200
+    assert operation.status == LifecycleOperationStatus.SUCCEEDED
+    assert operation.error_message == "keep me"
+    assert operation.from_data_deletion_status == FromDataDeletionStatus.SUCCEEDED
+    assert operation.from_data_deleted_at is not None
+    assert operation.from_data_deletion_error is None
+    assert project_data.lifecycle_state == LifecycleState.COOL
+
+
+@pytest.mark.django_db
+def test_callback_from_data_deletion_failed_persists_error_without_state_change():
+    operation = _create_operation(
+        lifecycle_state=LifecycleState.COOL,
+        status=LifecycleOperationStatus.SUCCEEDED,
+    )
+    operation.from_data_deletion_status = FromDataDeletionStatus.RUNNING
+    operation.save(update_fields=["from_data_deletion_status"])
+
+    response = Client().post(
+        CALLBACK_URL,
+        data={
+            "operation_id": str(operation.operation_id),
+            "phase": "FROM_DATA_DELETION",
+            "from_data_deletion_status": "FAILED",
+            "error": {"code": "DELETE_FAILED", "message": "failed"},
+        },
+        headers=_backend_headers(),
+        content_type="application/json",
+    )
+
+    operation.refresh_from_db()
+    project_data = operation.project_data
+    project_data.refresh_from_db()
+
+    assert response.status_code == 200
+    assert operation.status == LifecycleOperationStatus.SUCCEEDED
+    assert operation.from_data_deletion_status == FromDataDeletionStatus.FAILED
+    assert operation.from_data_deleted_at is None
+    assert json.loads(operation.from_data_deletion_error or "{}") == {
+        "code": "DELETE_FAILED",
+        "message": "failed",
+    }
+    assert project_data.lifecycle_state == LifecycleState.COOL
+
+
+@pytest.mark.django_db
+def test_callback_from_data_deletion_failed_uses_default_error_when_missing():
+    operation = _create_operation(
+        lifecycle_state=LifecycleState.COOL,
+        status=LifecycleOperationStatus.SUCCEEDED,
+    )
+    operation.from_data_deletion_status = FromDataDeletionStatus.RUNNING
+    operation.save(update_fields=["from_data_deletion_status"])
+
+    response = Client().post(
+        CALLBACK_URL,
+        data={
+            "operation_id": str(operation.operation_id),
+            "phase": "FROM_DATA_DELETION",
+            "from_data_deletion_status": "FAILED",
+        },
+        headers=_backend_headers(),
+        content_type="application/json",
+    )
+
+    operation.refresh_from_db()
+
+    assert response.status_code == 200
+    assert operation.from_data_deletion_status == FromDataDeletionStatus.FAILED
+    assert (
+        operation.from_data_deletion_error
+        == "Tools API reported source data deletion failure."
+    )
+
+
+@pytest.mark.django_db
+def test_callback_from_data_deletion_is_idempotent_when_already_terminal():
+    operation = _create_operation(
+        lifecycle_state=LifecycleState.COOL,
+        status=LifecycleOperationStatus.SUCCEEDED,
+    )
+    deleted_at = timezone.now()
+    operation.from_data_deletion_status = FromDataDeletionStatus.SUCCEEDED
+    operation.from_data_deleted_at = deleted_at
+    operation.save(update_fields=["from_data_deletion_status", "from_data_deleted_at"])
+
+    response = Client().post(
+        CALLBACK_URL,
+        data={
+            "operation_id": str(operation.operation_id),
+            "phase": "FROM_DATA_DELETION",
+            "from_data_deletion_status": "FAILED",
+            "error": "ignored duplicate callback",
+        },
+        headers=_backend_headers(),
+        content_type="application/json",
+    )
+
+    operation.refresh_from_db()
+
+    assert response.status_code == 200
+    assert operation.from_data_deletion_status == FromDataDeletionStatus.SUCCEEDED
+    assert operation.from_data_deleted_at == deleted_at
+    assert operation.from_data_deletion_error is None
+
+
+@pytest.mark.django_db
+def test_callback_from_data_deletion_is_ignored_when_not_requested():
+    operation = _create_operation(
+        lifecycle_state=LifecycleState.COOL,
+        status=LifecycleOperationStatus.SUCCEEDED,
+    )
+
+    response = Client().post(
+        CALLBACK_URL,
+        data={
+            "operation_id": str(operation.operation_id),
+            "phase": "FROM_DATA_DELETION",
+            "from_data_deletion_status": "SUCCEEDED",
+        },
+        headers=_backend_headers(),
+        content_type="application/json",
+    )
+
+    operation.refresh_from_db()
+
+    assert response.status_code == 200
+    assert operation.from_data_deletion_status == FromDataDeletionStatus.NOT_REQUESTED
+    assert operation.from_data_deleted_at is None
+    assert operation.from_data_deletion_error is None

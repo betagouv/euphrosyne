@@ -9,10 +9,15 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
-from euphro_tools.project_data import post_cool_project, post_restore_project
+from euphro_tools.project_data import (
+    post_cool_project,
+    post_delete_project_source_data,
+    post_restore_project,
+)
 from lab.models import Project
 
 from .models import (
+    FromDataDeletionStatus,
     LifecycleOperation,
     LifecycleOperationStatus,
     LifecycleOperationType,
@@ -41,6 +46,20 @@ class LifecycleOperationStartError(Exception):
         self.operation = operation
 
 
+class FromDataDeletionNotAllowedError(Exception):
+    def __init__(self, detail: str, *, operation: LifecycleOperation) -> None:
+        super().__init__(detail)
+        self.detail = detail
+        self.operation = operation
+
+
+class FromDataDeletionStartError(Exception):
+    def __init__(self, detail: str, *, operation: LifecycleOperation) -> None:
+        super().__init__(detail)
+        self.detail = detail
+        self.operation = operation
+
+
 def trigger_cool_operation(
     project_id: int,
     *,
@@ -63,6 +82,70 @@ def trigger_restore_operation(
         LifecycleOperationType.RESTORE,
         post_function=post_function,
     )
+
+
+def resolve_from_storage_role(operation_type: str) -> str:
+    if operation_type == LifecycleOperationType.COOL:
+        return LifecycleState.HOT
+    if operation_type == LifecycleOperationType.RESTORE:
+        return LifecycleState.COOL
+    raise ValueError(f"Unsupported lifecycle operation type: {operation_type}")
+
+
+def trigger_from_data_deletion(
+    operation_id: uuid.UUID | str,
+    *,
+    post_function: Callable[..., requests.Response] | None = None,
+) -> LifecycleOperation:
+    with transaction.atomic():
+        operation = _get_locked_lifecycle_operation(operation_id)
+        if operation is None:
+            raise LifecycleOperation.DoesNotExist
+
+        _ensure_from_data_deletion_allowed(operation)
+
+        operation.from_data_deletion_status = FromDataDeletionStatus.RUNNING
+        operation.from_data_deletion_error = None
+        operation.from_data_deleted_at = None
+        operation.save(
+            update_fields=[
+                "from_data_deletion_status",
+                "from_data_deletion_error",
+                "from_data_deleted_at",
+            ]
+        )
+
+    try:
+        response = _post_from_data_deletion_request(
+            operation=operation,
+            post_function=post_function,
+        )
+    except requests.RequestException as error:
+        _mark_from_data_deletion_start_failed(
+            operation_id=operation.operation_id,
+            error_message="Tools API request failed.",
+            error_details=str(error),
+        )
+        raise FromDataDeletionStartError(
+            _("Delete source data request failed while calling tools API."),
+            operation=operation,
+        ) from error
+
+    if response.status_code != HTTPStatus.ACCEPTED:
+        _mark_from_data_deletion_start_failed(
+            operation_id=operation.operation_id,
+            error_message=(
+                "Tools API rejected source data deletion request "
+                f"({response.status_code})."
+            ),
+            error_details=response.text,
+        )
+        raise FromDataDeletionStartError(
+            _("Delete source data request was rejected by tools API."),
+            operation=operation,
+        )
+
+    return operation
 
 
 def is_retryable_operation(project_data: ProjectData) -> bool:
@@ -167,6 +250,17 @@ def _get_locked_project_data(project_id: int) -> ProjectData | None:
     )
 
 
+def _get_locked_lifecycle_operation(
+    operation_id: uuid.UUID | str,
+) -> LifecycleOperation | None:
+    return (
+        LifecycleOperation.objects.select_for_update()
+        .select_related("project_data__project")
+        .filter(operation_id=operation_id)
+        .first()
+    )
+
+
 def _is_allowed_source(project_data: ProjectData, operation_type: str) -> bool:
     if operation_type == LifecycleOperationType.COOL:
         return _is_allowed_cool_source(project_data)
@@ -210,6 +304,44 @@ def _has_active_operation(project_data: ProjectData) -> bool:
     ).exists()
 
 
+def _ensure_from_data_deletion_allowed(operation: LifecycleOperation) -> None:
+    if operation.type != LifecycleOperationType.COOL:
+        raise FromDataDeletionNotAllowedError(
+            _("Only cool operations can delete source data."),
+            operation=operation,
+        )
+
+    if operation.status != LifecycleOperationStatus.SUCCEEDED:
+        raise FromDataDeletionNotAllowedError(
+            _("Lifecycle operation must have status succeeded."),
+            operation=operation,
+        )
+
+    if operation.project_data.lifecycle_state != LifecycleState.COOL:
+        raise FromDataDeletionNotAllowedError(
+            _("Project lifecycle state must be cool."),
+            operation=operation,
+        )
+
+    if operation.from_data_deletion_status not in (
+        FromDataDeletionStatus.NOT_REQUESTED,
+        FromDataDeletionStatus.FAILED,
+    ):
+        raise FromDataDeletionNotAllowedError(
+            _(
+                "Source data deletion can only be requested when it was not "
+                "requested yet or after a failed attempt."
+            ),
+            operation=operation,
+        )
+
+    if _has_active_operation(operation.project_data):
+        raise FromDataDeletionNotAllowedError(
+            _("Project already has an active lifecycle operation."),
+            operation=operation,
+        )
+
+
 def _transition_project_to_running_state(
     *,
     project_data: ProjectData,
@@ -248,6 +380,21 @@ def _post_operation_request(
     )
 
 
+def _post_from_data_deletion_request(
+    *,
+    operation: LifecycleOperation,
+    post_function: Callable[..., requests.Response] | None = None,
+) -> requests.Response:
+    if post_function is None:
+        post_function = post_delete_project_source_data
+    return post_function(
+        project_slug=operation.project_data.project.slug,
+        storage_role=resolve_from_storage_role(operation.type),
+        operation_id=str(operation.operation_id),
+        timeout=TOOLS_API_TIMEOUT_SECONDS,
+    )
+
+
 def _mark_operation_start_failed(
     *,
     operation_id: uuid.UUID,
@@ -268,6 +415,28 @@ def _mark_operation_start_failed(
                 "error_message",
                 "error_details",
                 "finished_at",
+            ]
+        )
+
+
+def _mark_from_data_deletion_start_failed(
+    *,
+    operation_id: uuid.UUID,
+    error_message: str,
+    error_details: str | None,
+) -> None:
+    with transaction.atomic():
+        operation = LifecycleOperation.objects.select_for_update().get(
+            operation_id=operation_id
+        )
+        operation.from_data_deletion_status = FromDataDeletionStatus.FAILED
+        operation.from_data_deletion_error = error_details or error_message
+        operation.from_data_deleted_at = None
+        operation.save(
+            update_fields=[
+                "from_data_deletion_status",
+                "from_data_deletion_error",
+                "from_data_deleted_at",
             ]
         )
 

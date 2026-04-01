@@ -6,6 +6,7 @@ import pytest
 import requests
 from django.test import Client
 from django.utils import timezone
+from django.utils.translation import gettext
 
 from data_management.models import (
     LifecycleOperation,
@@ -229,7 +230,7 @@ def test_restore_rejects_when_active_restore_operation_exists(active_status: str
 
     assert response.status_code == 400
     assert response.json() == {
-        "detail": "Project already has an active lifecycle operation.",
+        "detail": gettext("Project already has an active lifecycle operation."),
         "lifecycle_state": LifecycleState.COOL,
     }
     assert LifecycleOperation.objects.count() == 1
