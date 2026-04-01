@@ -33,7 +33,7 @@ class ProjectFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Project
 
-    name = factory.Faker("name")
+    name = factory.Sequence(lambda n: f"Project {n}")
 
 
 class ProjectWithLeaderFactory(ProjectFactory):
