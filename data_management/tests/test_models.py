@@ -5,6 +5,7 @@ import pytest
 from django.utils import timezone
 
 from data_management.models import (
+    FromDataDeletionStatus,
     LifecycleOperation,
     LifecycleOperationStatus,
     LifecycleOperationType,
@@ -54,6 +55,19 @@ def test_for_project_backfills_missing_cooling_eligible_at():
     reloaded = ProjectData.for_project(project)
 
     assert reloaded.cooling_eligible_at == expected
+
+
+@pytest.mark.django_db
+def test_lifecycle_operation_from_data_deletion_fields_default_to_not_requested():
+    operation = LifecycleOperation.objects.create(
+        project_data=create_project_data(),
+        type=LifecycleOperationType.COOL,
+        status=LifecycleOperationStatus.PENDING,
+    )
+
+    assert operation.from_data_deletion_status == FromDataDeletionStatus.NOT_REQUESTED
+    assert operation.from_data_deleted_at is None
+    assert operation.from_data_deletion_error is None
 
 
 @pytest.mark.django_db

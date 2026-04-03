@@ -142,6 +142,31 @@ The backend flow mirrors archive:
 4. after acceptance, the project becomes `RESTORING`
 5. callback verification is required before the project returns to `HOT`
 
+### Admin-triggered source data deletion
+
+Lab admins can trigger source data deletion from the `LifecycleOperation`
+changelist in Django admin after a successful `COOL` operation.
+
+The backend flow is:
+
+1. admin confirms the `Delete source data` bulk action
+2. Euphrosyne validates the selected operation:
+   - type must be `COOL`
+   - status must be `SUCCEEDED`
+   - project lifecycle state must be `COOL`
+   - source-data deletion state must be `NOT_REQUESTED` or `FAILED`
+   - no other lifecycle operation may be active for the project
+3. the existing `LifecycleOperation` is updated with:
+   - `from_data_deletion_status=RUNNING`
+   - `from_data_deletion_error=NULL`
+   - `from_data_deleted_at=NULL`
+4. Euphrosyne calls `euphrosyne-tools-api`
+5. the admin request returns immediately after asynchronous acceptance
+
+Deletion is intentionally tracked as a sub-status of the lifecycle operation.
+It does not create a new operation row, and it does not change the project
+lifecycle state.
+
 ### Callback completion and verification
 
 `POST /api/data-management/operations/callback` is the final authority for
@@ -165,6 +190,21 @@ Failure path:
 
 Once an operation is already terminal (`SUCCEEDED` or `FAILED`), later callback
 retries are treated as no-op `200 OK` responses.
+
+Deletion callback path:
+
+- callback payload sets `phase=FROM_DATA_DELETION`
+- callback payload also includes:
+  - `from_data_deletion_status`
+  - optional `error`
+- Euphrosyne updates only:
+  - `from_data_deletion_status`
+  - `from_data_deleted_at`
+  - `from_data_deletion_error`
+- Euphrosyne does not modify:
+  - `operation.status`
+  - `project_data.lifecycle_state`
+- repeated deletion callbacks are no-op once deletion is already terminal
 
 ## Immutability Rules
 
@@ -249,6 +289,7 @@ This repository currently initiates lifecycle operations through:
 
 - `POST data/projects/{project_slug}/cool?operation_id={operation_id}`
 - `POST data/projects/{project_slug}/restore?operation_id={operation_id}`
+- `POST data/projects/{project_slug}/delete/{storage_role}?operation_id={operation_id}`
 
 These requests are sent by `euphro_tools.project_data` using the shared tools
 API authentication header.
@@ -283,6 +324,18 @@ The `ProjectData` admin changelist provides:
 The changelist is read-only. Opening a project row redirects to the project
 workplace rather than a model edit form.
 
+The `LifecycleOperation` changelist remains read-only as well, but now exposes
+an admin-only bulk action:
+
+- `Delete source data`
+
+The action shows a confirmation page before dispatching deletion requests. The
+change form and changelist also display:
+
+- `from_data_deletion_status`
+- `from_data_deleted_at`
+- `from_data_deletion_error`
+
 ### Workplace
 
 The workplace page now exposes lifecycle state to the frontend and renders a
@@ -313,6 +366,8 @@ Retry rules are operation-aware:
   `COOL`
 - restore can be retried from `ERROR` only if the last failed operation was
   `RESTORE`
+- source-data deletion can be retried only from
+  `from_data_deletion_status=FAILED`
 
 This keeps retry semantics aligned with the last known storage transition.
 
