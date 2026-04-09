@@ -1,4 +1,3 @@
-import enum
 import typing
 from functools import lru_cache
 
@@ -10,120 +9,27 @@ from ..models import ObjectGroup
 from .base import ObjectProvider
 from .registry import registry
 
-
-class POPDatabases(enum.StrEnum):
-    MERIMEE = "merimee"
-    PALISSY = "palissy"
-    MEMOIRE = "memoire"
-    JOCONDE = "joconde"
-    MNR = "mnr"
-    MUSEO = "museo"
-    ENLUMINURES = "enluminures"
-    AUTOR = "autor"
-
-
-SEARCHED_DATABASES = ",".join([POPDatabases.JOCONDE.value, POPDatabases.PALISSY.value])
-POP_BASE_URL = f"https://api.pop.culture.gouv.fr/search/{SEARCHED_DATABASES}/_msearch"
+POP_RESOURCE_ID = "7e3307c2-f2ff-455c-bbca-bb6f11aec7bb"
+POP_BASE_URL = f"https://tabular-api.data.gouv.fr/api/resources/{POP_RESOURCE_ID}/data/"
 
 POP_IMAGE_URL = "https://pop-perf-assets.s3.gra.io.cloud.ovh.net"
 
 
 class ObjectData(typing.TypedDict):
-    POP_COORDONNEES: dict
-    MILU: str
-    CONTACT: str
-    ETAT: str
-    LOCA: str
-    PDAT: str
-    HIST: str
-    VIDEO: typing.List[str]
-    TICO: str
-    LVID: str
-    PREP: str
-    DESC: str
-    RANG: str
-    DIFFU: str
-    HISTORIQUE: typing.List[typing.Any]
-    COMM: str
-    IMAGE: str
-    TITR: str
-    PRODUCTEUR: str
-    INSC: typing.List[typing.Any]
-    DREP: str
-    LABEL: str
-    POP_CONTIENT_GEOLOCALISATION: str
-    DDPT: str
-    DENO: typing.List[typing.Any]
-    PUTI: str
-    LABO: str
-    IMG: typing.List[str]
-    CONTIENT_IMAGE: str
-    UTIL: typing.List[typing.Any]
-    NSDA: str
-    POP_IMPORT: typing.List[typing.Any]
-    DECV: str
-    AUTR: typing.List[str]
-    PEOC: typing.List[typing.Any]
-    REGION: str
-    TECH: typing.List[str]
-    DACQ: str
-    GENE: typing.List[typing.Any]
-    NOMOFF: str
-    POP_FLAGS: typing.List[typing.Any]
-    DATA: str
-    PDEC: str
-    DESY: str
-    MILL: typing.List[typing.Any]
-    REFMEM: typing.List[typing.Any]
-    VILLE_M: str
-    REFMER: typing.List[typing.Any]
-    REFMIS: str
-    LARC: str
-    DPT: str
-    PERI: typing.List[str]
-    DIMS: str
-    DOMN: typing.List[str]
-    BIBL: str
-    BASE: str
-    MANQUANT: typing.List[typing.Any]
-    COOR: str
-    INV: str
-    DMAJ: str
-    EXPO: str
-    DMIS: str
-    REPR: typing.List[typing.Any]
-    MOSA: str
-    DATION: str
-    REDA: typing.List[typing.Any]
-    ONOM: typing.List[typing.Any]
-    LIEUX: typing.List[typing.Any]
-    ECOL: typing.List[str]
-    PINS: str
-    PERU: typing.List[typing.Any]
-    DEPO: typing.List[typing.Any]
-    LOCA3: str
-    LOCA2: str
-    COPY: str
-    SREP: typing.List[typing.Any]
-    MANQUANT_COM: str
-    EPOQ: typing.List[typing.Any]
-    ATTR: str
-    PLIEUX: str
-    MUSEO: str
-    REFPAL: typing.List[typing.Any]
-    STAT: typing.List[str]
-    REF: str
-    REFIM: str
-    APPL: str
-    PAUT: str
-    WWW: typing.List[str]
-    APTN: str
-    MSGCOM: str
-    PHOT: str
-    ADPT: str
-    RETIF: str
-    GEOHI: typing.List[typing.Any]
-    TOUT: str
+    Reference: str
+    Titre: typing.NotRequired[str | None]
+    Denomination: typing.NotRequired[str | None]
+    Appellation: typing.NotRequired[str | None]
+    Epoque: typing.NotRequired[str | None]
+    Periode_de_creation: typing.NotRequired[str | None]
+    Numero_inventaire: typing.NotRequired[str | None]
+    Materiaux_techniques: typing.NotRequired[str | None]
+    Lien_site_associe: typing.NotRequired[str | None]
+    Source_de_la_representation: typing.NotRequired[str | None]
+
+
+class POPDataResponse(typing.TypedDict):
+    data: list[ObjectData]
 
 
 class POPProvider(ObjectProvider):
@@ -133,34 +39,51 @@ class POPProvider(ObjectProvider):
     def _fetch_raw_data(self, provider_id: str) -> ObjectData | None:
         """Fetch raw object data from POP."""
         try:
-            body = (
-                '{"preference":"res"}\n{"query":{"bool":{"must":[{"bool":{"should":[{"term":{"REF.keyword":"%s"}}]}},{"match_all":{}}]}},"size":25,"from":0}'  # pylint: disable=line-too-long
-                % provider_id
-            )
-            response = requests.post(
+            response = requests.get(
                 POP_BASE_URL,
-                data=body,
-                headers={
-                    "Content-Type": "application/x-ndjson",
+                params={
+                    "Reference__exact": provider_id,
+                    "page_size": 1,
                 },
                 timeout=5,
             )
             response.raise_for_status()
-        except (requests.HTTPError, requests.ConnectionError) as error:
+        except (
+            requests.HTTPError,
+            requests.ConnectionError,
+            requests.Timeout,
+        ) as error:
             self._handle_http_error(error, provider_id)
 
-        if response.status_code == 200:
-            data = response.json()
-            if not data["responses"][0]["hits"]["hits"]:
-                return None
-            return data["responses"][0]["hits"]["hits"][0]["_source"]
-        return None
+        try:
+            data: POPDataResponse = response.json()
+        except ValueError as error:
+            self._handle_general_error(error, provider_id)
+            return None
+
+        records = data.get("data") or []
+        return records[0] if records else None
+
+    @staticmethod
+    def _split_values(value: str | None) -> list[str]:
+        if not value:
+            return []
+        return [v.strip() for v in value.split(";") if v.strip()]
+
+    @staticmethod
+    def _resolve_label(data: ObjectData, object_id: str) -> str:
+        return (
+            (data.get("Titre") or "").strip()
+            or (data.get("Denomination") or "").strip()
+            or (data.get("Appellation") or "").strip()
+            or object_id
+        )
 
     def fetch_partial_data(self, object_id: str):
         """Fetch object data with minimum information to save it to DB."""
         data = self._fetch_raw_data(object_id)
         if data:
-            return {"label": data["TITR"]}
+            return {"label": self._resolve_label(data, object_id)}
         return None
 
     def fetch_full_object(
@@ -173,26 +96,39 @@ class POPProvider(ObjectProvider):
             return object_group
 
         updated_og.object_count = 1
-        updated_og.label = data["TITR"]
-        if data.get("PERI"):
-            dating_label = ", ".join(data["PERI"])
+        updated_og.label = self._resolve_label(data, object_id)
+        periods = self._split_values(data.get("Periode_de_creation"))
+        if periods:
+            dating_label = ", ".join(periods)
             updated_og.dating_period = Period(label=dating_label)
-        if data.get("EPOQ"):
-            era_label = ", ".join(data["EPOQ"])
+        eras = self._split_values(data.get("Epoque"))
+        if eras:
+            era_label = ", ".join(eras)
             updated_og.dating_era = Era(label=era_label)
-        updated_og.inventory = data.get("INV", "")
-        updated_og.materials = data.get("TECH", [])
+        updated_og.inventory = data.get("Numero_inventaire") or ""
+        updated_og.materials = self._split_values(data.get("Materiaux_techniques"))
         return updated_og
 
     def fetch_object_image_urls(self, object_id: str) -> list[str]:
         """Fetch list of image URLs for the given object ID."""
         data = self._fetch_raw_data(object_id)
-        if not data or "IMG" not in data:
+        if not data:
             return []
-        return [self.construct_image_url(img) for img in data["IMG"]]
+        # The tabular API does not expose POP IMG paths. Keep only direct URL
+        # values when available in link fields.
+        image_urls: list[str] = []
+        for field_name in ("Lien_site_associe", "Source_de_la_representation"):
+            value = data.get(field_name)
+            if not value:
+                continue
+            for url in [item.strip() for item in value.split(";") if item.strip()]:
+                if url.startswith(("http://", "https://")):
+                    image_urls.append(url)
+        return list(dict.fromkeys(image_urls))
 
     def construct_image_url(self, path: str) -> str:
-        return f"{POP_IMAGE_URL}/{path}"
+        normalized_path = path if path.startswith("/") else f"/{path}"
+        return f"{POP_IMAGE_URL}{normalized_path}"
 
 
 registry.register("pop", POPProvider)
