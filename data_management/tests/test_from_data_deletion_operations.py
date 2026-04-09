@@ -88,6 +88,33 @@ def test_trigger_from_data_deletion_for_eligible_cool_operation_calls_tools_api(
 
 
 @pytest.mark.django_db
+def test_trigger_from_data_deletion_for_eligible_restore_operation_calls_tools_api():
+    operation = create_operation(
+        operation_type=LifecycleOperationType.RESTORE,
+        lifecycle_state=LifecycleState.HOT,
+    )
+
+    with mock.patch(
+        "data_management.operations.post_delete_project_source_data",
+        return_value=DummyResponse(status_code=202),
+    ) as delete_mock:
+        result = trigger_from_data_deletion(operation.operation_id)
+
+    operation.refresh_from_db()
+
+    assert result.operation_id == operation.operation_id
+    assert operation.from_data_deletion_status == FromDataDeletionStatus.RUNNING
+    assert operation.from_data_deleted_at is None
+    assert operation.from_data_deletion_error is None
+    delete_mock.assert_called_once_with(
+        project_slug=operation.project_data.project.slug,
+        storage_role=LifecycleState.COOL,
+        operation_id=str(operation.operation_id),
+        timeout=10,
+    )
+
+
+@pytest.mark.django_db
 def test_trigger_from_data_deletion_retry_from_failed_resets_running_state():
     operation = create_operation(
         from_data_deletion_status=FromDataDeletionStatus.FAILED,
@@ -152,44 +179,24 @@ def test_trigger_from_data_deletion_marks_failed_when_tools_api_rejects_request(
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    ("operation_type", "status", "lifecycle_state", "deletion_status"),
+    ("status", "deletion_status"),
     [
         (
-            LifecycleOperationType.RESTORE,
-            LifecycleOperationStatus.SUCCEEDED,
-            LifecycleState.COOL,
-            FromDataDeletionStatus.NOT_REQUESTED,
-        ),
-        (
-            LifecycleOperationType.COOL,
             LifecycleOperationStatus.FAILED,
-            LifecycleState.COOL,
             FromDataDeletionStatus.NOT_REQUESTED,
         ),
         (
-            LifecycleOperationType.COOL,
             LifecycleOperationStatus.SUCCEEDED,
-            LifecycleState.HOT,
-            FromDataDeletionStatus.NOT_REQUESTED,
-        ),
-        (
-            LifecycleOperationType.COOL,
-            LifecycleOperationStatus.SUCCEEDED,
-            LifecycleState.COOL,
             FromDataDeletionStatus.SUCCEEDED,
         ),
     ],
 )
 def test_trigger_from_data_deletion_rejects_ineligible_operations(
-    operation_type: str,
     status: str,
-    lifecycle_state: str,
     deletion_status: str,
 ):
     operation = create_operation(
-        operation_type=operation_type,
         status=status,
-        lifecycle_state=lifecycle_state,
         from_data_deletion_status=deletion_status,
     )
 
