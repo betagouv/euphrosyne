@@ -78,7 +78,12 @@ PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS = _split_values(
 CSP_ENFORCE = os.getenv("CSP_ENFORCE", "false").lower() == "true"
 SECURE_CSP_REPORT_ONLY = {
     "default-src": [CSP.SELF],
-    "img-src": [CSP.SELF, "data:", "https://info.orcid.org"],
+    "img-src": [
+        CSP.SELF,
+        "data:",
+        "https://info.orcid.org",
+        "https://iiif.prd.cloud.culture.fr",
+    ],
     "script-src": [CSP.SELF, CSP.UNSAFE_INLINE, "https://stats.beta.gouv.fr"],
     "style-src": [CSP.SELF, CSP.UNSAFE_INLINE],
     "connect-src": [

@@ -45,18 +45,18 @@ def test_fetch_full_objectgroup_from_pop(_):
 )
 def test_fetch_object_image_urls_from_pop(_):
     assert fetch_object_image_urls("pop", "50010009167") == [
-        "https://iiif.prd.cloud.culture.fr/iiif/3/joconde%2F50010009167%2F95ce19410.jpg/full/max/0/default.jpg",
-        "https://iiif.prd.cloud.culture.fr/iiif/3/joconde%2F50010009167%2F95ce19415.jpg/full/max/0/default.jpg",
+        "https://iiif.prd.cloud.culture.fr/iiif/3/joconde%2F50010009167%2F95ce19410.jpg/full/max/0/default.jpg",  # pylint: disable=line-too-long
+        "https://iiif.prd.cloud.culture.fr/iiif/3/joconde%2F50010009167%2F95ce19415.jpg/full/max/0/default.jpg",  # pylint: disable=line-too-long
     ]
 
 
 def test_construct_image_url_from_pop_path():
     assert (
-        construct_image_url("pop", "joconde/12345.webp")
+        construct_image_url("pop", "iiif/3/joconde/12345.webp")
         == "https://iiif.prd.cloud.culture.fr/iiif/3/joconde/12345.webp"
     )
     assert (
-        construct_image_url("pop", "/joconde/12345.webp")
+        construct_image_url("pop", "/iiif/3/joconde/12345.webp")
         == "https://iiif.prd.cloud.culture.fr/iiif/3/joconde/12345.webp"
     )
 
@@ -69,6 +69,7 @@ def test_pop_provider_fetch_raw_data_uses_tabular_api(mock_get):
     mock_get.return_value = response
 
     provider = POPProvider()
+    # pylint: disable=protected-access
     assert provider._fetch_raw_data("50010009167") == {"Reference": "50010009167"}
     mock_get.assert_called_once_with(
         POP_BASE_URL,

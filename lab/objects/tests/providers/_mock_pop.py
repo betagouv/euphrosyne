@@ -1,3 +1,6 @@
+# pylint: disable=line-too-long
+
+
 FETCH_RAW_DATA_RETURN = {
     "__id": 99,
     "Reference": "50010009167",

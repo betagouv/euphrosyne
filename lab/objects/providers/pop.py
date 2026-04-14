@@ -15,7 +15,7 @@ POP_BASE_URL = "https://tabular-api.data.gouv.fr/api/resources/7e3307c2-f2ff-455
 POP_IIF_MANIFEST_URL = (
     "https://api.pop.culture.gouv.fr/notices/joconde/{}/iiif/manifest"
 )
-POP_IMAGE_URL = "https://iiif.prd.cloud.culture.fr/iiif/3"
+POP_IMAGE_URL = "https://iiif.prd.cloud.culture.fr"
 
 
 POPQueryParams = dict[str, str | int]
