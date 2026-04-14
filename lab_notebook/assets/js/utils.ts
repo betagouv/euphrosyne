@@ -18,7 +18,7 @@ export function extractProviderFromPath(path: string): ImageProvider {
     path.split("/").length === 2
   ) {
     return "eros";
-  } else if (path.startsWith("/joconde") || path.startsWith("/palissy")) {
+  } else if (path.startsWith("/joconde")) {
     return "pop";
   }
   return "euphrosyne";
