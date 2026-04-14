@@ -239,7 +239,7 @@ def construct_image_url_from_path(
     ) and len(path.split("/")) == 2:
         return construct_image_url("eros", path)
 
-    if path.startswith("joconde") or path.startswith("palissy"):
+    if path.startswith("/iiif/3/joconde"):
         return construct_image_url("pop", path)
 
     return (

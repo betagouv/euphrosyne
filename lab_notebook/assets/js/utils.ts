@@ -6,6 +6,9 @@ export function extractPath(pathname: string, provider: ImageProvider): string {
   if (provider === "eros") {
     return pathname.split(".")[0].split("/").splice(-2).join("/");
   }
+  if (provider === "pop") {
+    return pathname;
+  }
   // For Euphrosyne S3-stored images
   return pathname;
 }
@@ -18,7 +21,7 @@ export function extractProviderFromPath(path: string): ImageProvider {
     path.split("/").length === 2
   ) {
     return "eros";
-  } else if (path.startsWith("/joconde") || path.startsWith("/palissy")) {
+  } else if (path.startsWith("/iiif/3/joconde")) {
     return "pop";
   }
   return "euphrosyne";

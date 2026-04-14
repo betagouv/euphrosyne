@@ -1,6 +1,6 @@
 import { ExternalImageProvider } from "./types";
 
-const POP_IMAGE_URL = "https://pop-perf-assets.s3.gra.io.cloud.ovh.net";
+const POP_IMAGE_URL = "https://iiif.prd.cloud.culture.fr";
 
 async function getImagesURLForObject(providerObjectId: string) {
   let fetchFailed = false,
