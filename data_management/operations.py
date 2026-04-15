@@ -305,21 +305,9 @@ def _has_active_operation(project_data: ProjectData) -> bool:
 
 
 def _ensure_from_data_deletion_allowed(operation: LifecycleOperation) -> None:
-    if operation.type != LifecycleOperationType.COOL:
-        raise FromDataDeletionNotAllowedError(
-            _("Only cool operations can delete source data."),
-            operation=operation,
-        )
-
     if operation.status != LifecycleOperationStatus.SUCCEEDED:
         raise FromDataDeletionNotAllowedError(
             _("Lifecycle operation must have status succeeded."),
-            operation=operation,
-        )
-
-    if operation.project_data.lifecycle_state != LifecycleState.COOL:
-        raise FromDataDeletionNotAllowedError(
-            _("Project lifecycle state must be cool."),
             operation=operation,
         )
 

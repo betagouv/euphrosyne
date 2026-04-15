@@ -456,7 +456,7 @@ def test_lifecycle_operation_admin_delete_source_data_action_skips_ineligible_ro
     ineligible_operation = LifecycleOperation.objects.create(
         project_data=ProjectDataFactory(lifecycle_state=LifecycleState.COOL),
         type=LifecycleOperationType.RESTORE,
-        status=LifecycleOperationStatus.SUCCEEDED,
+        status=LifecycleOperationStatus.FAILED,
     )
     client = Client()
     client.force_login(LabAdminUserFactory())
@@ -503,6 +503,6 @@ def test_lifecycle_operation_admin_delete_source_data_action_skips_ineligible_ro
         "Could not delete source data for operation %(operation_id)s: %(detail)s"
     ) % {
         "operation_id": ineligible_operation.operation_id,
-        "detail": gettext("Only cool operations can delete source data."),
+        "detail": gettext("Lifecycle operation must have status succeeded."),
     }
     assert expected_message in response_messages
