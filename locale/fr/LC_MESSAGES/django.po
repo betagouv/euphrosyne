@@ -265,16 +265,8 @@ msgstr ""
 msgid "Project already has an active lifecycle operation."
 msgstr "Ce projet a déjà une opération en cours."
 
-msgid "Only cool operations can delete source data."
-msgstr ""
-"Seules les opérations de refroidissement peuvent supprimer les données "
-"source."
-
 msgid "Lifecycle operation must have status succeeded."
 msgstr "L'opération du cycle de vie doit avoir le statut « Réussi »."
-
-msgid "Project lifecycle state must be cool."
-msgstr "L'état du cycle de vie du projet doit être « Refroidi »."
 
 msgid ""
 "Source data deletion can only be requested when it was not requested yet or "
