@@ -97,13 +97,15 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  renderComponent(
-    "project-config-image-definitions",
-    createElement(ProjectImageDefinitionSelect, {
-      projectSlug: project.slug,
-      fetchFn: toolsFetch,
-    }),
-  );
+  if (isLabAdmin) {
+    renderComponent(
+      "project-config-image-definitions",
+      createElement(ProjectImageDefinitionSelect, {
+        projectSlug: project.slug,
+        fetchFn: toolsFetch,
+      }),
+    );
+  }
 
   document.querySelectorAll(".run-data-download-btn").forEach((btn) => {
     btn.addEventListener("click", async (e) => {
