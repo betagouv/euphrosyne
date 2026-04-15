@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-25 13:49+0100\n"
+"POT-Creation-Date: 2026-04-01 17:51+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
-"Language: \n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -131,6 +131,200 @@ msgstr "Priorité de tri : %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Changer l'ordre de tri"
 
+msgid "available"
+msgstr "disponible"
+
+msgid "archived"
+msgstr "archivé"
+
+msgid "archiving"
+msgstr "archivage"
+
+msgid "restoring"
+msgstr "restauration"
+
+msgid "error"
+msgstr "erreur"
+
+msgid "Delete source data"
+msgstr "Supprimer les données source"
+
+#, python-format
+msgid "Could not delete source data for operation %(operation_id)s: %(detail)s"
+msgstr ""
+"Impossible de supprimer les données source pour l'opération "
+"%(operation_id)s : %(detail)s"
+
+#, python-format
+msgid ""
+"Could not start source data deletion for operation %(operation_id)s: "
+"%(detail)s"
+msgstr ""
+"Impossible de démarrer la suppression des données source pour l'opération "
+"%(operation_id)s : %(detail)s"
+
+#, python-format
+msgid "Started source data deletion for %(count)d operation(s)."
+msgstr "Suppression des données source lancée pour %(count)d opération(s)."
+
+msgid "eligible for cooling"
+msgstr "éligible au refroidissement"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "No"
+msgstr "Non"
+
+msgid "lifecycle state"
+msgstr "état du cycle de vie"
+
+msgid "project"
+msgstr "projet"
+
+msgid "Project data lifecycle"
+msgstr "Cycle de vie des données"
+
+msgid "Project"
+msgstr "Projet"
+
+msgid "Last operation lifecycle"
+msgstr "Dernière transition du cycle de vie"
+
+#, python-format
+msgid "%(old_state)s to %(new_state)s"
+msgstr "%(old_state)s vers %(new_state)s"
+
+msgid "Last operation"
+msgstr "Dernière opération"
+
+msgid "Bytes moved"
+msgstr "Octets déplacés"
+
+msgid "Files moved"
+msgstr "Fichiers déplacés"
+
+msgid "Error details"
+msgstr "Détails de l'erreur"
+
+msgid "This field is required for deletion callbacks."
+msgstr "Ce champ est requis pour les callbacks de suppression."
+
+msgid "This field is required."
+msgstr "Ce champ est requis."
+
+msgid ""
+"Project is read-only while lifecycle_state is COOL or COOLING. Restore the "
+"project to HOT to modify files or create runs."
+msgstr ""
+"Le projet est en lecture seule lorsque lifecycle_state est COOL ou COOLING. "
+"Restaurez le projet vers HOT pour modifier des fichiers ou créer des runs."
+
+msgid "Hot"
+msgstr "Chaud"
+
+msgid "Cooling"
+msgstr "Refroidissement"
+
+msgid "Cool"
+msgstr "Refroidi"
+
+msgid "Restoring"
+msgstr "Restauration"
+
+msgid "Error"
+msgstr "Erreur"
+
+msgid "Restore"
+msgstr "Restaurer"
+
+msgid "Pending"
+msgstr "En attente"
+
+msgid "Running"
+msgstr "En cours"
+
+msgid "Succeeded"
+msgstr "Réussi"
+
+msgid "Failed"
+msgstr "Échec"
+
+msgid "Not requested"
+msgstr "Non demandée"
+
+msgid "Delete source data request failed while calling tools API."
+msgstr ""
+"La requête de suppression des données source a échoué lors de l'appel à "
+"tools API."
+
+msgid "Delete source data request was rejected by tools API."
+msgstr ""
+"La requête de suppression des données source a été rejetée par tools API."
+
+msgid "Project already has an active lifecycle operation."
+msgstr "Ce projet a déjà une opération en cours."
+
+msgid "Lifecycle operation must have status succeeded."
+msgstr "L'opération du cycle de vie doit avoir le statut « Réussi »."
+
+msgid ""
+"Source data deletion can only be requested when it was not requested yet or "
+"after a failed attempt."
+msgstr ""
+"La suppression des données source ne peut être demandée que si elle n'a pas "
+"encore été demandée ou après une tentative échouée."
+
+msgid "Project lifecycle state does not allow cool."
+msgstr "L'état du cycle de vie du projet n'autorise pas le refroidissement."
+
+msgid "Project lifecycle state does not allow restore."
+msgstr "L'état du cycle de vie du projet n'autorise pas la restauration."
+
+msgid "Cool retry request failed while calling tools API."
+msgstr ""
+"La relance du refroidissement a échoué lors de l'appel à l'API des outils."
+
+msgid "Restore request failed while calling tools API."
+msgstr ""
+"La requête de restauration a échoué lors de l'appel à l'API des outils."
+
+msgid "Cool retry request was rejected by tools API."
+msgstr "La relance du refroidissement a été rejetée par l'API des outils."
+
+msgid "Restore request was rejected by tools API."
+msgstr "La requête de restauration a été rejetée par l'API des outils."
+
+msgid "Home"
+msgstr "Accueil"
+
+msgid ""
+"Are you sure you want to delete source data for the selected lifecycle "
+"operations?"
+msgstr ""
+"Êtes-vous sûr(e) de vouloir supprimer les données source pour les opérations "
+"de cycle de vie sélectionnées ?"
+
+msgid "Operations"
+msgstr "Opérations"
+
+msgid "Yes, I’m sure"
+msgstr "Oui, je confirme"
+
+msgid "No, take me back"
+msgstr "Non, revenir en arrière"
+
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Merci de corriger l'erreur ci-dessous"
+msgstr[1] "Merci de corriger les erreurs ci-dessous"
+
+msgid "Please correct the errors below."
+msgstr "Merci de corriger les erreurs ci-dessous"
+
+msgid "Save"
+msgstr "Enregistrer"
+
 msgid "Accept request(s) (send download links)"
 msgstr "Accepter les demandes (envoyer les liens de téléchargement)"
 
@@ -142,12 +336,6 @@ msgstr ""
 
 msgid "has been sent"
 msgstr "envoyé"
-
-msgid "Yes"
-msgstr "Oui"
-
-msgid "No"
-msgstr "Non"
 
 msgid "Data requests"
 msgstr "Demandes de données"
@@ -547,9 +735,6 @@ msgstr "Montrer tout"
 msgid "Delete"
 msgstr "Supprimer"
 
-msgid "Save"
-msgstr "Enregistrer"
-
 msgid "Save as new"
 msgstr "Sauvegarder comme nouveau"
 
@@ -652,22 +837,8 @@ msgstr "Email"
 msgid "The online board to track your %(aglae_tag)s search projects"
 msgstr "L'outil en ligne pour gérer vos projets de recherche %(aglae_tag)s"
 
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "Merci de corriger l'erreur ci-dessous"
-msgstr[1] "Merci de corriger les erreurs ci-dessous"
-
-msgid "Please correct the errors below."
-msgstr "Merci de corriger les erreurs ci-dessous"
-
-msgid "Project"
-msgstr "Projet"
-
 msgid "This user is already a participant in the project."
 msgstr "Cet utilisateur est déjà un participant du projet."
-
-msgid "This field is required."
-msgstr "Ce champ est requis."
 
 msgid "Upload documents"
 msgstr "Téléverser des documents"
@@ -1368,8 +1539,8 @@ msgstr "Importer avec un numéro Eros"
 msgid "Delete selected %(model)s"
 msgstr "Modifier l’objet %(model)s sélectionné"
 
-msgid "Administration"
-msgstr "Administration"
+msgid "VMs"
+msgstr "Machines virtuelles"
 
 msgid "Project type"
 msgstr "Type de projet"
@@ -1403,6 +1574,9 @@ msgstr "Télécharger les données travaillées du run %(label)s"
 msgid "Run(s)"
 msgstr "Run(s)"
 
+msgid "Administration"
+msgstr "Administration"
+
 msgid "Prevention plans"
 msgstr "Plans de prévention"
 
@@ -1413,6 +1587,12 @@ msgid "Only alphanumeric, underscore, hyphen and space characters are allowed"
 msgstr ""
 "Seuls les lettres, chiffres, tirets bas, traits d'union et espaces sont des "
 "caractères valides"
+
+msgid "Data management"
+msgstr "Gestion des données"
+
+msgid "Loading"
+msgstr "Chargement"
 
 #, python-format
 msgid "Project: %s"

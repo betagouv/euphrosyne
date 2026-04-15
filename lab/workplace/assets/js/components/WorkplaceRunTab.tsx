@@ -42,6 +42,7 @@ export default function WorkplaceRunTab({
               projectId={project.id}
               dataLabel={t["Raw data"]}
               fileService={run.rawDataFileService}
+              canDelete={run.rawDataTable.canDelete}
               isSearchable={true}
             />
           </div>
@@ -50,6 +51,7 @@ export default function WorkplaceRunTab({
               projectId={project.id}
               dataLabel={t["Processed data"]}
               fileService={run.processedDataFileService}
+              canDelete={run.processedDataTable.canDelete}
               isSearchable={true}
             />
           </div>

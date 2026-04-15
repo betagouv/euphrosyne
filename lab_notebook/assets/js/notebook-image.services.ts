@@ -49,7 +49,7 @@ export class ObjectGroupImageServices extends UploadSasUrlMixin {
     this.objectGroupId = objectGroupId;
     this.uploadSasUrl =
       `/images/upload/signed-url` +
-      `?project_name=${projectSlug}&object_group_id=${objectGroupId}`;
+      `?project_slug=${projectSlug}&object_group_id=${objectGroupId}`;
   }
 
   async getUploadSASUrl(fileName: string) {

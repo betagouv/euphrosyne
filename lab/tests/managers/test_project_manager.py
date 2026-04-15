@@ -78,6 +78,11 @@ class ProjectModelTestCase(TestCase):
             assert leader_has_accepted_cgu_project in qs
 
     def test_filter_by_status(self):
+        def project_ids_for(status: Project.Status) -> list[int]:
+            return sorted(
+                Project.objects.filter_by_status(status).values_list("id", flat=True)
+            )
+
         to_schedule_ids = [
             r.project.id for r in RunFactory.create_batch(5, start_date=None)
         ]
@@ -115,44 +120,24 @@ class ProjectModelTestCase(TestCase):
         ]
 
         self.assertListEqual(
-            list(
-                Project.objects.filter_by_status(
-                    Project.Status.TO_SCHEDULE
-                ).values_list("id", flat=True)
-            ),
-            to_schedule_ids,
+            project_ids_for(Project.Status.TO_SCHEDULE),
+            sorted(to_schedule_ids),
         )
         self.assertListEqual(
-            list(
-                Project.objects.filter_by_status(Project.Status.SCHEDULED).values_list(
-                    "id", flat=True
-                )
-            ),
-            scheduled_ids,
+            project_ids_for(Project.Status.SCHEDULED),
+            sorted(scheduled_ids),
         )
         self.assertListEqual(
-            list(
-                Project.objects.filter_by_status(Project.Status.ONGOING).values_list(
-                    "id", flat=True
-                )
-            ),
-            ongoing_ids,
+            project_ids_for(Project.Status.ONGOING),
+            sorted(ongoing_ids),
         )
         self.assertListEqual(
-            list(
-                Project.objects.filter_by_status(Project.Status.FINISHED).values_list(
-                    "id", flat=True
-                )
-            ),
-            finished_ids,
+            project_ids_for(Project.Status.FINISHED),
+            sorted(finished_ids),
         )
         self.assertListEqual(
-            list(
-                Project.objects.filter_by_status(
-                    Project.Status.DATA_AVAILABLE
-                ).values_list("id", flat=True)
-            ),
-            data_available_ids,
+            project_ids_for(Project.Status.DATA_AVAILABLE),
+            sorted(data_available_ids),
         )
 
     def test_annotate_first_run_date(self):
