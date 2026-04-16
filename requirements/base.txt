@@ -20,7 +20,7 @@ python-dotenv==1.2.2
 python3-openid==3.2.0
 python-slugify==8.0.4
 pyyaml==6.0.3
-reportlab==4.4.7 
+reportlab==4.4.10 
 sentry-sdk==2.55.0
 social-auth-app-django==5.7.0
 wheel==0.46.3
