@@ -11,7 +11,7 @@ from radiation_protection.document import (
 )
 from radiation_protection.models import ElectricalSignatureProcess, RiskPreventionPlan
 
-from .providers.goodflag import StepType, start_workflow
+from .providers.goodflag import StepType, Watcher, start_workflow
 
 ELECTRICAL_SIGNATURE_PROVIDER_NAME = "goodflag"
 
@@ -88,6 +88,14 @@ def start_electrical_signature_processes(  # pylint: disable=too-many-locals
     ):
         existing_processes.setdefault(process.label, process)
 
+    watchers: list[Watcher] = [
+        {
+            "email": email,
+            "notifiedEvents": ["workflowStopped", "workflowFinishedDownloadLink"],
+        }
+        for email in app_settings.GOODFLAG_WATCHER_EMAILS  # type: ignore[misc]
+    ]
+
     # AUTHORIZATION ACCESS FORM
     access_process = existing_processes.get(access_form_workflow_name)
     if access_process:
@@ -126,6 +134,7 @@ def start_electrical_signature_processes(  # pylint: disable=too-many-locals
                     },
                 ],
                 document_path=temp_file.name,
+                watchers=watchers,
             )
         processes.append(
             ElectricalSignatureProcess.objects.create(
@@ -184,6 +193,7 @@ def start_electrical_signature_processes(  # pylint: disable=too-many-locals
                     },
                 ],
                 document_path=temp_file.name,
+                watchers=watchers,
             )
 
         processes.append(

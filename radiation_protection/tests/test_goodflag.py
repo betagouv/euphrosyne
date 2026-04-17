@@ -11,6 +11,7 @@ from radiation_protection.electrical_signature.providers.goodflag import (
     GoodflagClient,
     Step,
     StepType,
+    Watcher,
     start_workflow,
 )
 
@@ -112,6 +113,36 @@ def test_create_workflow(mock_request, goodflag_client: GoodflagClient, sample_s
 
     step_1_recipient = call_kwargs["json"]["steps"][1]["recipients"][0]
     assert step_1_recipient["preferredLocale"] == "en"
+    assert "watchers" not in call_kwargs["json"]
+
+
+@mock.patch(
+    "radiation_protection.electrical_signature.providers.goodflag.requests.request"
+)
+def test_create_workflow_with_watchers(
+    mock_request, goodflag_client: GoodflagClient, sample_steps
+):
+    """Test creating a workflow with watchers."""
+    mock_response = mock.Mock()
+    mock_response.json.return_value = {"id": "workflow_123"}
+    mock_response.ok = True
+    mock_request.return_value = mock_response
+
+    watchers: list[Watcher] = [
+        {
+            "email": "watcher@example.com",
+            "notifiedEvents": ["workflowStopped", "workflowFinishedDownloadLink"],
+        }
+    ]
+
+    goodflag_client.create_workflow(
+        name="Test Workflow",
+        steps=sample_steps,
+        watchers=watchers,
+    )
+
+    call_kwargs = mock_request.call_args[1]
+    assert call_kwargs["json"]["watchers"] == watchers
 
 
 @mock.patch(
@@ -246,6 +277,12 @@ def test_start_workflow_function(mock_client_class, sample_steps):
         "documents": [{"id": "doc_123"}, {"id": "doc_456"}]
     }
     mock_client.create_viewer.return_value = {"viewer_id": "viewer_123"}
+    watchers = [
+        {
+            "email": "watcher@example.com",
+            "notifiedEvents": ["workflowStopped", "workflowFinishedDownloadLink"],
+        }
+    ]
 
     # Create a temporary document
     with tempfile.NamedTemporaryFile(suffix=".docx", delete=False) as temp_file:
@@ -258,10 +295,15 @@ def test_start_workflow_function(mock_client_class, sample_steps):
                 workflow_name="Test Workflow",
                 steps=sample_steps,
                 document_path=temp_file.name,
+                watchers=watchers,
             )
 
             assert workflow_id == "workflow_123"
-            mock_client.create_workflow.assert_called_once()
+            mock_client.create_workflow.assert_called_once_with(
+                name="Test Workflow",
+                steps=sample_steps,
+                watchers=watchers,
+            )
             mock_client.upload_document.assert_called_once()
             mock_client.start_workflow.assert_called_once_with("workflow_123")
             # Verify create_viewer was called for each document

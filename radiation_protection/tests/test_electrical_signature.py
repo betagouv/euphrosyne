@@ -42,6 +42,11 @@ def radiation_protection_settings():
             "app_settings.RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME",
             "John Advisor",
         ),
+        mock.patch(
+            "radiation_protection.electrical_signature.electrical_signature."
+            "app_settings.GOODFLAG_WATCHER_EMAILS",
+            ["watcher1@example.com", "watcher2@example.com"],
+        ),
     ):
         yield
 
@@ -183,6 +188,19 @@ def test_start_electrical_signature_processes_workflow_steps(
         == risk_prevention_plan.participation.employer.email
     )
     assert risk_steps[2]["recipients"][0]["email"] == "advisor@example.com"
+
+    expected_watchers = [
+        {
+            "email": "watcher1@example.com",
+            "notifiedEvents": ["workflowStopped", "workflowFinishedDownloadLink"],
+        },
+        {
+            "email": "watcher2@example.com",
+            "notifiedEvents": ["workflowStopped", "workflowFinishedDownloadLink"],
+        },
+    ]
+    assert auth_call[1]["watchers"] == expected_watchers
+    assert risk_call[1]["watchers"] == expected_watchers
 
 
 @pytest.mark.django_db
