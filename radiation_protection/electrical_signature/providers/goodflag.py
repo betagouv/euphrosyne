@@ -41,12 +41,21 @@ class Step(typing.TypedDict):
     recipients: list[Recipient]
 
 
-def start_workflow(workflow_name: str, steps: list[Step], document_path: str) -> str:
+class Watcher(typing.TypedDict):
+    email: str
+    notifiedEvents: list[str]
+
+
+def start_workflow(
+    workflow_name: str,
+    steps: list[Step],
+    document_path: str,
+    watchers: list[Watcher] | None = None,
+) -> str:
     client = GoodflagClient()
 
     workflow = client.create_workflow(
-        name=workflow_name,
-        steps=steps,
+        name=workflow_name, steps=steps, watchers=watchers
     )
     workflow_id = workflow["id"]
 
@@ -157,7 +166,9 @@ class GoodflagClient:
                     response_data = {"text": e.response.text}
             raise GoodflagAPIError(str(e), status_code, response_data) from e
 
-    def create_workflow(self, name: str, steps: list[Step]) -> dict:
+    def create_workflow(
+        self, name: str, steps: list[Step], watchers: list[Watcher] | None = None
+    ) -> dict:
         """
         Create a new workflow with approval and signature steps.
 
@@ -195,6 +206,9 @@ class GoodflagClient:
                 for step in steps
             ],
         }
+
+        if watchers:
+            workflow_data["watchers"] = watchers
 
         response = self._make_request(
             "POST", endpoint, headers=self.headers, json=workflow_data
