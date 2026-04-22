@@ -22,14 +22,21 @@ const BADGE_LABEL_BY_STATE: Record<LifecycleState, string> = {
 };
 
 const AVAILABILITY_DESCRIPTION_BY_STATE: Record<LifecycleState, string> = {
-  HOT: "Project data is available and can be accessed from the virtual workstation.",
-  COOL: "Project data is archived in cold storage and is not currently accessible. Restore the data to make it available again.",
-  COOLING:
+  HOT: window.gettext(
+    "Project data is available and can be accessed from the virtual workstation.",
+  ),
+  COOL: window.gettext(
+    "Project data is archived in cold storage and is not currently accessible. Restore the data to make it available again.",
+  ),
+  COOLING: window.gettext(
     "Project data is currently being archived to cold storage. Some operations may be temporarily unavailable during this process.",
-  RESTORING:
+  ),
+  RESTORING: window.gettext(
     "Archived project data is currently being restored. The data will become available once the restoration is complete.",
-  ERROR:
+  ),
+  ERROR: window.gettext(
     "An error occurred while processing the project data. You can retry the operation.",
+  ),
 };
 
 export default function ProjectLifecycleStatus({
