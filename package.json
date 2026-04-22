@@ -38,7 +38,7 @@
     "jsdom": "^29.0.1",
     "prettier": "3.8.1",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.2"
+    "vitest": "^4.1.4"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.31.0",
