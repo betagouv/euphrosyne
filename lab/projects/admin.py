@@ -293,7 +293,7 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                     on_premises=True,
                     employer=employer,
                 )
-            initialize_project_directory(obj.name)
+            initialize_project_directory(obj.slug)
 
     def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
         view = super().changeform_view(

@@ -255,9 +255,9 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
             ensure_project_data_writable(obj.project)
         super().save_model(request, obj, form, change)
         if not change:
-            initialize_run_directory(obj.project.name, obj.label)
+            initialize_run_directory(obj.project.slug, obj.label)
         elif "label" in form.changed_data:
-            rename_run_directory(obj.project.name, form.initial["label"], obj.label)
+            rename_run_directory(obj.project.slug, form.initial["label"], obj.label)
 
     def _get_project(self, request, object_id=None) -> Project | None:
         if object_id:
