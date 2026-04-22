@@ -197,7 +197,7 @@ class TestRunAdminViewAsLeader(TestCase):
                 form=MagicMock(),
                 change=False,
             )
-        init_run_dir_mock.assert_called_once_with(run.project.name, run.label)
+        init_run_dir_mock.assert_called_once_with(run.project.slug, run.label)
 
     @patch("lab.runs.admin.initialize_run_directory")
     def test_create_run_is_forbidden_when_project_is_cooling(
@@ -407,7 +407,7 @@ class TestRunAdminViewAsAdmin(TestCase):
             assert form.is_valid()
             run_admin.save_model(request, run, form=form, change=True)
         rename_run_dir_mock.assert_called_once_with(
-            run.project.name, form.initial["label"], "new-run-name"
+            run.project.slug, form.initial["label"], "new-run-name"
         )
 
     @patch("lab.runs.admin.rename_run_directory")

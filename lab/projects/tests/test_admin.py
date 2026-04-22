@@ -495,7 +495,7 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
             form=form,
             change=False,
         )
-        init_project_dir_mock.assert_called_once_with(project.name)
+        init_project_dir_mock.assert_called_once_with(project.slug)
 
     def test_add_project_form_prefill_last_institution(self):
         """Prefill institution field with the last used institution."""
