@@ -53,7 +53,7 @@
     "@types/react-dom": "^19.2.3",
     "@witoldw/h5web-app": "^0.0.7",
     "axios": "^1.15.0",
-    "cropperjs": "^2.1.0",
+    "cropperjs": "^2.1.1",
     "css-loader": "^7.1.4",
     "css-minimizer-webpack-plugin": "^8.0.0",
     "dotenv": "^17.4.1",
