@@ -1,0 +1,56 @@
+name: Deploy Scalingo on release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scalingo-release-deploy
+  cancel-in-progress: false
+
+env:
+  SCALINGO_APP: ${{ vars.SCALINGO_APP }}
+  SCALINGO_REGION: ${{ vars.SCALINGO_REGION }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check configuration
+        run: |
+          missing=0
+
+          if [ -z "$SCALINGO_API_TOKEN" ]; then
+            echo "Missing required secret: SCALINGO_API_TOKEN"
+            missing=1
+          fi
+
+          if [ -z "$SCALINGO_APP" ]; then
+            echo "Missing required repository variable: SCALINGO_APP"
+            missing=1
+          fi
+
+          if [ -z "$SCALINGO_REGION" ]; then
+            echo "Missing required repository variable: SCALINGO_REGION"
+            missing=1
+          fi
+
+          exit "$missing"
+        env:
+          SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+
+      - name: Install Scalingo CLI
+        run: |
+          curl -L -O https://cli-dl.scalingo.com/install
+          bash install
+
+      - name: Trigger Scalingo deploy
+        run: |
+          scalingo login --api-token "$SCALINGO_API_TOKEN"
+          scalingo --app "$SCALINGO_APP" --region "$SCALINGO_REGION" integration-link-manual-deploy main
+        env:
+          SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
