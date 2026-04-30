@@ -22,6 +22,6 @@ python-slugify==8.0.4
 pyyaml==6.0.3
 reportlab==4.4.10 
 sentry-sdk==2.55.0
-social-auth-app-django==5.7.0
+social-auth-app-django==5.8.0
 wheel==0.46.3
 whitenoise==6.12.0
