@@ -31,13 +31,15 @@ class TestProjectData(TestCase):
             project_slug="project slug",
             storage_role="HOT",
             operation_id="operation-id",
+            file_count=122,
+            total_size=1234567890,
             timeout=10,
         )
 
         url = self.requests_post_mock.call_args[0][0]
         assert (
             url
-            == "http://example.com/data/projects/project%20slug/delete/HOT?operation_id=operation-id"  # pylint: disable=line-too-long
+            == "http://example.com/data/projects/project%20slug/delete/HOT?operation_id=operation-id&file_count=122&total_size=1234567890"  # pylint: disable=line-too-long
         )
         assert self.requests_post_mock.call_args[1]["timeout"] == 10
         assert self.requests_post_mock.call_args[1]["headers"] == {

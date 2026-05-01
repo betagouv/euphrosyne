@@ -289,10 +289,14 @@ This repository currently initiates lifecycle operations through:
 
 - `POST data/projects/{project_slug}/cool?operation_id={operation_id}`
 - `POST data/projects/{project_slug}/restore?operation_id={operation_id}`
-- `POST data/projects/{project_slug}/delete/{storage_role}?operation_id={operation_id}`
+- `POST data/projects/{project_slug}/delete/{storage_role}?operation_id={operation_id}&file_count={files_total}&total_size={bytes_total}`
 
 These requests are sent by `euphro_tools.project_data` using the shared tools
 API authentication header.
+
+For deletion requests, `storage_role` is the inactive side to delete, while
+`file_count` and `total_size` are the verified retained-side totals from the
+completed lifecycle operation. `total_size` is expressed in bytes.
 
 The implementation assumes the tools API will:
 
