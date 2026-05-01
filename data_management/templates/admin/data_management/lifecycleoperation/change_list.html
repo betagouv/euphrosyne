@@ -1,0 +1,49 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_list static %}
+
+{% block extrastyle %}
+<link rel="stylesheet" type="text/css" href="{% static "css/admin/project-changelist.css" %}">
+{{ block.super }}
+<style>
+  #changelist {
+    background: unset;
+    flex-direction: column-reverse;
+  }
+
+  @media (max-width: 767px) {
+    #changelist {
+      flex-direction: column-reverse !important;
+    }
+  }
+
+  .changelist-form-container,
+  nav.changelist-filters {
+    width: 100%;
+  }
+
+  details ul li {
+    display: inline;
+  }
+</style>
+{% endblock %}
+
+{% block filters %}
+{% if cl.has_filters %}
+<nav aria-labelledby="changelist-filter-header" class="changelist-filters fr-mb-3w">
+  <h4 id="changelist-filter-header" class="fr-mb-1v">{% translate "Filter" %}</h4>
+  <div class="fr-grid-row">
+    {% for spec in cl.filter_specs %}
+      <div class="fr-col-12 fr-col-md-4 fr-col-lg-3">
+        {% admin_list_filter cl spec %}
+      </div>
+    {% endfor %}
+  </div>
+</nav>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="fr-container">
+  {{ block.super }}
+</div>
+{% endblock %}

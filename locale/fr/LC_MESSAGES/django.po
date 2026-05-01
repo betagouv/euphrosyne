@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-01 12:22+0200\n"
+"POT-Creation-Date: 2026-05-01 14:55+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -182,6 +182,15 @@ msgstr "état du cycle de vie"
 msgid "project"
 msgstr "projet"
 
+msgid "operation type"
+msgstr "type d'opération"
+
+msgid "operation status"
+msgstr "statut de l'opération"
+
+msgid "source data deletion"
+msgstr "suppression des données source"
+
 msgid "Project data lifecycle"
 msgstr "Cycle de vie des données"
 
@@ -197,6 +206,45 @@ msgstr "%(old_state)s vers %(new_state)s"
 
 msgid "Last operation"
 msgstr "Dernière opération"
+
+msgid "Operation ID"
+msgstr "ID de l'opération"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Status"
+msgstr "Statut"
+
+msgid "Source deletion"
+msgstr "Suppression des données source"
+
+msgid "Started at"
+msgstr "Début"
+
+msgid "Finished at"
+msgstr "Fin"
+
+msgid "Total bytes"
+msgstr "Octets totaux"
+
+msgid "Total files"
+msgstr "Fichiers totaux"
+
+msgid "Copied bytes"
+msgstr "Octets copiés"
+
+msgid "Copied files"
+msgstr "Fichiers copiés"
+
+msgid "Source data deleted at"
+msgstr "Données source supprimées le"
+
+msgid "Source data deletion error"
+msgstr "Erreur de suppression des données source"
+
+msgid "Error message"
+msgstr "Message d'erreur"
 
 msgid "Bytes moved"
 msgstr "Octets déplacés"
@@ -472,9 +520,6 @@ msgstr "Projet apparenté"
 
 msgid "Related projects"
 msgstr "Projet apparentés"
-
-msgid "Status"
-msgstr "Statut"
 
 msgid "invitation completed"
 msgstr "invitation complétée"
