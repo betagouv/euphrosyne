@@ -389,6 +389,10 @@ def test_lifecycle_operation_admin_delete_source_data_action_renders_confirmatio
         project_data=ProjectDataFactory(lifecycle_state=LifecycleState.COOL),
         type=LifecycleOperationType.COOL,
         status=LifecycleOperationStatus.SUCCEEDED,
+        bytes_total=10,
+        files_total=2,
+        bytes_copied=10,
+        files_copied=2,
     )
     client = Client()
     client.force_login(LabAdminUserFactory())
@@ -416,6 +420,10 @@ def test_lifecycle_operation_admin_delete_source_data_action_triggers_deletion()
         project_data=ProjectDataFactory(lifecycle_state=LifecycleState.COOL),
         type=LifecycleOperationType.COOL,
         status=LifecycleOperationStatus.SUCCEEDED,
+        bytes_total=10,
+        files_total=2,
+        bytes_copied=10,
+        files_copied=2,
     )
     client = Client()
     client.force_login(LabAdminUserFactory())
@@ -452,6 +460,10 @@ def test_lifecycle_operation_admin_delete_source_data_action_skips_ineligible_ro
         project_data=ProjectDataFactory(lifecycle_state=LifecycleState.COOL),
         type=LifecycleOperationType.COOL,
         status=LifecycleOperationStatus.SUCCEEDED,
+        bytes_total=10,
+        files_total=2,
+        bytes_copied=10,
+        files_copied=2,
     )
     ineligible_operation = LifecycleOperation.objects.create(
         project_data=ProjectDataFactory(lifecycle_state=LifecycleState.COOL),

@@ -329,6 +329,16 @@ def _ensure_from_data_deletion_allowed(operation: LifecycleOperation) -> None:
             operation=operation,
         )
 
+    if operation.files_total is None or operation.bytes_total is None:
+        raise FromDataDeletionNotAllowedError(
+            _(
+                "Cannot delete source data because the retained copy could not "
+                "be verified. Check that the lifecycle operation reported a "
+                "file count and total size, then try again."
+            ),
+            operation=operation,
+        )
+
 
 def _transition_project_to_running_state(
     *,
@@ -379,6 +389,8 @@ def _post_from_data_deletion_request(
         project_slug=operation.project_data.project.slug,
         storage_role=resolve_from_storage_role(operation.type),
         operation_id=str(operation.operation_id),
+        file_count=operation.files_total,  # type: ignore
+        total_size=operation.bytes_total,  # type: ignore
         timeout=TOOLS_API_TIMEOUT_SECONDS,
     )
 
