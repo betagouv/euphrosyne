@@ -6,10 +6,12 @@ import pytest
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.messages import get_messages
+from django.template.defaultfilters import filesizeformat
 from django.test import Client, RequestFactory
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
+from django.utils.html import escape
 from django.utils.text import capfirst
 from django.utils.translation import gettext
 
@@ -318,6 +320,60 @@ def test_lifecycle_operation_admin_changelist_is_accessible_to_lab_admin():
 
 
 @pytest.mark.django_db
+def test_lifecycle_operation_admin_changelist_renders_tag_filters_and_badges():
+    operation = LifecycleOperation.objects.create(
+        project_data=ProjectDataFactory(),
+        type=LifecycleOperationType.COOL,
+        status=LifecycleOperationStatus.RUNNING,
+        from_data_deletion_status=FromDataDeletionStatus.NOT_REQUESTED,
+        bytes_total=10 * 1024 * 1024,
+        files_total=2000,
+        bytes_copied=5 * 1024 * 1024,
+        files_copied=1000,
+    )
+    LifecycleOperation.objects.create(
+        project_data=ProjectDataFactory(),
+        type=LifecycleOperationType.RESTORE,
+        status=LifecycleOperationStatus.FAILED,
+        from_data_deletion_status=FromDataDeletionStatus.FAILED,
+    )
+
+    client = Client()
+    client.force_login(LabAdminUserFactory())
+
+    response = client.get(
+        reverse("admin:data_management_lifecycleoperation_changelist"),
+        data={"status": LifecycleOperationStatus.RUNNING},
+    )
+
+    assert response.status_code == 200
+    assert all(
+        spec.template == "admin/lab/project/filter.html"
+        for spec in response.context_data["cl"].filter_specs
+    )
+    content = response.content.decode()
+    assert (
+        '<nav aria-labelledby="changelist-filter-header" class="changelist-filters'
+        in content
+    )
+    assert 'class="fr-tags-group"' in content
+    assert 'class="fr-tag"' in content
+    assert 'id="changelist-filter"' not in content
+    assert str(operation.operation_id) in content
+    assert gettext("Running") in content
+    assert gettext("Cool") in content
+    assert gettext("Not requested") in content
+    expected_bytes_progress = (
+        f"{filesizeformat(5 * 1024 * 1024)} / "
+        f"{filesizeformat(10 * 1024 * 1024)} (50%)"
+    )
+    assert expected_bytes_progress in content
+    assert "1000 / 2000 (50%)" in content
+    assert "1,000 / 2,000" not in content
+    assert 'class="fr-badge fr-badge--info fr-badge--no-icon fr-badge--sm"' in content
+
+
+@pytest.mark.django_db
 def test_lifecycle_operation_admin_change_view_is_accessible_to_lab_admin():
     project_data = ProjectDataFactory()
     operation = LifecycleOperation.objects.create(
@@ -363,9 +419,22 @@ def test_lifecycle_operation_admin_change_view_displays_from_data_deletion_field
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert "from_data_deletion_status" in content
-    assert "from_data_deleted_at" in content
-    assert "from_data_deletion_error" in content
+    expected_labels = (
+        "Source deletion",
+        "Source data deleted at",
+        "Source data deletion error",
+        "Operation ID",
+        "Started at",
+        "Finished at",
+        "Total bytes",
+        "Total files",
+        "Copied bytes",
+        "Copied files",
+        "Error message",
+        "Error details",
+    )
+    for label in expected_labels:
+        assert escape(gettext(label)) in content
     assert "delete failed" in content
 
 

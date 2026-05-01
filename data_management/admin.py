@@ -15,6 +15,7 @@ from django.db.models import (
 )
 from django.db.models.functions import Coalesce
 from django.http import Http404, HttpRequest, HttpResponseRedirect
+from django.template.defaultfilters import filesizeformat
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils import timezone
@@ -27,7 +28,9 @@ from django.utils.translation import gettext_lazy as _
 from lab.admin.mixins import LabAdminAllowedMixin
 
 from .models import (
+    FromDataDeletionStatus,
     LifecycleOperation,
+    LifecycleOperationStatus,
     LifecycleOperationType,
     LifecycleState,
     ProjectData,
@@ -52,6 +55,41 @@ LIFECYCLE_STATE_LABEL_BY_STATE: dict[str, str] = {
     LifecycleState.COOLING: gettext("archiving"),
     LifecycleState.RESTORING: gettext("restoring"),
     LifecycleState.ERROR: gettext("error"),
+}
+
+OPERATION_STATUS_BADGE_CLASS_BY_STATUS: dict[str, str] = {
+    LifecycleOperationStatus.PENDING: (
+        "fr-badge fr-badge--info fr-badge--no-icon fr-badge--sm"
+    ),
+    LifecycleOperationStatus.RUNNING: (
+        "fr-badge fr-badge--info fr-badge--no-icon fr-badge--sm"
+    ),
+    LifecycleOperationStatus.SUCCEEDED: (
+        "fr-badge fr-badge--success fr-badge--no-icon fr-badge--sm"
+    ),
+    LifecycleOperationStatus.FAILED: (
+        "fr-badge fr-badge--error fr-badge--no-icon fr-badge--sm"
+    ),
+}
+
+FROM_DATA_DELETION_STATUS_BADGE_CLASS_BY_STATUS: dict[str, str] = {
+    FromDataDeletionStatus.NOT_REQUESTED: ("fr-badge fr-badge--no-icon fr-badge--sm"),
+    FromDataDeletionStatus.RUNNING: (
+        "fr-badge fr-badge--info fr-badge--no-icon fr-badge--sm"
+    ),
+    FromDataDeletionStatus.SUCCEEDED: (
+        "fr-badge fr-badge--success fr-badge--no-icon fr-badge--sm"
+    ),
+    FromDataDeletionStatus.FAILED: (
+        "fr-badge fr-badge--error fr-badge--no-icon fr-badge--sm"
+    ),
+}
+
+OPERATION_TYPE_BADGE_CLASS_BY_TYPE: dict[str, str] = {
+    LifecycleOperationType.COOL: "fr-badge fr-badge--no-icon fr-badge--sm",
+    LifecycleOperationType.RESTORE: (
+        "fr-badge fr-badge--info fr-badge--no-icon fr-badge--sm"
+    ),
 }
 
 
@@ -189,6 +227,7 @@ class ProjectDataLifecycleStateListFilter(admin.SimpleListFilter):
 class LifecycleOperationProjectDataListFilter(admin.SimpleListFilter):
     title = _("project")
     parameter_name = "project_data"
+    template = "admin/lab/project/filter.html"
 
     def lookups(self, request, model_admin):
         return ()
@@ -202,6 +241,60 @@ class LifecycleOperationProjectDataListFilter(admin.SimpleListFilter):
         if not value:
             return queryset
         return queryset.filter(project_data_id=value)  # type: ignore
+
+
+class LifecycleOperationTypeListFilter(admin.SimpleListFilter):
+    title = _("operation type")
+    parameter_name = "type"
+    template = "admin/lab/project/filter.html"
+
+    def lookups(self, request, model_admin):
+        return LifecycleOperationType.choices
+
+    def queryset(
+        self,
+        request: HttpRequest,
+        queryset: QuerySet[LifecycleOperation],
+    ) -> QuerySet[LifecycleOperation]:
+        if not self.value():
+            return queryset
+        return queryset.filter(type=self.value())
+
+
+class LifecycleOperationStatusListFilter(admin.SimpleListFilter):
+    title = _("operation status")
+    parameter_name = "status"
+    template = "admin/lab/project/filter.html"
+
+    def lookups(self, request, model_admin):
+        return LifecycleOperationStatus.choices
+
+    def queryset(
+        self,
+        request: HttpRequest,
+        queryset: QuerySet[LifecycleOperation],
+    ) -> QuerySet[LifecycleOperation]:
+        if not self.value():
+            return queryset
+        return queryset.filter(status=self.value())
+
+
+class FromDataDeletionStatusListFilter(admin.SimpleListFilter):
+    title = _("source data deletion")
+    parameter_name = "from_data_deletion_status"
+    template = "admin/lab/project/filter.html"
+
+    def lookups(self, request, model_admin):
+        return FromDataDeletionStatus.choices
+
+    def queryset(
+        self,
+        request: HttpRequest,
+        queryset: QuerySet[LifecycleOperation],
+    ) -> QuerySet[LifecycleOperation]:
+        if not self.value():
+            return queryset
+        return queryset.filter(from_data_deletion_status=self.value())
 
 
 @admin.register(ProjectData)
@@ -359,25 +452,27 @@ class ProjectDataAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
 @admin.register(LifecycleOperation)
 class LifecycleOperationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
     actions = [delete_source_data]
+    change_list_template = "admin/data_management/lifecycleoperation/change_list.html"
     delete_source_data_confirmation_template = (
         "admin/data_management/lifecycleoperation/delete_source_data_confirmation.html"
     )
     list_display = (
-        "operation_id",
+        "operation_id_display",
         "project_link",
-        "type",
-        "status",
-        "started_at",
-        "finished_at",
-        "from_data_deletion_status",
-        "from_data_deleted_at",
+        "operation_type_badge",
+        "status_badge",
+        "started_at_display",
+        "finished_at_display",
+        "from_data_deletion_status_badge",
+        "from_data_deleted_at_display",
         "bytes_progress",
         "files_progress",
     )
     list_filter = (
         LifecycleOperationProjectDataListFilter,
-        "type",
-        "status",
+        LifecycleOperationTypeListFilter,
+        LifecycleOperationStatusListFilter,
+        FromDataDeletionStatusListFilter,
     )
     search_fields = (
         "operation_id",
@@ -386,20 +481,20 @@ class LifecycleOperationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
     )
     ordering = ("-started_at", "-finished_at")
     fields = (
-        "operation_id",
+        "operation_id_display",
         "project_link",
-        "type",
-        "status",
-        "started_at",
-        "finished_at",
-        "bytes_total",
-        "files_total",
-        "bytes_copied",
-        "files_copied",
-        "from_data_deletion_status",
-        "from_data_deleted_at",
-        "from_data_deletion_error",
-        "error_message",
+        "operation_type_badge",
+        "status_badge",
+        "started_at_display",
+        "finished_at_display",
+        "bytes_total_display",
+        "files_total_display",
+        "bytes_copied_display",
+        "files_copied_display",
+        "from_data_deletion_status_badge",
+        "from_data_deleted_at_display",
+        "from_data_deletion_error_display",
+        "error_message_display",
         "formatted_error_details",
     )
     readonly_fields = fields
@@ -423,6 +518,10 @@ class LifecycleOperationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
     def has_delete_permission(self, request: HttpRequest, obj=None) -> bool:
         return False
 
+    @admin.display(description=_("Operation ID"), ordering="operation_id")
+    def operation_id_display(self, obj: LifecycleOperation) -> UUID:
+        return obj.operation_id
+
     @admin.display(description=_("Project"))
     def project_link(self, obj: LifecycleOperation) -> str:
         return format_html(
@@ -431,17 +530,105 @@ class LifecycleOperationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
             obj.project_data.project.name,
         )
 
+    @admin.display(description=_("Type"), ordering="type")
+    def operation_type_badge(self, obj: LifecycleOperation) -> str:
+        return format_html(
+            '<span class="{}">{}</span>',
+            OPERATION_TYPE_BADGE_CLASS_BY_TYPE[obj.type],
+            obj.get_type_display(),
+        )
+
+    @admin.display(description=_("Status"), ordering="status")
+    def status_badge(self, obj: LifecycleOperation) -> str:
+        return format_html(
+            '<span class="{}">{}</span>',
+            OPERATION_STATUS_BADGE_CLASS_BY_STATUS[obj.status],
+            obj.get_status_display(),
+        )
+
+    @admin.display(
+        description=_("Source deletion"),
+        ordering="from_data_deletion_status",
+    )
+    def from_data_deletion_status_badge(self, obj: LifecycleOperation) -> str:
+        return format_html(
+            '<span class="{}">{}</span>',
+            FROM_DATA_DELETION_STATUS_BADGE_CLASS_BY_STATUS[
+                obj.from_data_deletion_status
+            ],
+            obj.get_from_data_deletion_status_display(),
+        )
+
+    @admin.display(description=_("Started at"), ordering="started_at")
+    def started_at_display(self, obj: LifecycleOperation) -> datetime | None:
+        return obj.started_at
+
+    @admin.display(description=_("Finished at"), ordering="finished_at")
+    def finished_at_display(self, obj: LifecycleOperation) -> datetime | None:
+        return obj.finished_at
+
+    @admin.display(description=_("Total bytes"), ordering="bytes_total")
+    def bytes_total_display(self, obj: LifecycleOperation) -> str:
+        return self._format_bytes(obj.bytes_total)
+
+    @admin.display(description=_("Total files"), ordering="files_total")
+    def files_total_display(self, obj: LifecycleOperation) -> int | None:
+        return obj.files_total
+
+    @admin.display(description=_("Copied bytes"), ordering="bytes_copied")
+    def bytes_copied_display(self, obj: LifecycleOperation) -> str:
+        return self._format_bytes(obj.bytes_copied)
+
+    @admin.display(description=_("Copied files"), ordering="files_copied")
+    def files_copied_display(self, obj: LifecycleOperation) -> int | None:
+        return obj.files_copied
+
+    @admin.display(
+        description=_("Source data deleted at"),
+        ordering="from_data_deleted_at",
+    )
+    def from_data_deleted_at_display(self, obj: LifecycleOperation) -> datetime | None:
+        return obj.from_data_deleted_at
+
+    @admin.display(description=_("Source data deletion error"))
+    def from_data_deletion_error_display(self, obj: LifecycleOperation) -> str | None:
+        return obj.from_data_deletion_error
+
+    @admin.display(description=_("Error message"))
+    def error_message_display(self, obj: LifecycleOperation) -> str | None:
+        return obj.error_message
+
     @admin.display(description=_("Bytes moved"))
     def bytes_progress(self, obj: LifecycleOperation) -> str:
-        copied_display = obj.bytes_copied if obj.bytes_copied is not None else "-"
-        total_display = obj.bytes_total if obj.bytes_total is not None else "-"
-        return f"{copied_display} / {total_display}"
+        return self._format_bytes_progress(obj.bytes_copied, obj.bytes_total)
 
     @admin.display(description=_("Files moved"))
     def files_progress(self, obj: LifecycleOperation) -> str:
-        copied_display = obj.files_copied if obj.files_copied is not None else "-"
-        total_display = obj.files_total if obj.files_total is not None else "-"
-        return f"{copied_display} / {total_display}"
+        return self._format_progress(obj.files_copied, obj.files_total)
+
+    @staticmethod
+    def _format_progress(copied: int | None, total: int | None) -> str:
+        copied_display = str(copied) if copied is not None else "-"
+        total_display = str(total) if total is not None else "-"
+        if copied is None or not total:
+            return f"{copied_display} / {total_display}"
+        percentage = round((copied / total) * 100)
+        return f"{copied_display} / {total_display} ({percentage}%)"
+
+    @staticmethod
+    def _format_bytes_progress(copied: int | None, total: int | None) -> str:
+        copied_display = LifecycleOperationAdmin._format_bytes(copied)
+        total_display = LifecycleOperationAdmin._format_bytes(total)
+        if copied is None or not total:
+            return f"{copied_display} / {total_display}"
+        percentage = round((copied / total) * 100)
+        return f"{copied_display} / {total_display} ({percentage}%)"
+
+    @staticmethod
+    def _format_bytes(value: int | None) -> str:
+        if value is None:
+            return "-"
+        return filesizeformat(value)
 
     @admin.display(description=_("Error details"))
     def formatted_error_details(self, obj: LifecycleOperation) -> str | None:
