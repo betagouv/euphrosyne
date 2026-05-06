@@ -22,6 +22,7 @@ interface ParticipationFormProps {
   participationType: ParticipationType;
   participation?: Participation | null;
   employerFormExemptRorIds: string[];
+  canEditUser?: boolean;
   onSuccess?: () => void;
 }
 
@@ -42,6 +43,7 @@ export default function ParticipationForm({
   participation,
   participationType,
   employerFormExemptRorIds,
+  canEditUser = participationType === "leader",
   onSuccess,
 }: ParticipationFormProps) {
   const t = {
@@ -95,6 +97,7 @@ export default function ParticipationForm({
     email &&
     employer.email &&
     email.toLowerCase() === employer.email.toLowerCase();
+  const isUserFieldDisabled = !!participationId && !canEditUser;
 
   const resetForm = () => {
     setEmail("");
@@ -125,7 +128,7 @@ export default function ParticipationForm({
         await setProjectLeader(
           projectId,
           {
-            user: { email },
+            ...(canEditUser ? { user: { email } } : {}),
             institution: {
               name: institution.name,
               country: institution.country,
@@ -204,7 +207,7 @@ export default function ParticipationForm({
           <div className="fr-input-group">
             <label className="fr-label" htmlFor="participation-email">
               {t.email}
-              {participationType !== "leader" && !!participationId && (
+              {isUserFieldDisabled && (
                 <span className="fr-hint-text">{t.disabledReason}</span>
               )}
             </label>
@@ -217,7 +220,7 @@ export default function ParticipationForm({
               onChange={(e) => setEmail(e.target.value)}
               required={!participationId}
               autoComplete="on"
-              disabled={participationType !== "leader" && !!participationId}
+              disabled={isUserFieldDisabled}
             />
             <FieldError errors={errors} firstKey="user" secondKey="email" />
             <FieldError errors={errors} firstKey="user" />

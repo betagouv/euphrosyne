@@ -53,7 +53,7 @@ interface ParticipationEditData {
 }
 
 interface ParticipationLeaderData {
-  user: UserWithEmailData;
+  user?: UserWithEmailData;
   institution: InstitutionData;
   employer: EmployerData | null;
 }
@@ -157,9 +157,6 @@ export async function setProjectLeader(
   change: boolean = false,
 ) {
   const payload: Record<string, unknown> = {
-    user: {
-      email: participationData.user.email,
-    },
     institution: {
       name: participationData.institution.name,
       country: participationData.institution.country,
@@ -167,6 +164,12 @@ export async function setProjectLeader(
     },
     employer: null,
   };
+
+  if (participationData.user) {
+    payload.user = {
+      email: participationData.user.email,
+    };
+  }
 
   if (participationData.employer) {
     payload.employer = {
