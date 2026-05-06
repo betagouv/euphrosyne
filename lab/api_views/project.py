@@ -2,8 +2,10 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django_filters import rest_framework as filters
 from rest_framework import generics, serializers
-from rest_framework.permissions import IsAdminUser
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import SAFE_METHODS, IsAdminUser
 
+from lab.permissions import is_lab_admin, is_project_leader
 from lab.runs.models import Run
 
 from ..models import Participation, Project
@@ -168,6 +170,28 @@ class ProjectLeaderParticipationRetrieveCreateUpdateGroupView(
         project_id = self.kwargs.get("project_id")
         return Project.objects.filter(id=project_id).first()
 
+    def check_permissions(self, request):
+        """Allow project members to read, and only lab admins/leaders to update.
+
+        Lab admins retain full management access, including creating a leader
+        participation and changing the leader user. Project leaders may only
+        update their own leader participation. Other project members may read
+        the leader participation but cannot modify it.
+        """
+        super().check_permissions(request)
+        project = self.get_related_project()
+        if project is None:
+            return
+        if is_lab_admin(request.user):
+            return
+        if request.method in SAFE_METHODS:
+            if project.participation_set.filter(user=request.user).exists():
+                return
+        elif request.method in ("PATCH", "PUT"):
+            if is_project_leader(request.user, project):
+                return
+        raise PermissionDenied()
+
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
         obj = get_object_or_404(queryset)
@@ -183,7 +207,22 @@ class ProjectLeaderParticipationRetrieveCreateUpdateGroupView(
             "project": self.get_related_project(),
         }
 
+    def get_serializer(self, *args, **kwargs):
+        if (
+            getattr(self, "request", None)
+            and not is_lab_admin(self.request.user)
+            and self.request.method in ("PATCH", "PUT")
+            and "data" in kwargs
+        ):
+            data = kwargs["data"].copy()
+            data.pop("user", None)
+            kwargs["data"] = data
+        return super().get_serializer(*args, **kwargs)
+
     def perform_create(self, serializer: serializers.ModelSerializer):
         serializer.save(
             on_premises=True, project=self.get_related_project(), is_leader=True
         )
+
+    def perform_update(self, serializer: serializers.ModelSerializer):
+        serializer.save(is_leader=True)

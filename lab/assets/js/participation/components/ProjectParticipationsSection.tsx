@@ -29,7 +29,7 @@ function isLabAdminOrProjectLeader(
 ) {
   return !!(
     userData.isLabAdmin ||
-    (leaderParticipation && userData.email === leaderParticipation.user.email)
+    (leaderParticipation && userData.id === leaderParticipation.user.id)
   );
 }
 
@@ -121,6 +121,10 @@ export default function ProjectParticipationsForm({
     useState<Participation | null>(null);
   const [onPremisesParticipationToEdit, setOnPremisesParticipationToEdit] =
     useState<Participation | null>(null);
+  const canManageParticipations = isLabAdminOrProjectLeader(
+    userData,
+    leaderParticipation,
+  );
 
   const loadParticipations = useCallback(async () => {
     await fetchLeaderParticipation(projectId).then((data) => {
@@ -154,6 +158,7 @@ export default function ProjectParticipationsForm({
         participation={leaderParticipation}
         projectId={projectId}
         employerFormExemptRorIds={employerFormExemptRorIds}
+        canEditUser={userData.isLabAdmin}
         onFormSubmit={() => loadParticipations()}
         modalTitle={t.leaderModalTitle}
       />
@@ -188,7 +193,7 @@ export default function ProjectParticipationsForm({
             tableCaption={t.leaderParticipationsTable}
             editModalId={leaderModalId}
             canDelete={false}
-            canEdit={userData.isLabAdmin}
+            canEdit={canManageParticipations}
             isRadiationProtectionEnabled={isRadiationProtectionEnabled}
           />
         )}
@@ -212,8 +217,8 @@ export default function ProjectParticipationsForm({
             participations={onPremisesParticipations}
             tableCaption={t.onPremisesParticipationsTable}
             editModalId={onPremisesModalId}
-            canDelete={isLabAdminOrProjectLeader(userData, leaderParticipation)}
-            canEdit={isLabAdminOrProjectLeader(userData, leaderParticipation)}
+            canDelete={canManageParticipations}
+            canEdit={canManageParticipations}
             onDeleteClick={onDeleteClick}
             onEditClick={(participation) => {
               setOnPremisesParticipationToEdit(participation);
@@ -221,7 +226,7 @@ export default function ProjectParticipationsForm({
             isRadiationProtectionEnabled={isRadiationProtectionEnabled}
           />
         )}
-        {isLabAdminOrProjectLeader(userData, leaderParticipation) && (
+        {canManageParticipations && (
           <AddParticipationButton
             modalId={onPremisesModalId}
             onClick={() => {
@@ -244,14 +249,14 @@ export default function ProjectParticipationsForm({
             tableCaption={t.remoteParticipationsTable}
             editModalId={remoteModalId}
             onDeleteClick={onDeleteClick}
-            canDelete={isLabAdminOrProjectLeader(userData, leaderParticipation)}
-            canEdit={isLabAdminOrProjectLeader(userData, leaderParticipation)}
+            canDelete={canManageParticipations}
+            canEdit={canManageParticipations}
             onEditClick={(participation) => {
               setRemoteParticipationToEdit(participation);
             }}
           />
         )}
-        {isLabAdminOrProjectLeader(userData, leaderParticipation) && (
+        {canManageParticipations && (
           <AddParticipationButton
             modalId={remoteModalId}
             onClick={() => {

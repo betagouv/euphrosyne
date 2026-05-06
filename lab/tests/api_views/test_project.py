@@ -1,6 +1,7 @@
 from unittest import mock
 
-from django.test import Client, TestCase
+from django.contrib.auth import get_user_model
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -269,3 +270,122 @@ class TestProjectLeaderParticipationRetrieveCreateUpdateGroupView(TestCase):
         self.project.leader.refresh_from_db()
         assert self.project.leader.user.email == "newleader@test.test"
         assert self.project.leader.is_leader is True
+
+    def test_project_member_can_retrieve_leader_participation(self):
+        member_participation = factories.ParticipationFactory(project=self.project)
+        self.client.force_login(member_participation.user)
+
+        response = self.client.get(self.api_url)
+
+        assert response.status_code == 200
+        assert response.json()["id"] == self.project.leader.id
+
+    def test_project_leader_can_update_own_institution_and_employer(self):
+        self.client.force_login(self.project.leader.user)
+        data = {
+            "institution": {
+                "name": "Updated Institution",
+                "country": "Germany",
+                "ror_id": "https://ror.org/updated",
+            },
+            "employer": {
+                "first_name": "Jane",
+                "last_name": "Doe",
+                "email": "jane.doe@example.com",
+                "function": "Research manager",
+            },
+        }
+
+        response = self.client.patch(
+            self.api_url, data, content_type="application/json"
+        )
+
+        assert response.status_code == 200
+        self.project.leader.refresh_from_db()
+        assert self.project.leader.institution.name == "Updated Institution"
+        assert self.project.leader.institution.country == "Germany"
+        assert self.project.leader.institution.ror_id == "https://ror.org/updated"
+        assert self.project.leader.employer.first_name == "Jane"
+        assert self.project.leader.employer.last_name == "Doe"
+        assert self.project.leader.employer.email == "jane.doe@example.com"
+        assert self.project.leader.employer.function == "Research manager"
+
+    @mock.patch("lab.api_views.serializers.send_project_invitation_email")
+    def test_project_leader_cannot_update_own_user_email(
+        self, mock_send_project_invitation
+    ):
+        self.client.force_login(self.project.leader.user)
+        old_email = self.project.leader.user.email
+        new_email = "not-the-leader@example.com"
+
+        response = self.client.patch(
+            self.api_url,
+            {"user": {"email": new_email}},
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        self.project.leader.refresh_from_db()
+        assert self.project.leader.user.email == old_email
+        assert not get_user_model().objects.filter(email=new_email).exists()
+        mock_send_project_invitation.assert_not_called()
+
+    def test_non_leader_project_member_cannot_update_leader_participation(self):
+        member_participation = factories.ParticipationFactory(project=self.project)
+        self.client.force_login(member_participation.user)
+
+        response = self.client.patch(
+            self.api_url,
+            {
+                "institution": {
+                    "name": "Forbidden Institution",
+                    "country": "France",
+                }
+            },
+            content_type="application/json",
+        )
+
+        assert response.status_code == 403
+
+    def test_unrelated_staff_user_cannot_update_leader_participation(self):
+        self.client.force_login(auth_factories.StaffUserFactory())
+
+        response = self.client.patch(
+            self.api_url,
+            {
+                "institution": {
+                    "name": "Forbidden Institution",
+                    "country": "France",
+                }
+            },
+            content_type="application/json",
+        )
+
+        assert response.status_code == 403
+
+    @override_settings(
+        PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS=["https://ror.org/exempt"]
+    )
+    def test_project_leader_update_to_exempt_institution_removes_employer(self):
+        employer = factories.EmployerFactory()
+        leader = self.project.leader
+        leader.employer = employer
+        leader.save()
+        self.client.force_login(self.project.leader.user)
+
+        response = self.client.patch(
+            self.api_url,
+            {
+                "institution": {
+                    "name": "Exempt Institution",
+                    "country": "France",
+                    "ror_id": "https://ror.org/exempt",
+                }
+            },
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        self.project.leader.refresh_from_db()
+        assert self.project.leader.institution.name == "Exempt Institution"
+        assert self.project.leader.employer is None
