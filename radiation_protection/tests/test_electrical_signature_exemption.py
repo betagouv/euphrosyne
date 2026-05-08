@@ -1,16 +1,18 @@
 from unittest import mock
 
 import pytest
+from django.test import override_settings
 
 from lab.tests import factories as lab_factories
-from radiation_protection.electrical_signature.policy import should_exempt_institution
+from radiation_protection.electrical_signature.policy import (
+    participation_has_required_employer_for_risk_prevention,
+    should_exempt_institution,
+)
 from radiation_protection.models import RiskPreventionPlan
 
 
-@mock.patch(
-    "radiation_protection.electrical_signature.policy.app_settings."
-    "RADIATION_PROTECTION_ELECTRICAL_SIGNATURE_EXEMPT_ROR_IDS",
-    ["https://ror.org/123456789"],
+@override_settings(
+    PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS=["https://ror.org/123456789"]
 )
 def test_should_exempt_institution_matches_ror_id():
     assert (
@@ -24,10 +26,45 @@ def test_should_exempt_institution_matches_ror_id():
 
 
 @pytest.mark.django_db
-@mock.patch(
-    "radiation_protection.electrical_signature.policy.app_settings."
-    "RADIATION_PROTECTION_ELECTRICAL_SIGNATURE_EXEMPT_ROR_IDS",
-    ["https://ror.org/123456789"],
+@override_settings(
+    PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS=["https://ror.org/123456789"]
+)
+def test_participation_has_required_employer_with_employer_or_exempt_institution():
+    exempt_institution = lab_factories.InstitutionFactory(
+        ror_id="https://ror.org/123456789"
+    )
+
+    assert (
+        participation_has_required_employer_for_risk_prevention(
+            lab_factories.ParticipationFactory(
+                employer=lab_factories.EmployerFactory(),
+            )
+        )
+        is True
+    )
+    assert (
+        participation_has_required_employer_for_risk_prevention(
+            lab_factories.ParticipationFactory(
+                employer=None,
+                institution=exempt_institution,
+            )
+        )
+        is True
+    )
+    assert (
+        participation_has_required_employer_for_risk_prevention(
+            lab_factories.ParticipationFactory(
+                employer=None,
+                institution=None,
+            )
+        )
+        is False
+    )
+
+
+@pytest.mark.django_db
+@override_settings(
+    PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS=["https://ror.org/123456789"]
 )
 def test_risk_prevention_plan_sets_exempt_on_create():
     user = lab_factories.StaffUserFactory()
@@ -46,10 +83,8 @@ def test_risk_prevention_plan_sets_exempt_on_create():
 
 
 @pytest.mark.django_db
-@mock.patch(
-    "radiation_protection.electrical_signature.policy.app_settings."
-    "RADIATION_PROTECTION_ELECTRICAL_SIGNATURE_EXEMPT_ROR_IDS",
-    ["https://ror.org/123456789"],
+@override_settings(
+    PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS=["https://ror.org/123456789"]
 )
 def test_risk_prevention_plan_does_not_update_exempt_on_save():
     user = lab_factories.StaffUserFactory()

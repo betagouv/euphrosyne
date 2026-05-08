@@ -1,0 +1,33 @@
+{% autoescape off %}
+English version below
+
+Bonjour,
+
+Vous êtes attendu(e) sur site pour le projet « {{ project.name }} ».
+
+Nous avons constaté que vos informations employeur n’ont pas encore été renseignées. Ces informations sont nécessaires pour préparer les documents administratifs et de sécurité requis avant votre visite à New AGLAE.
+
+Merci de compléter vos informations via le lien suivant :
+{{ completion_url }}
+
+Pour toute question, n’hésitez pas à nous contacter.
+
+Cordialement,
+L’équipe New AGLAE
+
+__________________________________________________________________________
+
+Hello,
+
+You are expected on site for project “{{ project.name }}”.
+
+We noticed that your employer information has not yet been provided. This information is required to prepare the administrative and safety documents needed before your visit to New AGLAE.
+
+Please complete your information via the following link:
+{{ completion_url }}
+
+If you have any questions, please do not hesitate to contact us.
+
+Best regards,
+The New AGLAE Team
+{% endautoescape %}

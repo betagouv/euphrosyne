@@ -6,6 +6,9 @@ from django.core.management.base import BaseCommand
 from ...electrical_signature.electrical_signature import (
     start_electrical_signature_processes,
 )
+from ...electrical_signature.policy import (
+    participation_has_required_employer_for_risk_prevention,
+)
 from ...models import RiskPreventionPlan
 
 logger = logging.getLogger(__name__)
@@ -20,9 +23,18 @@ class Command(BaseCommand):
             "[send-electrical-signature-processes] Sending documents to sign..."
         )
 
-        plans = RiskPreventionPlan.objects.filter(
-            risk_advisor_notification_sent=False,
-        ).exclude(electrical_signature_exempt=True)
+        plans = (
+            RiskPreventionPlan.objects.filter(
+                risk_advisor_notification_sent=False,
+            )
+            .exclude(electrical_signature_exempt=True)
+            .select_related(
+                "participation__employer",
+                "participation__institution",
+                "participation__user",
+                "run",
+            )
+        )
 
         self.stdout.write(
             "[send-electrical-signature-processes] Found %d risk prevention plans to process."  # pylint: disable=line-too-long
@@ -33,6 +45,15 @@ class Command(BaseCommand):
             user = plan.participation.user
             sentry_sdk.set_extra("user", user.email)
             sentry_sdk.set_extra("run", plan.run.id)
+
+            if not participation_has_required_employer_for_risk_prevention(
+                plan.participation
+            ):
+                logger.error(
+                    "Skipping electrical signature process for plan %s because employer information is missing.",  # pylint: disable=line-too-long
+                    plan.id,
+                )
+                continue
 
             # Generate the document
             try:

@@ -1,6 +1,7 @@
 from typing import Any, Protocol
 
 from django import forms
+from django.conf import settings
 from django.utils.datastructures import MultiValueDict
 from django.utils.translation import gettext_lazy as _
 
@@ -77,10 +78,16 @@ class MemberProjectForm(BaseProjectForm, InstitutionFormMixin):
         widget=widgets.InstitutionAutoCompleteWidget(),
     )
 
-    employer_first_name = forms.CharField(label=_("First name"), max_length=150)
-    employer_last_name = forms.CharField(label=_("Last name"), max_length=150)
-    employer_email = forms.EmailField(label=_("Email"), max_length=150)
-    employer_function = forms.CharField(label=_("Function"), max_length=150)
+    employer_first_name = forms.CharField(
+        label=_("First name"), max_length=150, required=False
+    )
+    employer_last_name = forms.CharField(
+        label=_("Last name"), max_length=150, required=False
+    )
+    employer_email = forms.EmailField(label=_("Email"), max_length=150, required=False)
+    employer_function = forms.CharField(
+        label=_("Function"), max_length=150, required=False
+    )
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(
@@ -88,6 +95,26 @@ class MemberProjectForm(BaseProjectForm, InstitutionFormMixin):
             **kwargs,
         )
         self.fields["comments"].required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        institution = cleaned_data.get("institution")
+        if (
+            institution
+            and institution.ror_id
+            in settings.PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS
+        ):
+            return cleaned_data
+
+        for field in [
+            "employer_first_name",
+            "employer_last_name",
+            "employer_email",
+            "employer_function",
+        ]:
+            if not cleaned_data.get(field):
+                self.add_error(field, _("This field is required."))
+        return cleaned_data
 
     def full_clean(self):
         self.try_populate_institution()

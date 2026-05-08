@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-01 14:55+0200\n"
+"POT-Creation-Date: 2026-05-06 16:07+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -1100,6 +1100,9 @@ msgstr "Cet objet a déjà été ajouté à ce run."
 msgid "%s import"
 msgstr "Import %s"
 
+msgid "Function"
+msgstr "Fonction"
+
 msgid "On premises"
 msgstr "Sur place"
 
@@ -1114,6 +1117,12 @@ msgstr "pays"
 
 msgid "function"
 msgstr "fonction"
+
+msgid "Employer information has been saved."
+msgstr "Les informations employeur ont été enregistrées."
+
+msgid "Employer information required"
+msgstr "Informations employeur requises"
 
 msgid "Leader"
 msgstr "Chef de projet"
@@ -1186,9 +1195,6 @@ msgstr "Ce champ doit faire moins de 560 caractères."
 
 msgid "I have read and accepted the general conditions of Euphrosyne."
 msgstr "J'ai lu et accepté les conditions générales d'Euphrosyne."
-
-msgid "Function"
-msgstr "Fonction"
 
 msgid "Scheduled"
 msgstr "Planifié"
@@ -1321,13 +1327,6 @@ msgstr "Embargo permanent"
 
 msgid "The end date must be after the start date"
 msgstr "La date de fin doit être après la date de début"
-
-msgid ""
-"All on-site participations must have an employer before scheduling this run "
-"for the first time."
-msgstr ""
-"Toutes les participations sur site doivent avoir un employeur avant de "
-"planifier ce run pour la première fois."
 
 msgid "Run label"
 msgstr "Libellé du run"
@@ -1549,6 +1548,25 @@ msgstr "Cordialement,"
 msgid "Other"
 msgstr "Autre"
 
+msgid "Complete your employer information"
+msgstr "Complétez vos informations employeur"
+
+msgid "Please provide your employer information to continue."
+msgstr "Veuillez renseigner vos informations employeur pour continuer."
+
+msgid "Why we need this information"
+msgstr "Pourquoi nous avons besoin de ces informations"
+
+msgid ""
+"This information is required to prepare the mandatory site access and safety "
+"documentation before your visit to New AGLAE."
+msgstr ""
+"Ces informations sont nécessaires pour préparer les documents obligatoires "
+"d’accès au site et de sécurité avant votre visite à New AGLAE."
+
+msgid "Save employer information"
+msgstr "Enregistrer les informations employeur"
+
 #, python-format
 msgid ""
 "The VM of project %(project_name)s has been running for a long time now."
@@ -1735,6 +1753,10 @@ msgstr "Formulaire d'autorisation d'accès"
 #, python-format
 msgid "started (%(steps_completed)s)"
 msgstr "démarré (%(steps_completed)s)"
+
+#, python-format
+msgid "Employer information required for project %s"
+msgstr "Informations employeur requises pour le projet %s"
 
 msgid "Prevention plan sent"
 msgstr "Plan de prévention envoyé"

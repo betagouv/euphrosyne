@@ -22,6 +22,7 @@ from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
 
 from euphro_auth.views import UserTokenRegistrationView, cgu_acceptance_view
+from lab.participations.views import complete_employer_information
 from orcid_oauth.views import UserCompleteAccountView
 
 urlpatterns = [
@@ -61,6 +62,11 @@ urlpatterns = [
         "cgu-acceptance/",
         cgu_acceptance_view,
         name="cgu_acceptance",
+    ),
+    path(
+        "projects/<int:project_id>/employer/",
+        complete_employer_information,
+        name="participation_employer_completion",
     ),
     path("api/", include("euphrosyne.api_urls"), name="api"),
     path("i18n/", include("django.conf.urls.i18n")),

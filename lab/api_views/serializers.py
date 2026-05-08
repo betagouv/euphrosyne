@@ -347,17 +347,6 @@ class OnPremisesParticipationSerializer(ParticipationSerializer):
         self.Meta.fields = [*self.Meta.fields, "employer"]
         super().__init__(instance, data, **kwargs)
 
-    def validate(self, attrs):
-        attrs = super().validate(attrs)
-        if self._is_employer_form_exempt(attrs):
-            return attrs
-        if self._is_employer_data_missing(attrs):
-            required_message = self.fields["employer"].error_messages.get(
-                "required", _("This field is required.")
-            )
-            raise serializers.ValidationError({"employer": [required_message]})
-        return attrs
-
     def create(self, validated_data):
         employer = None
         employer_data = validated_data.pop("employer", None)
@@ -380,7 +369,8 @@ class OnPremisesParticipationSerializer(ParticipationSerializer):
 
         employer_data = validated_data.pop("employer", None)
         if (
-            self._get_institution_ror_id(validated_data)
+            "institution" in validated_data
+            and self._get_institution_ror_id(validated_data)
             in settings.PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS
             and instance.employer
         ):
@@ -401,21 +391,6 @@ class OnPremisesParticipationSerializer(ParticipationSerializer):
             send_project_invitation_email(instance.user.email, instance.project)
             self._handle_user_change(instance)
         return instance
-
-    def _is_employer_data_missing(self, attrs: dict) -> bool:
-        if self.partial and "employer" not in attrs:
-            return False
-        if attrs.get("employer") is not None:
-            return False
-        if self.instance and self.instance.employer:
-            return False
-        return True
-
-    def _is_employer_form_exempt(self, attrs: dict) -> bool:
-        ror_id = self._get_institution_ror_id(attrs)
-        if not ror_id:
-            return False
-        return ror_id in settings.PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS
 
     def _get_institution_ror_id(self, attrs: dict) -> str | None:
         institution_data = attrs.get("institution")

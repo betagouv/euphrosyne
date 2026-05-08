@@ -13,3 +13,5 @@ class Command(BaseCommand):
         management.call_command("check_long_running_vms", "1440", "--send-alerts")
         if apps.is_installed("data_management"):
             management.call_command("schedule_project_cooling")
+        if apps.is_installed("radiation_protection"):
+            management.call_command("send_employer_information_reminders")
