@@ -264,7 +264,12 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         if change and "name" in form.changed_data:
             ensure_project_data_writable(obj)
             try:
-                rename_project_directory(form.initial["name"], obj.name)
+                # For current project slug, we use obj.slug
+                # For new project slug, we use _generate_slug() because obj now
+                # has been populated with new `name`.
+                rename_project_directory(
+                    project_slug=obj.slug, new_project_slug=obj.generate_slug()
+                )
             except RenameFailedError as error:
                 # Prevent changing name
                 obj.name = form.initial["name"]
