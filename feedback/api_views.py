@@ -3,15 +3,15 @@ from django.core.mail import EmailMessage
 from rest_framework import status
 from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.parsers import MultiPartParser
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from .serializers import FeedbackFormSerializer
 
 
-@permission_classes([IsAdminUser])
-@parser_classes([MultiPartParser])
 @api_view(["POST"])
+@permission_classes([AllowAny])
+@parser_classes([MultiPartParser])
 def feedback_view(request):
     serializer = FeedbackFormSerializer(data=request.data)
     if serializer.is_valid():
