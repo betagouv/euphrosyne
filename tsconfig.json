@@ -8,7 +8,6 @@
     "jsxImportSource": "@emotion/react",
     "allowJs": true,
     "moduleResolution": "bundler",
-    "downlevelIteration": true,
     /* Type Checking */
     "strict": true /* Enable all strict type-checking options. */,
     "types": ["vitest/globals"],
