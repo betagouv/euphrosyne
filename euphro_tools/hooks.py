@@ -61,36 +61,36 @@ def initialize_run_directory(project_slug: str, run_name: str):
         )
 
 
-def rename_run_directory(project_name: str, run_name: str, new_run_name: str):
+def rename_run_directory(project_slug: str, run_name: str, new_run_name: str):
     base_url = os.environ["EUPHROSYNE_TOOLS_API_URL"]
     response = _make_request(
-        f"{base_url}/data/{project_name}/runs/{run_name}/rename/{new_run_name}"
+        f"{base_url}/data/{project_slug}/runs/{run_name}/rename/{new_run_name}"
     )
     if response is not None and not response.ok:
         logger.error(
             "Could not update run directory name from %s to %s of project %s. %s: %s",
             run_name,
             new_run_name,
-            project_name,
+            project_slug,
             response.status_code,
             response.text,
         )
 
 
-def rename_project_directory(project_name: str, new_project_name: str):
+def rename_project_directory(project_slug: str, new_project_slug: str):
     base_url = os.environ["EUPHROSYNE_TOOLS_API_URL"]
     base_error_message = "Could not update project directory name from %s to %s. %s"
     error = ""
     try:
         response = _make_request(
-            f"{base_url}/data/{project_name}/rename/{new_project_name}",
+            f"{base_url}/data/{project_slug}/rename/{new_project_slug}",
             raise_on_error=True,
         )
     except (requests.Timeout, requests.ConnectionError) as e:
         logger.error(
             base_error_message,
-            project_name,
-            new_project_name,
+            project_slug,
+            new_project_slug,
             str(error),
         )
         raise RenameFailedError(_("Euphro tools is not available.")) from e
@@ -98,8 +98,8 @@ def rename_project_directory(project_name: str, new_project_name: str):
         error = f"{response.status_code}: {response.text}"
         logger.error(
             base_error_message,
-            project_name,
-            new_project_name,
+            project_slug,
+            new_project_slug,
             str(error),
         )
         raise RenameFailedError(response.text)

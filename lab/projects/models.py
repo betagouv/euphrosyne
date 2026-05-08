@@ -225,7 +225,7 @@ class Project(TimestampedModel):
             raise ValidationError(
                 {"name": ValidationError(_("Project name cannot be empty."))}
             )
-        slug = self._generate_slug()
+        slug = self.generate_slug()
         qs = Project.objects.filter(slug=slug)
         if self.id:
             qs = qs.exclude(id=self.id)
@@ -244,10 +244,10 @@ class Project(TimestampedModel):
             )
 
     def save(self, *args, **kwargs) -> None:
-        self.slug = self._generate_slug()
+        self.slug = self.generate_slug()
         return super().save(*args, **kwargs)
 
-    def _generate_slug(self):
+    def generate_slug(self):
         if not self.name:
             raise ValueError("Can't generate slug : project name is empty.")
         return slugify(self.name)

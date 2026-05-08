@@ -126,11 +126,11 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
 
     @patch("lab.projects.admin.rename_project_directory")
     def test_change_project_name_calls_hook(self, rename_project_dir_mock):
-        project = ProjectFactory(name="project a")
+        project = ProjectFactory(name="project A")
         request = self.request_factory.post(
             reverse("admin:lab_project_change", args=[project.id]),
             data={
-                "name": "project b",
+                "name": "project B",
             },
         )
         request.user = self.admin_user
@@ -141,7 +141,9 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
             # Clean form to populate run instance
             assert form.is_valid()
             project_admin.save_model(request, project, form=form, change=True)
-        rename_project_dir_mock.assert_called_once_with("project a", "project b")
+        rename_project_dir_mock.assert_called_once_with(
+            project_slug="project-a", new_project_slug="project-b"
+        )
 
     @patch("lab.projects.admin.rename_project_directory")
     def test_change_project_name_is_forbidden_when_project_is_cool(
