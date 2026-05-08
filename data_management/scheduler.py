@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from http import HTTPStatus
 
 import requests
@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 
 COOLING_BATCH_LIMIT = 3
 TOOLS_API_TIMEOUT_SECONDS = 10
+RESTORED_PROJECT_COOLING_GRACE_PERIOD_DAYS = 30
 
 
 def _is_project_cooling_enabled() -> bool:
@@ -163,13 +164,24 @@ def run_cooling_scheduler(
             LifecycleOperationStatus.RUNNING,
         ],
     )
+    recent_successful_restore_ops = LifecycleOperation.objects.filter(
+        project_data_id=OuterRef("pk"),
+        type=LifecycleOperationType.RESTORE,
+        status=LifecycleOperationStatus.SUCCEEDED,
+        finished_at__gte=(
+            now - timedelta(days=RESTORED_PROJECT_COOLING_GRACE_PERIOD_DAYS)
+        ),
+    )
     eligible_qs = (
         ProjectData.objects.filter(
             lifecycle_state=LifecycleState.HOT,
             cooling_eligible_at__lte=timezone.localdate(),
         )
-        .annotate(has_active_cool=Exists(active_cool_ops))
-        .filter(has_active_cool=False)
+        .annotate(
+            has_active_cool=Exists(active_cool_ops),
+            has_recent_successful_restore=Exists(recent_successful_restore_ops),
+        )
+        .filter(has_active_cool=False, has_recent_successful_restore=False)
     )
     eligible_count = eligible_qs.count()
     logger.info("Cooling scheduler eligible projects: %s", eligible_count)

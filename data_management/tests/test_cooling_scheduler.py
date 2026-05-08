@@ -86,6 +86,96 @@ def test_scheduler_enqueues_oldest_three(monkeypatch):
 
 @pytest.mark.django_db
 @override_settings(DATA_COOLING_ENABLE=True)
+def test_scheduler_skips_recently_restored_project():
+    project_data = ProjectDataFactory(
+        cooling_eligible_at=timezone.localdate() - timedelta(days=1),
+    )
+    LifecycleOperation.objects.create(
+        project_data=project_data,
+        type=LifecycleOperationType.RESTORE,
+        status=LifecycleOperationStatus.SUCCEEDED,
+        finished_at=timezone.now() - timedelta(days=29),
+    )
+
+    with mock.patch("data_management.scheduler.post_cool_project") as cool_mock:
+        enqueued = run_cooling_scheduler()
+
+    project_data.refresh_from_db()
+
+    assert enqueued == 0
+    assert project_data.lifecycle_state == LifecycleState.HOT
+    assert LifecycleOperation.objects.count() == 1
+    cool_mock.assert_not_called()
+
+
+@pytest.mark.django_db
+@override_settings(DATA_COOLING_ENABLE=True)
+def test_scheduler_enqueues_project_restored_after_grace_period():
+    project_data = ProjectDataFactory(
+        cooling_eligible_at=timezone.localdate() - timedelta(days=1),
+    )
+    LifecycleOperation.objects.create(
+        project_data=project_data,
+        type=LifecycleOperationType.RESTORE,
+        status=LifecycleOperationStatus.SUCCEEDED,
+        finished_at=timezone.now() - timedelta(days=31),
+    )
+
+    with mock.patch(
+        "data_management.scheduler.post_cool_project",
+        return_value=DummyResponse(status_code=202),
+    ) as cool_mock:
+        enqueued = run_cooling_scheduler()
+
+    project_data.refresh_from_db()
+
+    assert enqueued == 1
+    assert project_data.lifecycle_state == LifecycleState.COOLING
+    assert (
+        LifecycleOperation.objects.filter(type=LifecycleOperationType.COOL).count() == 1
+    )
+    cool_mock.assert_called_once()
+
+
+@pytest.mark.django_db
+@override_settings(DATA_COOLING_ENABLE=True)
+def test_scheduler_grace_period_only_uses_successful_restore_operations():
+    recent_failed_restore_project_data = ProjectDataFactory(
+        cooling_eligible_at=timezone.localdate() - timedelta(days=2),
+    )
+    LifecycleOperation.objects.create(
+        project_data=recent_failed_restore_project_data,
+        type=LifecycleOperationType.RESTORE,
+        status=LifecycleOperationStatus.FAILED,
+        finished_at=timezone.now() - timedelta(days=1),
+    )
+
+    recent_cool_project_data = ProjectDataFactory(
+        cooling_eligible_at=timezone.localdate() - timedelta(days=1),
+    )
+    LifecycleOperation.objects.create(
+        project_data=recent_cool_project_data,
+        type=LifecycleOperationType.COOL,
+        status=LifecycleOperationStatus.SUCCEEDED,
+        finished_at=timezone.now() - timedelta(days=1),
+    )
+
+    with mock.patch(
+        "data_management.scheduler.post_cool_project",
+        return_value=DummyResponse(status_code=202),
+    ):
+        enqueued = run_cooling_scheduler(limit=2)
+
+    recent_failed_restore_project_data.refresh_from_db()
+    recent_cool_project_data.refresh_from_db()
+
+    assert enqueued == 2
+    assert recent_failed_restore_project_data.lifecycle_state == LifecycleState.COOLING
+    assert recent_cool_project_data.lifecycle_state == LifecycleState.COOLING
+
+
+@pytest.mark.django_db
+@override_settings(DATA_COOLING_ENABLE=True)
 def test_scheduler_marks_failed_when_tools_api_rejects():
 
     project_data = ProjectDataFactory(
