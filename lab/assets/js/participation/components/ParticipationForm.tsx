@@ -90,8 +90,12 @@ export default function ParticipationForm({
 
   const isEmployerFormExempt =
     !!institution.rorId && employerFormExemptRorIds.includes(institution.rorId);
+  const hasEmployerData = Object.values(employer).some(
+    (value) => value.trim() !== "",
+  );
   const shouldSendEmployer =
-    participationType !== "remote" && !isEmployerFormExempt;
+    participationType !== "remote" && !isEmployerFormExempt && hasEmployerData;
+  const isEmployerFieldRequired = !isEmployerFormExempt && hasEmployerData;
   const hasSameEmail =
     shouldSendEmployer &&
     email &&
@@ -290,7 +294,7 @@ export default function ParticipationForm({
                   setEmployer({ ...employer, email: e.target.value })
                 }
                 aria-describedby="participation-employer-email-messages"
-                required={!isEmployerFormExempt}
+                required={isEmployerFieldRequired}
               />
               <FieldError
                 errors={errors}
@@ -322,7 +326,7 @@ export default function ParticipationForm({
                 onChange={(e) =>
                   setEmployer({ ...employer, firstName: e.target.value })
                 }
-                required={!isEmployerFormExempt}
+                required={isEmployerFieldRequired}
               />
               <FieldError
                 errors={errors}
@@ -348,7 +352,7 @@ export default function ParticipationForm({
                 onChange={(e) =>
                   setEmployer({ ...employer, lastName: e.target.value })
                 }
-                required={!isEmployerFormExempt}
+                required={isEmployerFieldRequired}
               />
               <FieldError
                 errors={errors}
@@ -373,7 +377,7 @@ export default function ParticipationForm({
                 onChange={(e) =>
                   setEmployer({ ...employer, function: e.target.value })
                 }
-                required={!isEmployerFormExempt}
+                required={isEmployerFieldRequired}
               />
               <FieldError
                 errors={errors}

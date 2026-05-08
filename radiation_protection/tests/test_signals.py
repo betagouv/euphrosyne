@@ -13,11 +13,34 @@ from lab.participations.models import Participation
 from lab.tests import factories as lab_factories
 from radiation_protection.models import RiskPreventionPlan
 from radiation_protection.signals import (
+    _is_participation_ready_for_risk_prevention_plan,
     handle_radiation_protection_certification,
     handle_radiation_protection_on_participation,
     handle_radiation_protection_on_schedule_run,
 )
 from radiation_protection.tests.factories import RadiationProtectionQuizResult
+
+
+class TestRiskPreventionPlanReadiness(TestCase):
+    @mock.patch("radiation_protection.signals.check_radio_protection_certification")
+    def test_uses_certification_invitation_helper(self, mock_check):
+        project = lab_factories.ProjectFactory()
+        participation = lab_factories.ParticipationFactory(
+            project=project,
+            on_premises=True,
+            employer=lab_factories.EmployerFactory(),
+        )
+        run = lab_factories.RunFactory(
+            project=project,
+            start_date=timezone.now() + timedelta(days=7),
+        )
+        mock_check.return_value = False
+
+        assert (
+            _is_participation_ready_for_risk_prevention_plan(participation, run)
+            is False
+        )
+        mock_check.assert_called_once_with(participation.user)
 
 
 class TestHandleRadiationProtectionCertification(TestCase):
@@ -145,13 +168,19 @@ class TestHandleRadiationProtectionCertification(TestCase):
 
         run = lab_factories.RunFactory(start_date=timezone.now() + timedelta(days=7))
         run_participation = lab_factories.ParticipationFactory(
-            user=user, on_premises=True, project=run.project
+            user=user,
+            on_premises=True,
+            project=run.project,
+            employer=lab_factories.EmployerFactory(),
         )
         other_run = lab_factories.RunFactory(
             start_date=timezone.now() + timedelta(days=14)
         )
         other_run_participation = lab_factories.ParticipationFactory(
-            user=user, on_premises=True, project=other_run.project
+            user=user,
+            on_premises=True,
+            project=other_run.project,
+            employer=lab_factories.EmployerFactory(),
         )
 
         initial_count = RiskPreventionPlan.objects.count()
@@ -171,6 +200,30 @@ class TestHandleRadiationProtectionCertification(TestCase):
         assert RiskPreventionPlan.objects.filter(
             participation=other_run_participation, run=other_run
         ).exists()
+
+    def test_success_case_with_missing_employer_does_not_create_plan(self):
+        """Test that certification alone does not create plans without employer."""
+        user = auth_factories.StaffUserFactory()
+        user.participation_set.all().delete()
+
+        run = lab_factories.RunFactory(start_date=timezone.now() + timedelta(days=7))
+        lab_factories.ParticipationFactory(
+            user=user,
+            on_premises=True,
+            project=run.project,
+            employer=None,
+        )
+        initial_count = RiskPreventionPlan.objects.count()
+
+        quiz_result = RadiationProtectionQuizResult(is_passed=True, score=95, user=user)
+
+        handle_radiation_protection_certification(
+            sender=QuizResult,
+            instance=quiz_result,
+            created=True,
+        )
+
+        assert RiskPreventionPlan.objects.count() == initial_count
 
     def test_notify_additional_emails_is_called(self):
         """Test that notify_additional_emails is called."""
@@ -265,7 +318,10 @@ class TestHandleRadiationProtectionOnScheduleRun(TestCase):
         initial_count = RiskPreventionPlan.objects.count()
 
         participation = lab_factories.ParticipationFactory(
-            user=user, project=run.project, on_premises=True
+            user=user,
+            project=run.project,
+            on_premises=True,
+            employer=lab_factories.EmployerFactory(),
         )
 
         assert RiskPreventionPlan.objects.count() == initial_count
@@ -286,7 +342,10 @@ class TestHandleRadiationProtectionOnScheduleRun(TestCase):
         initial_count = RiskPreventionPlan.objects.count()
 
         participation = lab_factories.ParticipationFactory(
-            user=user, project=run.project, on_premises=True
+            user=user,
+            project=run.project,
+            on_premises=True,
+            employer=lab_factories.EmployerFactory(),
         )
 
         assert RiskPreventionPlan.objects.count() == initial_count + 1
@@ -297,6 +356,28 @@ class TestHandleRadiationProtectionOnScheduleRun(TestCase):
         assert plan.participation == participation
         assert plan.run == run
         mock_check.assert_called_once_with(participation.user)
+
+    @mock.patch("radiation_protection.signals.check_radio_protection_certification")
+    def test_user_with_certification_but_missing_employer_does_not_create_plan(
+        self, mock_check
+    ):
+        user = auth_factories.StaffUserFactory()
+        run = lab_factories.RunFactory(
+            start_date=timezone.now() + timedelta(days=7),
+            end_date=timezone.now() + timedelta(days=14),
+        )
+        run.project.participation_set.all().delete()
+        mock_check.return_value = True
+
+        initial_count = RiskPreventionPlan.objects.count()
+        lab_factories.ParticipationFactory(
+            user=user,
+            project=run.project,
+            on_premises=True,
+            employer=None,
+        )
+
+        assert RiskPreventionPlan.objects.count() == initial_count
 
     @mock.patch("radiation_protection.signals.check_radio_protection_certification")
     def test_multiple_participations_mixed_certification(self, mock_check):
@@ -319,10 +400,16 @@ class TestHandleRadiationProtectionOnScheduleRun(TestCase):
         initial_count = RiskPreventionPlan.objects.count()
 
         participation1 = lab_factories.ParticipationFactory(
-            user=user1, project=run.project, on_premises=True
+            user=user1,
+            project=run.project,
+            on_premises=True,
+            employer=lab_factories.EmployerFactory(),
         )
         participation2 = lab_factories.ParticipationFactory(
-            user=user2, project=run.project, on_premises=True
+            user=user2,
+            project=run.project,
+            on_premises=True,
+            employer=lab_factories.EmployerFactory(),
         )
 
         assert RiskPreventionPlan.objects.count() == initial_count + 1
@@ -339,7 +426,10 @@ class TestHandleRadiationProtectionOnScheduleRun(TestCase):
         user = auth_factories.StaffUserFactory()
         project = lab_factories.ProjectFactory()
         participation = lab_factories.ParticipationFactory(
-            user=user, project=project, on_premises=True
+            user=user,
+            project=project,
+            on_premises=True,
+            employer=lab_factories.EmployerFactory(),
         )
         upcoming_run = lab_factories.RunFactory(
             project=project,
@@ -370,7 +460,10 @@ class TestHandleRadiationProtectionOnScheduleRun(TestCase):
         user = auth_factories.StaffUserFactory()
         project = lab_factories.ProjectFactory()
         participation = lab_factories.ParticipationFactory(
-            user=user, project=project, on_premises=True
+            user=user,
+            project=project,
+            on_premises=True,
+            employer=lab_factories.EmployerFactory(),
         )
         past_run = lab_factories.RunFactory(
             project=project,
@@ -473,7 +566,10 @@ class TestHandleRadiationProtectionOnParticipation(TestCase):
         initial_count = RiskPreventionPlan.objects.count()
 
         participation = lab_factories.ParticipationFactory(
-            user=user, project=upcoming_run.project, on_premises=True
+            user=user,
+            project=upcoming_run.project,
+            on_premises=True,
+            employer=lab_factories.EmployerFactory(),
         )
 
         assert RiskPreventionPlan.objects.count() == initial_count
@@ -492,7 +588,10 @@ class TestHandleRadiationProtectionOnParticipation(TestCase):
         initial_count = RiskPreventionPlan.objects.count()
 
         participation = lab_factories.ParticipationFactory(
-            user=user, project=upcoming_run.project, on_premises=True
+            user=user,
+            project=upcoming_run.project,
+            on_premises=True,
+            employer=lab_factories.EmployerFactory(),
         )
 
         assert RiskPreventionPlan.objects.count() == initial_count + 1
@@ -505,12 +604,41 @@ class TestHandleRadiationProtectionOnParticipation(TestCase):
         mock_check.assert_called_once_with(participation.user)
 
     @mock.patch("radiation_protection.signals.check_radio_protection_certification")
+    def test_user_with_certification_but_missing_employer_does_not_create_plan(
+        self, mock_check
+    ):
+        user = auth_factories.StaffUserFactory()
+        upcoming_run = lab_factories.RunFactory(
+            start_date=timezone.now() + timedelta(days=7),
+            end_date=timezone.now() + timedelta(days=14),
+        )
+        mock_check.return_value = True
+
+        initial_count = RiskPreventionPlan.objects.count()
+        participation = lab_factories.ParticipationFactory(
+            user=user,
+            project=upcoming_run.project,
+            on_premises=True,
+            employer=None,
+        )
+
+        handle_radiation_protection_on_participation(
+            sender=None,
+            instance=participation,
+        )
+
+        assert RiskPreventionPlan.objects.count() == initial_count
+
+    @mock.patch("radiation_protection.signals.check_radio_protection_certification")
     def test_multiple_upcoming_runs(self, mock_check):
         """Test handler with multiple upcoming runs."""
         user = auth_factories.StaffUserFactory()
         project = lab_factories.ProjectFactory()
         participation = Participation.objects.create(
-            user=user, project=project, on_premises=True
+            user=user,
+            project=project,
+            on_premises=True,
+            employer=lab_factories.EmployerFactory(),
         )
 
         mock_check.return_value = True
@@ -548,7 +676,10 @@ class TestHandleRadiationProtectionOnParticipation(TestCase):
         user = auth_factories.StaffUserFactory()
         project = lab_factories.ProjectFactory()
         participation = Participation.objects.create(
-            user=user, project=project, on_premises=True
+            user=user,
+            project=project,
+            on_premises=True,
+            employer=lab_factories.EmployerFactory(),
         )
         upcoming_run = lab_factories.RunFactory(
             project=project,

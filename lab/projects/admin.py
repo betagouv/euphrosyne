@@ -278,12 +278,22 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
         obj.save()
         if not change:
             if not is_lab_admin(request.user):
-                employer = Employer.objects.create(
-                    first_name=form.cleaned_data["employer_first_name"],
-                    last_name=form.cleaned_data["employer_last_name"],
-                    email=form.cleaned_data["employer_email"],
-                    function=form.cleaned_data["employer_function"],
-                )
+                employer = None
+                if all(
+                    form.cleaned_data.get(field)
+                    for field in [
+                        "employer_first_name",
+                        "employer_last_name",
+                        "employer_email",
+                        "employer_function",
+                    ]
+                ):
+                    employer = Employer.objects.create(
+                        first_name=form.cleaned_data["employer_first_name"],
+                        last_name=form.cleaned_data["employer_last_name"],
+                        email=form.cleaned_data["employer_email"],
+                        function=form.cleaned_data["employer_function"],
+                    )
                 obj.participation_set.create(
                     user=request.user,  # type: ignore[misc]
                     institution=form.cleaned_data[
@@ -306,16 +316,12 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                 "show_save_as_new": False,
                 "show_save_and_add_another": False,
                 "json_data": json.dumps(
-                    (
-                        {
-                            "projectId": object_id,
-                            "participationEmployerFormExemptRorIds": (
-                                settings.PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS
-                            ),
-                        }
-                        if object_id
-                        else None
-                    )
+                    {
+                        "projectId": object_id,
+                        "participationEmployerFormExemptRorIds": (
+                            settings.PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS
+                        ),
+                    }
                 ),
             },
         )

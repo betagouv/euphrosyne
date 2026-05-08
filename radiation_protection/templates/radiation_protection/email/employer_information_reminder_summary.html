@@ -1,0 +1,20 @@
+{% autoescape off %}
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Les participations sur site suivantes n’ont pas d’informations employeur renseignées pour l’expérience « {{ run.label }} » du projet « {{ project.name }} » prévue le {{ run.start_date|date:"SHORT_DATE_FORMAT" }} :
+</p>
+
+<ul style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+{% for participation in participations %}
+  <li>
+    {{ participation.user.get_full_name|default:participation.user.email }}
+    ({{ participation.user.email }}) —
+    <a href="{{ site_url }}{% url 'participation_employer_completion' participation.project_id %}">lien de complétion</a>
+  </li>
+{% endfor %}
+</ul>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Euphrosyne
+</p>
+
+{% endautoescape %}

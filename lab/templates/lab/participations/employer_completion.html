@@ -1,0 +1,55 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+<div class="fr-container fr-my-6w">
+  <div class="fr-grid-row">
+    <div class="fr-col-12 fr-col-lg-8">
+      <h1>{% translate "Complete your employer information" %}</h1>
+
+      <p class="fr-text--lead">
+        {% translate "Please provide your employer information to continue." %}
+      </p>
+
+      <div class="fr-callout fr-icon-information-line fr-mt-4w">
+        <h2 class="fr-callout__title">{% translate "Why we need this information" %}</h2>
+        <p class="fr-callout__text">
+          {% blocktranslate trimmed %}
+          This information is required to prepare the mandatory site access and safety documentation before your visit to New AGLAE.
+          {% endblocktranslate %}
+        </p>
+      </div>
+
+      <form method="post" class="fr-mt-5w" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="fr-alert fr-alert--error fr-mb-3w">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        {% for field in form %}
+          <div class="fr-input-group{% if field.errors %} fr-input-group--error{% endif %}">
+            <label class="fr-label" for="{{ field.id_for_label }}">
+              {{ field.label }}
+            </label>
+            {{ field }}
+            {% if field.errors %}
+              <div class="fr-messages-group" id="{{ field.id_for_label }}-messages" aria-live="polite">
+                {% for error in field.errors %}
+                  <p class="fr-message fr-message--error">{{ error }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        <button type="submit" class="fr-btn fr-mt-4w">{% translate "Save employer information" %}</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

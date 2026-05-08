@@ -163,6 +163,11 @@ MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else 
     "euphro_auth.middlewares.CGUAcceptanceMiddleware",
 ]
 
+if "radiation_protection" in EUPHROSYNE_FEATURES:
+    MIDDLEWARE.append(
+        "lab.participations.middleware.ParticipationEmployerCompletionMiddleware"
+    )
+
 ROOT_URLCONF = "euphrosyne.urls"
 
 TEMPLATES = [

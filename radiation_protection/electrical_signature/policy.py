@@ -1,12 +1,21 @@
+from django.conf import settings
+
 from lab.models import Institution
-from radiation_protection.app_settings import settings as app_settings
+from lab.participations.models import Participation
 
 
 def should_exempt_institution(institution: Institution | None = None) -> bool:
-    exempt_ror_ids = (
-        app_settings.RADIATION_PROTECTION_ELECTRICAL_SIGNATURE_EXEMPT_ROR_IDS  # type: ignore[misc] # pylint: disable=line-too-long
-    )
+    """Return whether the institution is exempt from employer/signature workflow."""
+    exempt_ror_ids = settings.PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS
     institution_ror_id = institution.ror_id if institution else None
-    if not exempt_ror_ids or not institution_ror_id:
+    if not institution_ror_id:
         return False
     return institution_ror_id in exempt_ror_ids
+
+
+def participation_has_required_employer_for_risk_prevention(
+    participation: Participation,
+) -> bool:
+    return bool(participation.employer_id) or should_exempt_institution(
+        participation.institution
+    )

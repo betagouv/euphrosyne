@@ -132,6 +132,38 @@ def test_send_electrical_signature_processes_command_skips_exempt(
 @mock.patch(
     "radiation_protection.management.commands.send_electrical_signature_processes.start_electrical_signature_processes"  # pylint: disable=line-too-long
 )
+def test_send_electrical_signature_processes_command_skips_missing_employer(
+    mock_start_processes,
+):
+    user = lab_factories.StaffUserFactory()
+    project = lab_factories.ProjectFactory()
+    run = lab_factories.RunFactory(project=project)
+    institution = lab_factories.InstitutionFactory()
+    participation = project.participation_set.create(
+        user=user,
+        institution=institution,
+        employer=None,
+        on_premises=True,
+    )
+    plan = radiation_factories.RiskPreventionPlanFactory(
+        participation=participation,
+        run=run,
+        risk_advisor_notification_sent=False,
+        electrical_signature_exempt=False,
+    )
+
+    out = StringIO()
+    call_command("send_electrical_signature_processes", stdout=out)
+
+    mock_start_processes.assert_not_called()
+    plan.refresh_from_db()
+    assert plan.risk_advisor_notification_sent is False
+
+
+@pytest.mark.django_db
+@mock.patch(
+    "radiation_protection.management.commands.send_electrical_signature_processes.start_electrical_signature_processes"  # pylint: disable=line-too-long
+)
 def test_send_electrical_signature_processes_command_no_plans(mock_start_processes):
     """Test the command when there are no plans to process."""
     out = StringIO()

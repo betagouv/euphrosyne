@@ -1,0 +1,67 @@
+{% load i18n %}{% autoescape off %}
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+<b>English version below</b>
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">Bonjour,</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Vous êtes attendu(e) sur site pour le projet « {{ project.name }} ».
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Nous avons constaté que vos informations employeur n’ont pas encore été renseignées. Ces informations sont nécessaires pour préparer les documents administratifs et de sécurité requis avant votre visite à New AGLAE.
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Merci de compléter vos informations en cliquant sur le bouton ci-dessous :
+</p>
+
+<p>
+  <a href="{{ completion_url }}"
+     style="background:#007BFF; color:white; padding:10px 20px; border-radius:4px; text-decoration:none; font-family:Arial,sans-serif;">
+    Compléter mes informations employeur
+  </a>
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Pour toute question, n’hésitez pas à nous contacter.
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Cordialement,<br/>L’équipe New AGLAE
+</p>
+
+<hr style="margin:30px 0; border:none; border-top:1px solid #ccc;" />
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">Hello,</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+You are expected on site for project “{{ project.name }}”.
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+We noticed that your employer information has not yet been provided. This information is required to prepare the administrative and safety documents needed before your visit to New AGLAE.
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Please complete your information by clicking the button below:
+</p>
+
+<p>
+  <a href="{{ completion_url }}"
+     style="background:#007BFF; color:white; padding:10px 20px; border-radius:4px; text-decoration:none; font-family:Arial,sans-serif;">
+    Complete my employer information
+  </a>
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+If you have any questions, please do not hesitate to contact us.
+</p>
+
+<p style="font-family:Arial,sans-serif; font-size:14px; color:#333;">
+Best regards,<br/>The New AGLAE Team
+</p>
+
+{% endautoescape %}

@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 import pytest
-from django.core.exceptions import NON_FIELD_ERRORS
 from django.db.models import QuerySet
 from django.test import override_settings
 from django.utils import timezone
@@ -86,7 +85,7 @@ def _get_schedule_data():
 
 
 @pytest.mark.django_db
-def test_first_schedule_requires_employer_for_on_premises_participations():
+def test_first_schedule_allows_missing_employer_for_on_premises_participations():
     run = factories.RunFactory(start_date=None, end_date=None)
     factories.ParticipationFactory(
         project=run.project,
@@ -96,7 +95,7 @@ def test_first_schedule_requires_employer_for_on_premises_participations():
 
     form = forms.RunScheduleForm(data=_get_schedule_data(), instance=run)
 
-    assert form.has_error(NON_FIELD_ERRORS, code="missing_participation_employer")
+    assert form.is_valid()
 
 
 @pytest.mark.django_db

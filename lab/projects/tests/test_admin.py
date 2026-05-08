@@ -6,7 +6,7 @@ from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 from django.template.response import TemplateResponse
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils import timezone
@@ -272,7 +272,7 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
         assert project.leader.employer.email == "john.doe@example.com"
         assert project.leader.employer.function == "Manager"
 
-    def test_create_project_employer_fields_are_required(self):
+    def test_create_project_requires_employer_fields(self):
         response = self.client.post(
             self.add_view_url,
             data={
@@ -285,6 +285,48 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
         )
         assert response.status_code == 200
         assert not Project.objects.filter(name="some project name").exists()
+        form_errors = response.context_data["adminform"].form.errors
+        assert form_errors["employer_first_name"]
+        assert form_errors["employer_last_name"]
+        assert form_errors["employer_email"]
+        assert form_errors["employer_function"]
+
+    @override_settings(
+        PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS=["https://ror.org/exempt"]
+    )
+    def test_create_project_allows_missing_employer_for_exempt_institution(self):
+        response = self.client.post(
+            self.add_view_url,
+            data={
+                "name": "some project name",
+                "has_accepted_cgu": True,
+                "comments": "some comments",
+                "institution__name": "C3",
+                "institution__country": "France",
+                "institution__ror_id": "https://ror.org/exempt",
+            },
+        )
+        assert response.status_code == 302
+        project = Project.objects.get(name="some project name")
+        assert project.leader.employer is None
+
+    def test_create_project_rejects_partial_employer_fields(self):
+        response = self.client.post(
+            self.add_view_url,
+            data={
+                "name": "some project name",
+                "has_accepted_cgu": True,
+                "comments": "some comments",
+                "institution__name": "C3",
+                "institution__country": "France",
+                "employer_first_name": "John",
+                "employer_last_name": "Doe",
+            },
+        )
+        assert response.status_code == 200
+        assert not Project.objects.filter(name="some project name").exists()
+        assert response.context_data["adminform"].form.errors["employer_email"]
+        assert response.context_data["adminform"].form.errors["employer_function"]
 
     def test_add_project_form_prefills_employer_from_last_participation(self):
         """Prefill employer fields with the last participation's employer data."""
