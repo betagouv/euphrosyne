@@ -1,5 +1,23 @@
 import RadiationProtectionCheck from "./RadiationProtectionCheck";
+import type { CSSProperties } from "react";
 import type { Participation } from "../types";
+
+const textCellStyle: CSSProperties = {
+  overflowWrap: "anywhere",
+  whiteSpace: "normal",
+};
+
+const actionCellStyle: CSSProperties = {
+  whiteSpace: "nowrap",
+};
+
+const actionCellContentStyle: CSSProperties = {
+  alignItems: "center",
+  display: "flex",
+  gap: "0.25rem",
+  justifyContent: "flex-end",
+  whiteSpace: "nowrap",
+};
 
 interface ParticipationTableProps {
   participations: Participation[];
@@ -56,85 +74,104 @@ export default function ParticipationTable({
       <div className="fr-table__wrapper">
         <div className="fr-table__container">
           <div className="fr-table__content">
-            <table>
+            <table
+              style={{
+                minWidth: "64rem",
+                tableLayout: "fixed",
+                width: "100%",
+              }}
+            >
+              <colgroup>
+                <col style={{ width: "12%" }} />
+                <col style={{ width: "16%" }} />
+                <col style={{ width: "22%" }} />
+                <col />
+                <col style={{ width: "14rem" }} />
+              </colgroup>
               {tableCaption && <caption> {tableCaption} </caption>}
               <thead>
                 <tr>
-                  <th> {t.firstName} </th>
-                  <th> {t.lastName} </th>
-                  <th> {t.email} </th>
-                  <th> {t.institution} </th>
-                  <th> </th>
+                  <th style={textCellStyle}> {t.firstName} </th>
+                  <th style={textCellStyle}> {t.lastName} </th>
+                  <th style={textCellStyle}> {t.email} </th>
+                  <th style={textCellStyle}> {t.institution} </th>
+                  <th style={actionCellStyle}> </th>
                 </tr>
               </thead>
               <tbody>
                 {participations.map((participation) => (
                   <tr key={participation.id}>
-                    <td>{participation.user.firstName || "-"}</td>
-                    <td>{participation.user.lastName || "-"}</td>
-                    <td>{participation.user.email}</td>
-                    <td>
-                      {participation.institution?.name || "-"}{" "}
+                    <td style={textCellStyle}>
+                      {participation.user.firstName || "-"}
+                    </td>
+                    <td style={textCellStyle}>
+                      {participation.user.lastName || "-"}
+                    </td>
+                    <td style={textCellStyle}>{participation.user.email}</td>
+                    <td style={textCellStyle}>
+                      {participation.institution?.name || "-"}
                       {participation.institution?.country &&
                         `, ${participation.institution.country}`}
                     </td>
-                    <td>
-                      {canEdit && (
-                        <button
-                          type="button"
-                          className="fr-btn fr-icon-edit-box-line fr-btn--tertiary-no-outline"
-                          aria-controls={editModalId}
-                          onClick={() => _onEditClick(participation)}
-                        ></button>
-                      )}
-                      {canSwitchType && (
-                        <>
+                    <td style={actionCellStyle}>
+                      <div style={actionCellContentStyle}>
+                        {canEdit && (
                           <button
                             type="button"
-                            className="fr-btn fr-icon-arrow-left-right-line fr-btn--tertiary-no-outline"
-                            aria-controls={switchTypeModalId}
-                            aria-describedby={`participation-type-switch-${participation.id}-tooltip`}
-                            aria-label={
-                              participation.onPremises
-                                ? t.switchToRemoteButtonLabel
-                                : t.switchToOnSiteButtonLabel
-                            }
-                            onClick={() => _onSwitchTypeClick(participation)}
+                            className="fr-btn fr-icon-edit-box-line fr-btn--tertiary-no-outline"
+                            aria-controls={editModalId}
+                            onClick={() => _onEditClick(participation)}
                           ></button>
-                          <span
-                            className="fr-tooltip fr-placement"
-                            id={`participation-type-switch-${participation.id}-tooltip`}
-                            role="tooltip"
-                            aria-hidden="true"
-                          >
-                            {participation.onPremises
-                              ? t.switchToRemoteButtonLabel
-                              : t.switchToOnSiteButtonLabel}
-                          </span>
-                        </>
-                      )}
-                      {canDelete && (
-                        <button
-                          type="button"
-                          className="fr-btn fr-icon-close-line fr-btn--tertiary-no-outline"
-                          onClick={() =>
-                            onDeleteClick && onDeleteClick(participation)
-                          }
-                        >
-                          {t.deleteButtonLabel}
-                        </button>
-                      )}
-                      {participation.onPremises &&
-                        isRadiationProtectionEnabled && (
-                          <span
-                            className="fr-p-2v"
-                            style={{ display: "inline-block" }}
-                          >
-                            <RadiationProtectionCheck
-                              userId={participation.user.id}
-                            />
-                          </span>
                         )}
+                        {canSwitchType && (
+                          <>
+                            <button
+                              type="button"
+                              className="fr-btn fr-icon-arrow-left-right-line fr-btn--tertiary-no-outline"
+                              aria-controls={switchTypeModalId}
+                              aria-describedby={`participation-type-switch-${participation.id}-tooltip`}
+                              aria-label={
+                                participation.onPremises
+                                  ? t.switchToRemoteButtonLabel
+                                  : t.switchToOnSiteButtonLabel
+                              }
+                              onClick={() => _onSwitchTypeClick(participation)}
+                            ></button>
+                            <span
+                              className="fr-tooltip fr-placement"
+                              id={`participation-type-switch-${participation.id}-tooltip`}
+                              role="tooltip"
+                              aria-hidden="true"
+                            >
+                              {participation.onPremises
+                                ? t.switchToRemoteButtonLabel
+                                : t.switchToOnSiteButtonLabel}
+                            </span>
+                          </>
+                        )}
+                        {canDelete && (
+                          <button
+                            type="button"
+                            className="fr-btn fr-icon-close-line fr-btn--tertiary-no-outline"
+                            onClick={() =>
+                              onDeleteClick && onDeleteClick(participation)
+                            }
+                          >
+                            {t.deleteButtonLabel}
+                          </button>
+                        )}
+                        {participation.onPremises &&
+                          isRadiationProtectionEnabled && (
+                            <span
+                              className="fr-p-2v"
+                              style={{ display: "inline-block" }}
+                            >
+                              <RadiationProtectionCheck
+                                userId={participation.user.id}
+                              />
+                            </span>
+                          )}
+                      </div>
                     </td>
                   </tr>
                 ))}
