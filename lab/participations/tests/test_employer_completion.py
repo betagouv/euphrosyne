@@ -32,6 +32,26 @@ class TestEmployerCompletionWorkflow(TestCase):
             kwargs={"project_id": self.project.id},
         )
 
+    def test_incomplete_participation_redirects_run_page_to_completion(self):
+        run = factories.RunFactory(project=self.project)
+
+        response = self.client.get(reverse("admin:lab_run_change", args=[run.id]))
+
+        assert response.status_code == 302
+        assert response["Location"] == reverse(
+            "participation_employer_completion",
+            kwargs={"project_id": self.project.id},
+        )
+
+    def test_malformed_run_change_object_id_does_not_crash(self):
+        response = self.client.get(f"/lab/run/{self.project.id}/notebook/change/")
+
+        assert response.status_code == 302
+        assert response["Location"] != reverse(
+            "participation_employer_completion",
+            kwargs={"project_id": self.project.id},
+        )
+
     def test_completion_page_is_rendered(self):
         response = self.client.get(
             reverse(

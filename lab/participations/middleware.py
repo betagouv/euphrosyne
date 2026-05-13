@@ -57,12 +57,11 @@ class ParticipationEmployerCompletionMiddleware:
             return view_kwargs["project_id"]
 
         if resolver_match.url_name == "lab_project_change":
-            object_id = view_kwargs.get("object_id")
-            return int(object_id) if object_id else None
+            return _parse_admin_object_id(view_kwargs.get("object_id"))
 
         if resolver_match.url_name == "lab_run_change":
-            object_id = view_kwargs.get("object_id")
-            if not object_id:
+            object_id = _parse_admin_object_id(view_kwargs.get("object_id"))
+            if object_id is None:
                 return None
             return (
                 Run.objects.filter(id=object_id)
@@ -70,4 +69,11 @@ class ParticipationEmployerCompletionMiddleware:
                 .first()
             )
 
+        return None
+
+
+def _parse_admin_object_id(object_id) -> int | None:
+    try:
+        return int(object_id)
+    except (TypeError, ValueError):
         return None
