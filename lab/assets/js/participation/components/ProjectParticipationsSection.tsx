@@ -5,8 +5,10 @@ import {
   deleteParticipation,
   fetchLeaderParticipation,
   fetchParticipations,
+  switchParticipationType,
 } from "../participation.service";
 import ParticipationFormModal from "./ParticipationFormModal";
+import ParticipationTypeSwitchModal from "./ParticipationTypeSwitchModal";
 import { UserData } from "../../../../../euphrosyne/assets/js/main";
 
 interface ProjectParticipationsFormProps {
@@ -103,6 +105,7 @@ export default function ProjectParticipationsForm({
   const leaderModalId = "modal-leader-participation";
   const remoteModalId = "modal-remote-participation";
   const onPremisesModalId = "modal-onpremises-participation";
+  const switchTypeModalId = "modal-switch-participation-type";
 
   const [leaderParticipation, setLeaderParticipation] =
     useState<Participation | null>(null);
@@ -121,6 +124,9 @@ export default function ProjectParticipationsForm({
     useState<Participation | null>(null);
   const [onPremisesParticipationToEdit, setOnPremisesParticipationToEdit] =
     useState<Participation | null>(null);
+  const [participationToSwitchType, setParticipationToSwitchType] =
+    useState<Participation | null>(null);
+  const [switchTypeOpenRequest, setSwitchTypeOpenRequest] = useState(0);
   const canManageParticipations = isLabAdminOrProjectLeader(
     userData,
     leaderParticipation,
@@ -146,9 +152,35 @@ export default function ProjectParticipationsForm({
     [projectId, loadParticipations],
   );
 
+  const onSwitchTypeConfirm = useCallback(
+    async (participation: Participation) => {
+      await switchParticipationType(
+        projectId,
+        participation.id,
+        !participation.onPremises,
+      );
+      await loadParticipations();
+      setParticipationToSwitchType(null);
+    },
+    [projectId, loadParticipations],
+  );
+
+  const onSwitchTypeClick = useCallback((participation: Participation) => {
+    setParticipationToSwitchType(participation);
+    setSwitchTypeOpenRequest((request) => request + 1);
+  }, []);
+
   useEffect(() => {
     loadParticipations();
   }, [loadParticipations]);
+
+  useEffect(() => {
+    if (!participationToSwitchType || switchTypeOpenRequest === 0) {
+      return;
+    }
+    // @ts-expect-error: Property 'dsfr' does not exist on type 'Window & typeof globalThis'.ts(2339)
+    window.dsfr(document.getElementById(switchTypeModalId)).modal.disclose();
+  }, [participationToSwitchType, switchTypeModalId, switchTypeOpenRequest]);
 
   return (
     <div className="fr-mb-5w">
@@ -161,6 +193,12 @@ export default function ProjectParticipationsForm({
         canEditUser={userData.isLabAdmin}
         onFormSubmit={() => loadParticipations()}
         modalTitle={t.leaderModalTitle}
+      />
+      <ParticipationTypeSwitchModal
+        modalId={switchTypeModalId}
+        participation={participationToSwitchType}
+        onConfirm={onSwitchTypeConfirm}
+        onDismiss={() => setParticipationToSwitchType(null)}
       />
       <ParticipationFormModal
         modalId={remoteModalId}
@@ -217,9 +255,12 @@ export default function ProjectParticipationsForm({
             participations={onPremisesParticipations}
             tableCaption={t.onPremisesParticipationsTable}
             editModalId={onPremisesModalId}
+            switchTypeModalId={switchTypeModalId}
             canDelete={canManageParticipations}
             canEdit={canManageParticipations}
+            canSwitchType={canManageParticipations}
             onDeleteClick={onDeleteClick}
+            onSwitchTypeClick={onSwitchTypeClick}
             onEditClick={(participation) => {
               setOnPremisesParticipationToEdit(participation);
             }}
@@ -248,9 +289,12 @@ export default function ProjectParticipationsForm({
             participations={remoteParticipations}
             tableCaption={t.remoteParticipationsTable}
             editModalId={remoteModalId}
+            switchTypeModalId={switchTypeModalId}
             onDeleteClick={onDeleteClick}
             canDelete={canManageParticipations}
             canEdit={canManageParticipations}
+            canSwitchType={canManageParticipations}
+            onSwitchTypeClick={onSwitchTypeClick}
             onEditClick={(participation) => {
               setRemoteParticipationToEdit(participation);
             }}

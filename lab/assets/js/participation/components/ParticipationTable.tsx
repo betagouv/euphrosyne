@@ -5,24 +5,34 @@ interface ParticipationTableProps {
   participations: Participation[];
   tableCaption?: string;
   editModalId?: string;
+  switchTypeModalId?: string;
   canDelete?: boolean;
   canEdit?: boolean;
+  canSwitchType?: boolean;
   onDeleteClick?: (participation: Participation) => void;
   onEditClick?: (participation: Participation) => void;
+  onSwitchTypeClick?: (participation: Participation) => void;
   isRadiationProtectionEnabled?: boolean;
 }
 export default function ParticipationTable({
   participations,
   tableCaption,
   editModalId,
+  switchTypeModalId,
   canDelete = false,
   canEdit = false,
+  canSwitchType = false,
   onDeleteClick,
   onEditClick,
+  onSwitchTypeClick,
   isRadiationProtectionEnabled,
 }: ParticipationTableProps) {
   const t = {
     deleteButtonLabel: window.gettext("Delete participation"),
+    switchToRemoteButtonLabel: window.gettext("Switch to remote participation"),
+    switchToOnSiteButtonLabel: window.gettext(
+      "Switch to on-site participation",
+    ),
     firstName: window.gettext("First name"),
     lastName: window.gettext("Last name"),
     email: window.gettext("Email"),
@@ -35,6 +45,10 @@ export default function ParticipationTable({
       window.dsfr(document.getElementById(editModalId)).modal.disclose();
     }
     onEditClick?.(participation);
+  };
+
+  const _onSwitchTypeClick = (participation: Participation) => {
+    onSwitchTypeClick?.(participation);
   };
 
   return (
@@ -72,6 +86,32 @@ export default function ParticipationTable({
                           aria-controls={editModalId}
                           onClick={() => _onEditClick(participation)}
                         ></button>
+                      )}
+                      {canSwitchType && (
+                        <>
+                          <button
+                            type="button"
+                            className="fr-btn fr-icon-arrow-left-right-line fr-btn--tertiary-no-outline"
+                            aria-controls={switchTypeModalId}
+                            aria-describedby={`participation-type-switch-${participation.id}-tooltip`}
+                            aria-label={
+                              participation.onPremises
+                                ? t.switchToRemoteButtonLabel
+                                : t.switchToOnSiteButtonLabel
+                            }
+                            onClick={() => _onSwitchTypeClick(participation)}
+                          ></button>
+                          <span
+                            className="fr-tooltip fr-placement"
+                            id={`participation-type-switch-${participation.id}-tooltip`}
+                            role="tooltip"
+                            aria-hidden="true"
+                          >
+                            {participation.onPremises
+                              ? t.switchToRemoteButtonLabel
+                              : t.switchToOnSiteButtonLabel}
+                          </span>
+                        </>
                       )}
                       {canDelete && (
                         <button

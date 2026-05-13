@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-06 16:07+0200\n"
+"POT-Creation-Date: 2026-05-13 15:29+0200\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -201,6 +201,31 @@ msgstr "Fermer"
 
 msgid "Delete participation"
 msgstr "Supprimer la participation"
+
+msgid "Switch to remote participation"
+msgstr "Passer en participation à distance"
+
+msgid "Switch to on-site participation"
+msgstr "Passer en participation sur site"
+
+msgid "Switch participation type"
+msgstr "Changer le type de participation"
+
+msgid "Confirm"
+msgstr "Confirmer"
+
+msgid "on-site"
+msgstr "sur site"
+
+msgid "remote"
+msgstr "à distance"
+
+#, javascript-format
+msgid "Switch %s to %s participation?"
+msgstr "Passer %s en participation %s ?"
+
+msgid "The participation type could not be switched."
+msgstr "Le type de participation n'a pas pu être changé."
 
 msgid "Add member"
 msgstr "Ajouter un membre"

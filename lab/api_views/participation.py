@@ -22,6 +22,13 @@ class MemberParticipationRetrieveUpdateDestroyGroupView(
     queryset = Participation.objects.all()
 
     def get_serializer_class(self):
+        if (
+            getattr(self, "request", None)
+            and self.request.method in ("PATCH", "PUT")
+            and "on_premises" in self.request.data
+        ):
+            return serializers.ParticipationTypeSwitchSerializer
+
         participation = self.get_object()
         if participation.on_premises:
             return serializers.OnPremisesParticipationSerializer
