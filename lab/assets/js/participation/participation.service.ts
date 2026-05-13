@@ -310,3 +310,26 @@ export async function deleteParticipation(
     throw new Error(`Error deleting participation ${participationId}`);
   }
 }
+
+export async function switchParticipationType(
+  projectId: number,
+  participationId: number,
+  onPremises: boolean,
+): Promise<void> {
+  const response = await fetch(
+    `/api/lab/projects/${projectId}/participations/${participationId}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCSRFToken() || "",
+      },
+      body: JSON.stringify({
+        on_premises: onPremises,
+      }),
+    },
+  );
+  if (!response.ok) {
+    throw new Error(`Error switching participation ${participationId}`);
+  }
+}

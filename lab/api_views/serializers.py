@@ -340,6 +340,29 @@ class ParticipationSerializer(serializers.ModelSerializer):
         return user
 
 
+def _check_radiation_protection_certification(instance: Participation | None = None):
+    if apps.is_installed("radiation_protection") and instance:
+        # pylint: disable=import-outside-toplevel
+        from radiation_protection.certification import (
+            check_radio_protection_certification,
+        )
+
+        check_radio_protection_certification(instance.user)
+
+
+class ParticipationTypeSwitchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Participation
+        fields = ("on_premises",)
+
+    def update(self, instance: Participation, validated_data: dict):
+        was_remote = not instance.on_premises
+        instance = super().update(instance, validated_data)
+        if was_remote and instance.on_premises:
+            _check_radiation_protection_certification(instance)
+        return instance
+
+
 class OnPremisesParticipationSerializer(ParticipationSerializer):
     employer = _EmployerParticipationSerializer(required=False, allow_null=True)
 
@@ -354,7 +377,7 @@ class OnPremisesParticipationSerializer(ParticipationSerializer):
             employer = Employer.objects.create(**employer_data)
         instance = super().create({**validated_data, "employer": employer})
 
-        self._handle_user_change(instance)
+        _check_radiation_protection_certification(instance)
 
         return instance
 
@@ -389,7 +412,7 @@ class OnPremisesParticipationSerializer(ParticipationSerializer):
         instance = super().update(instance, validated_data)
         if user_has_changed:
             send_project_invitation_email(instance.user.email, instance.project)
-            self._handle_user_change(instance)
+            _check_radiation_protection_certification(instance)
         return instance
 
     def _get_institution_ror_id(self, attrs: dict) -> str | None:
@@ -404,14 +427,3 @@ class OnPremisesParticipationSerializer(ParticipationSerializer):
         if self.instance and self.instance.institution:
             return self.instance.institution.ror_id
         return None
-
-    def _handle_user_change(self, instance: Participation | None = None):
-        if apps.is_installed("radiation_protection") and instance:
-            # pylint: disable=import-outside-toplevel
-            from radiation_protection.certification import (
-                check_radio_protection_certification,
-            )
-
-            check_radio_protection_certification(
-                instance.user,
-            )

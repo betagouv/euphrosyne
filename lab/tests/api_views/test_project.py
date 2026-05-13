@@ -389,3 +389,167 @@ class TestProjectLeaderParticipationRetrieveCreateUpdateGroupView(TestCase):
         self.project.leader.refresh_from_db()
         assert self.project.leader.institution.name == "Exempt Institution"
         assert self.project.leader.employer is None
+
+
+class TestProjectParticipationTypeSwitch(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.admin_user = auth_factories.LabAdminUserFactory()
+        self.project = factories.ProjectWithLeaderFactory()
+
+    def _url(self, participation):
+        return reverse(
+            "api:project-remote-participation-retrieve-update-destroy",
+            kwargs={
+                "project_id": self.project.id,
+                "pk": participation.id,
+            },
+        )
+
+    def test_lab_admin_can_switch_on_premises_to_remote(self):
+        self.client.force_login(self.admin_user)
+        participation = factories.ParticipationFactory(
+            project=self.project,
+            on_premises=True,
+        )
+
+        response = self.client.patch(
+            self._url(participation),
+            {"on_premises": False},
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        participation.refresh_from_db()
+        assert participation.on_premises is False
+
+    def test_project_leader_can_switch_remote_to_on_premises(self):
+        self.client.force_login(self.project.leader.user)
+        participation = factories.ParticipationFactory(
+            project=self.project,
+            on_premises=False,
+        )
+
+        response = self.client.patch(
+            self._url(participation),
+            {"on_premises": True},
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        participation.refresh_from_db()
+        assert participation.on_premises is True
+
+    @mock.patch(
+        "radiation_protection.certification.check_radio_protection_certification"
+    )
+    def test_switching_remote_to_on_premises_checks_radiation_protection(
+        self, mock_check_radiation_protection
+    ):
+        self.client.force_login(self.admin_user)
+        participation = factories.ParticipationFactory(
+            project=self.project,
+            employer=None,
+            on_premises=False,
+        )
+
+        response = self.client.patch(
+            self._url(participation),
+            {"on_premises": True},
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        participation.refresh_from_db()
+        assert participation.on_premises is True
+        mock_check_radiation_protection.assert_called_once_with(participation.user)
+
+    @mock.patch(
+        "radiation_protection.certification.check_radio_protection_certification"
+    )
+    def test_switching_on_premises_to_remote_does_not_check_radiation_protection(
+        self, mock_check_radiation_protection
+    ):
+        self.client.force_login(self.admin_user)
+        participation = factories.ParticipationFactory(
+            project=self.project,
+            on_premises=True,
+        )
+
+        response = self.client.patch(
+            self._url(participation),
+            {"on_premises": False},
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        mock_check_radiation_protection.assert_not_called()
+
+    def test_non_leader_project_member_cannot_switch_participation_type(self):
+        member_participation = factories.ParticipationFactory(project=self.project)
+        target_participation = factories.ParticipationFactory(
+            project=self.project,
+            on_premises=False,
+        )
+        self.client.force_login(member_participation.user)
+
+        response = self.client.patch(
+            self._url(target_participation),
+            {"on_premises": True},
+            content_type="application/json",
+        )
+
+        assert response.status_code == 403
+        target_participation.refresh_from_db()
+        assert target_participation.on_premises is False
+
+    def test_unrelated_staff_user_cannot_switch_participation_type(self):
+        self.client.force_login(auth_factories.StaffUserFactory())
+        participation = factories.ParticipationFactory(
+            project=self.project,
+            on_premises=False,
+        )
+
+        response = self.client.patch(
+            self._url(participation),
+            {"on_premises": True},
+            content_type="application/json",
+        )
+
+        assert response.status_code == 403
+        participation.refresh_from_db()
+        assert participation.on_premises is False
+
+    def test_switching_on_premises_to_remote_keeps_employer(self):
+        self.client.force_login(self.admin_user)
+        employer = factories.EmployerFactory()
+        participation = factories.ParticipationFactory(
+            project=self.project,
+            employer=employer,
+            on_premises=True,
+        )
+
+        response = self.client.patch(
+            self._url(participation),
+            {"on_premises": False},
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        participation.refresh_from_db()
+        assert participation.on_premises is False
+        assert participation.employer == employer
+
+    def test_leader_participation_cannot_be_switched_from_member_endpoint(self):
+        self.client.force_login(self.admin_user)
+        leader = self.project.leader
+
+        response = self.client.patch(
+            self._url(leader),
+            {"on_premises": False},
+            content_type="application/json",
+        )
+
+        assert response.status_code == 404
+        leader.refresh_from_db()
+        assert leader.is_leader is True
