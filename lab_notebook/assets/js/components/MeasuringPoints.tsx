@@ -6,10 +6,16 @@ import { fetchRunObjectGroups } from "../../../../lab/objects/assets/js/services
 import AddObjectGroupModal from "./AddObjectGroupModal";
 import AddImageToMeasuringModal from "./AddImageToMeasuringModal";
 import { RunMeasuringPointStandards } from "../../../../standard/assets/js/IStandard";
+import { normalizeMeasuringPointName, RunDataFiles } from "../data-files";
 
 export default function MeasuringPoints({
   runId,
+  projectId,
+  projectSlug,
+  runLabel,
+  fetchFn,
   points,
+  dataFiles,
   objectGroups,
   runMeasuringPointStandards,
   onAddObjectToPoint,
@@ -17,6 +23,11 @@ export default function MeasuringPoints({
 }: {
   points: IMeasuringPoint[];
   runId: string;
+  projectId: string;
+  projectSlug: string;
+  runLabel: string;
+  fetchFn?: typeof fetch;
+  dataFiles: RunDataFiles;
   runMeasuringPointStandards: RunMeasuringPointStandards;
   objectGroups: RunObjectGroup[];
   onAddObjectToPoint: () => void;
@@ -127,40 +138,56 @@ export default function MeasuringPoints({
         </div>
       )}
       {points.length === 0 && <p>{t["noPoint"]}</p>}
-      {points.map((point, index) => (
-        <div
-          className="fr-accordions-group"
-          key={`accordiong-section-${point.name}`}
-        >
-          <section className="fr-accordion">
-            <h3 className="fr-accordion__title">
-              <button
-                className="fr-accordion__btn"
-                aria-expanded="false"
-                aria-controls={`accordiong-${point.name}`}
-                ref={(el) => {
-                  accordionButtons.current[index] = el;
-                }}
-                onClick={onAccordionClick}
-              >
-                {getMeasuringPointLabel(point)}
-              </button>
-            </h3>
-            <div className="fr-collapse" id={`accordiong-${point.name}`}>
-              <MeasuringPoint
-                point={point}
-                runObjectGroups={objectGroups}
-                runId={runId}
-                measuringPointStandard={runMeasuringPointStandards[point.id]}
-                onAddObjectClicked={() => setAddObjectModalPointId(point.id)}
-                onLocalizeImageClicked={() =>
-                  setAddImageToMeasuringPoint(point)
-                }
-              />
-            </div>
-          </section>
-        </div>
-      ))}
+      {points.map((point, index) => {
+        const pointSegment = normalizeMeasuringPointName(point.name);
+        const rawFiles = pointSegment
+          ? dataFiles.raw.byMeasuringPoint[pointSegment] || []
+          : [];
+        const processedFiles = pointSegment
+          ? dataFiles.processed.byMeasuringPoint[pointSegment] || []
+          : [];
+
+        return (
+          <div
+            className="fr-accordions-group"
+            key={`accordiong-section-${point.name}`}
+          >
+            <section className="fr-accordion">
+              <h3 className="fr-accordion__title">
+                <button
+                  className="fr-accordion__btn"
+                  aria-expanded="false"
+                  aria-controls={`accordiong-${point.name}`}
+                  ref={(el) => {
+                    accordionButtons.current[index] = el;
+                  }}
+                  onClick={onAccordionClick}
+                >
+                  {getMeasuringPointLabel(point)}
+                </button>
+              </h3>
+              <div className="fr-collapse" id={`accordiong-${point.name}`}>
+                <MeasuringPoint
+                  point={point}
+                  runObjectGroups={objectGroups}
+                  runId={runId}
+                  rawDataFiles={rawFiles}
+                  processedDataFiles={processedFiles}
+                  projectId={projectId}
+                  projectSlug={projectSlug}
+                  runLabel={runLabel}
+                  fetchFn={fetchFn}
+                  measuringPointStandard={runMeasuringPointStandards[point.id]}
+                  onAddObjectClicked={() => setAddObjectModalPointId(point.id)}
+                  onLocalizeImageClicked={() =>
+                    setAddImageToMeasuringPoint(point)
+                  }
+                />
+              </div>
+            </section>
+          </div>
+        );
+      })}
     </div>
   );
 }

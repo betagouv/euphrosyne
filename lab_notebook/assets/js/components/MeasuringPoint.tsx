@@ -17,6 +17,8 @@ import {
   deleteMeasuringPointStandard,
 } from "../../../../standard/assets/js/standard-services";
 import { IMeasuringPointStandard } from "../../../../standard/assets/js/IStandard";
+import { EuphrosyneFile } from "../../../../lab/assets/js/file-service";
+import NotebookDataFilesSection from "./NotebookDataFilesSection";
 
 const buttonContainerStyle = css({
   border: "dashed var(--background-action-high-blue-france) 1px",
@@ -40,11 +42,23 @@ export default function MeasuringPoint({
   onAddObjectClicked,
   onLocalizeImageClicked,
   measuringPointStandard,
+  rawDataFiles,
+  processedDataFiles,
+  projectId,
+  projectSlug,
+  runLabel,
+  fetchFn,
 }: {
   point: IMeasuringPoint;
   runObjectGroups: RunObjectGroup[];
   runId: string;
   measuringPointStandard?: IMeasuringPointStandard;
+  rawDataFiles: EuphrosyneFile[];
+  processedDataFiles: EuphrosyneFile[];
+  projectId: string;
+  projectSlug: string;
+  runLabel: string;
+  fetchFn?: typeof fetch;
   onAddObjectClicked: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onLocalizeImageClicked: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }) {
@@ -52,6 +66,7 @@ export default function MeasuringPoint({
     disabledTooltip: window.gettext(
       "Unset the object group or standard to change the analysis type",
     ),
+    "Associated data files": window.gettext("Associated data files"),
   };
   const { updatedMeasuringPointStandard } = useContext(NotebookContext);
 
@@ -126,6 +141,15 @@ export default function MeasuringPoint({
           <MeasuringPointComments pointId={point.id} value={point.comments} />
         </div>
       </div>
+      <NotebookDataFilesSection
+        title={t["Associated data files"]}
+        rawFiles={rawDataFiles}
+        processedFiles={processedDataFiles}
+        projectId={projectId}
+        projectSlug={projectSlug}
+        runLabel={runLabel}
+        fetchFn={fetchFn}
+      />
     </div>
   );
 }

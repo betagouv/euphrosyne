@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   createMeasuringPoint,
   listMeasuringPoints,
@@ -17,18 +17,30 @@ import {
 import { fetchRunObjectGroups } from "../../../../lab/objects/assets/js/services";
 import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 import { useImageStorage } from "../hooks/useImageStorage";
+import { useRunDataFiles } from "../data-files";
+import NotebookDataFilesSection from "./NotebookDataFilesSection";
 
 interface NotebookProps {
   runId: string;
+  projectId: string;
   projectSlug: string;
+  runLabel: string;
+  isDataAvailable: boolean;
 }
 
-export default function Notebook({ runId, projectSlug }: NotebookProps) {
+export default function Notebook({
+  runId,
+  projectId,
+  projectSlug,
+  runLabel,
+  isDataAvailable,
+}: NotebookProps) {
   const t = {
     gallery: window.gettext("Run images with point locations"),
     "Add image": window.gettext("Add image"),
     "Measuring points": window.gettext("Measuring points"),
     "Add point": window.gettext("Add point"),
+    "Global run files": window.gettext("Global run files"),
   };
 
   const imageStorage = useImageStorage(projectSlug);
@@ -45,8 +57,24 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
   const toolsClient = useClientContext();
 
   const [isAddingPoint, setIsAddingPoint] = useState(false);
+  const [hasLoadedMeasuringPoints, setHasLoadedMeasuringPoints] =
+    useState(false);
 
   const [objectGroups, setObjectGroups] = useState<RunObjectGroup[]>([]);
+
+  const measuringPointNames = useMemo(
+    () => measuringPoints.map((point) => point.name),
+    [measuringPoints],
+  );
+
+  const { dataFiles, isLoading: isLoadingDataFiles, error: dataFilesError } =
+    useRunDataFiles({
+      projectSlug,
+      runLabel,
+      isDataAvailable,
+      measuringPointNames,
+      fetchFn: toolsClient.fetchFn,
+    });
 
   const getNextMeasuringPointName = () => {
     const n = measuringPoints.length + 1;
@@ -59,13 +87,17 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
       name: getNextMeasuringPointName(),
     }).finally(() => setIsAddingPoint(false));
     setMeasuringPoints(await listMeasuringPoints(runId));
+    setHasLoadedMeasuringPoints(true);
     window.scrollTo(0, document.body.scrollHeight);
   };
 
   // useEffect
 
   useEffect(() => {
-    listMeasuringPoints(runId).then(setMeasuringPoints);
+    listMeasuringPoints(runId).then((points) => {
+      setMeasuringPoints(points);
+      setHasLoadedMeasuringPoints(true);
+    });
   }, []);
 
   useEffect(() => {
@@ -96,6 +128,20 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
     <EuphrosyneToolsClientContext.Provider value={toolsClient}>
       <NotebookContext.Provider value={notebookContext}>
         <div>
+          {isDataAvailable && hasLoadedMeasuringPoints && (
+            <NotebookDataFilesSection
+              title={t["Global run files"]}
+              rawFiles={dataFiles.raw.global}
+              processedFiles={dataFiles.processed.global}
+              projectId={projectId}
+              projectSlug={projectSlug}
+              runLabel={runLabel}
+              fetchFn={toolsClient.fetchFn}
+              isLoading={isLoadingDataFiles}
+              error={dataFilesError}
+            />
+          )}
+
           <div className="flex-container fr-mt-3w">
             <h4>{t.gallery}</h4>
           </div>
@@ -111,6 +157,11 @@ export default function Notebook({ runId, projectSlug }: NotebookProps) {
             <MeasuringPoints
               points={measuringPoints}
               runId={runId}
+              dataFiles={dataFiles}
+              projectId={projectId}
+              projectSlug={projectSlug}
+              runLabel={runLabel}
+              fetchFn={toolsClient.fetchFn}
               runMeasuringPointStandards={runMeasuringPointStandards}
               objectGroups={objectGroups}
               onAddObjectToPoint={() =>
