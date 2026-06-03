@@ -43,6 +43,7 @@ You can copy this file to a new `.env` file to easily set up your environment.
 | AZURE_STORAGE_CONNECTION_STRING                     | Azure Storage account connection string for static file storage                                                                                                                                                                                   |
 | CORS_ALLOWED_ORIGINS                                | Access-Control-Allow-Origin header value for REST API endpoints                                                                                                                                                                                   |
 | CSP_ENFORCE                                         | Optional. Set to 'true' to send an enforcing Content-Security-Policy header; otherwise report-only is used                                                                                                                                        |
+| DATA_REQUEST_ALLOWED_ORIGINS                        | Optional. Comma-separated origins allowed to submit `POST /api/data-request/` when the `data_request` feature is enabled                                                                                                                          |
 | DJANGO_SETTINGS_MODULE                              | Python path to the Django settings module                                                                                                                                                                                                         |
 | DB\_\*                                              | Database configuration variables                                                                                                                                                                                                                  |
 | DJANGO_SECRET_KEY                                   | [Secret key](https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-SECRET_KEY) used by Django for cryptographic signing; also used to sign JWT tokens                                                                                   |
@@ -97,6 +98,26 @@ Available optional modules:
 
 For implementation and operational details of project archive/restore flows, see
 [`docs/project_data_lifecycle.md`](docs/project_data_lifecycle.md).
+
+### Data request Origin protection
+
+When `DATA_REQUEST_ALLOWED_ORIGINS` is configured, `POST /api/data-request/`
+requires an `Origin` header matching one of the configured origins. This limits
+simple automated submissions to the public data request endpoint.
+
+Example:
+
+```
+DATA_REQUEST_ALLOWED_ORIGINS=https://euphrosyne-digilab-production.osc-secnum-fr1.scalingo.io
+```
+
+`Origin` contains only `scheme://host[:port]`, not a path. Configure the Digilab
+domain itself, not a page such as `/fr/catalog/`. If `Origin` is missing or not
+allowed, `POST /api/data-request/` returns `403 Forbidden`. If the setting is
+empty, the endpoint keeps its previous permissive behavior.
+
+This is a lightweight filter against simple automated requests. It is not a
+strong guarantee against a bot that deliberately forges the `Origin` header.
 
 Optional project overrides can be provided as a dict in settings:
 
