@@ -166,3 +166,19 @@ class CertificationAdminExportPassedUsersActionTests(TestCase):
                 "expiration_date": "2026-04-04",
             }
         ]
+
+    def test_export_escapes_formula_like_user_fields(self):
+        certification = CertificationOfTypeQuizFactory(name="Laser safety")
+        quiz = QuizCertificationFactory(certification=certification, passing_score=80)
+        user = StaffUserFactory(
+            first_name="=cmd|' /C calc'!A0",
+            last_name="@HyperLink",
+            email="+user@example.com",
+        )
+        QuizResultFactory(user=user, quiz=quiz, score=80, is_passed=True)
+
+        _, rows = self._export_rows(certification)
+
+        assert rows[0]["first_name"] == "'=cmd|' /C calc'!A0"
+        assert rows[0]["last_name"] == "'@HyperLink"
+        assert rows[0]["email"] == "'+user@example.com"
