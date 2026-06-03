@@ -1,13 +1,16 @@
+import logging
 from typing import Any, Dict, Optional
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.options import ShowFacets
+from django.contrib.auth import login, logout
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.db.models.query import QuerySet
 from django.forms.models import ModelForm
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.http.request import HttpRequest
 from django.urls import reverse
 from django.utils import timezone
@@ -23,6 +26,17 @@ from lab.runs.models import Run
 from .emails import send_invitation_email
 from .forms import UserChangeForm, UserCreationForm
 from .models import User, UserInvitation
+
+logger = logging.getLogger(__name__)
+
+
+def get_request_ip(request: HttpRequest) -> str:
+    remote_addr = request.META.get(
+        "HTTP_X_FORWARDED_FOR", request.META.get("REMOTE_ADDR", "")
+    )
+    if "," in remote_addr:
+        remote_addr = remote_addr.split(",", 1)[0].strip()
+    return remote_addr
 
 
 class ProjectInline(admin.TabularInline):
@@ -159,7 +173,7 @@ class UserAdmin(DjangoUserAdmin):
     )
     list_per_page = 30
     show_facets = ShowFacets.NEVER
-    actions = ("send_invitation_mail_action",)
+    actions = ("send_invitation_mail_action", "impersonate_selected_user")
 
     add_fieldsets = (
         (
@@ -180,6 +194,12 @@ class UserAdmin(DjangoUserAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.prefetch_related("groups")
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if request.user.is_superuser is not True:
+            actions.pop("impersonate_selected_user", None)
+        return actions
 
     def get_list_display(self, request):
         list_display = [
@@ -336,6 +356,64 @@ class UserAdmin(DjangoUserAdmin):
                 message,
                 messages.WARNING,
             )
+
+    @admin.action(description=_("Impersonate selected user"))
+    def impersonate_selected_user(self, request: HttpRequest, queryset: QuerySet[User]):
+        if request.user.is_superuser is not True:
+            self.message_user(
+                request,
+                _("You do not have permission to impersonate users."),
+                level=messages.ERROR,
+            )
+            return None
+
+        if queryset.count() != 1:
+            self.message_user(
+                request,
+                _("Please select exactly one user to impersonate."),
+                level=messages.ERROR,
+            )
+            return None
+
+        target_user = queryset.get()
+        if target_user.is_superuser is True:
+            self.message_user(
+                request,
+                _("Impersonating superusers is not allowed."),
+                level=messages.ERROR,
+            )
+            return None
+
+        impersonator_user_id = request.user.pk
+        impersonated_user_id = target_user.pk
+        impersonation_started_at = timezone.now().isoformat()
+        remote_addr = get_request_ip(request)
+        backend = settings.AUTHENTICATION_BACKENDS[0]
+
+        logger.warning(
+            "Starting user impersonation",
+            extra={
+                "impersonator_user_id": impersonator_user_id,
+                "impersonated_user_id": impersonated_user_id,
+                "impersonation_started_at": impersonation_started_at,
+                "remote_addr": remote_addr,
+            },
+        )
+
+        logout(request)
+        login(request, target_user, backend=backend)
+
+        request.session["impersonator_user_id"] = impersonator_user_id
+        request.session["impersonated_user_id"] = impersonated_user_id
+        request.session["impersonation_started_at"] = impersonation_started_at
+
+        self.message_user(
+            request,
+            _("You are now impersonating {}.").format(target_user),
+            level=messages.SUCCESS,
+        )
+
+        return HttpResponseRedirect("/")
 
     @admin.display(description=_("Name"))
     def full_name_display(self, obj: User) -> str:
