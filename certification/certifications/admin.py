@@ -1,13 +1,17 @@
+import csv
+from datetime import timedelta
 from typing import Any
 
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.options import InlineModelAdmin
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.html import format_html
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 from lab.admin.mixins import LabAdminAllowedMixin
@@ -58,6 +62,7 @@ class QuizCertificationInline(LabAdminAllowedMixin, admin.StackedInline):
 @admin.register(Certification)
 class CertificationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
     list_display = ("name", "created")
+    actions = ("export_passed_users_as_csv",)
     fields = (
         "type_of",
         "name",
@@ -68,6 +73,72 @@ class CertificationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
     )
 
     form = CertificationAdminForm
+
+    @admin.action(description=_("Export passed users as CSV"))
+    def export_passed_users_as_csv(self, request: HttpRequest, queryset):
+        response = HttpResponse(content_type="text/csv")
+
+        def get_passed_users_export_filename(queryset) -> str:
+            certification_name = "selected-certifications"
+            if queryset.count() == 1:
+                certification_name = slugify(queryset.first().name)
+            timestamp = timezone.localtime().strftime("%Y%m%d-%H%M%S")
+            return f"export-cert-{certification_name}-{timestamp}.csv"
+
+        filename = get_passed_users_export_filename(queryset)
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        writer = csv.writer(response)
+        writer.writerow(
+            [
+                "certification",
+                "first_name",
+                "last_name",
+                "email",
+                "score",
+                "quiz_url",
+                "certificate_date",
+                "expiration_date",
+            ]
+        )
+
+        results = (
+            QuizResult.objects.filter(
+                quiz__certification__in=queryset,
+                is_passed=True,
+            )
+            .select_related("user", "quiz", "quiz__certification")
+            .order_by("quiz__certification_id", "user_id", "-created", "-id")
+        )
+
+        exported_keys = set()
+        for result in results:
+            certification = result.quiz.certification
+            key = (certification.id, result.user_id)
+            if key in exported_keys:
+                continue
+            exported_keys.add(key)
+
+            certificate_date = timezone.localdate(result.created).isoformat()
+            expiration_date = ""
+            if certification.num_days_valid is not None:
+                expiration_date = timezone.localdate(
+                    result.created + timedelta(days=certification.num_days_valid)
+                ).isoformat()
+
+            writer.writerow(
+                [
+                    certification.name,
+                    result.user.first_name,
+                    result.user.last_name,
+                    result.user.email,
+                    result.score,
+                    result.quiz.url,
+                    certificate_date,
+                    expiration_date,
+                ]
+            )
+
+        return response
 
     def get_inlines(
         self, request: HttpRequest, obj: Certification | None
