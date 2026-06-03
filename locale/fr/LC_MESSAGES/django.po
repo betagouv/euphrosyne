@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-06 16:07+0200\n"
+"POT-Creation-Date: 2026-06-03 10:31+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -566,6 +566,22 @@ msgid ""
 msgstr ""
 "Les invitations n'ont pas été envoyées à ces comptes car l'enregistrement a "
 "déjà été effectué : {}"
+
+msgid "Impersonate selected user"
+msgstr "Se connecter en tant que l'utilisateur sélectionné"
+
+msgid "You do not have permission to impersonate users."
+msgstr ""
+"Vous n'avez pas la permission de se connecter en tant qu'autres utilisateurs."
+
+msgid "Please select exactly one user to impersonate."
+msgstr "Sélectionnez seulement un utilisateur à la fois."
+
+msgid "Impersonating superusers is not allowed."
+msgstr "Se connecter en tant que superadmin n'est pas autorisé."
+
+msgid "You are now impersonating {}."
+msgstr "Vous êtes connecté en tant que {}."
 
 msgid "Name"
 msgstr "Nom"
