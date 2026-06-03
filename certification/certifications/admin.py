@@ -110,6 +110,12 @@ class CertificationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
             .order_by("quiz__certification_id", "user_id", "-created", "-id")
         )
 
+        def escape_csv_cell(value):
+            dangerous_csv_cell_prefixes = ("=", "+", "-", "@", "\t", "\r")
+            if isinstance(value, str) and value.startswith(dangerous_csv_cell_prefixes):
+                return f"'{value}"
+            return value
+
         exported_keys = set()
         for result in results:
             certification = result.quiz.certification
@@ -127,10 +133,10 @@ class CertificationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
 
             writer.writerow(
                 [
-                    certification.name,
-                    result.user.first_name,
-                    result.user.last_name,
-                    result.user.email,
+                    escape_csv_cell(certification.name),
+                    escape_csv_cell(result.user.first_name),
+                    escape_csv_cell(result.user.last_name),
+                    escape_csv_cell(result.user.email),
                     result.score,
                     result.quiz.url,
                     certificate_date,
