@@ -29,6 +29,11 @@ EUPHROSYNE_FEATURES=data_management,data_request,lab_notebook
 
 Feature-specific settings (when the feature is enabled):
 
+- `data_request`:
+  - `DATA_REQUEST_ALLOWED_ORIGINS`
+  - Optional comma-separated list of origins allowed to submit `POST /api/data-request/`, for example `DATA_REQUEST_ALLOWED_ORIGINS=https://euphrosyne-digilab-production.osc-secnum-fr1.scalingo.io`.
+  - When configured, a missing or non-allowed `Origin` returns `403 Forbidden`. `Origin` contains only `scheme://host[:port]`, so configure the Digilab domain rather than a path such as `/fr/catalog/`.
+  - This filters simple automated submissions, but is not a strong guarantee against a bot that forges the `Origin` header.
 - `data_management`:
   - `DATA_COOLING_ENABLE`
   - See [project_data_lifecycle.md](project_data_lifecycle.md) for lifecycle flows, API contracts, and operational details.

@@ -5,6 +5,7 @@ from euphro_auth.jwt.authentication import EuphrosyneAdminJWTAuthentication
 from lab.runs.models import Run
 
 from .models import DataAccessEvent, DataRequest
+from .permissions import DataRequestOriginPermission
 
 
 class DataRequestSerializer(serializers.ModelSerializer):
@@ -29,6 +30,7 @@ class DataRequestSerializer(serializers.ModelSerializer):
 class DataRequestCreateAPIView(generics.CreateAPIView):
     queryset = DataRequest.objects.all()
     serializer_class = DataRequestSerializer
+    permission_classes = [DataRequestOriginPermission]
 
     def perform_create(self, serializer: DataRequestSerializer):
         super().perform_create(serializer)
