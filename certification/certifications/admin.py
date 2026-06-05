@@ -87,7 +87,8 @@ class CertificationAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
 
         filename = get_passed_users_export_filename(queryset)
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
-        writer = csv.writer(response)
+        response.write("\ufeff")
+        writer = csv.writer(response, delimiter=";")
         writer.writerow(
             [
                 "certification",
