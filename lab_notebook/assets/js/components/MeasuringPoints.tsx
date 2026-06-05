@@ -6,6 +6,7 @@ import { fetchRunObjectGroups } from "../../../../lab/objects/assets/js/services
 import AddObjectGroupModal from "./AddObjectGroupModal";
 import AddImageToMeasuringModal from "./AddImageToMeasuringModal";
 import { RunMeasuringPointStandards } from "../../../../standard/assets/js/IStandard";
+import { useNotebookHDF5Context } from "../hdf5";
 
 export default function MeasuringPoints({
   runId,
@@ -29,6 +30,7 @@ export default function MeasuringPoints({
     unfoldAll: window.gettext("Unfold all"),
     closeAll: window.gettext("Close all"),
   };
+  const { hasMatchesByPointId, loadEntriesForPoint } = useNotebookHDF5Context();
 
   // Selected measuring point for object group modal
   const [addObjectModalPointId, setAddObjectModalPointId] = useState<
@@ -70,7 +72,30 @@ export default function MeasuringPoints({
     accordionButtons.current = accordionButtons.current.slice(0, points.length);
   }, [points]);
 
-  const onAccordionClick = () => {
+  useEffect(() => {
+    accordionButtons.current.forEach((button, index) => {
+      const point = points[index];
+      if (
+        button?.ariaExpanded === "true" &&
+        point &&
+        hasMatchesByPointId[point.id]
+      ) {
+        void loadEntriesForPoint(point.id);
+      }
+    });
+  }, [hasMatchesByPointId, points, loadEntriesForPoint]);
+
+  const onAccordionClick = (
+    point: IMeasuringPoint,
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    if (
+      event.currentTarget.ariaExpanded === "false" &&
+      hasMatchesByPointId[point.id]
+    ) {
+      void loadEntriesForPoint(point.id);
+    }
+
     const expandedNum: number = (
       accordionButtons.current.map((b) =>
         b?.ariaExpanded === "true" ? 1 : 0,
@@ -141,7 +166,7 @@ export default function MeasuringPoints({
                 ref={(el) => {
                   accordionButtons.current[index] = el;
                 }}
-                onClick={onAccordionClick}
+                onClick={(event) => onAccordionClick(point, event)}
               >
                 {getMeasuringPointLabel(point)}
               </button>

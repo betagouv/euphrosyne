@@ -31,6 +31,11 @@ class NotebookView(ProjectMembershipRequiredMixin, TemplateView):
             "project": self.run.project,
             "notebook": self.run.run_notebook,
             "json_data": json.dumps(
-                {"runId": str(self.run.id), "projectSlug": self.run.project.slug}
+                {
+                    "runId": str(self.run.id),
+                    "projectSlug": self.run.project.slug,
+                    "projectId": str(self.run.project.id),
+                    "runName": self.run.label,
+                }
             ),
         }
