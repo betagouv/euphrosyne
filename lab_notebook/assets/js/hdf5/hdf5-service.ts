@@ -1,5 +1,15 @@
 import { HDF5Attribute, HDF5Entity, HDF5Type, ToolsFetch } from "./types";
 
+export const HDF5_DATA_TRANSFER_PROGRESS_EVENT = "hdf5:data-transfer-progress";
+
+export interface HDF5DataTransferProgressDetail {
+  file: string | null;
+  path: string | null;
+  loaded: number;
+  total: number | null;
+  done: boolean;
+}
+
 export async function fetchHDF5Metadata(
   fetchFn: ToolsFetch,
   filePath: string,
@@ -33,8 +43,99 @@ export function createToolsH5GroveFetcher(fetchFn: ToolsFetch) {
         `Failed to fetch HDF5 data. Response status: ${response.status}`,
       );
     }
-    return response.arrayBuffer();
+    return readResponseWithProgress(response, {
+      file: params.file || null,
+      path: params.path || null,
+    });
   };
+}
+
+async function readResponseWithProgress(
+  response: Response,
+  request: Pick<HDF5DataTransferProgressDetail, "file" | "path">,
+): Promise<ArrayBuffer> {
+  const total = getContentLength(response);
+
+  dispatchDataTransferProgress({
+    ...request,
+    loaded: 0,
+    total,
+    done: false,
+  });
+
+  if (!response.body) {
+    const buffer = await response.arrayBuffer();
+    dispatchDataTransferProgress({
+      ...request,
+      loaded: buffer.byteLength,
+      total: total ?? buffer.byteLength,
+      done: true,
+    });
+    return buffer;
+  }
+
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let loaded = 0;
+  let isReading = true;
+
+  while (isReading) {
+    const { done, value } = await reader.read();
+    if (done) {
+      isReading = false;
+      continue;
+    }
+    if (!value) {
+      continue;
+    }
+    chunks.push(value);
+    loaded += value.byteLength;
+    dispatchDataTransferProgress({
+      ...request,
+      loaded,
+      total,
+      done: false,
+    });
+  }
+
+  const buffer = concatenateChunks(chunks, loaded);
+  dispatchDataTransferProgress({
+    ...request,
+    loaded,
+    total: total ?? loaded,
+    done: true,
+  });
+  return buffer;
+}
+
+function getContentLength(response: Response): number | null {
+  const contentLength = response.headers.get("Content-Length");
+  if (!contentLength) {
+    return null;
+  }
+  const parsedLength = Number(contentLength);
+  return Number.isFinite(parsedLength) && parsedLength >= 0
+    ? parsedLength
+    : null;
+}
+
+function concatenateChunks(chunks: Uint8Array[], byteLength: number) {
+  const bytes = new Uint8Array(byteLength);
+  let offset = 0;
+  chunks.forEach((chunk) => {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  });
+  return bytes.buffer;
+}
+
+function dispatchDataTransferProgress(detail: HDF5DataTransferProgressDetail) {
+  window.dispatchEvent(
+    new CustomEvent<HDF5DataTransferProgressDetail>(
+      HDF5_DATA_TRANSFER_PROGRESS_EVENT,
+      { detail },
+    ),
+  );
 }
 
 function parseHDF5Entity(value: unknown, path: string): HDF5Entity {

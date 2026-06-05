@@ -77,6 +77,9 @@ export interface HDF5DatasetEntry {
   datasetPath: string;
   shape: number[];
   metadataSummary: string;
+  acquisitionName?: string;
+  acquisitionPath?: string;
+  detectorName?: string;
 }
 
 export interface ScientificMetadataRow {

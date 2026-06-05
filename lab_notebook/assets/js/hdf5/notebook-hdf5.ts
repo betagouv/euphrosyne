@@ -18,6 +18,7 @@ import {
 const HDF5_INTEGER_TYPE_CLASS = 0;
 const HDF5_FLOAT_TYPE_CLASS = 1;
 const HDF5_EXTENSIONS = [".h5", ".hdf5"];
+const HDF5_MAPS_FOLDER_NAME = "HDF5_maps_files";
 const HDF5_SPECTRUM_NAME_PATTERNS = [/^X\d+$/, /^G\d+$/, /^R\d+$/];
 const SUPPORTED_DATASET_ENTRY_KINDS: HDF5DatasetEntryKind[] = ["spectrum"];
 
@@ -51,6 +52,10 @@ interface HDF5SpectrumDataset extends HDF5NotebookDatasetBase {
 
 interface HDF5MapDataset extends HDF5NotebookDatasetBase {
   dataKind: "map";
+  detectorName?: string;
+  detectorPath?: string;
+  acquisitionName?: string;
+  acquisitionPath?: string;
 }
 
 type HDF5NotebookDataset = HDF5SpectrumDataset | HDF5MapDataset;
@@ -80,6 +85,12 @@ export function filterHDF5Files(files: EuphrosyneFile[]): EuphrosyneFile[] {
     const lowerName = file.name.toLowerCase();
     return HDF5_EXTENSIONS.some((extension) => lowerName.endsWith(extension));
   });
+}
+
+export function filterHDF5MapFiles(files: EuphrosyneFile[]): EuphrosyneFile[] {
+  return filterHDF5Files(files).filter((file) =>
+    file.path.split("/").includes(HDF5_MAPS_FOLDER_NAME),
+  );
 }
 
 export function normalizeMeasuringPointName(name: string): string | null {
@@ -168,6 +179,43 @@ export function createDatasetEntriesFromGroup(
   );
 }
 
+export function createMapDatasetEntriesFromRoot(
+  file: EuphrosyneFile,
+  root: HDF5Entity | null,
+): HDF5DatasetEntry[] {
+  if (!root || root.kind !== "group") {
+    return [];
+  }
+
+  return getMapAcquisitionGroups(root).flatMap((acquisition) =>
+    createHDF5MapAcquisition(acquisition).maps.map((dataset) =>
+      createMapDatasetEntry(file, acquisition, dataset),
+    ),
+  );
+}
+
+export function createMapDatasetEntryFromDetectorDataset(
+  file: EuphrosyneFile,
+  acquisition: HDF5Group,
+  detector: HDF5Group,
+  entity: HDF5Entity,
+): HDF5DatasetEntry[] {
+  const map = createHDF5MapDataset(entity);
+  if (!map || !isMapsDataset(entity)) {
+    return [];
+  }
+
+  return [
+    createMapDatasetEntry(file, acquisition, {
+      ...map,
+      detectorName: detector.name,
+      detectorPath: detector.path,
+      acquisitionName: acquisition.name,
+      acquisitionPath: acquisition.path,
+    }),
+  ];
+}
+
 function createDatasetEntry(
   match: HDF5GroupMatch,
   dataset: HDF5NotebookDataset,
@@ -186,6 +234,39 @@ function createDatasetEntry(
     datasetPath: dataset.path,
     shape: dataset.shape,
     metadataSummary: getMetadataSummary(dataset),
+    ...(dataset.dataKind === "map"
+      ? {
+          acquisitionName: dataset.acquisitionName,
+          acquisitionPath: dataset.acquisitionPath,
+          detectorName: dataset.detectorName,
+        }
+      : {}),
+  };
+}
+
+function createMapDatasetEntry(
+  file: EuphrosyneFile,
+  acquisition: HDF5Group,
+  dataset: HDF5MapDataset,
+): HDF5DatasetEntry {
+  const detectorName = dataset.detectorName || dataset.name;
+  return {
+    id: `${file.path}:${dataset.path}`,
+    pointId: "",
+    pointKey: "",
+    fileName: file.name,
+    filePath: file.path,
+    groupName: detectorName,
+    groupPath: dataset.detectorPath || acquisition.path,
+    dataKind: "map",
+    dataKindLabel: getDatasetKindLabel("map"),
+    datasetName: dataset.name,
+    datasetPath: dataset.path,
+    shape: dataset.shape,
+    metadataSummary: getMetadataSummary(dataset),
+    acquisitionName: acquisition.name,
+    acquisitionPath: acquisition.path,
+    detectorName,
   };
 }
 
@@ -229,6 +310,61 @@ function createHDF5Point(group: HDF5Group): HDF5Point | null {
     metadata: createMetadataRecord(group.attributes),
     ...children,
   };
+}
+
+function getMapAcquisitionGroups(root: HDF5Group): HDF5Group[] {
+  const directAcquisition = createHDF5MapAcquisition(root);
+  if (directAcquisition.maps.length > 0) {
+    return [root];
+  }
+
+  return root.children.filter(
+    (child): child is HDF5Group =>
+      child.kind === "group" && createHDF5MapAcquisition(child).maps.length > 0,
+  );
+}
+
+function createHDF5MapAcquisition(group: HDF5Group): {
+  maps: HDF5MapDataset[];
+} {
+  return {
+    maps: [
+      ...createHDF5MapDatasetsFromDetectorGroup(group, group),
+      ...group.children.flatMap((child) =>
+        child.kind === "group"
+          ? createHDF5MapDatasetsFromDetectorGroup(group, child)
+          : [],
+      ),
+    ],
+  };
+}
+
+function createHDF5MapDatasetsFromDetectorGroup(
+  acquisition: HDF5Group,
+  detector: HDF5Group,
+): HDF5MapDataset[] {
+  return detector.children.flatMap((child) => {
+    const map = createHDF5MapDataset(child);
+    if (!map || !isMapsDataset(child)) {
+      return [];
+    }
+    return [
+      {
+        ...map,
+        detectorName: detector.name,
+        detectorPath: detector.path,
+        acquisitionName: acquisition.name,
+        acquisitionPath: acquisition.path,
+      },
+    ];
+  });
+}
+
+function isMapsDataset(entity: HDF5Entity): boolean {
+  return (
+    entity.kind === "dataset" &&
+    (entity.name === "maps" || entity.path.endsWith("/maps"))
+  );
 }
 
 function toPointGroupReference(group: HDF5Group): PointGroupReference | null {
@@ -329,7 +465,7 @@ function createHDF5MapDataset(entity: HDF5Entity): HDF5MapDataset | null {
 
   if (
     entity.kind !== "dataset" ||
-    entity.shape.length !== 2 ||
+    entity.shape.length !== 3 ||
     entity.shape.some((dimension) => dimension <= 0) ||
     !isNumericType
   ) {
@@ -449,6 +585,6 @@ function getSpectrumMetadataSummary(entity: HDF5SpectrumDataset): string {
 
 function getMapMetadataSummary(entity: HDF5MapDataset): string {
   return window.interpolate(window.gettext("%s map"), [
-    entity.shape.join(" x "),
+    entity.shape.join(" × "),
   ]);
 }

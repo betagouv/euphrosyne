@@ -31,6 +31,31 @@ export const SCIENTIFIC_METADATA_FIELDS: Array<{
     attributeName: "dose",
   },
   {
+    key: "dosePerColumn",
+    labelText: "Dose per column",
+    attributeName: "dose/column",
+  },
+  {
+    key: "mapSizeX",
+    labelText: "Map size X",
+    attributeName: "map size x (um)",
+  },
+  {
+    key: "mapSizeY",
+    labelText: "Map size Y",
+    attributeName: "map size y (um)",
+  },
+  {
+    key: "pixelSizeX",
+    labelText: "Pixel size X",
+    attributeName: "pixel size x (um)",
+  },
+  {
+    key: "pixelSizeY",
+    labelText: "Pixel size Y",
+    attributeName: "pixel size y (um)",
+  },
+  {
     key: "objectReference",
     labelText: "Object reference",
     attributeName: "obj euphrosyne",
@@ -49,6 +74,56 @@ export const SCIENTIFIC_METADATA_FIELDS: Array<{
     key: "institution",
     labelText: "Institution",
     attributeName: "institution",
+  },
+  {
+    key: "username",
+    labelText: "Username",
+    attributeName: "username",
+  },
+  {
+    key: "adcName",
+    labelText: "ADC name",
+    attributeName: "adc name",
+  },
+  {
+    key: "calibration",
+    labelText: "Calibration",
+    attributeName: "calibration",
+  },
+  {
+    key: "detectorType",
+    labelText: "Detector type",
+    attributeName: "det. type",
+  },
+  {
+    key: "detectorSerialNumber",
+    labelText: "Detector serial number",
+    attributeName: "det. S/N",
+  },
+  {
+    key: "detectorActiveArea",
+    labelText: "Detector active area",
+    attributeName: "det. active area",
+  },
+  {
+    key: "detectorAngle",
+    labelText: "Detector angle",
+    attributeName: "det. angle",
+  },
+  {
+    key: "detectorEntranceWindow",
+    labelText: "Detector entrance window",
+    attributeName: "det. entrance window",
+  },
+  {
+    key: "detectorFilter",
+    labelText: "Detector filter",
+    attributeName: "det. filter",
+  },
+  {
+    key: "detectorThickness",
+    labelText: "Detector thickness",
+    attributeName: "det. thickness",
   },
 ];
 
