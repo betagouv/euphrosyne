@@ -22,10 +22,9 @@ export default function HDF5RunDataSection({
   const t = {
     title: window.gettext("Available viewable files for this run"),
     hint: window.gettext(
-      "Viewable data has been detected automatically from the run files. Expand a measurement point below to visualize the associated spectra.",
+      "Viewable data has been detected automatically from the run files. Expand a measurement point below to visualize spectra, or select a detector map to visualize intensity over a channel range.",
     ),
     file: window.gettext("HDF5 file"),
-    entries: window.gettext("Entries (groups)"),
     coveredPoints: window.gettext("Covered points"),
     modified: window.gettext("Modified"),
     size: window.gettext("Size"),
@@ -33,7 +32,6 @@ export default function HDF5RunDataSection({
     explore: window.gettext("Explore"),
     loading: window.gettext("Loading HDF5 data..."),
     noData: window.gettext("No HDF5 data available for this run."),
-    unknown: window.gettext("Unknown"),
   };
 
   return (
@@ -59,7 +57,6 @@ export default function HDF5RunDataSection({
                   <thead>
                     <tr>
                       <th scope="col">{t.file}</th>
-                      <th scope="col">{t.entries}</th>
                       <th scope="col">{t.coveredPoints}</th>
                       <th scope="col">{t.modified}</th>
                       <th scope="col">{t.size}</th>
@@ -69,33 +66,30 @@ export default function HDF5RunDataSection({
                     </tr>
                   </thead>
                   <tbody>
-                    {fileSummaries.map(
-                      ({ file, entryCount, coveredPointRange }) => (
-                        <tr key={file.path}>
-                          <td>
-                            <span
-                              className="fr-icon-file-line fr-icon--sm hdf5-file-icon"
-                              aria-hidden="true"
-                            />
-                            <span>{file.name}</span>
-                          </td>
-                          <td>{entryCount ?? t.unknown}</td>
-                          <td>{coveredPointRange || "-"}</td>
-                          <td>{formatDate(file.lastModified)}</td>
-                          <td>
-                            {file.size === null ? "-" : formatBytes(file.size)}
-                          </td>
-                          <td className="hdf5-table__action">
-                            <a
-                              className="fr-link fr-icon-external-link-line fr-link--icon-right"
-                              href={`/lab/project/${projectId}/hdf5-viewer?file=${encodeURIComponent(file.path)}`}
-                            >
-                              {t.explore}
-                            </a>
-                          </td>
-                        </tr>
-                      ),
-                    )}
+                    {fileSummaries.map(({ file, coveredPointRange }) => (
+                      <tr key={file.path}>
+                        <td>
+                          <span
+                            className="fr-icon-file-line fr-icon--sm hdf5-file-icon"
+                            aria-hidden="true"
+                          />
+                          <span>{file.name}</span>
+                        </td>
+                        <td>{coveredPointRange || "-"}</td>
+                        <td>{formatDate(file.lastModified)}</td>
+                        <td>
+                          {file.size === null ? "-" : formatBytes(file.size)}
+                        </td>
+                        <td className="hdf5-table__action">
+                          <a
+                            className="fr-link fr-icon-external-link-line fr-link--icon-right"
+                            href={`/lab/project/${projectId}/hdf5-viewer?file=${encodeURIComponent(file.path)}`}
+                          >
+                            {t.explore}
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>

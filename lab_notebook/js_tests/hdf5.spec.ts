@@ -2,8 +2,11 @@ import {
   buildScientificMetadataRows,
   createDatasetEntriesFromGroup,
   createHDF5FileSummaries,
+  createMapDatasetEntryFromDetectorDataset,
+  createMapDatasetEntriesFromRoot,
   fetchHDF5Metadata,
   filterHDF5Files,
+  filterHDF5MapFiles,
   findHDF5GroupMatches,
   normalizeMeasuringPointName,
   type HDF5Attribute,
@@ -104,6 +107,25 @@ describe("notebook HDF5 data helpers", () => {
         { ...file("folder.h5"), isDir: true },
       ]).map(({ name }) => name),
     ).toEqual(["batch.hdf5", "standard.H5"]);
+  });
+
+  it("filters HDF5 map files to the cartography folder", () => {
+    expect(
+      filterHDF5MapFiles([
+        {
+          ...file("map-file.hdf5"),
+          path: "/run/raw_data/HDF5_maps_files/map-file.hdf5",
+        },
+        {
+          ...file("spectrum-file.hdf5"),
+          path: "/run/raw_data/spectrum-file.hdf5",
+        },
+        {
+          ...file("map-notes.txt"),
+          path: "/run/raw_data/HDF5_maps_files/map-notes.txt",
+        },
+      ]).map(({ name }) => name),
+    ).toEqual(["map-file.hdf5"]);
   });
 
   it("normalizes numeric measuring point names to four digits", () => {
@@ -384,6 +406,161 @@ describe("notebook HDF5 data helpers", () => {
     expect(entries[0]).toMatchObject({
       datasetPath: "/20260224_0005_CRRMF48563/G20",
       metadataSummary: "2048 channels",
+    });
+  });
+
+  it("creates map entries from detector groups containing 3D maps datasets", () => {
+    const hdf5File = {
+      ...file("cartography.hdf5"),
+      path: "/run/raw_data/HDF5_maps_files/cartography.hdf5",
+    };
+    const root = group(
+      "/",
+      [
+        group(
+          "X0",
+          [
+            dataset({
+              name: "maps",
+              path: "/X0/maps",
+              shape: [20, 40, 2048],
+              type: integer32Type,
+              attributes: [attribute("adc name")],
+            }),
+          ],
+          "/X0",
+        ),
+        group(
+          "X1",
+          [
+            dataset({
+              name: "maps",
+              path: "/X1/maps",
+              shape: [20, 40],
+              type: integer32Type,
+            }),
+          ],
+          "/X1",
+        ),
+      ],
+      "/",
+    );
+
+    const entries = createMapDatasetEntriesFromRoot(hdf5File, root);
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({
+      pointId: "",
+      dataKind: "map",
+      dataKindLabel: "Map",
+      fileName: "cartography.hdf5",
+      detectorName: "X0",
+      groupName: "X0",
+      groupPath: "/X0",
+      datasetName: "maps",
+      datasetPath: "/X0/maps",
+      shape: [20, 40, 2048],
+      acquisitionPath: "/",
+      metadataSummary: "20 × 40 × 2048 map",
+    });
+  });
+
+  it("creates map entries from a fetched detector group containing a maps dataset", () => {
+    const hdf5File = {
+      ...file("cartography.hdf5"),
+      path: "/run/raw_data/HDF5_maps_files/cartography.hdf5",
+    };
+    const detector = group(
+      "X0",
+      [
+        dataset({
+          name: "maps",
+          path: "/X0/maps",
+          shape: [20, 40, 2048],
+          type: integer32Type,
+        }),
+      ],
+      "/X0",
+    );
+
+    const entries = createMapDatasetEntriesFromRoot(hdf5File, detector);
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({
+      detectorName: "X0",
+      groupName: "X0",
+      groupPath: "/X0",
+      datasetPath: "/X0/maps",
+      shape: [20, 40, 2048],
+    });
+  });
+
+  it("creates map entries from a directly fetched detector maps dataset", () => {
+    const hdf5File = {
+      ...file("cartography.hdf5"),
+      path: "/run/raw_data/HDF5_maps_files/cartography.hdf5",
+    };
+    const acquisition = group("/", [], "/");
+    const detector = group("X0", [], "/X0");
+    const maps = dataset({
+      name: "maps",
+      path: "/X0/maps",
+      shape: [20, 40, 2048],
+      type: integer32Type,
+    });
+
+    const entries = createMapDatasetEntryFromDetectorDataset(
+      hdf5File,
+      acquisition,
+      detector,
+      maps,
+    );
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({
+      detectorName: "X0",
+      groupPath: "/X0",
+      datasetPath: "/X0/maps",
+      shape: [20, 40, 2048],
+    });
+  });
+
+  it("creates map entries from acquisition-level groups", () => {
+    const hdf5File = {
+      ...file("cartography.hdf5"),
+      path: "/run/raw_data/HDF5_maps_files/cartography.hdf5",
+    };
+    const acquisition = group(
+      "scan-1",
+      [
+        group(
+          "X13",
+          [
+            dataset({
+              name: "maps",
+              path: "/scan-1/X13/maps",
+              shape: [4, 5, 1024],
+              type: float64Type,
+            }),
+          ],
+          "/scan-1/X13",
+        ),
+      ],
+      "/scan-1",
+    );
+
+    const entries = createMapDatasetEntriesFromRoot(
+      hdf5File,
+      group("/", [acquisition], "/"),
+    );
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({
+      detectorName: "X13",
+      acquisitionName: "scan-1",
+      acquisitionPath: "/scan-1",
+      datasetPath: "/scan-1/X13/maps",
+      shape: [4, 5, 1024],
     });
   });
 

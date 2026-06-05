@@ -1,6 +1,5 @@
 import { css } from "@emotion/react";
 import { Component, ReactNode, Suspense, use, useEffect, useMemo } from "react";
-import { LineVis, useDomain } from "@witoldw/h5web-lib";
 
 import {
   assertArrayShape,
@@ -20,6 +19,9 @@ import {
   ScientificMetadataRow,
   ToolsFetch,
 } from "../hdf5";
+import HDF5DataLoadingIndicator from "./HDF5DataLoadingIndicator";
+import HDF5MetadataPanel from "./HDF5MetadataPanel";
+import HDF5SpectrumPlot from "./HDF5SpectrumPlot";
 
 const modalContentStyle = css({
   minHeight: "70vh",
@@ -27,23 +29,35 @@ const modalContentStyle = css({
 
 const visualizationLayoutStyle = css({
   display: "grid",
-  gridTemplateColumns: "minmax(16rem, 22rem) minmax(0, 1fr)",
-  gap: "2rem",
+  gridTemplateColumns: "minmax(15rem, 18rem) minmax(0, 1fr)",
   minHeight: "62vh",
-  "@media (max-width: 48rem)": {
+  border: "1px solid var(--border-default-grey)",
+  borderRadius: "0.5rem",
+  overflow: "hidden",
+  "@media (max-width: 62rem)": {
     gridTemplateColumns: "1fr",
   },
 });
 
 const metadataPanelStyle = css({
   borderRight: "1px solid var(--border-default-grey)",
-  paddingRight: "1rem",
-  "@media (max-width: 48rem)": {
+  padding: "1rem 1.25rem",
+  background: "var(--background-alt-grey)",
+  "@media (max-width: 62rem)": {
     borderRight: "none",
     borderBottom: "1px solid var(--border-default-grey)",
-    paddingRight: 0,
-    paddingBottom: "1rem",
   },
+});
+
+const spectrumPanelStyle = css({
+  minWidth: 0,
+  padding: "1rem 1.25rem",
+});
+
+const visualizationLoadingStyle = css({
+  alignItems: "center",
+  display: "flex",
+  minHeight: "28rem",
 });
 
 const plotStyle = css({
@@ -171,10 +185,6 @@ function HDF5SpectrumContent({ entry }: { entry: HDF5DatasetEntry }) {
     );
   }
 
-  const value = useDatasetValue(dataset);
-  const numericValue = useToNumArray(value);
-  const dataArray = useNdArray(numericValue, dataset.shape);
-  const domain = useDomain(dataArray);
   const { attrValuesStore } = useDataContext();
   const group = useEntity(entry.groupPath);
   const metadataRows = buildModalMetadataRows(entry, {
@@ -184,36 +194,54 @@ function HDF5SpectrumContent({ entry }: { entry: HDF5DatasetEntry }) {
 
   return (
     <div css={visualizationLayoutStyle}>
-      <MetadataPanel rows={metadataRows} />
-      <LineVis
-        css={plotStyle}
-        dataArray={dataArray}
-        domain={domain}
-        ordinateLabel={window.gettext("Counts")}
-        abscissaParams={{ label: window.gettext("Channel") }}
-        title={entry.datasetName}
-        showGrid
-      />
+      <aside css={metadataPanelStyle}>
+        <HDF5MetadataPanel rows={metadataRows} />
+      </aside>
+      <section css={spectrumPanelStyle}>
+        <Suspense
+          fallback={
+            <div css={visualizationLoadingStyle}>
+              <HDF5DataLoadingIndicator
+                datasetPath={entry.datasetPath}
+                filePath={entry.filePath}
+                label={window.gettext("Loading visualization...")}
+              />
+            </div>
+          }
+        >
+          <HDF5SpectrumVisualization
+            dataset={dataset}
+            title={entry.datasetName}
+          />
+        </Suspense>
+      </section>
     </div>
   );
 }
 
-function MetadataPanel({ rows }: { rows: ScientificMetadataRow[] }) {
+function HDF5SpectrumVisualization({
+  dataset,
+  title,
+}: {
+  dataset: ReturnType<typeof useEntity>;
+  title: string;
+}) {
+  assertDataset(dataset, "Expected selected HDF5 entry to be a dataset.");
+  assertArrayShape(dataset, "Expected selected HDF5 entry to be an array.");
+  assertNumericType(dataset, "Expected selected HDF5 entry to be numeric.");
+
+  if (dataset.shape.length !== 1) {
+    throw new Error(
+      "Expected selected HDF5 entry to be a one-dimensional array.",
+    );
+  }
+
+  const value = useDatasetValue(dataset);
+  const numericValue = useToNumArray(value);
+  const dataArray = useNdArray(numericValue, dataset.shape);
+
   return (
-    <aside css={metadataPanelStyle}>
-      <div className="fr-table fr-table--sm">
-        <table>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.key}>
-                <th scope="row">{row.label}</th>
-                <td>{row.value}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </aside>
+    <HDF5SpectrumPlot dataArray={dataArray} plotCss={plotStyle} title={title} />
   );
 }
 

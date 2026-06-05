@@ -654,14 +654,24 @@ msgstr ""
 "fichiers du run. Dépliez un point de mesure ci-dessous pour visualiser les "
 "spectres associés."
 
+msgid ""
+"Viewable data has been detected automatically from the run files. Expand a "
+"measurement point below to visualize spectra, or select a detector map to "
+"visualize intensity over a channel range."
+msgstr ""
+"Des données visualisables ont été détectées automatiquement dans les "
+"fichiers du run. Dépliez un point de mesure ci-dessous pour visualiser les "
+"spectres, ou sélectionnez une carte de détecteur pour visualiser l'intensité "
+"sur une plage de canaux."
+
 msgid "HDF5 file"
 msgstr "Fichier HDF5"
 
-msgid "Entries (groups)"
-msgstr "Entrées (groupes)"
+msgid "Entries"
+msgstr "Entrées"
 
 msgid "Covered points"
-msgstr "Points couverts"
+msgstr "Points associés"
 
 msgid "Modified"
 msgstr "Modifié"
@@ -689,6 +699,14 @@ msgstr "Visualisation des données"
 
 msgid "Loading visualization..."
 msgstr "Chargement de la visualisation..."
+
+#, javascript-format
+msgid "%s loaded"
+msgstr "%s chargés"
+
+#, javascript-format
+msgid "%s of %s loaded"
+msgstr "%s sur %s chargés"
 
 msgid "Unset the object group or standard to change the analysis type"
 msgstr ""
@@ -814,11 +832,215 @@ msgstr "%s canaux"
 msgid "%s map"
 msgstr "Carte %s"
 
+#, javascript-format
+msgid "%s map — %s"
+msgstr "Carte %s — %s"
+
+msgid "Available map data for this run"
+msgstr "Données cartographiques disponibles pour ce run"
+
+msgid ""
+"Map data has been detected automatically from the run files. Select a "
+"detector map to visualize intensity over a channel range."
+msgstr ""
+"Des données cartographiques ont été détectées automatiquement dans les "
+"fichiers du run. Sélectionnez une carte de détecteur pour visualiser "
+"l'intensité sur une plage de canaux."
+
+msgid "Detector"
+msgstr "Détecteur"
+
+msgid "Shape"
+msgstr "Dimensions"
+
+msgid "Loading HDF5 map data..."
+msgstr "Chargement des données cartographiques HDF5..."
+
+msgid "No valid HDF5 map datasets were found in the cartography files."
+msgstr ""
+"Aucun jeu de données cartographique HDF5 valide n'a été trouvé dans les "
+"fichiers de cartographie."
+
+msgid "The selected HDF5 map could not be loaded."
+msgstr "La carte HDF5 sélectionnée n'a pas pu être chargée."
+
+msgid "Loading map visualization..."
+msgstr "Chargement de la visualisation cartographique..."
+
+msgid "Counts"
+msgstr "Comptages"
+
+msgid "Channel"
+msgstr "Canal"
+
+msgid "Global spectrum"
+msgstr "Spectre global"
+
+msgid "X pixel"
+msgstr "Pixel X"
+
+msgid "Y pixel"
+msgstr "Pixel Y"
+
+msgid "Integrated intensity map"
+msgstr "Carte d'intensité intégrée"
+
+#, javascript-format
+msgid "Integrated intensity map (%s - %s)"
+msgstr "Carte d'intensité intégrée (%s - %s)"
+
+msgid "Select a channel range on the global spectrum to update the integrated intensity map."
+msgstr ""
+"Sélectionnez une plage de canaux sur le spectre global pour mettre à jour "
+"la carte d'intensité intégrée."
+
+msgid "Channel range"
+msgstr "Plage de canaux"
+
+msgid "Lower channel"
+msgstr "Canal inférieur"
+
+msgid "Upper channel"
+msgstr "Canal supérieur"
+
+msgid "From"
+msgstr "De"
+
+msgid "To"
+msgstr "À"
+
+#, javascript-format
+msgid "Available channels: 0 to %s."
+msgstr "Canaux disponibles : 0 à %s."
+
+#, javascript-format
+msgid "Range width: %s channels"
+msgstr "Largeur : %s canaux"
+
+msgid "Apply"
+msgstr "Appliquer"
+
+msgid "Metadata"
+msgstr "Métadonnées"
+
+msgid "Acquisition"
+msgstr "Acquisition"
+
+msgid "Geometry"
+msgstr "Géométrie"
+
+msgid "Map size"
+msgstr "Taille de la carte"
+
+msgid "pixels"
+msgstr "pixels"
+
+msgid "Physical size"
+msgstr "Taille physique"
+
+msgid "Pixel"
+msgstr "Pixel"
+
+msgid "Channels"
+msgstr "Canaux"
+
+msgid "Entry"
+msgstr "Entrée"
+
+msgid "Enter both channel range bounds."
+msgstr "Saisissez les deux bornes de la plage de canaux."
+
+msgid "Channel bounds must be whole numbers."
+msgstr "Les bornes des canaux doivent être des nombres entiers."
+
+msgid "The lower channel must be at least 0."
+msgstr "Le canal inférieur doit être au moins égal à 0."
+
+msgid "The upper channel must not exceed the number of channels."
+msgstr "Le canal supérieur ne doit pas dépasser le nombre de canaux."
+
+msgid "The lower channel must be smaller than the upper channel."
+msgstr "Le canal inférieur doit être plus petit que le canal supérieur."
+
+msgid "Particle"
+msgstr "Particule"
+
+msgid "Beam energy"
+msgstr "Énergie du faisceau"
+
+msgid "Target type"
+msgstr "Type de cible"
+
+msgid "Acquisition time"
+msgstr "Temps d'acquisition"
+
+msgid "Dose"
+msgstr "Dose"
+
+msgid "Dose per column"
+msgstr "Dose par colonne"
+
+msgid "Map size X"
+msgstr "Taille de carte X"
+
+msgid "Map size Y"
+msgstr "Taille de carte Y"
+
+msgid "Pixel size X"
+msgstr "Taille de pixel X"
+
+msgid "Pixel size Y"
+msgstr "Taille de pixel Y"
+
+msgid "Analysis reference"
+msgstr "Référence d'analyse"
+
+msgid "Timestamp"
+msgstr "Horodatage"
+
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+msgid "ADC name"
+msgstr "Nom ADC"
+
+msgid "Calibration"
+msgstr "Étalonnage"
+
+msgid "Detector type"
+msgstr "Type de détecteur"
+
+msgid "Detector serial number"
+msgstr "Numéro de série du détecteur"
+
+msgid "Detector active area"
+msgstr "Surface active du détecteur"
+
+msgid "Detector angle"
+msgstr "Angle du détecteur"
+
+msgid "Detector entrance window"
+msgstr "Fenêtre d'entrée du détecteur"
+
+msgid "Detector filter"
+msgstr "Filtre du détecteur"
+
+msgid "Detector thickness"
+msgstr "Épaisseur du détecteur"
+
 msgid "Some HDF5 file metadata could not be loaded."
 msgstr "Certaines métadonnées des fichiers HDF5 n'ont pas pu être chargées."
 
+msgid "Some HDF5 map file metadata could not be loaded."
+msgstr ""
+"Certaines métadonnées des fichiers cartographiques HDF5 n'ont pas pu être "
+"chargées."
+
 msgid "HDF5 data could not be loaded."
 msgstr "Les données HDF5 n'ont pas pu être chargées."
+
+msgid "HDF5 map data could not be loaded."
+msgstr "Les données cartographiques HDF5 n'ont pas pu être chargées."
 
 msgid "Some HDF5 measurement point metadata could not be loaded."
 msgstr ""

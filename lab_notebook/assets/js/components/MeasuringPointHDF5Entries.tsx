@@ -10,6 +10,7 @@ export default function MeasuringPointHDF5Entries({
     hasMatchesByPointId,
     loadingEntriesByPointId,
     spectrumModalId,
+    mapModalId,
     visualizeEntry,
   } = useNotebookHDF5Context();
   const entries = entriesByPointId[pointId] || [];
@@ -63,7 +64,11 @@ export default function MeasuringPointHDF5Entries({
                     {entries.map((entry) => (
                       <tr key={entry.id}>
                         <td>
-                          <span>{entry.datasetName}</span>
+                          <span>
+                            {entry.dataKind === "map"
+                              ? entry.detectorName || entry.groupName
+                              : entry.datasetName}
+                          </span>
                         </td>
                         <td>{entry.dataKindLabel}</td>
                         <td>{entry.fileName}</td>
@@ -72,7 +77,11 @@ export default function MeasuringPointHDF5Entries({
                           <button
                             type="button"
                             className="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-btn--icon-left fr-icon-eye-line"
-                            aria-controls={spectrumModalId}
+                            aria-controls={
+                              entry.dataKind === "map"
+                                ? mapModalId
+                                : spectrumModalId
+                            }
                             data-fr-opened={false}
                             onClick={() => visualizeEntry(entry)}
                           >

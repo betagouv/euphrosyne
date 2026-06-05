@@ -1,8 +1,16 @@
-export { createToolsH5GroveFetcher, fetchHDF5Metadata } from "./hdf5-service";
+export {
+  createToolsH5GroveFetcher,
+  fetchHDF5Metadata,
+  HDF5_DATA_TRANSFER_PROGRESS_EVENT,
+} from "./hdf5-service";
+export type { HDF5DataTransferProgressDetail } from "./hdf5-service";
 export {
   createDatasetEntriesFromGroup,
   createHDF5FileSummaries,
+  createMapDatasetEntryFromDetectorDataset,
+  createMapDatasetEntriesFromRoot,
   filterHDF5Files,
+  filterHDF5MapFiles,
   findHDF5GroupMatches,
   normalizeMeasuringPointName,
 } from "./notebook-hdf5";
