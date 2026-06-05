@@ -12,6 +12,11 @@ declare global {
   interface Window {
     gettext: (text: string) => string;
     interpolate: (text: string, args: string[]) => string;
+    dsfr?: (element: HTMLElement | null) => {
+      modal: {
+        disclose: () => void;
+      };
+    };
     dismissAddRelatedObjectGroupPopup?: (win: Window) => void;
   }
 }
