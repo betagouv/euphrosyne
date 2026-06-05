@@ -32,7 +32,11 @@ class CertificationAdminExportPassedUsersActionTests(TestCase):
                 id__in=[certification.id for certification in certifications]
             ),
         )
-        rows = list(csv.DictReader(StringIO(response.content.decode())))
+        rows = list(
+            csv.DictReader(
+                StringIO(response.content.decode("utf-8-sig")), delimiter=";"
+            )
+        )
         return response, rows
 
     @staticmethod
@@ -94,13 +98,14 @@ class CertificationAdminExportPassedUsersActionTests(TestCase):
         )
 
         assert response["Content-Type"] == "text/csv"
+        assert response.content.startswith(b"\xef\xbb\xbf")
         self.assertRegex(
             response["Content-Disposition"],
             r'^attachment; filename="export-cert-selected-certifications-\d{8}-\d{6}\.csv"$',  # pylint: disable=line-too-long
         )
-        assert response.content.decode().splitlines()[0] == (
-            "certification,first_name,last_name,email,score,quiz_url,"
-            "certificate_date,expiration_date"
+        assert response.content.decode("utf-8-sig").splitlines()[0] == (
+            "certification;first_name;last_name;email;score;quiz_url;"
+            "certificate_date;expiration_date"
         )
         assert rows == [
             {
@@ -182,3 +187,19 @@ class CertificationAdminExportPassedUsersActionTests(TestCase):
         assert rows[0]["first_name"] == "'=cmd|' /C calc'!A0"
         assert rows[0]["last_name"] == "'@HyperLink"
         assert rows[0]["email"] == "'+user@example.com"
+
+    def test_export_preserves_accents(self):
+        certification = CertificationOfTypeQuizFactory(name="Sécurité laser")
+        quiz = QuizCertificationFactory(certification=certification, passing_score=80)
+        user = StaffUserFactory(
+            first_name="Élodie",
+            last_name="Durand-Maçon",
+            email="elodie@example.com",
+        )
+        QuizResultFactory(user=user, quiz=quiz, score=80, is_passed=True)
+
+        _, rows = self._export_rows(certification)
+
+        assert rows[0]["certification"] == "Sécurité laser"
+        assert rows[0]["first_name"] == "Élodie"
+        assert rows[0]["last_name"] == "Durand-Maçon"
