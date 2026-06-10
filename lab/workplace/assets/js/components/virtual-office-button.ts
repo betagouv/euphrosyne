@@ -2,7 +2,9 @@
 
 import euphrosyneToolsService from "../euphrosyne-tools-service.js";
 import utils from "../../../../assets/js/utils.js";
-import euphrosyneToolsFetch from "../../../../../shared/js/euphrosyne-tools-client";
+import euphrosyneToolsFetch, {
+  ToolsFetch,
+} from "../../../../../shared/js/euphrosyne-tools-client";
 
 type DeploymentStatus =
   | "NotSpecified"
@@ -19,7 +21,7 @@ type DeploymentStatus =
 export default class VirtualOfficeButton extends HTMLElement {
   connectionUrl: string | null = null;
   buttonEl: HTMLButtonElement;
-  fetchFn: typeof fetch = euphrosyneToolsFetch;
+  fetchFn: ToolsFetch = euphrosyneToolsFetch;
 
   deploymentStatus: DeploymentStatus | null = null;
 

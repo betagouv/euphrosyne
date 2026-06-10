@@ -1,6 +1,9 @@
 "use strict";
 
-import { EuphroToolsService } from "../../../shared/js/euphrosyne-tools-client";
+import {
+  EuphroToolsService,
+  ToolsFetch,
+} from "../../../shared/js/euphrosyne-tools-client";
 
 type FileType = "file" | "directory";
 
@@ -28,7 +31,7 @@ export class FileService extends EuphroToolsService {
   constructor(
     listFileURL: string,
     fetchPresignedURL: string,
-    fetchFn?: typeof fetch,
+    fetchFn?: ToolsFetch,
   ) {
     super(fetchFn);
     this.listFileURL = listFileURL;

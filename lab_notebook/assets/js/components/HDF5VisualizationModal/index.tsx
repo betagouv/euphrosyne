@@ -1,11 +1,8 @@
 import { Suspense, useEffect, useMemo } from "react";
 import { H5GroveProvider } from "@witoldw/h5web-app";
 
-import {
-  createToolsH5GroveFetcher,
-  HDF5DatasetEntry,
-  ToolsFetch,
-} from "../../hdf5";
+import { createToolsH5GroveFetcher, HDF5DatasetEntry } from "../../hdf5";
+import { ToolsFetch } from "../../../../../shared/js/euphrosyne-tools-client";
 import { HDF5VisualizationContent } from "./HDF5VisualizationContent";
 import { HDF5VisualizationErrorBoundary } from "./HDF5VisualizationErrorBoundary";
 import { getVisualizationModalTitle } from "./metadata";
