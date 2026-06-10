@@ -1,136 +1,140 @@
 import { ScientificMetadataRow } from "./types";
 
-export const SCIENTIFIC_METADATA_FIELDS: Array<{
+type ScientificMetadataField = {
   key: string;
   labelText: string;
   attributeName: string;
-}> = [
-  {
-    key: "particle",
-    labelText: "Particle",
-    attributeName: "particle",
-  },
-  {
-    key: "beamEnergy",
-    labelText: "Beam energy",
-    attributeName: "beam energy",
-  },
-  {
-    key: "targetType",
-    labelText: "Target type",
-    attributeName: "target type",
-  },
-  {
-    key: "acquisitionTime",
-    labelText: "Acquisition time",
-    attributeName: "acquisition time (sec.)",
-  },
-  {
-    key: "dose",
-    labelText: "Dose",
-    attributeName: "dose",
-  },
-  {
-    key: "dosePerColumn",
-    labelText: "Dose per column",
-    attributeName: "dose/column",
-  },
-  {
-    key: "mapSizeX",
-    labelText: "Map size X",
-    attributeName: "map size x (um)",
-  },
-  {
-    key: "mapSizeY",
-    labelText: "Map size Y",
-    attributeName: "map size y (um)",
-  },
-  {
-    key: "pixelSizeX",
-    labelText: "Pixel size X",
-    attributeName: "pixel size x (um)",
-  },
-  {
-    key: "pixelSizeY",
-    labelText: "Pixel size Y",
-    attributeName: "pixel size y (um)",
-  },
-  {
-    key: "objectReference",
-    labelText: "Object reference",
-    attributeName: "obj euphrosyne",
-  },
-  {
-    key: "analysisReference",
-    labelText: "Analysis reference",
-    attributeName: "ref. analyse",
-  },
-  {
-    key: "timestamp",
-    labelText: "Timestamp",
-    attributeName: "timestamp",
-  },
-  {
-    key: "institution",
-    labelText: "Institution",
-    attributeName: "institution",
-  },
-  {
-    key: "username",
-    labelText: "Username",
-    attributeName: "username",
-  },
-  {
-    key: "adcName",
-    labelText: "ADC name",
-    attributeName: "adc name",
-  },
-  {
-    key: "calibration",
-    labelText: "Calibration",
-    attributeName: "calibration",
-  },
-  {
-    key: "detectorType",
-    labelText: "Detector type",
-    attributeName: "det. type",
-  },
-  {
-    key: "detectorSerialNumber",
-    labelText: "Detector serial number",
-    attributeName: "det. S/N",
-  },
-  {
-    key: "detectorActiveArea",
-    labelText: "Detector active area",
-    attributeName: "det. active area",
-  },
-  {
-    key: "detectorAngle",
-    labelText: "Detector angle",
-    attributeName: "det. angle",
-  },
-  {
-    key: "detectorEntranceWindow",
-    labelText: "Detector entrance window",
-    attributeName: "det. entrance window",
-  },
-  {
-    key: "detectorFilter",
-    labelText: "Detector filter",
-    attributeName: "det. filter",
-  },
-  {
-    key: "detectorThickness",
-    labelText: "Detector thickness",
-    attributeName: "det. thickness",
-  },
-];
+};
+
+export function getScientificMetadataFields(): ScientificMetadataField[] {
+  return [
+    {
+      key: "particle",
+      labelText: window.gettext("Particle"),
+      attributeName: "particle",
+    },
+    {
+      key: "beamEnergy",
+      labelText: window.gettext("Beam energy"),
+      attributeName: "beam energy",
+    },
+    {
+      key: "targetType",
+      labelText: window.gettext("Target type"),
+      attributeName: "target type",
+    },
+    {
+      key: "acquisitionTime",
+      labelText: window.gettext("Acquisition time"),
+      attributeName: "acquisition time (sec.)",
+    },
+    {
+      key: "dose",
+      labelText: window.gettext("Dose"),
+      attributeName: "dose",
+    },
+    {
+      key: "dosePerColumn",
+      labelText: window.gettext("Dose per column"),
+      attributeName: "dose/column",
+    },
+    {
+      key: "mapSizeX",
+      labelText: window.gettext("Map size X"),
+      attributeName: "map size x (um)",
+    },
+    {
+      key: "mapSizeY",
+      labelText: window.gettext("Map size Y"),
+      attributeName: "map size y (um)",
+    },
+    {
+      key: "pixelSizeX",
+      labelText: window.gettext("Pixel size X"),
+      attributeName: "pixel size x (um)",
+    },
+    {
+      key: "pixelSizeY",
+      labelText: window.gettext("Pixel size Y"),
+      attributeName: "pixel size y (um)",
+    },
+    {
+      key: "objectReference",
+      labelText: window.gettext("Object reference"),
+      attributeName: "obj euphrosyne",
+    },
+    {
+      key: "analysisReference",
+      labelText: window.gettext("Analysis reference"),
+      attributeName: "ref. analyse",
+    },
+    {
+      key: "timestamp",
+      labelText: window.gettext("Timestamp"),
+      attributeName: "timestamp",
+    },
+    {
+      key: "institution",
+      labelText: window.gettext("Institution"),
+      attributeName: "institution",
+    },
+    {
+      key: "username",
+      labelText: window.gettext("Username"),
+      attributeName: "username",
+    },
+    {
+      key: "adcName",
+      labelText: window.gettext("ADC name"),
+      attributeName: "adc name",
+    },
+    {
+      key: "calibration",
+      labelText: window.gettext("Calibration"),
+      attributeName: "calibration",
+    },
+    {
+      key: "detectorType",
+      labelText: window.gettext("Detector type"),
+      attributeName: "det. type",
+    },
+    {
+      key: "detectorSerialNumber",
+      labelText: window.gettext("Detector serial number"),
+      attributeName: "det. S/N",
+    },
+    {
+      key: "detectorActiveArea",
+      labelText: window.gettext("Detector active area"),
+      attributeName: "det. active area",
+    },
+    {
+      key: "detectorAngle",
+      labelText: window.gettext("Detector angle"),
+      attributeName: "det. angle",
+    },
+    {
+      key: "detectorEntranceWindow",
+      labelText: window.gettext("Detector entrance window"),
+      attributeName: "det. entrance window",
+    },
+    {
+      key: "detectorFilter",
+      labelText: window.gettext("Detector filter"),
+      attributeName: "det. filter",
+    },
+    {
+      key: "detectorThickness",
+      labelText: window.gettext("Detector thickness"),
+      attributeName: "det. thickness",
+    },
+  ];
+}
 
 export function buildScientificMetadataRows(
   attributeValues: Record<string, unknown>,
 ): ScientificMetadataRow[] {
-  return SCIENTIFIC_METADATA_FIELDS.flatMap(
+  return getScientificMetadataFields().flatMap(
     ({ key, labelText, attributeName }) => {
       const value = attributeValues[attributeName];
       if (value === undefined || value === null) {
@@ -139,7 +143,7 @@ export function buildScientificMetadataRows(
       return [
         {
           key,
-          label: window.gettext(labelText),
+          label: labelText,
           value: formatAttributeValue(value),
         },
       ];

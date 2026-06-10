@@ -1,7 +1,7 @@
 import { EuphrosyneFile } from "../../../../lab/assets/js/file-service";
 import {
   formatAttributeValue,
-  SCIENTIFIC_METADATA_FIELDS,
+  getScientificMetadataFields,
 } from "./scientific-metadata";
 import {
   HDF5Attribute,
@@ -571,8 +571,9 @@ function getSpectrumMetadataSummary(entity: HDF5SpectrumDataset): string {
     ]),
   ];
 
+  const scientificMetadataFields = getScientificMetadataFields();
   const attributeNames = Object.keys(entity.metadata).filter((name) =>
-    SCIENTIFIC_METADATA_FIELDS.some(
+    scientificMetadataFields.some(
       ({ attributeName }) => attributeName === name,
     ),
   );

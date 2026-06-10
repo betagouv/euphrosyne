@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-10 16:47+0200\n"
+"POT-Creation-Date: 2026-06-10 17:24+0200\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -892,6 +892,72 @@ msgstr "%s canaux"
 #, javascript-format
 msgid "%s map"
 msgstr "Carte %s"
+
+msgid "Particle"
+msgstr "Particule"
+
+msgid "Beam energy"
+msgstr "Énergie du faisceau"
+
+msgid "Target type"
+msgstr "Type de cible"
+
+msgid "Acquisition time"
+msgstr "Temps d'acquisition"
+
+msgid "Dose"
+msgstr "Dose"
+
+msgid "Dose per column"
+msgstr "Dose par colonne"
+
+msgid "Map size X"
+msgstr "Taille de la carte X"
+
+msgid "Map size Y"
+msgstr "Taille de la carte Y"
+
+msgid "Pixel size X"
+msgstr "Taille du pixel X"
+
+msgid "Pixel size Y"
+msgstr "Taille du pixel Y"
+
+msgid "Analysis reference"
+msgstr "Référence d'analyse"
+
+msgid "Timestamp"
+msgstr "Horodatage"
+
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+msgid "ADC name"
+msgstr "Nom ADC"
+
+msgid "Calibration"
+msgstr "Étalonnage"
+
+msgid "Detector type"
+msgstr "Type de détecteur"
+
+msgid "Detector serial number"
+msgstr "Numéro de série du détecteur"
+
+msgid "Detector active area"
+msgstr "Surface active du détecteur"
+
+msgid "Detector angle"
+msgstr "Angle du détecteur"
+
+msgid "Detector entrance window"
+msgstr "Fenêtre d'entrée du détecteur"
+
+msgid "Detector filter"
+msgstr "Filtre du détecteur"
+
+msgid "Detector thickness"
+msgstr "Épaisseur du détecteur"
 
 msgid "Some HDF5 file metadata could not be loaded."
 msgstr "Certaines métadonnées des fichiers HDF5 n'ont pas pu être chargées."
