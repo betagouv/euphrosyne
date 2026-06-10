@@ -60,6 +60,8 @@ interface HDF5MapDataset extends HDF5NotebookDatasetBase {
 
 type HDF5NotebookDataset = HDF5SpectrumDataset | HDF5MapDataset;
 
+// Classified for upcoming embedded-image visualization; not exposed as a
+// viewable notebook entry yet.
 interface HDF5ImageDataset {
   name: string;
   path: string;
@@ -69,6 +71,8 @@ interface HDF5ImageDataset {
   metadata: Record<string, string>;
 }
 
+// Point child groups that do not map to a known visualization type yet.
+// Keeping them classified makes future nested HDF5 browsing easier.
 interface HDF5AuxiliaryGroup {
   name: string;
   path: string;
