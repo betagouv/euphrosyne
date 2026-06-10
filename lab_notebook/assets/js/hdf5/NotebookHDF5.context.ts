@@ -3,14 +3,14 @@ import { HDF5DatasetEntry } from "./types";
 
 export interface NotebookHDF5ContextValue {
   entriesByPointId: Record<string, HDF5DatasetEntry[]>;
-  hasMatchesByPointId: Record<string, boolean>;
+  hasViewableHDF5DataByPointId: Record<string, boolean>;
   loadingEntriesByPointId: Record<string, boolean>;
   loadEntriesForPoint: (pointId: string) => Promise<void>;
 }
 
 export const NotebookHDF5Context = createContext<NotebookHDF5ContextValue>({
   entriesByPointId: {},
-  hasMatchesByPointId: {},
+  hasViewableHDF5DataByPointId: {},
   loadingEntriesByPointId: {},
   loadEntriesForPoint: async () => {},
 });
