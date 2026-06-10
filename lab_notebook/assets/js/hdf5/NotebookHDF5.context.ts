@@ -5,8 +5,7 @@ export interface NotebookHDF5ContextValue {
   entriesByPointId: Record<string, HDF5DatasetEntry[]>;
   hasMatchesByPointId: Record<string, boolean>;
   loadingEntriesByPointId: Record<string, boolean>;
-  spectrumModalId: string;
-  mapModalId: string;
+  visualizationModalId: string;
   loadEntriesForPoint: (pointId: string) => Promise<void>;
   visualizeEntry: (entry: HDF5DatasetEntry) => void;
 }
@@ -15,8 +14,7 @@ export const NotebookHDF5Context = createContext<NotebookHDF5ContextValue>({
   entriesByPointId: {},
   hasMatchesByPointId: {},
   loadingEntriesByPointId: {},
-  spectrumModalId: "",
-  mapModalId: "",
+  visualizationModalId: "",
   loadEntriesForPoint: async () => {},
   visualizeEntry: () => {},
 });

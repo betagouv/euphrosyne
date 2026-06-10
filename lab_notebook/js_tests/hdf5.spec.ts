@@ -1,5 +1,7 @@
 import {
   buildScientificMetadataRows,
+  computeGlobalSpectrum,
+  computeIntegratedMap,
   createDatasetEntriesFromGroup,
   createHDF5FileSummaries,
   createMapDatasetEntryFromDetectorDataset,
@@ -9,6 +11,7 @@ import {
   filterHDF5MapFiles,
   findHDF5GroupMatches,
   normalizeMeasuringPointName,
+  validateChannelRange,
   type HDF5Attribute,
   type HDF5Group,
   type HDF5Type,
@@ -618,5 +621,48 @@ describe("notebook HDF5 data helpers", () => {
         value: "CRRMF48563",
       },
     ]);
+  });
+
+  it("computes a global spectrum by summing every spatial pixel", () => {
+    const spectrum = computeGlobalSpectrum(
+      new Float64Array([
+        1, 2, 3, 4, 10, 20, 30, 40, 100, 200, 300, 400, 1000, 2000, 3000, 4000,
+      ]),
+      2,
+      2,
+      4,
+    );
+
+    expect(Array.from(spectrum)).toEqual([1111, 2222, 3333, 4444]);
+  });
+
+  it("computes integrated maps over the selected channel range", () => {
+    const map = computeIntegratedMap(
+      new Float64Array([
+        1, 2, 3, 4, 10, 20, 30, 40, 100, 200, 300, 400, 1000, 2000, 3000, 4000,
+      ]),
+      2,
+      2,
+      4,
+      1,
+      3,
+    );
+
+    expect(Array.from(map)).toEqual([5, 50, 500, 5000]);
+  });
+
+  it("validates map channel ranges", () => {
+    expect(validateChannelRange(0, 4, 4)).toEqual({
+      isValid: true,
+      message: null,
+    });
+    expect(validateChannelRange(2, 2, 4)).toMatchObject({
+      isValid: false,
+      message: "The lower channel must be smaller than the upper channel.",
+    });
+    expect(validateChannelRange(0, 5, 4)).toMatchObject({
+      isValid: false,
+      message: "The upper channel must not exceed the number of channels.",
+    });
   });
 });

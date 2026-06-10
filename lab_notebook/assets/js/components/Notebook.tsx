@@ -18,9 +18,8 @@ import { fetchRunObjectGroups } from "../../../../lab/objects/assets/js/services
 import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 import { useImageStorage } from "../hooks/useImageStorage";
 import useNotebookHDF5Data from "../hooks/useNotebookHDF5Data";
-import HDF5MapModal from "./HDF5MapModal";
 import HDF5RunDataSection from "./HDF5RunDataSection";
-import HDF5SpectrumModal from "./HDF5SpectrumModal";
+import HDF5VisualizationModal from "./HDF5VisualizationModal";
 import {
   HDF5DatasetEntry,
   NotebookHDF5Context,
@@ -34,8 +33,7 @@ interface NotebookProps {
   runName: string;
 }
 
-const hdf5SpectrumModalId = "hdf5-spectrum-modal";
-const hdf5MapModalId = "hdf5-map-modal";
+const hdf5VisualizationModalId = "hdf5-visualization-modal";
 
 export default function Notebook({
   runId,
@@ -79,8 +77,7 @@ export default function Notebook({
       entriesByPointId: hdf5Data.entriesByPointId,
       hasMatchesByPointId: hdf5Data.hasMatchesByPointId,
       loadingEntriesByPointId: hdf5Data.loadingEntriesByPointId,
-      spectrumModalId: hdf5SpectrumModalId,
-      mapModalId: hdf5MapModalId,
+      visualizationModalId: hdf5VisualizationModalId,
       loadEntriesForPoint: hdf5Data.loadEntriesForPoint,
       visualizeEntry: setSelectedHDF5Entry,
     }),
@@ -180,21 +177,9 @@ export default function Notebook({
                 </div>
               )}
             </div>
-            <HDF5SpectrumModal
-              modalId={hdf5SpectrumModalId}
-              entry={
-                selectedHDF5Entry?.dataKind === "spectrum"
-                  ? selectedHDF5Entry
-                  : null
-              }
-              fetchFn={toolsClient.fetchFn}
-              onClose={() => setSelectedHDF5Entry(null)}
-            />
-            <HDF5MapModal
-              modalId={hdf5MapModalId}
-              entry={
-                selectedHDF5Entry?.dataKind === "map" ? selectedHDF5Entry : null
-              }
+            <HDF5VisualizationModal
+              modalId={hdf5VisualizationModalId}
+              entry={selectedHDF5Entry}
               fetchFn={toolsClient.fetchFn}
               onClose={() => setSelectedHDF5Entry(null)}
             />
