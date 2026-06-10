@@ -195,42 +195,17 @@ export default function useNotebookHDF5Data({
   );
 
   const pointIdByPointKey = useMemo(
-    () =>
-      new Map(
-        measuringPoints.flatMap((point) => {
-          const pointKey = normalizeMeasuringPointName(point.name);
-          return pointKey ? [[pointKey, point.id] as const] : [];
-        }),
-      ),
+    () => createPointIdByPointKey(measuringPoints),
     [measuringPoints],
   );
 
   const mapEntries = useMemo(
-    () =>
-      discoveredMapEntries.map((entry) => {
-        const pointKey = getPointKeyFromHDF5FileName(entry.fileName);
-        const pointId = pointKey ? pointIdByPointKey.get(pointKey) || "" : "";
-        return {
-          ...entry,
-          pointId,
-          pointKey: pointKey || "",
-        };
-      }),
+    () => createMapEntriesWithPointIds(discoveredMapEntries, pointIdByPointKey),
     [discoveredMapEntries, pointIdByPointKey],
   );
 
   const mapFilesByPointId = useMemo(
-    () =>
-      mapFiles.reduce<Record<string, EuphrosyneFile[]>>((accumulator, file) => {
-        const pointKey = getPointKeyFromHDF5FileName(file.name);
-        const pointId = pointKey ? pointIdByPointKey.get(pointKey) || "" : "";
-        if (!pointId) {
-          return accumulator;
-        }
-        accumulator[pointId] = accumulator[pointId] || [];
-        accumulator[pointId].push(file);
-        return accumulator;
-      }, {}),
+    () => groupMapFilesByPointId(mapFiles, pointIdByPointKey),
     [mapFiles, pointIdByPointKey],
   );
 
@@ -243,18 +218,7 @@ export default function useNotebookHDF5Data({
   );
 
   const mapEntriesByPointId = useMemo(
-    () =>
-      mapEntries.reduce<Record<string, HDF5DatasetEntry[]>>(
-        (accumulator, entry) => {
-          if (!entry.pointId) {
-            return accumulator;
-          }
-          accumulator[entry.pointId] = accumulator[entry.pointId] || [];
-          accumulator[entry.pointId].push(entry);
-          return accumulator;
-        },
-        {},
-      ),
+    () => groupEntriesByPointId(mapEntries),
     [mapEntries],
   );
 
@@ -405,15 +369,10 @@ export default function useNotebookHDF5Data({
     return emptyNotebookHDF5Data;
   }
 
-  const combinedEntriesByPointId = {
-    ...entriesByPointId,
-    ...Object.fromEntries(
-      Object.entries(mapEntriesByPointId).map(([pointId, entries]) => [
-        pointId,
-        [...(entriesByPointId[pointId] || []), ...entries],
-      ]),
-    ),
-  };
+  const combinedEntriesByPointId = combineEntriesByPointId(
+    entriesByPointId,
+    mapEntriesByPointId,
+  );
 
   return {
     files,
@@ -444,6 +403,80 @@ function createMapFileSummaries(
   });
 }
 
+function createPointIdByPointKey(points: IMeasuringPoint[]) {
+  return new Map(
+    points.flatMap((point) => {
+      const pointKey = normalizeMeasuringPointName(point.name);
+      return pointKey ? [[pointKey, point.id] as const] : [];
+    }),
+  );
+}
+
+function createMapEntriesWithPointIds(
+  entries: HDF5DatasetEntry[],
+  pointIdByPointKey: Map<string, string>,
+): HDF5DatasetEntry[] {
+  return entries.map((entry) => {
+    const pointKey = getPointKeyFromHDF5FileName(entry.fileName);
+    const pointId = pointKey ? pointIdByPointKey.get(pointKey) || "" : "";
+    return {
+      ...entry,
+      pointId,
+      pointKey: pointKey || "",
+    };
+  });
+}
+
+function groupMapFilesByPointId(
+  mapFiles: EuphrosyneFile[],
+  pointIdByPointKey: Map<string, string>,
+): Record<string, EuphrosyneFile[]> {
+  return mapFiles.reduce<Record<string, EuphrosyneFile[]>>(
+    (accumulator, file) => {
+      const pointKey = getPointKeyFromHDF5FileName(file.name);
+      const pointId = pointKey ? pointIdByPointKey.get(pointKey) || "" : "";
+      if (!pointId) {
+        return accumulator;
+      }
+      accumulator[pointId] = accumulator[pointId] || [];
+      accumulator[pointId].push(file);
+      return accumulator;
+    },
+    {},
+  );
+}
+
+function groupEntriesByPointId(
+  entries: HDF5DatasetEntry[],
+): Record<string, HDF5DatasetEntry[]> {
+  return entries.reduce<Record<string, HDF5DatasetEntry[]>>(
+    (accumulator, entry) => {
+      if (!entry.pointId) {
+        return accumulator;
+      }
+      accumulator[entry.pointId] = accumulator[entry.pointId] || [];
+      accumulator[entry.pointId].push(entry);
+      return accumulator;
+    },
+    {},
+  );
+}
+
+function combineEntriesByPointId(
+  entriesByPointId: Record<string, HDF5DatasetEntry[]>,
+  mapEntriesByPointId: Record<string, HDF5DatasetEntry[]>,
+): Record<string, HDF5DatasetEntry[]> {
+  return {
+    ...entriesByPointId,
+    ...Object.fromEntries(
+      Object.entries(mapEntriesByPointId).map(([pointId, entries]) => [
+        pointId,
+        [...(entriesByPointId[pointId] || []), ...entries],
+      ]),
+    ),
+  };
+}
+
 function getPointKeyFromHDF5FileName(fileName: string): string | null {
   const match = fileName.match(/^\d{8}_(\d{4})(?:_|\.|$)/);
   return match ? match[1] : null;
@@ -471,68 +504,57 @@ async function discoverMapEntriesForFile(
   }
 
   const entriesById = new Map<string, HDF5DatasetEntry>();
-  const visitedPaths = new Set<string>();
 
-  async function visitGroup(group: HDF5Group, depth: number): Promise<void> {
-    if (visitedPaths.has(group.path)) {
-      return;
-    }
-    visitedPaths.add(group.path);
-
-    createMapDatasetEntriesFromRoot(file, group).forEach((entry) => {
+  function addEntries(entries: HDF5DatasetEntry[]) {
+    entries.forEach((entry) => {
       entriesById.set(entry.id, entry);
     });
-
-    if (depth >= 2) {
-      return;
-    }
-
-    const childGroups = group.children.filter(
-      (child): child is HDF5Group => child.kind === "group",
-    );
-    const detectorGroups = childGroups.filter(({ name }) =>
-      isMapDetectorGroupName(name),
-    );
-    const childMetadataResults = await Promise.allSettled(
-      childGroups.map((child) =>
-        fetchHDF5Metadata(fetchFn, file.path, child.path),
-      ),
-    );
-    const directMapDatasetResults = await Promise.allSettled(
-      detectorGroups.map(async (detector) => ({
-        detector,
-        dataset: await fetchHDF5Metadata(
-          fetchFn,
-          file.path,
-          `${detector.path}/maps`,
-        ),
-      })),
-    );
-
-    directMapDatasetResults.forEach((result) => {
-      if (result.status !== "fulfilled") {
-        return;
-      }
-      createMapDatasetEntryFromDetectorDataset(
-        file,
-        group,
-        result.value.detector,
-        result.value.dataset,
-      ).forEach((entry) => {
-        entriesById.set(entry.id, entry);
-      });
-    });
-
-    await Promise.all(
-      childMetadataResults.map((result) =>
-        result.status === "fulfilled" && result.value.kind === "group"
-          ? visitGroup(result.value, depth + 1)
-          : Promise.resolve(),
-      ),
-    );
   }
 
-  await visitGroup(root, 0);
+  addEntries(createMapDatasetEntriesFromRoot(file, root));
+
+  const childGroups = root.children.filter(
+    (child): child is HDF5Group => child.kind === "group",
+  );
+  const detectorGroups = childGroups.filter(({ name }) =>
+    isMapDetectorGroupName(name),
+  );
+  const childMetadataResults = await Promise.allSettled(
+    childGroups.map((child) =>
+      fetchHDF5Metadata(fetchFn, file.path, child.path),
+    ),
+  );
+  const directMapDatasetResults = await Promise.allSettled(
+    detectorGroups.map(async (detector) => ({
+      detector,
+      dataset: await fetchHDF5Metadata(
+        fetchFn,
+        file.path,
+        `${detector.path}/maps`,
+      ),
+    })),
+  );
+
+  childMetadataResults.forEach((result) => {
+    if (result.status === "fulfilled") {
+      addEntries(createMapDatasetEntriesFromRoot(file, result.value));
+    }
+  });
+
+  directMapDatasetResults.forEach((result) => {
+    if (result.status !== "fulfilled") {
+      return;
+    }
+    addEntries(
+      createMapDatasetEntryFromDetectorDataset(
+        file,
+        root,
+        result.value.detector,
+        result.value.dataset,
+      ),
+    );
+  });
+
   return Array.from(entriesById.values());
 }
 

@@ -1,19 +1,21 @@
 # HDF5 notebook module
 
 This folder contains the notebook-specific HDF5 integration. It converts HDF5
-metadata returned by the tools service into notebook entries that can be listed
-beside measuring points and visualized by React components.
+metadata returned by the tools service into entries that can be listed beside
+measurement points and visualized in the notebook.
 
 ## Files
 
-- `index.ts` is the public import surface for the rest of the notebook UI.
-- `types.ts` defines the validated HDF5 tree shape and the notebook-facing entry
+- `index.ts` is the public import surface for the notebook UI.
+- `types.ts` defines the validated HDF5 tree shape and notebook-facing entry
   contracts.
-- `hdf5-service.ts` fetches HDF5 metadata/data and validates tools-service JSON
-  into the locked `HDF5Entity` union.
+- `hdf5-service.ts` fetches HDF5 metadata/data and reports dataset transfer
+  progress for large visualizations.
 - `notebook-hdf5.ts` contains notebook-domain logic: HDF5 file filtering,
-  measuring-point matching, file summaries, dataset classification, and
-  `HDF5DatasetEntry` creation.
+  measurement-point matching, file summaries, dataset classification, and entry
+  creation.
+- `map-computation.ts` contains map-specific numeric helpers for global spectra,
+  integrated maps, and channel range validation.
 - `NotebookHDF5.context.ts` provides HDF5 entry state and actions to notebook
   components without threading HDF5 props through unrelated component layers.
 - `scientific-metadata.ts` defines the scientific metadata fields displayed in
@@ -21,31 +23,20 @@ beside measuring points and visualized by React components.
 
 ## Current behavior
 
-The notebook currently exposes only spectrum entries to users. Spectrum entries
-are numeric one-dimensional datasets whose names match the expected spectrum
-patterns (`X<digits>`, `G<digits>`, or `R<digits>`).
+The notebook exposes spectrum and map entries per measurement point.
 
-Map datasets are already represented internally as a future dataset kind:
+Spectrum entries are numeric one-dimensional datasets whose names match the
+expected spectrum patterns (`X<digits>`, `G<digits>`, or `R<digits>`).
 
-```ts
-export type HDF5DatasetEntryKind = "spectrum" | "map";
-```
+Map entries are numeric three-dimensional datasets named `maps`, with shape
+`[y, x, channel]`. Map files are discovered from the `HDF5_maps_files` folder
+and associated to measurement points from the point key in the file name.
 
-`notebook-hdf5.ts` classifies numeric two-dimensional non-image datasets as
-maps, but `SUPPORTED_DATASET_ENTRY_KINDS` currently contains only `"spectrum"`.
-This keeps the UI behavior unchanged until a map viewer exists.
+The visualization modal is shared by both entry kinds:
 
-## Adding map support
-
-When a map visualization is ready:
-
-1. Add `"map"` to `SUPPORTED_DATASET_ENTRY_KINDS` in `notebook-hdf5.ts`.
-2. Route map entries to a map-specific modal/component instead of
-   `HDF5SpectrumModal`.
-3. Keep spectrum-specific validation in `HDF5SpectrumModal`; map validation
-   should live in the map viewer.
-4. Add tests that assert map entries are created with `dataKind: "map"`,
-   `dataKindLabel: "Map"`, and the expected metadata summary.
+- spectra render as a line plot;
+- maps render a global spectrum, channel range controls, and a 2D integrated
+  intensity map for the selected range.
 
 ## Import rule
 

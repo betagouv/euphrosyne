@@ -5,6 +5,11 @@ export {
 } from "./hdf5-service";
 export type { HDF5DataTransferProgressDetail } from "./hdf5-service";
 export {
+  computeGlobalSpectrum,
+  computeIntegratedMap,
+  validateChannelRange,
+} from "./map-computation";
+export {
   createDatasetEntriesFromGroup,
   createHDF5FileSummaries,
   createMapDatasetEntryFromDetectorDataset,
