@@ -1,5 +1,5 @@
 import { ToolsFetch } from "../../../../shared/js/euphrosyne-tools-client";
-import { HDF5Attribute, HDF5Entity, HDF5Type } from "./types";
+import { HDF5Dataset, HDF5Entity, HDF5Group } from "./types";
 
 export const HDF5_DATA_TRANSFER_PROGRESS_EVENT = "hdf5:data-transfer-progress";
 
@@ -10,6 +10,14 @@ export interface HDF5DataTransferProgressDetail {
   total: number | null;
   done: boolean;
 }
+
+type HDF5MetadataGroupResponse = Omit<HDF5Group, "path" | "children"> & {
+  children?: HDF5MetadataEntityResponse[];
+};
+type HDF5MetadataDatasetResponse = Omit<HDF5Dataset, "path">;
+type HDF5MetadataEntityResponse =
+  | HDF5MetadataGroupResponse
+  | HDF5MetadataDatasetResponse;
 
 export async function fetchHDF5Metadata(
   fetchFn: ToolsFetch,
@@ -25,7 +33,10 @@ export async function fetchHDF5Metadata(
       `Failed to fetch HDF5 metadata for ${filePath}${path}. Response status: ${response.status}`,
     );
   }
-  return parseHDF5Entity(await response.json(), path);
+  return addEntityPaths(
+    (await response.json()) as HDF5MetadataEntityResponse,
+    path,
+  );
 }
 
 export function createToolsH5GroveFetcher(fetchFn: ToolsFetch) {
@@ -139,132 +150,33 @@ function dispatchDataTransferProgress(detail: HDF5DataTransferProgressDetail) {
   );
 }
 
-function parseHDF5Entity(value: unknown, path: string): HDF5Entity {
-  function getEntityPath(parentPath: string, childName: string): string {
-    if (parentPath === "/") {
-      return `/${childName}`;
-    }
-    return `${parentPath}/${childName}`;
-  }
-
-  const entity = getRecord(value, "HDF5 entity");
-  const name = getStringField(entity, "name", "HDF5 entity");
-  const kind = getStringField(entity, "kind", `HDF5 entity ${name}`);
-  const attributes = getAttributeArray(
-    entity.attributes,
-    `HDF5 entity ${name}`,
-  );
-
-  if (kind === "group") {
-    const children = Array.isArray(entity.children)
-      ? entity.children.map((child) => {
-          const childRecord = getRecord(child, `HDF5 child of ${name}`);
-          const childName = getStringField(
-            childRecord,
-            "name",
-            `HDF5 child of ${name}`,
-          );
-          return parseHDF5Entity(child, getEntityPath(path, childName));
-        })
-      : [];
-
+function addEntityPaths(
+  entity: HDF5MetadataEntityResponse,
+  path: string,
+): HDF5Entity {
+  if (entity.kind === "group") {
     return {
-      name,
-      kind,
+      ...entity,
       path,
-      attributes,
-      children,
-    };
-  }
-
-  if (kind === "dataset") {
-    return {
-      name,
-      kind,
-      path,
-      attributes,
-      shape: getNumberArray(entity.shape, `HDF5 dataset ${name} shape`),
-      type: getHDF5Type(entity.type, `HDF5 dataset ${name} type`),
-    };
-  }
-
-  throw new Error(`Unexpected HDF5 entity kind "${kind}" for ${name}.`);
-}
-
-function getAttributeArray(value: unknown, context: string): HDF5Attribute[] {
-  if (!Array.isArray(value)) {
-    throw new Error(`${context} attributes must be an array.`);
-  }
-
-  return value.map((attribute, index) => {
-    const record = getRecord(attribute, `${context} attribute ${index}`);
-    return {
-      name: getStringField(record, "name", `${context} attribute ${index}`),
-      shape: getNumberArray(
-        record.shape,
-        `${context} attribute ${index} shape`,
+      children: (entity.children ?? []).map((child) =>
+        addEntityPaths(child, getEntityPath(path, child.name)),
       ),
-      type: getHDF5Type(record.type, `${context} attribute ${index} type`),
-      value: record.value,
     };
-  });
+  }
+
+  if (entity.kind === "dataset") {
+    return {
+      ...entity,
+      path,
+    };
+  }
+
+  throw new Error("Unexpected HDF5 entity kind.");
 }
 
-function getHDF5Type(value: unknown, context: string): HDF5Type {
-  const record = getRecord(value, context);
-  const type: HDF5Type = {
-    class: getNumberField(record, "class", context),
-    dtype: getStringField(record, "dtype", context),
-    size: getNumberField(record, "size", context),
-  };
-
-  if (record.sign !== undefined) {
-    type.sign = getNumberField(record, "sign", context);
+function getEntityPath(parentPath: string, childName: string): string {
+  if (parentPath === "/") {
+    return `/${childName}`;
   }
-  if (record.order !== undefined) {
-    type.order = getNumberField(record, "order", context);
-  }
-
-  return type;
-}
-
-function getRecord(value: unknown, context: string): Record<string, unknown> {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error(`${context} must be an object.`);
-  }
-  return value as Record<string, unknown>;
-}
-
-function getStringField(
-  record: Record<string, unknown>,
-  field: string,
-  context: string,
-): string {
-  const value = record[field];
-  if (typeof value !== "string") {
-    throw new Error(`${context} ${field} must be a string.`);
-  }
-  return value;
-}
-
-function getNumberField(
-  record: Record<string, unknown>,
-  field: string,
-  context: string,
-): number {
-  const value = record[field];
-  if (typeof value !== "number") {
-    throw new Error(`${context} ${field} must be a number.`);
-  }
-  return value;
-}
-
-function getNumberArray(value: unknown, context: string): number[] {
-  if (
-    !Array.isArray(value) ||
-    !value.every((item) => typeof item === "number")
-  ) {
-    throw new Error(`${context} must be a number array.`);
-  }
-  return value;
+  return `${parentPath}/${childName}`;
 }
