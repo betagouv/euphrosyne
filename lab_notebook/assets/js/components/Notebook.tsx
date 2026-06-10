@@ -19,7 +19,6 @@ import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 import { useImageStorage } from "../hooks/useImageStorage";
 import useNotebookHDF5Data from "../hooks/useNotebookHDF5Data";
 import HDF5RunDataSection from "./HDF5RunDataSection";
-import HDF5VisualizationModal from "./HDF5VisualizationModal";
 import { NotebookHDF5Context } from "../hdf5";
 
 interface NotebookProps {
@@ -28,8 +27,6 @@ interface NotebookProps {
   projectId: string;
   runName: string;
 }
-
-const hdf5VisualizationModalId = "hdf5-visualization-modal";
 
 export default function Notebook({
   runId,
@@ -65,7 +62,6 @@ export default function Notebook({
     runName,
     measuringPoints,
     fetchFn: toolsClient.fetchFn,
-    visualizationModalId: hdf5VisualizationModalId,
   });
 
   const getNextMeasuringPointName = () => {
@@ -156,12 +152,6 @@ export default function Notebook({
                 </div>
               )}
             </div>
-            <HDF5VisualizationModal
-              modalId={hdf5VisualizationModalId}
-              entry={hdf5Data.selectedEntry}
-              fetchFn={toolsClient.fetchFn}
-              onClose={hdf5Data.closeVisualization}
-            />
           </div>
         </NotebookHDF5Context.Provider>
       </NotebookContext.Provider>

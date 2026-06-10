@@ -90,6 +90,7 @@ export default function MeasuringPoints({
     event: React.MouseEvent<HTMLButtonElement>,
   ) => {
     if (
+      // accordion is currently closed, and the user is clicking it to open it.
       event.currentTarget.ariaExpanded === "false" &&
       hasMatchesByPointId[point.id]
     ) {

@@ -18,10 +18,14 @@ export class HDF5VisualizationErrorBoundary extends Component<
   }
 
   render() {
+    const t = {
+      loadError: window.gettext("The selected HDF5 data could not be loaded."),
+    };
+
     if (this.state.error) {
       return (
         <div className="fr-alert fr-alert--error">
-          <p>{window.gettext("The selected HDF5 data could not be loaded.")}</p>
+          <p>{t.loadError}</p>
         </div>
       );
     }

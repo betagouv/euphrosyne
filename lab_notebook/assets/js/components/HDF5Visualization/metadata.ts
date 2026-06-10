@@ -56,13 +56,3 @@ export function buildMapMetadataRows(
     ...buildScientificMetadataRows(attributeValues),
   ];
 }
-
-export function getVisualizationModalTitle(entry: HDF5DatasetEntry): string {
-  if (entry.dataKind === "map") {
-    return window.interpolate(window.gettext("%s map — %s"), [
-      entry.detectorName || entry.groupName,
-      entry.fileName,
-    ]);
-  }
-  return window.gettext("Data visualization");
-}

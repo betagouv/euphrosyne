@@ -1,21 +1,8 @@
 import { css } from "@emotion/react";
 
-export const modalContentStyle = css({
-  minHeight: "calc(100vh - 8rem)",
-});
-
-export const modalContainerStyle = css({
-  maxWidth: "none",
-  width: "calc(100vw - 2rem)",
-  "@media (max-width: 48rem)": {
-    width: "100vw",
-  },
-});
-
 export const visualizationLayoutStyle = css({
   display: "grid",
   gridTemplateColumns: "minmax(15rem, 18rem) minmax(0, 1fr)",
-  minHeight: "calc(100vh - 14rem)",
   border: "1px solid var(--border-default-grey)",
   borderRadius: "0.5rem",
   overflow: "hidden",

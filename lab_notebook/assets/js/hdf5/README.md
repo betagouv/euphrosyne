@@ -16,8 +16,9 @@ measurement points and visualized in the notebook.
   creation.
 - `map-computation.ts` contains map-specific numeric helpers for global spectra,
   integrated maps, and channel range validation.
-- `NotebookHDF5.context.ts` provides HDF5 entry state and actions to notebook
-  components without threading HDF5 props through unrelated component layers.
+- `NotebookHDF5.context.ts` provides HDF5 entry loading state and actions to
+  notebook components without threading HDF5 props through unrelated component
+  layers.
 - `scientific-metadata.ts` defines the scientific metadata fields displayed in
   HDF5 visualizations.
 
@@ -32,7 +33,7 @@ Map entries are numeric three-dimensional datasets named `maps`, with shape
 `[y, x, channel]`. Map files are discovered from the `HDF5_maps_files` folder
 and associated to measurement points from the point key in the file name.
 
-The visualization modal is shared by both entry kinds:
+The inline visualization is shared by both entry kinds:
 
 - spectra render as a line plot;
 - maps render a global spectrum, channel range controls, and a 2D integrated
