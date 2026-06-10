@@ -27,7 +27,7 @@ interface NotebookHDF5Data {
   files: EuphrosyneFile[];
   fileSummaries: HDF5FileSummary[];
   entriesByPointId: Record<string, HDF5DatasetEntry[]>;
-  hasMatchesByPointId: Record<string, boolean>;
+  hasViewableHDF5DataByPointId: Record<string, boolean>;
   loadingEntriesByPointId: Record<string, boolean>;
   isLoading: boolean;
   isLoadingEntries: boolean;
@@ -226,7 +226,7 @@ export default function useNotebookHDF5Data({
     [roots, measuringPoints],
   );
 
-  const hasMatchesByPointId = useMemo(
+  const hasViewableHDF5DataByPointId = useMemo(
     () =>
       Array.from(
         new Set([
@@ -368,7 +368,9 @@ export default function useNotebookHDF5Data({
   const returnedEntriesByPointId = hasRunContext
     ? combinedEntriesByPointId
     : {};
-  const returnedHasMatchesByPointId = hasRunContext ? hasMatchesByPointId : {};
+  const returnedHasViewableHDF5DataByPointId = hasRunContext
+    ? hasViewableHDF5DataByPointId
+    : {};
   const returnedLoadingEntriesByPointId = hasRunContext
     ? loadingEntriesByPointId
     : {};
@@ -379,13 +381,13 @@ export default function useNotebookHDF5Data({
   const contextValue = useMemo<NotebookHDF5ContextValue>(
     () => ({
       entriesByPointId: returnedEntriesByPointId,
-      hasMatchesByPointId: returnedHasMatchesByPointId,
+      hasViewableHDF5DataByPointId: returnedHasViewableHDF5DataByPointId,
       loadingEntriesByPointId: returnedLoadingEntriesByPointId,
       loadEntriesForPoint: returnedLoadEntriesForPoint,
     }),
     [
       returnedEntriesByPointId,
-      returnedHasMatchesByPointId,
+      returnedHasViewableHDF5DataByPointId,
       returnedLoadingEntriesByPointId,
       returnedLoadEntriesForPoint,
     ],
@@ -395,7 +397,7 @@ export default function useNotebookHDF5Data({
     files: returnedFiles,
     fileSummaries: returnedFileSummaries,
     entriesByPointId: returnedEntriesByPointId,
-    hasMatchesByPointId: returnedHasMatchesByPointId,
+    hasViewableHDF5DataByPointId: returnedHasViewableHDF5DataByPointId,
     loadingEntriesByPointId: returnedLoadingEntriesByPointId,
     isLoading: hasRunContext ? isLoading : false,
     isLoadingEntries: Object.values(returnedLoadingEntriesByPointId).some(

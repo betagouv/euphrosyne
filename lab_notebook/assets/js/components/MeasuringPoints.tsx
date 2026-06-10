@@ -30,7 +30,8 @@ export default function MeasuringPoints({
     unfoldAll: window.gettext("Unfold all"),
     closeAll: window.gettext("Close all"),
   };
-  const { hasMatchesByPointId, loadEntriesForPoint } = useNotebookHDF5Context();
+  const { hasViewableHDF5DataByPointId, loadEntriesForPoint } =
+    useNotebookHDF5Context();
 
   // Selected measuring point for object group modal
   const [addObjectModalPointId, setAddObjectModalPointId] = useState<
@@ -78,12 +79,12 @@ export default function MeasuringPoints({
       if (
         button?.ariaExpanded === "true" &&
         point &&
-        hasMatchesByPointId[point.id]
+        hasViewableHDF5DataByPointId[point.id]
       ) {
         void loadEntriesForPoint(point.id);
       }
     });
-  }, [hasMatchesByPointId, points, loadEntriesForPoint]);
+  }, [hasViewableHDF5DataByPointId, points, loadEntriesForPoint]);
 
   const onAccordionClick = (
     point: IMeasuringPoint,
@@ -92,7 +93,7 @@ export default function MeasuringPoints({
     if (
       // accordion is currently closed, and the user is clicking it to open it.
       event.currentTarget.ariaExpanded === "false" &&
-      hasMatchesByPointId[point.id]
+      hasViewableHDF5DataByPointId[point.id]
     ) {
       void loadEntriesForPoint(point.id);
     }

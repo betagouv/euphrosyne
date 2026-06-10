@@ -9,11 +9,14 @@ export default function MeasuringPointHDF5Entries({
 }: {
   pointId: string;
 }) {
-  const { entriesByPointId, hasMatchesByPointId, loadingEntriesByPointId } =
-    useNotebookHDF5Context();
+  const {
+    entriesByPointId,
+    hasViewableHDF5DataByPointId,
+    loadingEntriesByPointId,
+  } = useNotebookHDF5Context();
   const toolsClient = useClientContext();
   const entries = entriesByPointId[pointId] || [];
-  const hasMatches = !!hasMatchesByPointId[pointId];
+  const hasViewableHDF5Data = !!hasViewableHDF5DataByPointId[pointId];
   const isLoading = !!loadingEntriesByPointId[pointId];
   const [selectedEntryId, setSelectedEntryId] = useState<string>("");
   const selectedEntry = useMemo(
@@ -38,7 +41,7 @@ export default function MeasuringPointHDF5Entries({
     }
   }, [entries, selectedEntryId]);
 
-  if (!hasMatches) {
+  if (!hasViewableHDF5Data) {
     return null;
   }
 
