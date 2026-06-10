@@ -20,6 +20,7 @@ import {
   HDF5Group,
   HDF5GroupMatch,
   normalizeMeasuringPointName,
+  type NotebookHDF5ContextValue,
 } from "../hdf5";
 
 interface NotebookHDF5Data {
@@ -32,36 +33,34 @@ interface NotebookHDF5Data {
   isLoadingEntries: boolean;
   error: string | null;
   loadEntriesForPoint: (pointId: string) => Promise<void>;
+  contextValue: NotebookHDF5ContextValue;
+  selectedEntry: HDF5DatasetEntry | null;
+  closeVisualization: () => void;
 }
 
-const emptyNotebookHDF5Data: NotebookHDF5Data = {
-  files: [],
-  fileSummaries: [],
-  entriesByPointId: {},
-  hasMatchesByPointId: {},
-  loadingEntriesByPointId: {},
-  isLoading: false,
-  isLoadingEntries: false,
-  error: null,
-  loadEntriesForPoint: async () => {},
-};
+const emptyLoadEntriesForPoint = async () => {};
 
 export default function useNotebookHDF5Data({
   projectSlug,
   runName,
   measuringPoints,
   fetchFn,
+  visualizationModalId,
 }: {
   projectSlug: string;
   runName: string;
   measuringPoints: IMeasuringPoint[];
   fetchFn: ToolsFetch;
+  visualizationModalId: string;
 }): NotebookHDF5Data {
   const [files, setFiles] = useState<EuphrosyneFile[]>([]);
   const [mapFiles, setMapFiles] = useState<EuphrosyneFile[]>([]);
   const [discoveredMapEntries, setDiscoveredMapEntries] = useState<
     HDF5DatasetEntry[]
   >([]);
+  const [selectedEntry, setSelectedEntry] = useState<HDF5DatasetEntry | null>(
+    null,
+  );
   const [roots, setRoots] = useState<HDF5FileRoot[]>([]);
   const [entriesByPointId, setEntriesByPointId] = useState<
     Record<string, HDF5DatasetEntry[]>
@@ -365,25 +364,62 @@ export default function useNotebookHDF5Data({
     [fetchCachedMetadata, fetchFn, mapFilesByPointId, matchesByPointId],
   );
 
-  if (!projectSlug || !runName) {
-    return emptyNotebookHDF5Data;
-  }
+  const closeVisualization = useCallback(() => {
+    setSelectedEntry(null);
+  }, []);
 
   const combinedEntriesByPointId = combineEntriesByPointId(
     entriesByPointId,
     mapEntriesByPointId,
   );
 
+  const hasRunContext = !!projectSlug && !!runName;
+  const returnedFiles = hasRunContext ? files : [];
+  const returnedFileSummaries = hasRunContext ? fileSummaries : [];
+  const returnedEntriesByPointId = hasRunContext
+    ? combinedEntriesByPointId
+    : {};
+  const returnedHasMatchesByPointId = hasRunContext ? hasMatchesByPointId : {};
+  const returnedLoadingEntriesByPointId = hasRunContext
+    ? loadingEntriesByPointId
+    : {};
+  const returnedLoadEntriesForPoint = hasRunContext
+    ? loadEntriesForPoint
+    : emptyLoadEntriesForPoint;
+
+  const contextValue = useMemo<NotebookHDF5ContextValue>(
+    () => ({
+      entriesByPointId: returnedEntriesByPointId,
+      hasMatchesByPointId: returnedHasMatchesByPointId,
+      loadingEntriesByPointId: returnedLoadingEntriesByPointId,
+      visualizationModalId,
+      loadEntriesForPoint: returnedLoadEntriesForPoint,
+      visualizeEntry: setSelectedEntry,
+    }),
+    [
+      returnedEntriesByPointId,
+      returnedHasMatchesByPointId,
+      returnedLoadingEntriesByPointId,
+      visualizationModalId,
+      returnedLoadEntriesForPoint,
+    ],
+  );
+
   return {
-    files,
-    fileSummaries,
-    entriesByPointId: combinedEntriesByPointId,
-    hasMatchesByPointId,
-    loadingEntriesByPointId,
-    isLoading,
-    isLoadingEntries: Object.values(loadingEntriesByPointId).some(Boolean),
-    error,
-    loadEntriesForPoint,
+    files: returnedFiles,
+    fileSummaries: returnedFileSummaries,
+    entriesByPointId: returnedEntriesByPointId,
+    hasMatchesByPointId: returnedHasMatchesByPointId,
+    loadingEntriesByPointId: returnedLoadingEntriesByPointId,
+    isLoading: hasRunContext ? isLoading : false,
+    isLoadingEntries: Object.values(returnedLoadingEntriesByPointId).some(
+      Boolean,
+    ),
+    error: hasRunContext ? error : null,
+    loadEntriesForPoint: returnedLoadEntriesForPoint,
+    contextValue,
+    selectedEntry: hasRunContext ? selectedEntry : null,
+    closeVisualization,
   };
 }
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   createMeasuringPoint,
   listMeasuringPoints,
@@ -20,11 +20,7 @@ import { useImageStorage } from "../hooks/useImageStorage";
 import useNotebookHDF5Data from "../hooks/useNotebookHDF5Data";
 import HDF5RunDataSection from "./HDF5RunDataSection";
 import HDF5VisualizationModal from "./HDF5VisualizationModal";
-import {
-  HDF5DatasetEntry,
-  NotebookHDF5Context,
-  NotebookHDF5ContextValue,
-} from "../hdf5";
+import { NotebookHDF5Context } from "../hdf5";
 
 interface NotebookProps {
   runId: string;
@@ -64,30 +60,13 @@ export default function Notebook({
   const [isAddingPoint, setIsAddingPoint] = useState(false);
 
   const [objectGroups, setObjectGroups] = useState<RunObjectGroup[]>([]);
-  const [selectedHDF5Entry, setSelectedHDF5Entry] =
-    useState<HDF5DatasetEntry | null>(null);
   const hdf5Data = useNotebookHDF5Data({
     projectSlug,
     runName,
     measuringPoints,
     fetchFn: toolsClient.fetchFn,
+    visualizationModalId: hdf5VisualizationModalId,
   });
-  const hdf5Context: NotebookHDF5ContextValue = useMemo(
-    () => ({
-      entriesByPointId: hdf5Data.entriesByPointId,
-      hasMatchesByPointId: hdf5Data.hasMatchesByPointId,
-      loadingEntriesByPointId: hdf5Data.loadingEntriesByPointId,
-      visualizationModalId: hdf5VisualizationModalId,
-      loadEntriesForPoint: hdf5Data.loadEntriesForPoint,
-      visualizeEntry: setSelectedHDF5Entry,
-    }),
-    [
-      hdf5Data.entriesByPointId,
-      hdf5Data.hasMatchesByPointId,
-      hdf5Data.loadingEntriesByPointId,
-      hdf5Data.loadEntriesForPoint,
-    ],
-  );
 
   const getNextMeasuringPointName = () => {
     const n = measuringPoints.length + 1;
@@ -136,7 +115,7 @@ export default function Notebook({
   return (
     <EuphrosyneToolsClientContext.Provider value={toolsClient}>
       <NotebookContext.Provider value={notebookContext}>
-        <NotebookHDF5Context.Provider value={hdf5Context}>
+        <NotebookHDF5Context.Provider value={hdf5Data.contextValue}>
           <div>
             <div className="flex-container fr-mt-3w">
               <h4>{t.gallery}</h4>
@@ -179,9 +158,9 @@ export default function Notebook({
             </div>
             <HDF5VisualizationModal
               modalId={hdf5VisualizationModalId}
-              entry={selectedHDF5Entry}
+              entry={hdf5Data.selectedEntry}
               fetchFn={toolsClient.fetchFn}
-              onClose={() => setSelectedHDF5Entry(null)}
+              onClose={hdf5Data.closeVisualization}
             />
           </div>
         </NotebookHDF5Context.Provider>
