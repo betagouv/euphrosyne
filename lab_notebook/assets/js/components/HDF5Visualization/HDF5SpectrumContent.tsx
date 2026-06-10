@@ -20,6 +20,10 @@ import {
 } from "./styles";
 
 export function HDF5SpectrumContent({ entry }: { entry: HDF5DatasetEntry }) {
+  const t = {
+    loadingVisualization: window.gettext("Loading visualization..."),
+  };
+
   if (entry.dataKind !== "spectrum") {
     throw new Error("Expected selected HDF5 entry to be a spectrum.");
   }
@@ -54,7 +58,7 @@ export function HDF5SpectrumContent({ entry }: { entry: HDF5DatasetEntry }) {
               <HDF5DataLoadingIndicator
                 datasetPath={entry.datasetPath}
                 filePath={entry.filePath}
-                label={window.gettext("Loading visualization...")}
+                label={t.loadingVisualization}
               />
             </div>
           }

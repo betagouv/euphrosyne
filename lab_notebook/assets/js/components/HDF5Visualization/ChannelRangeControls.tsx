@@ -30,6 +30,14 @@ export function ChannelRangeControls({
     return event.currentTarget.valueAsNumber;
   }
 
+  const t = {
+    channelRange: window.gettext("Channel range"),
+    from: window.gettext("From"),
+    to: window.gettext("To"),
+    rangeWidth: window.gettext("Range width: %s channels"),
+    apply: window.gettext("Apply"),
+  };
+
   return (
     <aside
       className={`fr-input-group ${validationMessage ? "fr-input-group--error" : ""}`}
@@ -37,12 +45,12 @@ export function ChannelRangeControls({
     >
       <fieldset css={rangeFieldsetStyle}>
         <legend className="fr-fieldset__legend fr-text--regular">
-          {window.gettext("Channel range")}
+          {t.channelRange}
         </legend>
         <div css={rangeControlsStyle}>
           <div>
             <label className="fr-label" htmlFor="hdf5-map-channel-start">
-              {window.gettext("From")}
+              {t.from}
             </label>
             <input
               className="fr-input"
@@ -57,7 +65,7 @@ export function ChannelRangeControls({
           </div>
           <div>
             <label className="fr-label" htmlFor="hdf5-map-channel-end">
-              {window.gettext("To")}
+              {t.to}
             </label>
             <input
               className="fr-input"
@@ -72,7 +80,7 @@ export function ChannelRangeControls({
           </div>
         </div>
         <p className="fr-hint-text" css={rangeHintStyle}>
-          {window.interpolate(window.gettext("Range width: %s channels"), [
+          {window.interpolate(t.rangeWidth, [
             Number.isFinite(rangeStart) && Number.isFinite(rangeEnd)
               ? Math.max(0, rangeEnd - rangeStart).toString()
               : "-",
@@ -91,7 +99,7 @@ export function ChannelRangeControls({
             onClick={onApply}
             type="button"
           >
-            {window.gettext("Apply")}
+            {t.apply}
           </button>
         </div>
       </fieldset>

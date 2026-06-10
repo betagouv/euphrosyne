@@ -39,6 +39,18 @@ export function HDF5MapVisualization({
   entryId: string;
   metadataRows: ScientificMetadataRow[];
 }) {
+  const t = {
+    globalSpectrum: window.gettext("Global spectrum"),
+    rangeHelp: window.gettext(
+      "Select a channel range on the global spectrum to update the integrated intensity map.",
+    ),
+    integratedIntensityMap: window.gettext(
+      "Integrated intensity map (%s - %s)",
+    ),
+    xPixel: window.gettext("X pixel"),
+    yPixel: window.gettext("Y pixel"),
+  };
+
   assertDataset(dataset, "Expected selected HDF5 entry to be a dataset.");
   assertArrayShape(dataset, "Expected selected HDF5 entry to be an array.");
   assertNumericType(dataset, "Expected selected HDF5 entry to be numeric.");
@@ -96,7 +108,7 @@ export function HDF5MapVisualization({
           <HDF5SpectrumPlot
             dataArray={globalSpectrumArray}
             plotCss={globalSpectrumPlotStyle}
-            title={window.gettext("Global spectrum")}
+            title={t.globalSpectrum}
           />
         </section>
         <aside>
@@ -116,20 +128,16 @@ export function HDF5MapVisualization({
             }}
           />
           <div css={helpCardStyle}>
-            <p className="fr-m-0">
-              {window.gettext(
-                "Select a channel range on the global spectrum to update the integrated intensity map.",
-              )}
-            </p>
+            <p className="fr-m-0">{t.rangeHelp}</p>
           </div>
         </aside>
       </div>
       <section css={mapSectionStyle}>
         <h2 className="fr-h5" css={sectionTitleStyle}>
-          {window.interpolate(
-            window.gettext("Integrated intensity map (%s - %s)"),
-            [rangeStart.toString(), rangeEnd.toString()],
-          )}
+          {window.interpolate(t.integratedIntensityMap, [
+            rangeStart.toString(),
+            rangeEnd.toString(),
+          ])}
         </h2>
         <HeatmapVis
           css={mapStyle}
@@ -137,8 +145,8 @@ export function HDF5MapVisualization({
           domain={integratedMapDomain}
           colorMap="Viridis"
           showGrid
-          abscissaParams={{ label: window.gettext("X pixel") }}
-          ordinateParams={{ label: window.gettext("Y pixel") }}
+          abscissaParams={{ label: t.xPixel }}
+          ordinateParams={{ label: t.yPixel }}
         />
       </section>
       <MapSummaryFooter

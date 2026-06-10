@@ -12,6 +12,14 @@ export function MapSummaryFooter({
   metadataRows: ScientificMetadataRow[];
   rows: number;
 }) {
+  const t = {
+    mapSize: window.gettext("Map size"),
+    pixels: window.gettext("pixels"),
+    physicalSize: window.gettext("Physical size"),
+    pixel: window.gettext("Pixel"),
+    channels: window.gettext("Channels"),
+  };
+
   const metadataByKey = new Map(
     metadataRows.map((row) => [row.key, row.value]),
   );
@@ -23,21 +31,20 @@ export function MapSummaryFooter({
   return (
     <div css={summaryFooterStyle}>
       <span css={summaryItemStyle}>
-        {window.gettext("Map size")} : {rows} × {columns}{" "}
-        {window.gettext("pixels")}
+        {t.mapSize} : {rows} × {columns} {t.pixels}
       </span>
       {mapSizeX && mapSizeY && (
         <span css={summaryItemStyle}>
-          {window.gettext("Physical size")} : {mapSizeX} × {mapSizeY}
+          {t.physicalSize} : {mapSizeX} × {mapSizeY}
         </span>
       )}
       {pixelSizeX && pixelSizeY && (
         <span css={summaryItemStyle}>
-          {window.gettext("Pixel")} : {pixelSizeX} × {pixelSizeY}
+          {t.pixel} : {pixelSizeX} × {pixelSizeY}
         </span>
       )}
       <span css={summaryItemStyle}>
-        {window.gettext("Channels")} : {channels}
+        {t.channels} : {channels}
       </span>
     </div>
   );

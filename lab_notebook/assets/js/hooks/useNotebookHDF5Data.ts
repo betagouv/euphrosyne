@@ -34,8 +34,6 @@ interface NotebookHDF5Data {
   error: string | null;
   loadEntriesForPoint: (pointId: string) => Promise<void>;
   contextValue: NotebookHDF5ContextValue;
-  selectedEntry: HDF5DatasetEntry | null;
-  closeVisualization: () => void;
 }
 
 const emptyLoadEntriesForPoint = async () => {};
@@ -45,22 +43,17 @@ export default function useNotebookHDF5Data({
   runName,
   measuringPoints,
   fetchFn,
-  visualizationModalId,
 }: {
   projectSlug: string;
   runName: string;
   measuringPoints: IMeasuringPoint[];
   fetchFn: ToolsFetch;
-  visualizationModalId: string;
 }): NotebookHDF5Data {
   const [files, setFiles] = useState<EuphrosyneFile[]>([]);
   const [mapFiles, setMapFiles] = useState<EuphrosyneFile[]>([]);
   const [discoveredMapEntries, setDiscoveredMapEntries] = useState<
     HDF5DatasetEntry[]
   >([]);
-  const [selectedEntry, setSelectedEntry] = useState<HDF5DatasetEntry | null>(
-    null,
-  );
   const [roots, setRoots] = useState<HDF5FileRoot[]>([]);
   const [entriesByPointId, setEntriesByPointId] = useState<
     Record<string, HDF5DatasetEntry[]>
@@ -364,10 +357,6 @@ export default function useNotebookHDF5Data({
     [fetchCachedMetadata, fetchFn, mapFilesByPointId, matchesByPointId],
   );
 
-  const closeVisualization = useCallback(() => {
-    setSelectedEntry(null);
-  }, []);
-
   const combinedEntriesByPointId = combineEntriesByPointId(
     entriesByPointId,
     mapEntriesByPointId,
@@ -392,15 +381,12 @@ export default function useNotebookHDF5Data({
       entriesByPointId: returnedEntriesByPointId,
       hasMatchesByPointId: returnedHasMatchesByPointId,
       loadingEntriesByPointId: returnedLoadingEntriesByPointId,
-      visualizationModalId,
       loadEntriesForPoint: returnedLoadEntriesForPoint,
-      visualizeEntry: setSelectedEntry,
     }),
     [
       returnedEntriesByPointId,
       returnedHasMatchesByPointId,
       returnedLoadingEntriesByPointId,
-      visualizationModalId,
       returnedLoadEntriesForPoint,
     ],
   );
@@ -418,8 +404,6 @@ export default function useNotebookHDF5Data({
     error: hasRunContext ? error : null,
     loadEntriesForPoint: returnedLoadEntriesForPoint,
     contextValue,
-    selectedEntry: hasRunContext ? selectedEntry : null,
-    closeVisualization,
   };
 }
 

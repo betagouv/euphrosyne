@@ -20,6 +20,10 @@ import {
 } from "./styles";
 
 export function HDF5MapContent({ entry }: { entry: HDF5DatasetEntry }) {
+  const t = {
+    loadingMapVisualization: window.gettext("Loading map visualization..."),
+  };
+
   if (entry.dataKind !== "map") {
     throw new Error("Expected selected HDF5 entry to be a map.");
   }
@@ -55,7 +59,7 @@ export function HDF5MapContent({ entry }: { entry: HDF5DatasetEntry }) {
             <HDF5DataLoadingIndicator
               datasetPath={entry.datasetPath}
               filePath={entry.filePath}
-              label={window.gettext("Loading map visualization...")}
+              label={t.loadingMapVisualization}
             />
           </div>
         }

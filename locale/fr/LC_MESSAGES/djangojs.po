@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-10 15:30+0200\n"
+"POT-Creation-Date: 2026-06-10 16:47+0200\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -703,6 +703,22 @@ msgstr "Comptages"
 msgid "Channel"
 msgstr "Canal"
 
+msgid "Channel range"
+msgstr "Plage de canaux"
+
+msgid "From"
+msgstr "De"
+
+msgid "To"
+msgstr "À"
+
+#, javascript-format
+msgid "Range width: %s channels"
+msgstr "Largeur de la plage : %s canaux"
+
+msgid "Apply"
+msgstr "Appliquer"
+
 msgid "Loading map visualization..."
 msgstr "Chargement de la visualisation cartographique..."
 
@@ -756,13 +772,6 @@ msgstr "Groupe de mesure"
 msgid "Shape"
 msgstr "Dimensions"
 
-#, javascript-format
-msgid "%s map — %s"
-msgstr "Carte %s — %s"
-
-msgid "Data visualization"
-msgstr "Visualisation des données"
-
 msgid "Unset the object group or standard to change the analysis type"
 msgstr ""
 "Supprimer le groupe d'objets ou le standard pour changer le type d'analyse"
@@ -778,24 +787,6 @@ msgstr "Commentaires"
 
 msgid "Associated viewable data"
 msgstr "Données visualisables associées"
-
-msgid "Select an entry to visualize the associated data."
-msgstr "Sélectionnez une entrée pour visualiser les données associées."
-
-msgid "Data"
-msgstr "Données"
-
-msgid "Type"
-msgstr "Type"
-
-msgid "Source file"
-msgstr "Fichier source"
-
-msgid "Information"
-msgstr "Informations"
-
-msgid "Visualize"
-msgstr "Visualiser"
 
 msgid "Loading associated HDF5 data..."
 msgstr "Chargement des données HDF5 associées..."
