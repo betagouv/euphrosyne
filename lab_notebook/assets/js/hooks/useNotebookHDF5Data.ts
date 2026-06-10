@@ -3,6 +3,7 @@ import { EuphrosyneFile } from "../../../../lab/assets/js/file-service";
 import { RawDataFileService } from "../../../../lab/workplace/assets/js/raw-data/raw-data-file-service";
 import { ProcessedDataFileService } from "../../../../lab/workplace/assets/js/processed-data/processed-data-file-service";
 import type { IMeasuringPoint } from "../../../../shared/js/images/types";
+import { ToolsFetch } from "../../../../shared/js/euphrosyne-tools-client";
 import {
   createDatasetEntriesFromGroup,
   createHDF5FileSummaries,
@@ -19,7 +20,6 @@ import {
   HDF5Group,
   HDF5GroupMatch,
   normalizeMeasuringPointName,
-  ToolsFetch,
 } from "../hdf5";
 
 interface NotebookHDF5Data {
@@ -107,12 +107,12 @@ export default function useNotebookHDF5Data({
     const rawDataFileService = new RawDataFileService(
       projectSlug,
       runName,
-      fetchFn as typeof fetch,
+      fetchFn,
     );
     const processedDataFileService = new ProcessedDataFileService(
       projectSlug,
       runName,
-      fetchFn as typeof fetch,
+      fetchFn,
     );
 
     Promise.all([

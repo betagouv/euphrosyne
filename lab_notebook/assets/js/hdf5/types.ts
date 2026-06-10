@@ -87,8 +87,3 @@ export interface ScientificMetadataRow {
   label: string;
   value: string;
 }
-
-export type ToolsFetch = (
-  input: string | URL | globalThis.Request,
-  init?: RequestInit,
-) => Promise<Response>;

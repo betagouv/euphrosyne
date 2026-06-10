@@ -1,8 +1,8 @@
 import { createContext } from "react";
-import toolsFetch from "./euphrosyne-tools-client";
+import toolsFetch, { ToolsFetch } from "./euphrosyne-tools-client";
 
 export interface IEuphrosyneToolsClient {
-  fetchFn: typeof toolsFetch;
+  fetchFn: ToolsFetch;
 }
 
 export const EuphrosyneToolsClientContext =

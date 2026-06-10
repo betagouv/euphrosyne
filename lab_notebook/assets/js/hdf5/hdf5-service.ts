@@ -1,4 +1,5 @@
-import { HDF5Attribute, HDF5Entity, HDF5Type, ToolsFetch } from "./types";
+import { ToolsFetch } from "../../../../shared/js/euphrosyne-tools-client";
+import { HDF5Attribute, HDF5Entity, HDF5Type } from "./types";
 
 export const HDF5_DATA_TRANSFER_PROGRESS_EVENT = "hdf5:data-transfer-progress";
 
