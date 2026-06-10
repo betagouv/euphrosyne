@@ -24,15 +24,9 @@ import {
 } from "../hdf5";
 
 interface NotebookHDF5Data {
-  files: EuphrosyneFile[];
   fileSummaries: HDF5FileSummary[];
-  entriesByPointId: Record<string, HDF5DatasetEntry[]>;
-  hasViewableHDF5DataByPointId: Record<string, boolean>;
-  loadingEntriesByPointId: Record<string, boolean>;
   isLoading: boolean;
-  isLoadingEntries: boolean;
   error: string | null;
-  loadEntriesForPoint: (pointId: string) => Promise<void>;
   contextValue: NotebookHDF5ContextValue;
 }
 
@@ -363,7 +357,6 @@ export default function useNotebookHDF5Data({
   );
 
   const hasRunContext = !!projectSlug && !!runName;
-  const returnedFiles = hasRunContext ? files : [];
   const returnedFileSummaries = hasRunContext ? fileSummaries : [];
   const returnedEntriesByPointId = hasRunContext
     ? combinedEntriesByPointId
@@ -394,17 +387,9 @@ export default function useNotebookHDF5Data({
   );
 
   return {
-    files: returnedFiles,
     fileSummaries: returnedFileSummaries,
-    entriesByPointId: returnedEntriesByPointId,
-    hasViewableHDF5DataByPointId: returnedHasViewableHDF5DataByPointId,
-    loadingEntriesByPointId: returnedLoadingEntriesByPointId,
     isLoading: hasRunContext ? isLoading : false,
-    isLoadingEntries: Object.values(returnedLoadingEntriesByPointId).some(
-      Boolean,
-    ),
     error: hasRunContext ? error : null,
-    loadEntriesForPoint: returnedLoadEntriesForPoint,
     contextValue,
   };
 }
