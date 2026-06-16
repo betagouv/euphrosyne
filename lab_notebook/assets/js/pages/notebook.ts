@@ -7,6 +7,8 @@ import { getTemplateJSONData } from "../../../../shared/js/utils";
 interface NotebookPageData {
   runId: string;
   projectSlug: string;
+  projectId: string;
+  runName: string;
 }
 
 NotebookRunComments.init();
@@ -19,7 +21,10 @@ document.addEventListener("DOMContentLoaded", () => {
     throw new Error("Workplace data not found in workplace-data script tag.");
   }
 
-  const { runId, projectSlug } = notebookPageData;
+  const { runId, projectSlug, projectId, runName } = notebookPageData;
 
-  renderComponent("notebook", createElement(Notebook, { runId, projectSlug }));
+  renderComponent(
+    "notebook",
+    createElement(Notebook, { runId, projectSlug, projectId, runName }),
+  );
 });
