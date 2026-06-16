@@ -4,8 +4,10 @@ import {
   computeIntegratedMap,
   createDatasetEntriesFromGroup,
   createHDF5FileSummaries,
+  createHDF5NotebookGenerationCandidates,
   createMapDatasetEntryFromDetectorDataset,
   createMapDatasetEntriesFromRoot,
+  fetchHDF5AttributeValues,
   fetchHDF5Metadata,
   filterHDF5Files,
   filterHDF5MapFiles,
@@ -86,11 +88,12 @@ function dataset({
   };
 }
 
-function attribute(name: string): HDF5Attribute {
+function attribute(name: string, value?: unknown): HDF5Attribute {
   return {
     name,
     shape: [],
     type: stringType,
+    value,
   };
 }
 
@@ -176,6 +179,33 @@ describe("notebook HDF5 data helpers", () => {
     });
   });
 
+  it("fetches h5grove attribute values for inspected entities", async () => {
+    const fetchFn = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        "analyse description": "face avant base zone verte",
+        "obj euphrosyne": "Object",
+        "ref. analyse": "CRRMF48563",
+        "target type": "object",
+      }),
+    });
+
+    const attributeValues = await fetchHDF5AttributeValues(
+      fetchFn as never,
+      "projects/project/runs/run/raw_data/file.hdf5",
+      "/20260224_0005_CRRMF48563",
+    );
+
+    expect(fetchFn).toHaveBeenCalledWith(
+      "/hdf5/attr/?file=projects%2Fproject%2Fruns%2Frun%2Fraw_data%2Ffile.hdf5&path=%2F20260224_0005_CRRMF48563",
+      { method: "GET" },
+    );
+    expect(attributeValues).toMatchObject({
+      "obj euphrosyne": "Object",
+      "target type": "object",
+    });
+  });
+
   it("matches groups containing normalized point keys", () => {
     const hdf5File = file("batch.hdf5");
     const matches = findHDF5GroupMatches(
@@ -253,6 +283,200 @@ describe("notebook HDF5 data helpers", () => {
         coveredPointRange: "0008 - 0012",
       }),
     ]);
+  });
+
+  it("creates object notebook generation candidates from HDF5 point metadata", () => {
+    const hdf5File = file("batch.hdf5");
+    const generationCandidates = createHDF5NotebookGenerationCandidates([
+      {
+        file: hdf5File,
+        root: group("/", [
+          {
+            ...group("20260224_0006_CRRMF48563"),
+            attributes: [
+              attribute("target type", "object"),
+              attribute("analyse description", "Face avant base zone rouge"),
+              attribute("ref. analyse", "CRRMF48563"),
+            ],
+          },
+        ]),
+      },
+    ]);
+
+    expect(generationCandidates.skippedCandidates).toEqual([]);
+    expect(generationCandidates.candidates).toEqual([
+      expect.objectContaining({
+        fileName: "batch.hdf5",
+        groupName: "20260224_0006_CRRMF48563",
+        pointKey: "0006",
+        pointName: "006",
+        analysisType: "object",
+        comment: "Face avant base zone rouge",
+        referenceLabel: "CRRMF48563",
+      }),
+    ]);
+  });
+
+  it("creates notebook generation candidates from child dataset metadata", () => {
+    const hdf5File = file("batch.hdf5");
+    const pointGroup = group("20260224_0006_CRRMF48563", [
+      dataset({
+        name: "G20",
+        path: "/20260224_0006_CRRMF48563/G20",
+        shape: [2048],
+        type: integer32Type,
+        attributes: [
+          attribute("target type", "objet"),
+          attribute("analyse description", "Face avant base zone rouge"),
+          attribute("ref. analyse", "CRRMF48563"),
+        ],
+      }),
+    ]);
+
+    const generationCandidates = createHDF5NotebookGenerationCandidates([
+      {
+        file: hdf5File,
+        root: group("/", [pointGroup]),
+      },
+    ]);
+
+    expect(generationCandidates.skippedCandidates).toEqual([]);
+    expect(generationCandidates.candidates).toEqual([
+      expect.objectContaining({
+        pointKey: "0006",
+        pointName: "006",
+        analysisType: "object",
+        comment: "Face avant base zone rouge",
+        referenceLabel: "CRRMF48563",
+      }),
+    ]);
+  });
+
+  it("uses obj euphrosyne as the real-world target type metadata fallback", () => {
+    const generationCandidates = createHDF5NotebookGenerationCandidates([
+      {
+        file: file("batch.hdf5"),
+        root: group("/", [
+          {
+            ...group("20260224_0005_CRRMF48563"),
+            attributes: [
+              attribute("analyse description", "face avant base zone verte"),
+              attribute("obj euphrosyne", "Object"),
+              attribute("ref. analyse", "CRRMF48563"),
+            ],
+          },
+        ]),
+      },
+    ]);
+
+    expect(generationCandidates.skippedCandidates).toEqual([]);
+    expect(generationCandidates.candidates).toEqual([
+      expect.objectContaining({
+        pointKey: "0005",
+        pointName: "005",
+        analysisType: "object",
+        comment: "face avant base zone verte",
+        referenceLabel: "CRRMF48563",
+      }),
+    ]);
+  });
+
+  it("creates standard notebook generation candidates from HDF5 point metadata", () => {
+    const generationCandidates = createHDF5NotebookGenerationCandidates([
+      {
+        file: file("standards.hdf5"),
+        root: group("/", [
+          {
+            ...group("20260224_0012_STD-A"),
+            attributes: [
+              attribute("target type", "std"),
+              attribute("analyse description", "Standard cuivre"),
+              attribute("ref. analyse", "STD-A"),
+            ],
+          },
+        ]),
+      },
+    ]);
+
+    expect(generationCandidates.candidates).toEqual([
+      expect.objectContaining({
+        pointKey: "0012",
+        pointName: "012",
+        analysisType: "standard",
+        comment: "Standard cuivre",
+        referenceLabel: "STD-A",
+      }),
+    ]);
+  });
+
+  it("skips notebook generation candidates with unsupported target metadata", () => {
+    const generationCandidates = createHDF5NotebookGenerationCandidates([
+      {
+        file: file("batch.hdf5"),
+        root: group("/", [
+          {
+            ...group("20260224_0006_CRRMF48563"),
+            attributes: [attribute("target type", "sample")],
+          },
+          {
+            ...group("20260224_0007_CRRMF48564"),
+            attributes: [],
+          },
+          {
+            ...group("20260224_0007_CRRMF48564"),
+            attributes: [],
+          },
+          group("not-a-point"),
+        ]),
+      },
+    ]);
+
+    expect(generationCandidates.candidates).toEqual([]);
+    expect(generationCandidates.skippedCandidates).toEqual([
+      expect.objectContaining({
+        pointKey: "0006",
+        groupName: "20260224_0006_CRRMF48563",
+      }),
+      expect.objectContaining({
+        pointKey: "0007",
+        groupName: "20260224_0007_CRRMF48564",
+      }),
+    ]);
+  });
+
+  it("deduplicates notebook generation candidates by point key deterministically", () => {
+    const generationCandidates = createHDF5NotebookGenerationCandidates([
+      {
+        file: file("first.hdf5"),
+        root: group("/", [
+          {
+            ...group("20260224_0008_FIRST"),
+            attributes: [
+              attribute("target type", "object"),
+              attribute("ref. analyse", "FIRST"),
+            ],
+          },
+        ]),
+      },
+      {
+        file: file("second.hdf5"),
+        root: group("/", [
+          {
+            ...group("20260224_0008_SECOND"),
+            attributes: [
+              attribute("target type", "object"),
+              attribute("ref. analyse", "SECOND"),
+            ],
+          },
+        ]),
+      },
+    ]);
+
+    expect(generationCandidates.candidates).toHaveLength(1);
+    expect(generationCandidates.candidates[0]).toMatchObject({
+      fileName: "first.hdf5",
+      referenceLabel: "FIRST",
+    });
   });
 
   it("keeps only numeric one-dimensional datasets", () => {
