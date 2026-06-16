@@ -61,6 +61,36 @@ export interface HDF5GroupMatch {
   groupPath: string;
 }
 
+export type HDF5NotebookGenerationAnalysisType = "object" | "standard";
+
+export interface HDF5NotebookGenerationCandidate {
+  id: string;
+  fileName: string;
+  filePath: string;
+  groupName: string;
+  groupPath: string;
+  pointKey: string;
+  pointName: string;
+  analysisType: HDF5NotebookGenerationAnalysisType;
+  comment: string | null;
+  referenceLabel: string | null;
+}
+
+export interface HDF5NotebookGenerationSkippedCandidate {
+  id: string;
+  fileName: string;
+  filePath: string;
+  groupName: string;
+  groupPath: string;
+  pointKey: string;
+  reason: string;
+}
+
+export interface HDF5NotebookGenerationCandidates {
+  candidates: HDF5NotebookGenerationCandidate[];
+  skippedCandidates: HDF5NotebookGenerationSkippedCandidate[];
+}
+
 export type HDF5DatasetEntryKind = "spectrum" | "map";
 
 export interface HDF5DatasetEntry {

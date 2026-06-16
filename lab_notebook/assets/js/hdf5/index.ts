@@ -1,5 +1,6 @@
 export {
   createToolsH5GroveFetcher,
+  fetchHDF5AttributeValues,
   fetchHDF5Metadata,
   HDF5_DATA_TRANSFER_PROGRESS_EVENT,
 } from "./hdf5-service";
@@ -12,6 +13,7 @@ export {
 export {
   createDatasetEntriesFromGroup,
   createHDF5FileSummaries,
+  createHDF5NotebookGenerationCandidates,
   createMapDatasetEntryFromDetectorDataset,
   createMapDatasetEntriesFromRoot,
   filterHDF5Files,
@@ -24,6 +26,14 @@ export {
   NotebookHDF5Context,
   useNotebookHDF5Context,
 } from "./NotebookHDF5.context";
+export {
+  discoverHDF5NotebookGenerationCandidates,
+  generateNotebookFromHDF5,
+  previewNotebookGenerationFromHDF5,
+  type HDF5NotebookGenerationProgress,
+  type HDF5NotebookGenerationPreview,
+  type HDF5NotebookGenerationPreviewWarning,
+} from "./notebook-generation";
 export type { NotebookHDF5ContextValue } from "./NotebookHDF5.context";
 export type {
   HDF5Attribute,
@@ -34,6 +44,10 @@ export type {
   HDF5FileSummary,
   HDF5Group,
   HDF5GroupMatch,
+  HDF5NotebookGenerationAnalysisType,
+  HDF5NotebookGenerationCandidate,
+  HDF5NotebookGenerationCandidates,
+  HDF5NotebookGenerationSkippedCandidate,
   HDF5Type,
   MeasuringPointLike,
   ScientificMetadataRow,

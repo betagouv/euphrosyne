@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   createMeasuringPoint,
   listMeasuringPoints,
@@ -20,12 +21,14 @@ import { useImageStorage } from "../hooks/useImageStorage";
 import useNotebookHDF5Data from "../hooks/useNotebookHDF5Data";
 import HDF5RunDataSection from "./HDF5RunDataSection";
 import { NotebookHDF5Context } from "../hdf5";
+import HDF5NotebookGenerationAction from "./HDF5NotebookGenerationAction";
 
 interface NotebookProps {
   runId: string;
   projectSlug: string;
   projectId: string;
   runName: string;
+  canGenerateNotebookFromHDF5: boolean;
 }
 
 export default function Notebook({
@@ -33,6 +36,7 @@ export default function Notebook({
   projectSlug,
   projectId,
   runName,
+  canGenerateNotebookFromHDF5,
 }: NotebookProps) {
   const t = {
     gallery: window.gettext("Run images with point locations"),
@@ -108,10 +112,31 @@ export default function Notebook({
     </button>
   );
 
+  const generationActionContainer = document.getElementById(
+    "notebook-generation-action",
+  );
+
+  const generationAction = (
+    <HDF5NotebookGenerationAction
+      runId={runId}
+      projectSlug={projectSlug}
+      runName={runName}
+      fetchFn={toolsClient.fetchFn}
+      canGenerateNotebookFromHDF5={canGenerateNotebookFromHDF5}
+      hasHDF5Files={hdf5Data.fileSummaries.length > 0}
+      setMeasuringPoints={setMeasuringPoints}
+      setObjectGroups={setObjectGroups}
+      setStandards={setStandards}
+      setRunMeasuringPointStandards={setRunMeasuringPointStandards}
+    />
+  );
+
   return (
     <EuphrosyneToolsClientContext.Provider value={toolsClient}>
       <NotebookContext.Provider value={notebookContext}>
         <NotebookHDF5Context.Provider value={hdf5Data.contextValue}>
+          {generationActionContainer &&
+            createPortal(generationAction, generationActionContainer)}
           <div>
             <div className="flex-container fr-mt-3w">
               <h4>{t.gallery}</h4>
