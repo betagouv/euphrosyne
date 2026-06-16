@@ -48,36 +48,32 @@ export async function listMeasuringPoints(
   const response = await fetch(`/api/lab/runs/${runId}/measuring-points`, {
     method: "GET",
   });
+  if (!response.ok) {
+    throw new Error(`Failed to list measuring points for run ${runId}`);
+  }
   const points = (await response.json()) as IMeasurePointResponse[];
-  return points.map(({ id, name, object_group, comments, image }) => ({
-    id,
-    name,
-    objectGroupId: object_group?.toString() || null,
-    comments,
-    image: image && {
-      id: image.id.toString(),
-      pointLocation: image.point_location,
-      runObjectGroupImage: {
-        ...image.run_object_group_image,
-        id: image.run_object_group_image.id.toString(),
-      },
-    },
-  }));
+  return points.map(parseMeasuringPointResponse);
 }
 
 export async function createMeasuringPoint(
   runId: string,
   body: IMeasuringPointCreate,
-) {
+): Promise<IMeasuringPoint> {
   const headers: HeadersInit = new Headers();
   headers.set("X-CSRFToken", getCSRFToken() || "");
   headers.set("Content-Type", "application/json");
 
-  await fetch(`/api/lab/runs/${runId}/measuring-points`, {
+  const response = await fetch(`/api/lab/runs/${runId}/measuring-points`, {
     method: "POST",
     headers,
     body: JSON.stringify(body),
   });
+  if (!response.ok) {
+    throw new Error(`Failed to create measuring point ${body.name}`);
+  }
+  return parseMeasuringPointResponse(
+    (await response.json()) as IMeasurePointResponse,
+  );
 }
 
 export function updateMeasuringPointObjectId(
@@ -109,11 +105,40 @@ async function updateMeasuringPoint(
   headers.set("X-CSRFToken", getCSRFToken() || "");
   headers.set("Content-Type", "application/json");
 
-  await fetch(`/api/lab/runs/${runId}/measuring-points/${pointId}`, {
-    method: "PATCH",
-    headers,
-    body: JSON.stringify(body),
-  });
+  const response = await fetch(
+    `/api/lab/runs/${runId}/measuring-points/${pointId}`,
+    {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify(body),
+    },
+  );
+  if (!response.ok) {
+    throw new Error(`Failed to update measuring point ${pointId}`);
+  }
+}
+
+function parseMeasuringPointResponse({
+  id,
+  name,
+  object_group,
+  comments,
+  image,
+}: IMeasurePointResponse): IMeasuringPoint {
+  return {
+    id,
+    name,
+    objectGroupId: object_group?.toString() || null,
+    comments,
+    image: image && {
+      id: image.id.toString(),
+      pointLocation: image.point_location,
+      runObjectGroupImage: {
+        ...image.run_object_group_image,
+        id: image.run_object_group_image.id.toString(),
+      },
+    },
+  };
 }
 
 interface IAddMeasuringPointImageResponse {

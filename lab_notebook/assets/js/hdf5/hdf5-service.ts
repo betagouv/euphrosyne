@@ -39,6 +39,23 @@ export async function fetchHDF5Metadata(
   );
 }
 
+export async function fetchHDF5AttributeValues(
+  fetchFn: ToolsFetch,
+  filePath: string,
+  path: string,
+): Promise<Record<string, unknown>> {
+  const query = new URLSearchParams({ file: filePath, path });
+  const response = await fetchFn(`/hdf5/attr/?${query.toString()}`, {
+    method: "GET",
+  });
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch HDF5 attributes for ${filePath}${path}. Response status: ${response.status}`,
+    );
+  }
+  return (await response.json()) as Record<string, unknown>;
+}
+
 export function createToolsH5GroveFetcher(fetchFn: ToolsFetch) {
   return async (
     url: string,
