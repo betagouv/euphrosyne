@@ -24,7 +24,7 @@ class MeasuringPointStandard(models.Model):
     )
     measuring_point = models.OneToOneField(
         MeasuringPoint,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="standard",
     )
 
