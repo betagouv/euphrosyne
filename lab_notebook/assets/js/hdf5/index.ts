@@ -21,6 +21,15 @@ export {
 } from "./notebook-hdf5";
 export { buildScientificMetadataRows } from "./scientific-metadata";
 export {
+  calculateEnergy,
+  createEnergyAbscissas,
+  formatEnergy,
+  hasOnlyPositiveValues,
+  parseSpectrumCalibration,
+  type SpectrumCalibration,
+  type SpectrumXAxisUnit,
+} from "./spectrum-calibration";
+export {
   NotebookHDF5Context,
   useNotebookHDF5Context,
 } from "./NotebookHDF5.context";

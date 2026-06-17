@@ -10,11 +10,14 @@ import {
 
 import HDF5SpectrumPlot from "../HDF5SpectrumPlot";
 import { spectrumPlotStyle } from "./styles";
+import type { SpectrumCalibration } from "../../hdf5";
 
 export function HDF5SpectrumVisualization({
+  calibration,
   dataset,
   title,
 }: {
+  calibration?: SpectrumCalibration | null;
   dataset: ReturnType<typeof useEntity>;
   title: string;
 }) {
@@ -34,6 +37,7 @@ export function HDF5SpectrumVisualization({
 
   return (
     <HDF5SpectrumPlot
+      calibration={calibration}
       dataArray={dataArray}
       plotCss={spectrumPlotStyle}
       title={title}

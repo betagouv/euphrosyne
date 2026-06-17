@@ -1,16 +1,20 @@
 import {
   buildScientificMetadataRows,
+  calculateEnergy,
   computeGlobalSpectrum,
   computeIntegratedMap,
+  createEnergyAbscissas,
   createDatasetEntriesFromGroup,
   createHDF5FileSummaries,
   createMapDatasetEntryFromDetectorDataset,
   createMapDatasetEntriesFromRoot,
+  formatEnergy,
   fetchHDF5Metadata,
   filterHDF5Files,
   filterHDF5MapFiles,
   findHDF5GroupMatches,
   normalizeMeasuringPointName,
+  parseSpectrumCalibration,
   validateChannelRange,
   type HDF5Attribute,
   type HDF5Group,
@@ -634,6 +638,42 @@ describe("notebook HDF5 data helpers", () => {
     );
 
     expect(Array.from(spectrum)).toEqual([1111, 2222, 3333, 4444]);
+  });
+
+  it("parses spectrum calibration attributes", () => {
+    expect(
+      parseSpectrumCalibration("MCA a=0.0200832, MCA b=-0.018052, MCA c=0"),
+    ).toEqual({
+      a: 0.0200832,
+      b: -0.018052,
+      c: 0,
+    });
+    expect(
+      parseSpectrumCalibration("MCA   c=1e-6, MCA b = -0.2, MCA a = 2.5"),
+    ).toEqual({
+      a: 2.5,
+      b: -0.2,
+      c: 0.000001,
+    });
+    expect(parseSpectrumCalibration("MCA a=0.02, MCA b=-0.01")).toBeNull();
+    expect(
+      parseSpectrumCalibration("MCA a=0.02, MCA b=bad, MCA c=0"),
+    ).toBeNull();
+  });
+
+  it("computes calibrated energy abscissas", () => {
+    const calibration = { a: 2, b: -1, c: 0.5 };
+
+    expect(calculateEnergy(3, calibration)).toBe(9.5);
+    expect(Array.from(createEnergyAbscissas(4, calibration))).toEqual([
+      -1, 1.5, 5, 9.5,
+    ]);
+  });
+
+  it("formats energy values for labels", () => {
+    expect(formatEnergy(0.123456)).toBe("0.123");
+    expect(formatEnergy(12.3456)).toBe("12.346");
+    expect(formatEnergy(Number.NaN)).toBe("-");
   });
 
   it("computes integrated maps over the selected channel range", () => {

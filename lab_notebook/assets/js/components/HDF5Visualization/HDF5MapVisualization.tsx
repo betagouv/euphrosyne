@@ -11,9 +11,13 @@ import {
 } from "@witoldw/h5web-app";
 
 import {
+  calculateEnergy,
   computeGlobalSpectrum,
   computeIntegratedMap,
+  formatEnergy,
   ScientificMetadataRow,
+  SpectrumCalibration,
+  SpectrumXAxisUnit,
   validateChannelRange,
 } from "../../hdf5";
 import HDF5SpectrumPlot from "../HDF5SpectrumPlot";
@@ -31,10 +35,12 @@ import {
 } from "./styles";
 
 export function HDF5MapVisualization({
+  calibration,
   dataset,
   entryId,
   metadataRows,
 }: {
+  calibration?: SpectrumCalibration | null;
   dataset: ReturnType<typeof useEntity>;
   entryId: string;
   metadataRows: ScientificMetadataRow[];
@@ -46,6 +52,9 @@ export function HDF5MapVisualization({
     ),
     integratedIntensityMap: window.gettext(
       "Integrated intensity map (%s - %s)",
+    ),
+    integratedIntensityMapWithEnergy: window.gettext(
+      "Integrated intensity map (channels %s - %s · %s - %s keV)",
     ),
     xPixel: window.gettext("X pixel"),
     yPixel: window.gettext("Y pixel"),
@@ -66,12 +75,14 @@ export function HDF5MapVisualization({
   const [draftRangeEnd, setDraftRangeEnd] = useState(channels);
   const [rangeStart, setRangeStart] = useState(0);
   const [rangeEnd, setRangeEnd] = useState(channels);
+  const [xAxisUnit, setXAxisUnit] = useState<SpectrumXAxisUnit>("channel");
 
   useEffect(() => {
     setDraftRangeStart(0);
     setDraftRangeEnd(channels);
     setRangeStart(0);
     setRangeEnd(channels);
+    setXAxisUnit("channel");
   }, [channels, entryId]);
 
   const value = useDatasetValue(dataset);
@@ -100,15 +111,25 @@ export function HDF5MapVisualization({
   );
   const integratedMapArray = useNdArray(integratedMap, [rows, columns]);
   const integratedMapDomain = useDomain(integratedMapArray);
+  const integratedMapTitle = createIntegratedMapTitle({
+    calibration,
+    rangeEnd,
+    rangeStart,
+    t,
+    xAxisUnit,
+  });
 
   return (
     <div css={mapPanelStyle}>
       <div css={spectrumAreaStyle}>
         <section css={sectionStyle}>
           <HDF5SpectrumPlot
+            calibration={calibration}
             dataArray={globalSpectrumArray}
+            onXAxisUnitChange={setXAxisUnit}
             plotCss={globalSpectrumPlotStyle}
             title={t.globalSpectrum}
+            xAxisUnit={xAxisUnit}
           />
         </section>
         <aside>
@@ -134,10 +155,7 @@ export function HDF5MapVisualization({
       </div>
       <section css={mapSectionStyle}>
         <h2 className="fr-h5" css={sectionTitleStyle}>
-          {window.interpolate(t.integratedIntensityMap, [
-            rangeStart.toString(),
-            rangeEnd.toString(),
-          ])}
+          {integratedMapTitle}
         </h2>
         <HeatmapVis
           css={mapStyle}
@@ -157,4 +175,35 @@ export function HDF5MapVisualization({
       />
     </div>
   );
+}
+
+function createIntegratedMapTitle({
+  calibration,
+  rangeEnd,
+  rangeStart,
+  t,
+  xAxisUnit,
+}: {
+  calibration?: SpectrumCalibration | null;
+  rangeEnd: number;
+  rangeStart: number;
+  t: {
+    integratedIntensityMap: string;
+    integratedIntensityMapWithEnergy: string;
+  };
+  xAxisUnit: SpectrumXAxisUnit;
+}) {
+  if (xAxisUnit !== "energy" || !calibration) {
+    return window.interpolate(t.integratedIntensityMap, [
+      rangeStart.toString(),
+      rangeEnd.toString(),
+    ]);
+  }
+
+  return window.interpolate(t.integratedIntensityMapWithEnergy, [
+    rangeStart.toString(),
+    rangeEnd.toString(),
+    formatEnergy(calculateEnergy(rangeStart, calibration)),
+    formatEnergy(calculateEnergy(rangeEnd, calibration)),
+  ]);
 }

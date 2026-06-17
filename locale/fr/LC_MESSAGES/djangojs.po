@@ -736,6 +736,10 @@ msgstr ""
 msgid "Integrated intensity map (%s - %s)"
 msgstr "Carte d'intensité intégrée (%s - %s)"
 
+#, javascript-format
+msgid "Integrated intensity map (channels %s - %s · %s - %s keV)"
+msgstr "Carte d'intensité intégrée (canaux %s - %s · %s - %s keV)"
+
 msgid "X pixel"
 msgstr "Pixel X"
 
@@ -762,6 +766,15 @@ msgstr "Pixel"
 
 msgid "Channels"
 msgstr "Canaux"
+
+msgid "Energy"
+msgstr "Énergie"
+
+msgid "Energy (keV)"
+msgstr "Énergie (keV)"
+
+msgid "X unit"
+msgstr "Unité X"
 
 msgid "Entry"
 msgstr "Entrée"

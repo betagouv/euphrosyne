@@ -7,7 +7,7 @@ import {
   useEntity,
 } from "@witoldw/h5web-app";
 
-import { HDF5DatasetEntry } from "../../hdf5";
+import { HDF5DatasetEntry, parseSpectrumCalibration } from "../../hdf5";
 import HDF5DataLoadingIndicator from "../HDF5DataLoadingIndicator";
 import HDF5MetadataPanel from "../HDF5MetadataPanel";
 import { HDF5MapVisualization } from "./HDF5MapVisualization";
@@ -42,11 +42,13 @@ export function HDF5MapContent({ entry }: { entry: HDF5DatasetEntry }) {
   const { attrValuesStore } = useDataContext();
   const acquisition = useEntity(entry.acquisitionPath || "/");
   const detector = useEntity(entry.groupPath);
-  const metadataRows = buildMapMetadataRows(entry, {
+  const attributeValues = {
     ...use(attrValuesStore.get(acquisition)),
     ...use(attrValuesStore.get(detector)),
     ...use(attrValuesStore.get(dataset)),
-  });
+  };
+  const calibration = parseSpectrumCalibration(attributeValues.calibration);
+  const metadataRows = buildMapMetadataRows(entry, attributeValues);
 
   return (
     <div css={visualizationLayoutStyle}>
@@ -65,6 +67,7 @@ export function HDF5MapContent({ entry }: { entry: HDF5DatasetEntry }) {
         }
       >
         <HDF5MapVisualization
+          calibration={calibration}
           dataset={dataset}
           entryId={entry.id}
           metadataRows={metadataRows}
