@@ -4,11 +4,12 @@ import type {
   HDF5NotebookGenerationProgress,
   HDF5NotebookGenerationSkippedCandidate,
 } from "../hdf5";
-import type { HDF5NotebookGenerationLabels } from "./HDF5NotebookGenerationLabels";
-
-export type GenerationStatus = "idle" | "running" | "success" | "error";
-export type CandidateDiscoveryStatus = "idle" | "loading" | "loaded" | "error";
-export type PreflightStatus = "idle" | "loading" | "loaded" | "error";
+import type {
+  CandidateDiscoveryStatus,
+  GenerationStatus,
+  HDF5NotebookGenerationLabels,
+  PreflightStatus,
+} from "../hooks/useHDF5NotebookGenerationWorkflow";
 
 export function HDF5NotebookGenerationProgressPanel({
   progress,

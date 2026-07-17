@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   createMeasuringPoint,
@@ -21,7 +21,7 @@ import { useImageStorage } from "../hooks/useImageStorage";
 import useNotebookHDF5Data from "../hooks/useNotebookHDF5Data";
 import HDF5RunDataSection from "./HDF5RunDataSection";
 import { NotebookHDF5Context } from "../hdf5";
-import HDF5NotebookGenerationAction from "./HDF5NotebookGenerationAction";
+import HDF5NotebookGenerationModal from "./HDF5NotebookGenerationModal";
 
 interface NotebookProps {
   runId: string;
@@ -102,6 +102,30 @@ export default function Notebook({
     fetchRunObjectGroups(runId).then(setObjectGroups);
   }, []);
 
+  const refreshNotebookState = useCallback(async () => {
+    const [
+      latestPoints,
+      latestObjectGroups,
+      latestStandards,
+      latestRunStandards,
+    ] = await Promise.all([
+      listMeasuringPoints(runId),
+      fetchRunObjectGroups(runId),
+      listStandards(),
+      listRunMeasuringPointsStandard(runId),
+    ]);
+    setMeasuringPoints(latestPoints);
+    setObjectGroups(latestObjectGroups);
+    setStandards(latestStandards);
+    setRunMeasuringPointStandards(latestRunStandards);
+  }, [
+    runId,
+    setMeasuringPoints,
+    setObjectGroups,
+    setStandards,
+    setRunMeasuringPointStandards,
+  ]);
+
   const AddButton = () => (
     <button
       className="fr-btn fr-btn--secondary fr-mt-2w"
@@ -117,17 +141,14 @@ export default function Notebook({
   );
 
   const generationAction = (
-    <HDF5NotebookGenerationAction
+    <HDF5NotebookGenerationModal
       runId={runId}
       projectSlug={projectSlug}
       runName={runName}
       fetchFn={toolsClient.fetchFn}
       canGenerateNotebookFromHDF5={canGenerateNotebookFromHDF5}
       hasHDF5Files={hdf5Data.fileSummaries.length > 0}
-      setMeasuringPoints={setMeasuringPoints}
-      setObjectGroups={setObjectGroups}
-      setStandards={setStandards}
-      setRunMeasuringPointStandards={setRunMeasuringPointStandards}
+      onGenerationComplete={refreshNotebookState}
     />
   );
 
