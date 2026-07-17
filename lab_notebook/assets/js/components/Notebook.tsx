@@ -1,9 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import {
-  createMeasuringPoint,
-  listMeasuringPoints,
-} from "../../../../lab/assets/js/measuring-point.services";
+import { createMeasuringPoint } from "../../../../lab/assets/js/measuring-point.services";
 import MeasuringPoints from "./MeasuringPoints";
 import { NotebookContext, useNotebookContext } from "../Notebook.context";
 import MeasuringPointImageGallery from "./MeasuringPointImageGallery";
@@ -11,12 +8,6 @@ import {
   EuphrosyneToolsClientContext,
   useClientContext,
 } from "../../../../shared/js/EuphrosyneToolsClient.context";
-import {
-  listRunMeasuringPointsStandard,
-  listStandards,
-} from "../../../../standard/assets/js/standard-services";
-import { fetchRunObjectGroups } from "../../../../lab/objects/assets/js/services";
-import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 import { useImageStorage } from "../hooks/useImageStorage";
 import useNotebookHDF5Data from "../hooks/useNotebookHDF5Data";
 import HDF5RunDataSection from "./HDF5RunDataSection";
@@ -50,19 +41,12 @@ export default function Notebook({
   const imageStorage = useImageStorage(projectSlug);
 
   const notebookContext = useNotebookContext(projectSlug, runId, imageStorage);
-  const {
-    measuringPoints,
-    runMeasuringPointStandards,
-    setMeasuringPoints,
-    setStandards,
-    setRunMeasuringPointStandards,
-  } = notebookContext;
+  const { measuringPoints, refreshNotebookState } = notebookContext;
 
   const toolsClient = useClientContext();
 
   const [isAddingPoint, setIsAddingPoint] = useState(false);
 
-  const [objectGroups, setObjectGroups] = useState<RunObjectGroup[]>([]);
   const hdf5Data = useNotebookHDF5Data({
     projectSlug,
     runName,
@@ -80,53 +64,15 @@ export default function Notebook({
     await createMeasuringPoint(runId, {
       name: getNextMeasuringPointName(),
     }).finally(() => setIsAddingPoint(false));
-    setMeasuringPoints(await listMeasuringPoints(runId));
+    await refreshNotebookState();
     window.scrollTo(0, document.body.scrollHeight);
   };
 
   // useEffect
 
   useEffect(() => {
-    listMeasuringPoints(runId).then(setMeasuringPoints);
-  }, []);
-
-  useEffect(() => {
-    listStandards().then(setStandards);
-  }, []);
-
-  useEffect(() => {
-    listRunMeasuringPointsStandard(runId).then((data) => {
-      setRunMeasuringPointStandards(data);
-    });
-  }, []);
-
-  useEffect(() => {
-    fetchRunObjectGroups(runId).then(setObjectGroups);
-  }, []);
-
-  const refreshNotebookState = useCallback(async () => {
-    const [
-      latestPoints,
-      latestObjectGroups,
-      latestStandards,
-      latestRunStandards,
-    ] = await Promise.all([
-      listMeasuringPoints(runId),
-      fetchRunObjectGroups(runId),
-      listStandards(),
-      listRunMeasuringPointsStandard(runId),
-    ]);
-    setMeasuringPoints(latestPoints);
-    setObjectGroups(latestObjectGroups);
-    setStandards(latestStandards);
-    setRunMeasuringPointStandards(latestRunStandards);
-  }, [
-    runId,
-    setMeasuringPoints,
-    setObjectGroups,
-    setStandards,
-    setRunMeasuringPointStandards,
-  ]);
+    void refreshNotebookState();
+  }, [refreshNotebookState]);
 
   const AddButton = () => (
     <button
@@ -165,7 +111,7 @@ export default function Notebook({
             <div className="flex-container fr-mt-3w">
               <h4>{t.gallery}</h4>
             </div>
-            <MeasuringPointImageGallery runObjectGroups={objectGroups} />
+            <MeasuringPointImageGallery />
 
             <div>
               <section className="fr-mt-4w">
@@ -182,18 +128,7 @@ export default function Notebook({
                   <AddButton />
                 </div>
               </div>
-              <MeasuringPoints
-                points={measuringPoints}
-                runId={runId}
-                runMeasuringPointStandards={runMeasuringPointStandards}
-                objectGroups={objectGroups}
-                onAddObjectToPoint={() =>
-                  listMeasuringPoints(runId).then(setMeasuringPoints)
-                }
-                setObjectGroups={(objectGroups) =>
-                  setObjectGroups(objectGroups)
-                }
-              />
+              <MeasuringPoints />
               {measuringPoints.length > 20 && (
                 <div className="flex-container">
                   <div></div>

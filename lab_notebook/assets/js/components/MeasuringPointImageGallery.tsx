@@ -7,7 +7,6 @@ import ImageGrid from "../../../../shared/js/images/ImageGrid";
 import CroppedImageDisplay from "./CroppedImageDisplay";
 import { getToken } from "../../../../shared/js/jwt";
 import { IMeasuringPointImage } from "../../../../shared/js/images/types";
-import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
 
 const modalStyle = css({
   position: "fixed",
@@ -22,11 +21,7 @@ interface IRunObjectImageWithObjectRef extends IRunObjectImage {
   objectRef: string;
 }
 
-export default function MeasuringPointImageGallery({
-  runObjectGroups,
-}: {
-  runObjectGroups: RunObjectGroup[];
-}) {
+export default function MeasuringPointImageGallery() {
   const t = {
     noImage: window.gettext(
       "There is no image for this run yet. You can add images to the measurement points below, and they will appear here with their corresponding point locations.",
@@ -34,7 +29,8 @@ export default function MeasuringPointImageGallery({
     helpText: window.gettext("Click on an image to expand it."),
   };
 
-  const { measuringPoints, imageStorage } = useContext(NotebookContext);
+  const { measuringPoints, runObjectGroups, imageStorage } =
+    useContext(NotebookContext);
 
   const [euphrosyneToken, setEuphrosyneToken] = useState<string | null>(null);
 

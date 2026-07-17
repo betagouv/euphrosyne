@@ -1,28 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import type { IMeasuringPoint } from "../../../../shared/js/images/types";
 import MeasuringPoint from "./MeasuringPoint";
-import { RunObjectGroup } from "../../../../lab/objects/assets/js/types";
-import { fetchRunObjectGroups } from "../../../../lab/objects/assets/js/services";
 import AddObjectGroupModal from "./AddObjectGroupModal";
 import AddImageToMeasuringModal from "./AddImageToMeasuringModal";
-import { RunMeasuringPointStandards } from "../../../../standard/assets/js/IStandard";
 import { useNotebookHDF5Context } from "../hdf5";
+import { NotebookContext } from "../Notebook.context";
 
-export default function MeasuringPoints({
-  runId,
-  points,
-  objectGroups,
-  runMeasuringPointStandards,
-  onAddObjectToPoint,
-  setObjectGroups,
-}: {
-  points: IMeasuringPoint[];
-  runId: string;
-  runMeasuringPointStandards: RunMeasuringPointStandards;
-  objectGroups: RunObjectGroup[];
-  onAddObjectToPoint: () => void;
-  setObjectGroups: (objectGroups: RunObjectGroup[]) => void;
-}) {
+export default function MeasuringPoints() {
   const t = {
     noPoint: window.gettext(
       "There are no notes in this notebook yet. Click the button to add the first one.",
@@ -30,6 +14,13 @@ export default function MeasuringPoints({
     unfoldAll: window.gettext("Unfold all"),
     closeAll: window.gettext("Close all"),
   };
+  const {
+    runId,
+    measuringPoints,
+    runObjectGroups,
+    runMeasuringPointStandards,
+    refreshNotebookState,
+  } = useContext(NotebookContext);
   const { hasViewableHDF5DataByPointId, loadEntriesForPoint } =
     useNotebookHDF5Context();
 
@@ -44,24 +35,23 @@ export default function MeasuringPoints({
 
   useEffect(() => {
     // Init object group selection & image location modal
-    if (objectGroups.length > 0) {
-      setAddObjectModalPointId(objectGroups[0].id);
+    if (!addObjectModalPointId && runObjectGroups.length > 0) {
+      setAddObjectModalPointId(runObjectGroups[0].id);
     }
-  }, []);
+  }, [addObjectModalPointId, runObjectGroups]);
 
   useEffect(() => {
     // Reset if point changes
     if (addImageToMeasuringPoint)
       setAddImageToMeasuringPoint(
-        points.find((p) => p.id === addImageToMeasuringPoint.id),
+        measuringPoints.find((p) => p.id === addImageToMeasuringPoint.id),
       );
-  }, [points]);
+  }, [measuringPoints]);
 
   const onAddObjectSuccess = useCallback(() => {
     setAddObjectModalPointId(null);
-    fetchRunObjectGroups(runId).then(setObjectGroups);
-    onAddObjectToPoint();
-  }, [runId]);
+    void refreshNotebookState();
+  }, [refreshNotebookState]);
 
   // Accordion buttons management
 
@@ -70,12 +60,15 @@ export default function MeasuringPoints({
   const accordionButtons = useRef<Array<HTMLButtonElement | null>>([]);
 
   useEffect(() => {
-    accordionButtons.current = accordionButtons.current.slice(0, points.length);
-  }, [points]);
+    accordionButtons.current = accordionButtons.current.slice(
+      0,
+      measuringPoints.length,
+    );
+  }, [measuringPoints]);
 
   useEffect(() => {
     accordionButtons.current.forEach((button, index) => {
-      const point = points[index];
+      const point = measuringPoints[index];
       if (
         button?.ariaExpanded === "true" &&
         point &&
@@ -84,7 +77,7 @@ export default function MeasuringPoints({
         void loadEntriesForPoint(point.id);
       }
     });
-  }, [hasViewableHDF5DataByPointId, points, loadEntriesForPoint]);
+  }, [hasViewableHDF5DataByPointId, measuringPoints, loadEntriesForPoint]);
 
   const onAccordionClick = (
     point: IMeasuringPoint,
@@ -103,7 +96,7 @@ export default function MeasuringPoints({
         b?.ariaExpanded === "true" ? 1 : 0,
       ) as number[]
     ).reduce((a, b) => a + b);
-    setAllExpanded(expandedNum === points.length - 1); // points.length - 1 because ariaExpanded is not updated when event is fired
+    setAllExpanded(expandedNum === measuringPoints.length - 1); // measuringPoints.length - 1 because ariaExpanded is not updated when event is fired
   };
 
   const toggleButtons = (action: "open" | "close") => {
@@ -119,7 +112,7 @@ export default function MeasuringPoints({
     (point: IMeasuringPoint) => {
       let label: string | undefined = undefined;
       if (point.objectGroupId) {
-        label = objectGroups.find(
+        label = runObjectGroups.find(
           (rog) => rog.objectGroup.id === point.objectGroupId,
         )?.objectGroup.label;
       } else if (point.id in runMeasuringPointStandards) {
@@ -128,22 +121,22 @@ export default function MeasuringPoints({
       if (label) return `${point.name} - ${label}`;
       return point.name;
     },
-    [objectGroups, runMeasuringPointStandards],
+    [runObjectGroups, runMeasuringPointStandards],
   );
 
   return (
     <div>
       <AddObjectGroupModal
         runId={runId}
-        runObjectGroupLabels={objectGroups.map((o) => o.objectGroup.label)}
+        runObjectGroupLabels={runObjectGroups.map((o) => o.objectGroup.label)}
         measuringPointId={addObjectModalPointId}
         onAddSuccess={onAddObjectSuccess}
       />
       <AddImageToMeasuringModal
-        runObjectGroups={objectGroups}
+        runObjectGroups={runObjectGroups}
         measuringPoint={addImageToMeasuringPoint}
       />
-      {points.length > 1 && (
+      {measuringPoints.length > 1 && (
         <div className="fr-my-1w">
           <button
             className={`fr-btn fr-btn--tertiary-no-outline fr-btn--icon-left fr-icon-arrow-${allExpanded ? "up" : "down"}-s-line`}
@@ -153,8 +146,8 @@ export default function MeasuringPoints({
           </button>
         </div>
       )}
-      {points.length === 0 && <p>{t["noPoint"]}</p>}
-      {points.map((point, index) => (
+      {measuringPoints.length === 0 && <p>{t["noPoint"]}</p>}
+      {measuringPoints.map((point, index) => (
         <div
           className="fr-accordions-group"
           key={`accordiong-section-${point.name}`}
@@ -176,7 +169,7 @@ export default function MeasuringPoints({
             <div className="fr-collapse" id={`accordiong-${point.name}`}>
               <MeasuringPoint
                 point={point}
-                runObjectGroups={objectGroups}
+                runObjectGroups={runObjectGroups}
                 runId={runId}
                 measuringPointStandard={runMeasuringPointStandards[point.id]}
                 onAddObjectClicked={() => setAddObjectModalPointId(point.id)}
