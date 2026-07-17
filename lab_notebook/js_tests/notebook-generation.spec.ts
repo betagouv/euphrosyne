@@ -107,7 +107,7 @@ describe("HDF5 notebook generation workflow", () => {
         ]);
       }
       if (url.includes("/processed_data")) {
-        return jsonResponse([]);
+        throw new Error("Processed data should not be listed for generation");
       }
       if (
         url.includes("/hdf5/meta/") &&

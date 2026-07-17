@@ -1,5 +1,6 @@
-import type { EuphrosyneFile } from "../../../../../lab/assets/js/file-service";
-import { ProcessedDataFileService } from "../../../../../lab/workplace/assets/js/processed-data/processed-data-file-service";
+/**
+ * Discovers HDF5 notebook generation candidates from raw run files.
+ */
 import { RawDataFileService } from "../../../../../lab/workplace/assets/js/raw-data/raw-data-file-service";
 import type { ToolsFetch } from "../../../../../shared/js/euphrosyne-tools-client";
 import { fetchHDF5AttributeValues, fetchHDF5Metadata } from "../hdf5-service";
@@ -18,6 +19,10 @@ import type {
   HDF5NotebookGenerationDiscoveryResult,
 } from "./types";
 
+/**
+ * Lists raw HDF5 files, loads enough metadata to identify notebook points, and
+ * hydrates skipped candidate groups whose identifying attributes are nested.
+ */
 export async function discoverHDF5NotebookGenerationCandidates({
   projectSlug,
   runName,
@@ -28,19 +33,8 @@ export async function discoverHDF5NotebookGenerationCandidates({
     runName,
     fetchFn,
   );
-  const processedDataFileService = new ProcessedDataFileService(
-    projectSlug,
-    runName,
-    fetchFn,
-  );
 
-  const [rawDataFiles, processedDataFiles] = await Promise.all([
-    rawDataFileService.listData(),
-    processedDataFileService.listData(),
-  ]);
-  const metadataFiles = deduplicateFilesByPath(
-    filterHDF5Files([...rawDataFiles, ...processedDataFiles]),
-  );
+  const metadataFiles = filterHDF5Files(await rawDataFileService.listData());
   const rootMetadataResults = await Promise.allSettled(
     metadataFiles.map(async (file) => ({
       file,
@@ -58,6 +52,10 @@ export async function discoverHDF5NotebookGenerationCandidates({
   ]);
 }
 
+/**
+ * Reloads skipped group roots with hydrated descendants so nested attributes
+ * can be used to create generation candidates.
+ */
 async function loadDetailedGenerationRoots(
   fetchFn: ToolsFetch,
   roots: HDF5FileRoot[],
@@ -128,6 +126,9 @@ async function loadDetailedGenerationRoots(
   });
 }
 
+/**
+ * Recursively loads attribute values for an HDF5 entity and its children.
+ */
 async function hydrateEntityAttributeValues(
   fetchFn: ToolsFetch,
   filePath: string,
@@ -156,6 +157,9 @@ async function hydrateEntityAttributeValues(
   };
 }
 
+/**
+ * Returns a non-group entity with loaded attribute values merged in.
+ */
 function hydrateEntityAttributes(
   entity: HDF5Entity,
   attributeValues: Record<string, unknown>,
@@ -166,6 +170,10 @@ function hydrateEntityAttributes(
   };
 }
 
+/**
+ * Merges attribute values into existing metadata attributes, creating fallback
+ * string attributes for values not present in the metadata response.
+ */
 function mergeAttributeValues(
   attributes: HDF5Attribute[],
   attributeValues: Record<string, unknown>,
@@ -191,8 +199,4 @@ function mergeAttributeValues(
   });
 
   return Array.from(attributesByName.values());
-}
-
-function deduplicateFilesByPath(files: EuphrosyneFile[]): EuphrosyneFile[] {
-  return Array.from(new Map(files.map((file) => [file.path, file])).values());
 }
