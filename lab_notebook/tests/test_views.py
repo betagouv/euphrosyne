@@ -22,7 +22,7 @@ def test_notebook_view_exposes_hdf5_generation_flags_for_lab_admin():
 
     assert data["isLabAdmin"] is True
     assert data["canWriteNotebook"] is True
-    assert data["canGenerateNotebookFromHDF5"] is True
+    assert "canGenerateNotebookFromHDF5" not in data
 
 
 @pytest.mark.django_db
@@ -39,7 +39,7 @@ def test_notebook_view_disables_hdf5_generation_for_non_lab_admin():
 
     assert data["isLabAdmin"] is False
     assert data["canWriteNotebook"] is True
-    assert data["canGenerateNotebookFromHDF5"] is False
+    assert "canGenerateNotebookFromHDF5" not in data
 
 
 @pytest.mark.django_db
@@ -59,4 +59,4 @@ def test_notebook_view_disables_hdf5_generation_when_project_is_immutable(
 
     assert data["isLabAdmin"] is True
     assert data["canWriteNotebook"] is False
-    assert data["canGenerateNotebookFromHDF5"] is False
+    assert "canGenerateNotebookFromHDF5" not in data

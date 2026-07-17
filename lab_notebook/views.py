@@ -41,8 +41,6 @@ class NotebookView(ProjectMembershipRequiredMixin, TemplateView):
                     "runName": self.run.label,
                     "isLabAdmin": user_is_lab_admin,
                     "canWriteNotebook": can_write_notebook,
-                    "canGenerateNotebookFromHDF5": user_is_lab_admin
-                    and can_write_notebook,
                 }
             ),
         }

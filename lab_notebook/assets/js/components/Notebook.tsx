@@ -28,7 +28,8 @@ interface NotebookProps {
   projectSlug: string;
   projectId: string;
   runName: string;
-  canGenerateNotebookFromHDF5: boolean;
+  isLabAdmin: boolean;
+  canWriteNotebook: boolean;
 }
 
 export default function Notebook({
@@ -36,7 +37,8 @@ export default function Notebook({
   projectSlug,
   projectId,
   runName,
-  canGenerateNotebookFromHDF5,
+  isLabAdmin,
+  canWriteNotebook,
 }: NotebookProps) {
   const t = {
     gallery: window.gettext("Run images with point locations"),
@@ -146,7 +148,8 @@ export default function Notebook({
       projectSlug={projectSlug}
       runName={runName}
       fetchFn={toolsClient.fetchFn}
-      canGenerateNotebookFromHDF5={canGenerateNotebookFromHDF5}
+      isLabAdmin={isLabAdmin}
+      canWriteNotebook={canWriteNotebook}
       hasHDF5Files={hdf5Data.fileSummaries.length > 0}
       onGenerationComplete={refreshNotebookState}
     />

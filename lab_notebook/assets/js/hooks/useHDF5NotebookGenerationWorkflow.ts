@@ -48,107 +48,13 @@ interface HDF5NotebookGenerationPreflightData {
   runMeasuringPointStandards: RunMeasuringPointStandards;
 }
 
-export function createHDF5NotebookGenerationLabels() {
-  return {
-    button: window.gettext("Generate notebook"),
-    cancel: window.gettext("Cancel"),
-    close: window.gettext("Close"),
-    confirm: window.gettext("Confirm generation"),
-    title: window.gettext("Generate notebook from HDF5"),
-    stepCount: window.gettext("Step %s of %s"),
-    nextStep: window.gettext("Next step:"),
-    metadataStep: window.gettext("Prepare generation"),
-    generationStep: window.gettext("Generate notebook"),
-    warning: window.gettext(
-      "The measurement points in this notebook can be created or completed using the HDF5 data available for this run. Existing measurement points may be updated, but duplicate points and objects will not be created. Please review the notebook after generation.",
-    ),
-    keepOpen: window.gettext(
-      "Keep this browser tab open while generation is running.",
-    ),
-    started: window.gettext("Generation started."),
-    success: window.gettext("Notebook generation completed."),
-    error: window.gettext(
-      "Notebook generation stopped. You can retry after the issue is fixed.",
-    ),
-    detectedPoints: window.gettext("Detected points"),
-    currentPoint: window.gettext("Current point"),
-    pointsCreated: window.gettext("Points created"),
-    pointsUpdated: window.gettext("Points updated/completed"),
-    objectsCreated: window.gettext("Objects created"),
-    objectsReused: window.gettext("Objects reused"),
-    standardsReused: window.gettext("Standards reused"),
-    errors: window.gettext("Errors"),
-    skipped: window.gettext("Skipped HDF5 entries"),
-    noData: window.gettext("No usable HDF5 metadata detected yet."),
-    noFiles: window.gettext("No HDF5 files detected yet."),
-    loadingMetadata: window.gettext("Loading HDF5 metadata for generation..."),
-    loadingPreflight: window.gettext("Loading current notebook state..."),
-    detectedMetadata: window.gettext("Detected HDF5 metadata"),
-    expectedChanges: window.gettext("Expected changes"),
-    rulesApplied: window.gettext("Rules applied"),
-    warnings: window.gettext("Warnings"),
-    hdf5Points: window.gettext("HDF5 points"),
-    objectPoints: window.gettext("Object analyses"),
-    standardPoints: window.gettext("Standard analyses"),
-    skippedEntries: window.gettext("Skipped entries"),
-    pointsToCreate: window.gettext("Points to create"),
-    existingPointsToReuse: window.gettext("Existing points reused"),
-    commentsToFill: window.gettext("Comments to fill"),
-    commentsPreserved: window.gettext("Comments preserved"),
-    objectsToCreate: window.gettext("Objects to create"),
-    objectsReusedOrLinked: window.gettext("Objects reused/linked"),
-    standardsToAttachOrReuse: window.gettext("Standards attached/reused"),
-    missingStandards: window.gettext("Missing standards"),
-    noPreviewWarnings: window.gettext("No blocking issue detected."),
-    ruleComments: window.gettext("Existing comments are not overwritten."),
-    ruleAssignments: window.gettext(
-      "Existing object or standard assignments are not replaced if different.",
-    ),
-    ruleObjects: window.gettext("Existing objects are reused by label."),
-    ruleStandards: window.gettext(
-      "Standards are matched without case, spaces, hyphens, underscores, or other special characters.",
-    ),
-    ruleMissingStandards: window.gettext(
-      "Missing standards are reported, not created.",
-    ),
-    ruleRetry: window.gettext("The operation can be retried safely."),
-    warningMissingObjectReference: window.gettext(
-      "Point %s has no object reference in HDF5 metadata.",
-    ),
-    warningPointLinkedToStandard: window.gettext(
-      "Point %s is already linked to a standard; it will not be changed to an object analysis.",
-    ),
-    warningDifferentObject: window.gettext(
-      "Point %s is already linked to a different object; it will not be overwritten.",
-    ),
-    warningDifferentComment: window.gettext(
-      "Point %s already has a different comment; it will be preserved.",
-    ),
-    warningMissingStandardReference: window.gettext(
-      "Point %s has no standard reference in HDF5 metadata.",
-    ),
-    warningPointLinkedToObject: window.gettext(
-      "Point %s is already linked to an object; it will not be changed to a standard analysis.",
-    ),
-    warningDifferentStandard: window.gettext(
-      "Point %s is already linked to a different standard; it will not be overwritten.",
-    ),
-    warningMissingStandard: window.gettext(
-      "Standard %s does not exist yet; create it and retry generation to attach it.",
-    ),
-  };
-}
-
-export type HDF5NotebookGenerationLabels = ReturnType<
-  typeof createHDF5NotebookGenerationLabels
->;
-
 interface UseHDF5NotebookGenerationWorkflowOptions {
   runId: string;
   projectSlug: string;
   runName: string;
   fetchFn: ToolsFetch;
   hasHDF5Files: boolean;
+  errorMessage: string;
   onGenerationComplete: () => Promise<void>;
 }
 
@@ -158,9 +64,9 @@ export function useHDF5NotebookGenerationWorkflow({
   runName,
   fetchFn,
   hasHDF5Files,
+  errorMessage,
   onGenerationComplete,
 }: UseHDF5NotebookGenerationWorkflowOptions) {
-  const labels = createHDF5NotebookGenerationLabels();
   const [status, setStatus] = useState<GenerationStatus>("idle");
   const [candidateDiscoveryStatus, setCandidateDiscoveryStatus] =
     useState<CandidateDiscoveryStatus>("idle");
@@ -224,7 +130,7 @@ export function useHDF5NotebookGenerationWorkflow({
       fetchFn,
     }).catch((error) => {
       console.error(error);
-      setFatalError((error as Error).message || labels.error);
+      setFatalError((error as Error).message || errorMessage);
       setCandidateDiscoveryStatus("error");
       return null;
     });
@@ -261,7 +167,7 @@ export function useHDF5NotebookGenerationWorkflow({
       setPreflightStatus("loaded");
     } catch (error) {
       console.error(error);
-      setFatalError((error as Error).message || labels.error);
+      setFatalError((error as Error).message || errorMessage);
       setPreflightStatus("error");
     }
   };
@@ -299,7 +205,7 @@ export function useHDF5NotebookGenerationWorkflow({
       setStatus("success");
     } catch (error) {
       console.error(error);
-      const message = (error as Error).message || labels.error;
+      const message = (error as Error).message || errorMessage;
       setFatalError(message);
       appendProgressError(message);
       try {
@@ -312,7 +218,6 @@ export function useHDF5NotebookGenerationWorkflow({
   };
 
   return {
-    labels,
     status,
     candidateDiscoveryStatus,
     preflightStatus,

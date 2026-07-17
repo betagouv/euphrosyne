@@ -9,7 +9,8 @@ interface NotebookPageData {
   projectSlug: string;
   projectId: string;
   runName: string;
-  canGenerateNotebookFromHDF5: boolean;
+  isLabAdmin: boolean;
+  canWriteNotebook: boolean;
 }
 
 NotebookRunComments.init();
@@ -27,7 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
     projectSlug,
     projectId,
     runName,
-    canGenerateNotebookFromHDF5,
+    isLabAdmin,
+    canWriteNotebook,
   } = notebookPageData;
 
   renderComponent(
@@ -37,7 +39,8 @@ document.addEventListener("DOMContentLoaded", () => {
       projectSlug,
       projectId,
       runName,
-      canGenerateNotebookFromHDF5,
+      isLabAdmin,
+      canWriteNotebook,
     }),
   );
 });
