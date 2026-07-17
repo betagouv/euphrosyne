@@ -1,8 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useClientContext } from "../../../../shared/js/EuphrosyneToolsClient.context";
 import { useNotebookHDF5Context } from "../hdf5";
 import { HDF5DatasetEntry } from "../hdf5";
-import HDF5InlineVisualization from "./HDF5Visualization";
+
+const loadHDF5Visualization = () =>
+  import(
+    /* webpackChunkName: "hdf5-inline-visualization" */
+    "./HDF5Visualization"
+  );
+
+const HDF5InlineVisualization = lazy(loadHDF5Visualization);
 
 export default function MeasuringPointHDF5Entries({
   pointId,
@@ -28,8 +35,15 @@ export default function MeasuringPointHDF5Entries({
     title: window.gettext("Associated viewable data"),
     detector: window.gettext("Detector"),
     loading: window.gettext("Loading associated HDF5 data..."),
+    loadingVisualization: window.gettext("Loading visualization..."),
     noData: window.gettext("No visualizable HDF5 data found for this point."),
   };
+
+  useEffect(() => {
+    if (hasViewableHDF5Data) {
+      void loadHDF5Visualization();
+    }
+  }, [hasViewableHDF5Data]);
 
   useEffect(() => {
     if (entries.length === 0) {
@@ -75,10 +89,12 @@ export default function MeasuringPointHDF5Entries({
           </div>
           {selectedEntry && (
             <div className="hdf5-inline-visualization">
-              <HDF5InlineVisualization
-                entry={selectedEntry}
-                fetchFn={toolsClient.fetchFn}
-              />
+              <Suspense fallback={<p>{t.loadingVisualization}</p>}>
+                <HDF5InlineVisualization
+                  entry={selectedEntry}
+                  fetchFn={toolsClient.fetchFn}
+                />
+              </Suspense>
             </div>
           )}
         </>
