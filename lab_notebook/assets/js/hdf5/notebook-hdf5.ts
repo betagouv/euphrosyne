@@ -12,10 +12,6 @@ import {
   HDF5FileSummary,
   HDF5Group,
   HDF5GroupMatch,
-  HDF5NotebookGenerationAnalysisType,
-  HDF5NotebookGenerationCandidate,
-  HDF5NotebookGenerationCandidates,
-  HDF5NotebookGenerationSkippedCandidate,
   MeasuringPointLike,
 } from "./types";
 
@@ -26,14 +22,14 @@ const HDF5_MAPS_FOLDER_NAME = "HDF5_maps_files";
 const HDF5_SPECTRUM_NAME_PATTERNS = [/^X\d+$/, /^G\d+$/, /^R\d+$/];
 const SUPPORTED_DATASET_ENTRY_KINDS: HDF5DatasetEntryKind[] = ["spectrum"];
 
-interface PointGroupReference {
+export interface HDF5PointGroupReference {
   name: string;
   path: string;
   pointNumber: string;
   analysisReference: string | null;
 }
 
-interface HDF5Point extends PointGroupReference {
+interface HDF5Point extends HDF5PointGroupReference {
   metadata: Record<string, string>;
   spectra: HDF5SpectrumDataset[];
   maps: HDF5MapDataset[];
@@ -114,9 +110,11 @@ export function createHDF5FileSummaries(
   roots: HDF5FileRoot[],
   pointKeys: string[],
 ): HDF5FileSummary[] {
-  function toPointGroupReferences(groups: HDF5Group[]): PointGroupReference[] {
+  function toPointGroupReferences(
+    groups: HDF5Group[],
+  ): HDF5PointGroupReference[] {
     return groups.flatMap((group) => {
-      const pointGroup = toPointGroupReference(group);
+      const pointGroup = getHDF5PointGroupReference(group);
       return pointGroup ? [pointGroup] : [];
     });
   }
@@ -125,7 +123,7 @@ export function createHDF5FileSummaries(
 
   return files.map((file) => {
     const root = rootByPath.get(file.path) || null;
-    const points = toPointGroupReferences(getChildGroups(root));
+    const points = toPointGroupReferences(getHDF5ChildGroups(root));
     const coveredPointKeys = points
       .map(({ pointNumber }) => pointNumber)
       .filter((pointNumber) => pointKeys.includes(pointNumber));
@@ -145,8 +143,8 @@ export function findHDF5GroupMatches(
   const pointsByKey = indexMeasuringPointsByKey(points);
 
   return roots.flatMap(({ file, root }) =>
-    getChildGroups(root).flatMap((group) => {
-      const pointGroup = toPointGroupReference(group);
+    getHDF5ChildGroups(root).flatMap((group) => {
+      const pointGroup = getHDF5PointGroupReference(group);
       if (!pointGroup) {
         return [];
       }
@@ -167,83 +165,6 @@ export function findHDF5GroupMatches(
       ];
     }),
   );
-}
-
-export function createHDF5NotebookGenerationCandidates(
-  roots: HDF5FileRoot[],
-): HDF5NotebookGenerationCandidates {
-  const candidatesByPointKey = new Map<
-    string,
-    HDF5NotebookGenerationCandidate
-  >();
-  const skippedCandidates: HDF5NotebookGenerationSkippedCandidate[] = [];
-
-  roots.forEach(({ file, root }) => {
-    getChildGroups(root).forEach((group) => {
-      const pointGroup = toPointGroupReference(group);
-      if (!pointGroup) {
-        return;
-      }
-
-      const metadata = createGenerationMetadataRecord(group);
-      const targetType = getGenerationTargetType(metadata);
-      const analysisType = normalizeGenerationAnalysisType(targetType);
-      const id = `${file.path}:${group.path}`;
-
-      if (!analysisType) {
-        skippedCandidates.push({
-          id,
-          fileName: file.name,
-          filePath: file.path,
-          groupName: group.name,
-          groupPath: group.path,
-          pointKey: pointGroup.pointNumber,
-          reason: window.interpolate(
-            window.gettext("Unsupported HDF5 target type: %s"),
-            [targetType || window.gettext("missing")],
-          ),
-        });
-        return;
-      }
-
-      if (candidatesByPointKey.has(pointGroup.pointNumber)) {
-        return;
-      }
-
-      candidatesByPointKey.set(pointGroup.pointNumber, {
-        id,
-        fileName: file.name,
-        filePath: file.path,
-        groupName: group.name,
-        groupPath: group.path,
-        pointKey: pointGroup.pointNumber,
-        pointName: pointGroup.pointNumber.replace(/^0(?=\d{3}$)/, ""),
-        analysisType,
-        comment: normalizeGenerationMetadataValue(
-          metadata["analyse description"],
-        ),
-        referenceLabel: normalizeGenerationMetadataValue(
-          metadata["ref. analyse"],
-        ),
-      });
-    });
-  });
-
-  const candidates = Array.from(candidatesByPointKey.values()).sort(
-    (left, right) => left.pointKey.localeCompare(right.pointKey),
-  );
-  const candidatePointKeys = new Set(
-    candidates.map(({ pointKey }) => pointKey),
-  );
-
-  return {
-    candidates,
-    skippedCandidates: deduplicateSkippedGenerationCandidates(
-      skippedCandidates.filter(
-        ({ pointKey }) => !candidatePointKeys.has(pointKey),
-      ),
-    ),
-  };
 }
 
 export function createDatasetEntriesFromGroup(
@@ -374,7 +295,7 @@ function getSupportedDatasets(point: HDF5Point): HDF5NotebookDataset[] {
   );
 }
 
-function getChildGroups(entity: HDF5Entity | null): HDF5Group[] {
+export function getHDF5ChildGroups(entity: HDF5Entity | null): HDF5Group[] {
   if (!entity || entity.kind !== "group") {
     return [];
   }
@@ -384,7 +305,7 @@ function getChildGroups(entity: HDF5Entity | null): HDF5Group[] {
 }
 
 function createHDF5Point(group: HDF5Group): HDF5Point | null {
-  const pointGroup = toPointGroupReference(group);
+  const pointGroup = getHDF5PointGroupReference(group);
   if (!pointGroup) {
     return null;
   }
@@ -452,7 +373,9 @@ function isMapsDataset(entity: HDF5Entity): boolean {
   );
 }
 
-function toPointGroupReference(group: HDF5Group): PointGroupReference | null {
+export function getHDF5PointGroupReference(
+  group: HDF5Group,
+): HDF5PointGroupReference | null {
   const parsedName = parsePointGroupName(group.name);
   if (!parsedName) {
     return null;
@@ -621,64 +544,6 @@ function createMetadataRecord(
       name,
       value === undefined ? "" : formatAttributeValue(value),
     ]),
-  );
-}
-
-function createGenerationMetadataRecord(
-  group: HDF5Group,
-): Record<string, string> {
-  const metadata = createMetadataRecord(group.attributes);
-
-  function fillFromEntity(entity: HDF5Entity) {
-    const entityMetadata = createMetadataRecord(entity.attributes);
-    Object.entries(entityMetadata).forEach(([key, value]) => {
-      if (metadata[key] === undefined || metadata[key] === "") {
-        metadata[key] = value;
-      }
-    });
-
-    if (entity.kind === "group") {
-      entity.children.forEach(fillFromEntity);
-    }
-  }
-
-  group.children.forEach(fillFromEntity);
-
-  return metadata;
-}
-
-function getGenerationTargetType(metadata: Record<string, string>) {
-  return metadata["target type"] || metadata["obj euphrosyne"];
-}
-
-function normalizeGenerationAnalysisType(
-  value: string | undefined,
-): HDF5NotebookGenerationAnalysisType | null {
-  const normalizedValue = value?.trim().toLowerCase();
-  if (normalizedValue === "object" || normalizedValue === "objet") {
-    return "object";
-  }
-  if (normalizedValue === "standard" || normalizedValue === "std") {
-    return "standard";
-  }
-  return null;
-}
-
-function normalizeGenerationMetadataValue(value: string | undefined) {
-  const trimmedValue = value?.trim();
-  return trimmedValue ? trimmedValue : null;
-}
-
-function deduplicateSkippedGenerationCandidates(
-  candidates: HDF5NotebookGenerationSkippedCandidate[],
-) {
-  return Array.from(
-    new Map(
-      candidates.map((candidate) => [
-        `${candidate.filePath}:${candidate.groupPath}`,
-        candidate,
-      ]),
-    ).values(),
   );
 }
 

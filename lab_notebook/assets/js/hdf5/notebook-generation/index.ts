@@ -1,3 +1,4 @@
+export { createHDF5NotebookGenerationCandidates } from "./candidates";
 export { discoverHDF5NotebookGenerationCandidates } from "./discovery";
 export { generateNotebookFromHDF5 } from "./runner";
 export { previewNotebookGenerationFromHDF5 } from "./preview";

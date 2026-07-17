@@ -13,7 +13,6 @@ export {
 export {
   createDatasetEntriesFromGroup,
   createHDF5FileSummaries,
-  createHDF5NotebookGenerationCandidates,
   createMapDatasetEntryFromDetectorDataset,
   createMapDatasetEntriesFromRoot,
   filterHDF5Files,
@@ -27,6 +26,7 @@ export {
   useNotebookHDF5Context,
 } from "./NotebookHDF5.context";
 export {
+  createHDF5NotebookGenerationCandidates,
   discoverHDF5NotebookGenerationCandidates,
   generateNotebookFromHDF5,
   previewNotebookGenerationFromHDF5,

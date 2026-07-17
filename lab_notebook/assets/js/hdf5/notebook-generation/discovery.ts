@@ -4,16 +4,14 @@
 import { RawDataFileService } from "../../../../../lab/workplace/assets/js/raw-data/raw-data-file-service";
 import type { ToolsFetch } from "../../../../../shared/js/euphrosyne-tools-client";
 import { fetchHDF5AttributeValues, fetchHDF5Metadata } from "../hdf5-service";
-import {
-  createHDF5NotebookGenerationCandidates,
-  filterHDF5Files,
-} from "../notebook-hdf5";
+import { filterHDF5Files } from "../notebook-hdf5";
 import type {
   HDF5Attribute,
   HDF5Entity,
   HDF5FileRoot,
   HDF5Group,
 } from "../types";
+import { createHDF5NotebookGenerationCandidates } from "./candidates";
 import type {
   DiscoverHDF5NotebookGenerationCandidatesOptions,
   HDF5NotebookGenerationDiscoveryResult,

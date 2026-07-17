@@ -14,6 +14,8 @@ measurement points and visualized in the notebook.
 - `notebook-hdf5.ts` contains notebook-domain logic: HDF5 file filtering,
   measurement-point matching, file summaries, dataset classification, and entry
   creation.
+- `notebook-generation/` contains HDF5-to-notebook generation discovery,
+  preview, candidate selection, and generation runner code.
 - `map-computation.ts` contains map-specific numeric helpers for global spectra,
   integrated maps, and channel range validation.
 - `NotebookHDF5.context.ts` provides HDF5 entry loading state and actions to
