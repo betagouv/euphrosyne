@@ -8,7 +8,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from lab import models as lab_models
-from lab.permissions import ProjectMembershipRequiredMixin
+from lab.permissions import ProjectMembershipRequiredMixin, is_lab_admin
+from lab.project_immutability import is_project_data_immutable
 
 
 class NotebookView(ProjectMembershipRequiredMixin, TemplateView):
@@ -23,6 +24,8 @@ class NotebookView(ProjectMembershipRequiredMixin, TemplateView):
         return super().dispatch(request, self.run.project_id, *args, **kwargs)
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        user_is_lab_admin = is_lab_admin(self.request.user)
+        can_write_notebook = not is_project_data_immutable(self.run.project)
         return {
             **super().get_context_data(**kwargs),
             **site.each_context(self.request),
@@ -31,6 +34,13 @@ class NotebookView(ProjectMembershipRequiredMixin, TemplateView):
             "project": self.run.project,
             "notebook": self.run.run_notebook,
             "json_data": json.dumps(
-                {"runId": str(self.run.id), "projectSlug": self.run.project.slug}
+                {
+                    "runId": str(self.run.id),
+                    "projectSlug": self.run.project.slug,
+                    "projectId": str(self.run.project.id),
+                    "runName": self.run.label,
+                    "isLabAdmin": user_is_lab_admin,
+                    "canWriteNotebook": can_write_notebook,
+                }
             ),
         }

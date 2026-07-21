@@ -17,6 +17,7 @@ import {
   deleteMeasuringPointStandard,
 } from "../../../../standard/assets/js/standard-services";
 import { IMeasuringPointStandard } from "../../../../standard/assets/js/IStandard";
+import MeasuringPointHDF5Entries from "./MeasuringPointHDF5Entries";
 
 const buttonContainerStyle = css({
   border: "dashed var(--background-action-high-blue-france) 1px",
@@ -126,6 +127,7 @@ export default function MeasuringPoint({
           <MeasuringPointComments pointId={point.id} value={point.comments} />
         </div>
       </div>
+      <MeasuringPointHDF5Entries pointId={point.id} />
     </div>
   );
 }

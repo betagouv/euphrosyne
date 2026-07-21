@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-13 15:29+0200\n"
+"POT-Creation-Date: 2026-07-21 18:05+0200\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -643,6 +643,338 @@ msgstr ""
 "Une erreur s'est produite lors de l'ajout du groupe d'objets / objet au "
 "point de mesure."
 
+#, javascript-format
+msgid "%s of %s loaded"
+msgstr "%s sur %s chargés"
+
+#, javascript-format
+msgid "%s loaded"
+msgstr "%s chargés"
+
+msgid "Metadata"
+msgstr "Métadonnées"
+
+msgid "Acquisition"
+msgstr "Acquisition"
+
+msgid "Detector"
+msgstr "Détecteur"
+
+msgid "Geometry"
+msgstr "Géométrie"
+
+msgid "Generate notebook"
+msgstr "Générer le cahier"
+
+msgid "Confirm generation"
+msgstr "Confirmer la génération"
+
+msgid "Generate notebook from HDF5"
+msgstr "Générer le cahier depuis HDF5"
+
+msgid "Next step:"
+msgstr "Étape suivante :"
+
+msgid "Prepare generation"
+msgstr "Préparer la génération"
+
+msgid ""
+"The measurement points in this notebook can be created or completed using "
+"the HDF5 data available for this run. Existing measurement points may be "
+"updated, but duplicate points and objects will not be created. Please review "
+"the notebook after generation."
+msgstr ""
+"Les points de mesure de ce cahier peuvent être créés ou complétés à partir "
+"des données HDF5 disponibles pour ce run. Les points de mesure existants "
+"peuvent être mis à jour, mais aucun point ni objet en doublon ne sera créé. "
+"Veuillez vérifier le cahier après la génération."
+
+msgid "Keep this browser tab open while generation is running."
+msgstr "Gardez cet onglet du navigateur ouvert pendant la génération."
+
+msgid "Notebook generation stopped. You can retry after the issue is fixed."
+msgstr ""
+"La génération du cahier s'est arrêtée. Vous pourrez réessayer après la "
+"correction du problème."
+
+msgid "No HDF5 files detected yet."
+msgstr "Aucun fichier HDF5 détecté pour le moment."
+
+#, javascript-format
+msgid "Point %s has no object reference in HDF5 metadata."
+msgstr "Le point %s n'a pas de référence d'objet dans les métadonnées HDF5."
+
+#, javascript-format
+msgid ""
+"Point %s is already linked to a standard; it will not be changed to an "
+"object analysis."
+msgstr ""
+"Le point %s est déjà rattaché à un standard ; il ne sera pas transformé en "
+"analyse d'objet."
+
+#, javascript-format
+msgid ""
+"Point %s is already linked to a different object; it will not be overwritten."
+msgstr ""
+"Le point %s est déjà rattaché à un autre objet ; il ne sera pas écrasé."
+
+#, javascript-format
+msgid "Point %s already has a different comment; it will be preserved."
+msgstr "Le point %s a déjà un commentaire différent ; il sera conservé."
+
+#, javascript-format
+msgid "Point %s has no standard reference in HDF5 metadata."
+msgstr ""
+"Le point %s n'a pas de référence de standard dans les métadonnées HDF5."
+
+#, javascript-format
+msgid ""
+"Point %s is already linked to an object; it will not be changed to a "
+"standard analysis."
+msgstr ""
+"Le point %s est déjà rattaché à un objet ; il ne sera pas transformé en "
+"analyse de standard."
+
+#, javascript-format
+msgid ""
+"Point %s is already linked to a different standard; it will not be "
+"overwritten."
+msgstr ""
+"Le point %s est déjà rattaché à un autre standard ; il ne sera pas écrasé."
+
+#, javascript-format
+msgid ""
+"Standard %s does not exist yet; create it and retry generation to attach it."
+msgstr ""
+"Le standard %s n'existe pas encore ; créez-le puis relancez la génération "
+"pour le rattacher."
+
+msgid "Loading HDF5 metadata for generation..."
+msgstr "Chargement des métadonnées HDF5 pour la génération..."
+
+msgid "Loading current notebook state..."
+msgstr "Chargement de l'état actuel du cahier..."
+
+msgid "No usable HDF5 metadata detected yet."
+msgstr "Aucune métadonnée HDF5 exploitable détectée pour le moment."
+
+msgid "Detected HDF5 metadata"
+msgstr "Métadonnées HDF5 détectées"
+
+msgid "Expected changes"
+msgstr "Modifications attendues"
+
+msgid "Rules applied"
+msgstr "Règles appliquées"
+
+msgid "HDF5 points"
+msgstr "Points HDF5"
+
+msgid "Object analyses"
+msgstr "Analyses d'objet"
+
+msgid "Standard analyses"
+msgstr "Analyses de standard"
+
+msgid "Skipped entries"
+msgstr "Entrées ignorées"
+
+msgid "Points to create"
+msgstr "Points à créer"
+
+msgid "Existing points reused"
+msgstr "Points existants réutilisés"
+
+msgid "Comments to fill"
+msgstr "Commentaires à renseigner"
+
+msgid "Comments preserved"
+msgstr "Commentaires conservés"
+
+msgid "Objects to create"
+msgstr "Objets à créer"
+
+msgid "Objects reused/linked"
+msgstr "Objets réutilisés/liés"
+
+msgid "Standards attached/reused"
+msgstr "Standards rattachés/réutilisés"
+
+msgid "Missing standards"
+msgstr "Standards manquants"
+
+msgid "Existing comments are not overwritten."
+msgstr "Les commentaires existants ne sont pas écrasés."
+
+msgid "Existing object or standard assignments are not replaced if different."
+msgstr ""
+"Les rattachements existants à un objet ou à un standard ne sont pas "
+"remplacés s'ils sont différents."
+
+msgid "Existing objects are reused by label."
+msgstr "Les objets existants sont réutilisés par libellé."
+
+msgid ""
+"Standards are matched without case, spaces, hyphens, underscores, or other "
+"special characters."
+msgstr ""
+"Les standards sont comparés sans tenir compte de la casse, des espaces, des "
+"traits d'union, des tirets bas ou des autres caractères spéciaux."
+
+msgid "Missing standards are reported, not created."
+msgstr "Les standards manquants sont signalés, mais ne sont pas créés."
+
+msgid "The operation can be retried safely."
+msgstr "L'opération peut être relancée sans risque."
+
+msgid "No blocking issue detected."
+msgstr "Aucun problème bloquant détecté."
+
+msgid "Warnings"
+msgstr "Avertissements"
+
+msgid "Generation started."
+msgstr "Génération démarrée."
+
+msgid "Notebook generation completed."
+msgstr "Génération du cahier terminée."
+
+msgid "Detected points"
+msgstr "Points détectés"
+
+msgid "Current point"
+msgstr "Point en cours"
+
+msgid "Points created"
+msgstr "Points créés"
+
+msgid "Points updated/completed"
+msgstr "Points mis à jour/complétés"
+
+msgid "Objects created"
+msgstr "Objets créés"
+
+msgid "Objects reused"
+msgstr "Objets réutilisés"
+
+msgid "Standards reused"
+msgstr "Standards réutilisés"
+
+msgid "Errors"
+msgstr "Erreurs"
+
+msgid "Skipped HDF5 entries"
+msgstr "Entrées HDF5 ignorées"
+
+msgid "Available viewable files for this run"
+msgstr "Fichiers visualisables disponibles pour ce run"
+
+msgid ""
+"Viewable data has been detected automatically from the run files. Expand a "
+"measurement point below to visualize spectra, or select a detector map to "
+"visualize intensity over a channel range."
+msgstr ""
+"Des données visualisables ont été détectées automatiquement dans les "
+"fichiers du run. Dépliez un point de mesure ci-dessous pour visualiser les "
+"spectres, ou sélectionnez une carte de détecteur pour visualiser l'intensité "
+"sur une plage de canaux."
+
+msgid "HDF5 file"
+msgstr "Fichier HDF5"
+
+msgid "Covered points"
+msgstr "Points associés"
+
+msgid "Modified"
+msgstr "Modifié"
+
+msgid "Action"
+msgstr "Action"
+
+msgid "Explore"
+msgstr "Explorer"
+
+msgid "Loading HDF5 data..."
+msgstr "Chargement des données HDF5..."
+
+msgid "No HDF5 data available for this run."
+msgstr "Aucune donnée HDF5 disponible pour ce run."
+
+msgid "Counts"
+msgstr "Comptages"
+
+msgid "Channel"
+msgstr "Canal"
+
+msgid "Channel range"
+msgstr "Plage de canaux"
+
+msgid "From"
+msgstr "De"
+
+msgid "To"
+msgstr "À"
+
+#, javascript-format
+msgid "Range width: %s channels"
+msgstr "Largeur de la plage : %s canaux"
+
+msgid "Apply"
+msgstr "Appliquer"
+
+msgid "Loading map visualization..."
+msgstr "Chargement de la visualisation cartographique..."
+
+msgid "Global spectrum"
+msgstr "Spectre global"
+
+msgid ""
+"Select a channel range on the global spectrum to update the integrated "
+"intensity map."
+msgstr ""
+"Sélectionnez une plage de canaux sur le spectre global pour mettre à jour la "
+"carte d'intensité intégrée."
+
+#, javascript-format
+msgid "Integrated intensity map (%s - %s)"
+msgstr "Carte d'intensité intégrée (%s - %s)"
+
+msgid "X pixel"
+msgstr "Pixel X"
+
+msgid "Y pixel"
+msgstr "Pixel Y"
+
+msgid "Loading visualization..."
+msgstr "Chargement de la visualisation..."
+
+msgid "The selected HDF5 data could not be loaded."
+msgstr "Les données HDF5 sélectionnées n'ont pas pu être chargées."
+
+msgid "Map size"
+msgstr "Taille de la carte"
+
+msgid "pixels"
+msgstr "pixels"
+
+msgid "Physical size"
+msgstr "Taille physique"
+
+msgid "Pixel"
+msgstr "Pixel"
+
+msgid "Channels"
+msgstr "Canaux"
+
+msgid "Entry"
+msgstr "Entrée"
+
+msgid "Measurement group"
+msgstr "Groupe de mesure"
+
+msgid "Shape"
+msgstr "Dimensions"
+
 msgid "Unset the object group or standard to change the analysis type"
 msgstr ""
 "Supprimer le groupe d'objets ou le standard pour changer le type d'analyse"
@@ -655,6 +987,15 @@ msgstr "Modifier l'emplacement du point sur l'image"
 
 msgid "Comments"
 msgstr "Commentaires"
+
+msgid "Associated viewable data"
+msgstr "Données visualisables associées"
+
+msgid "Loading associated HDF5 data..."
+msgstr "Chargement des données HDF5 associées..."
+
+msgid "No visualizable HDF5 data found for this point."
+msgstr "Aucune donnée HDF5 visualisable trouvée pour ce point."
 
 msgid ""
 "There is no image for this run yet. You can add images to the measurement "
@@ -725,3 +1066,115 @@ msgstr "Zone"
 
 msgid "Selection mode"
 msgstr "Mode de sélection"
+
+msgid "Enter both channel range bounds."
+msgstr "Saisissez les deux bornes de la plage de canaux."
+
+msgid "Channel bounds must be whole numbers."
+msgstr "Les bornes des canaux doivent être des nombres entiers."
+
+msgid "The lower channel must be at least 0."
+msgstr "Le canal inférieur doit être au moins égal à 0."
+
+msgid "The upper channel must not exceed the number of channels."
+msgstr "Le canal supérieur ne doit pas dépasser le nombre de canaux."
+
+msgid "The lower channel must be smaller than the upper channel."
+msgstr "Le canal inférieur doit être plus petit que le canal supérieur."
+
+#, javascript-format
+msgid "Unsupported HDF5 target type: %s"
+msgstr ""
+
+msgid "missing"
+msgstr ""
+
+msgid "Map"
+msgstr "Carte"
+
+msgid "Spectrum"
+msgstr "Spectre"
+
+#, javascript-format
+msgid "%s channels"
+msgstr "%s canaux"
+
+#, javascript-format
+msgid "%s map"
+msgstr "Carte %s"
+
+msgid "Particle"
+msgstr "Particule"
+
+msgid "Beam energy"
+msgstr "Énergie du faisceau"
+
+msgid "Target type"
+msgstr "Type de cible"
+
+msgid "Acquisition time"
+msgstr "Temps d'acquisition"
+
+msgid "Dose"
+msgstr "Dose"
+
+msgid "Dose per column"
+msgstr "Dose par colonne"
+
+msgid "Map size X"
+msgstr "Taille de la carte X"
+
+msgid "Map size Y"
+msgstr "Taille de la carte Y"
+
+msgid "Pixel size X"
+msgstr "Taille du pixel X"
+
+msgid "Pixel size Y"
+msgstr "Taille du pixel Y"
+
+msgid "Analysis reference"
+msgstr "Référence d'analyse"
+
+msgid "Timestamp"
+msgstr "Horodatage"
+
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+msgid "ADC name"
+msgstr "Nom ADC"
+
+msgid "Calibration"
+msgstr "Étalonnage"
+
+msgid "Detector type"
+msgstr "Type de détecteur"
+
+msgid "Detector serial number"
+msgstr "Numéro de série du détecteur"
+
+msgid "Detector active area"
+msgstr "Surface active du détecteur"
+
+msgid "Detector angle"
+msgstr "Angle du détecteur"
+
+msgid "Detector entrance window"
+msgstr "Fenêtre d'entrée du détecteur"
+
+msgid "Detector filter"
+msgstr "Filtre du détecteur"
+
+msgid "Detector thickness"
+msgstr "Épaisseur du détecteur"
+
+msgid "Some HDF5 file metadata could not be loaded."
+msgstr "Certaines métadonnées des fichiers HDF5 n'ont pas pu être chargées."
+
+msgid "HDF5 data could not be loaded."
+msgstr "Les données HDF5 n'ont pas pu être chargées."
+
+msgid "Some HDF5 measurement point metadata could not be loaded."
+msgstr ""
+"Certaines métadonnées des points de mesure HDF5 n'ont pas pu être chargées."

@@ -58,9 +58,12 @@ export async function createObjectGroup(
 export async function fetchRunObjectGroups(
   runId: string,
 ): Promise<RunObjectGroup[]> {
-  const runObjectGroups = (await (
-    await fetch(`/api/lab/runs/${runId}/objectgroups`)
-  ).json()) as RunObjectGroupsResponseElement[];
+  const response = await fetch(`/api/lab/runs/${runId}/objectgroups`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch object groups for run ${runId}`);
+  }
+  const runObjectGroups =
+    (await response.json()) as RunObjectGroupsResponseElement[];
   return runObjectGroups.map((ro) => ({
     id: ro.id.toString(),
     objectGroup: {
@@ -87,9 +90,12 @@ export async function fetchRunObjectGroups(
 export async function fetchAvailableObjectGroups(
   runId: string,
 ): Promise<ObjectGroup[]> {
-  const availableObjectGroups = (await (
-    await fetch(`/api/lab/runs/${runId}/available-objectgroups`)
-  ).json()) as ObjectGroupResponseElement[];
+  const response = await fetch(`/api/lab/runs/${runId}/available-objectgroups`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch available object groups for run ${runId}`);
+  }
+  const availableObjectGroups =
+    (await response.json()) as ObjectGroupResponseElement[];
   return availableObjectGroups.map((objectgroup) => ({
     id: objectgroup.id.toString(),
     label: objectgroup.label,
@@ -110,17 +116,14 @@ export async function addObjectGroupToRun(
   runId: string,
   objectGroupId: string,
 ) {
-  let response;
-  try {
-    response = await fetch(`/api/lab/runs/${runId}/objectgroups`, {
-      ...getBasePOSTParams(),
-      body: JSON.stringify({ objectgroup: objectGroupId }),
-    });
-  } catch (error) {
-    console.error("Error adding object group to run", error);
-  }
+  const response = await fetch(`/api/lab/runs/${runId}/objectgroups`, {
+    ...getBasePOSTParams(),
+    body: JSON.stringify({ objectgroup: objectGroupId }),
+  });
   if (!response || !response.ok) {
-    console.error("Error adding object group to run", response);
+    throw new Error(
+      `Failed to add object group ${objectGroupId} to run ${runId}`,
+    );
   }
   return response;
 }

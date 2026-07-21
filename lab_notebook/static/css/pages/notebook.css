@@ -1,11 +1,142 @@
 body {
-    background-color: var(--body-bg) !important;
+  background-color: var(--body-bg) !important;
 }
 
 h2 {
-    font-size: 2rem !important;
+  font-size: 2rem !important;
 }
 
-.card-condition-experimental  {
-    width: 450px;
+.card-condition-experimental {
+  width: 450px;
+}
+
+.notebook-header-actions,
+#notebook-generation-action,
+.hdf5-generation {
+  align-items: center;
+  display: flex;
+}
+
+.notebook-header-actions {
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.hdf5-point-section {
+  border-top: 1px solid var(--border-default-grey);
+  padding-top: 1rem;
+}
+
+.hdf5-table.fr-table {
+  margin: 0;
+}
+
+.hdf5-table .fr-table__content {
+  overflow: visible;
+}
+
+.hdf5-table table {
+  margin-bottom: 0;
+}
+
+.hdf5-table th {
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  white-space: nowrap;
+}
+
+.hdf5-table td {
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  vertical-align: middle;
+}
+
+.hdf5-table th,
+.hdf5-table td {
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+}
+
+.hdf5-table__action {
+  text-align: right;
+  white-space: nowrap;
+  width: 8rem;
+}
+
+.hdf5-file-icon,
+.hdf5-entry-icon {
+  color: var(--text-action-high-blue-france);
+  margin-right: 0.5rem;
+  vertical-align: -0.125rem;
+}
+.hdf5-entry-icon {
+  margin-left: 0.75rem;
+  margin-right: 0;
+}
+
+.hdf5-detector-select {
+  max-width: 24rem;
+}
+
+.hdf5-inline-visualization {
+  margin-top: 1rem;
+}
+
+.hdf5-generation__progress {
+  display: grid;
+  gap: 0.5rem 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  margin: 1rem 0 0;
+}
+
+.hdf5-generation__progress div {
+  margin: 0;
+}
+
+.hdf5-generation__progress dt {
+  font-weight: 700;
+}
+
+.hdf5-generation__progress dd {
+  margin: 0;
+}
+
+.hdf5-generation__preview {
+  display: grid;
+  gap: 1rem;
+}
+
+.hdf5-generation__preview-section {
+  border-top: 1px solid var(--border-default-grey);
+  padding-top: 1rem;
+}
+
+.hdf5-generation__preview-grid {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  margin: 0;
+}
+
+.hdf5-generation__preview-grid div {
+  background: var(--background-alt-grey);
+  padding: 0.75rem;
+}
+
+.hdf5-generation__preview-grid dt {
+  color: var(--text-mention-grey);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.hdf5-generation__preview-grid dd {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 2rem;
+  margin: 0;
+}
+
+.hdf5-generation__details-list {
+  max-height: 16rem;
+  overflow: auto;
 }
