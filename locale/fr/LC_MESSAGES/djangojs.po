@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-16 15:46+0200\n"
+"POT-Creation-Date: 2026-07-21 18:05+0200\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -692,130 +692,13 @@ msgstr ""
 msgid "Keep this browser tab open while generation is running."
 msgstr "Gardez cet onglet du navigateur ouvert pendant la génération."
 
-msgid "Generation started."
-msgstr "Génération démarrée."
-
-msgid "Notebook generation completed."
-msgstr "Génération du cahier terminée."
-
 msgid "Notebook generation stopped. You can retry after the issue is fixed."
 msgstr ""
 "La génération du cahier s'est arrêtée. Vous pourrez réessayer après la "
 "correction du problème."
 
-msgid "Detected points"
-msgstr "Points détectés"
-
-msgid "Current point"
-msgstr "Point en cours"
-
-msgid "Points created"
-msgstr "Points créés"
-
-msgid "Points updated/completed"
-msgstr "Points mis à jour/complétés"
-
-msgid "Objects created"
-msgstr "Objets créés"
-
-msgid "Objects reused"
-msgstr "Objets réutilisés"
-
-msgid "Standards reused"
-msgstr "Standards réutilisés"
-
-msgid "Errors"
-msgstr "Erreurs"
-
-msgid "Skipped HDF5 entries"
-msgstr "Entrées HDF5 ignorées"
-
-msgid "No usable HDF5 metadata detected yet."
-msgstr "Aucune métadonnée HDF5 exploitable détectée pour le moment."
-
 msgid "No HDF5 files detected yet."
 msgstr "Aucun fichier HDF5 détecté pour le moment."
-
-msgid "Loading HDF5 metadata for generation..."
-msgstr "Chargement des métadonnées HDF5 pour la génération..."
-
-msgid "Loading current notebook state..."
-msgstr "Chargement de l'état actuel du cahier..."
-
-msgid "Detected HDF5 metadata"
-msgstr "Métadonnées HDF5 détectées"
-
-msgid "Expected changes"
-msgstr "Modifications attendues"
-
-msgid "Rules applied"
-msgstr "Règles appliquées"
-
-msgid "Warnings"
-msgstr "Avertissements"
-
-msgid "HDF5 points"
-msgstr "Points HDF5"
-
-msgid "Object analyses"
-msgstr "Analyses d'objet"
-
-msgid "Standard analyses"
-msgstr "Analyses de standard"
-
-msgid "Skipped entries"
-msgstr "Entrées ignorées"
-
-msgid "Points to create"
-msgstr "Points à créer"
-
-msgid "Existing points reused"
-msgstr "Points existants réutilisés"
-
-msgid "Comments to fill"
-msgstr "Commentaires à renseigner"
-
-msgid "Comments preserved"
-msgstr "Commentaires conservés"
-
-msgid "Objects to create"
-msgstr "Objets à créer"
-
-msgid "Objects reused/linked"
-msgstr "Objets réutilisés/liés"
-
-msgid "Standards attached/reused"
-msgstr "Standards rattachés/réutilisés"
-
-msgid "Missing standards"
-msgstr "Standards manquants"
-
-msgid "No blocking issue detected."
-msgstr "Aucun problème bloquant détecté."
-
-msgid "Existing comments are not overwritten."
-msgstr "Les commentaires existants ne sont pas écrasés."
-
-msgid "Existing object or standard assignments are not replaced if different."
-msgstr ""
-"Les rattachements existants à un objet ou à un standard ne sont pas "
-"remplacés s'ils sont différents."
-
-msgid "Existing objects are reused by label."
-msgstr "Les objets existants sont réutilisés par libellé."
-
-msgid ""
-"Standards are matched without case, spaces, hyphens, underscores, or other "
-"special characters."
-msgstr ""
-"Les standards sont comparés sans tenir compte de la casse, des espaces, des "
-"traits d'union, des tirets bas ou des autres caractères spéciaux."
-
-msgid "Missing standards are reported, not created."
-msgstr "Les standards manquants sont signalés, mais ne sont pas créés."
-
-msgid "The operation can be retried safely."
-msgstr "L'opération peut être relancée sans risque."
 
 #, javascript-format
 msgid "Point %s has no object reference in HDF5 metadata."
@@ -865,6 +748,123 @@ msgid ""
 msgstr ""
 "Le standard %s n'existe pas encore ; créez-le puis relancez la génération "
 "pour le rattacher."
+
+msgid "Loading HDF5 metadata for generation..."
+msgstr "Chargement des métadonnées HDF5 pour la génération..."
+
+msgid "Loading current notebook state..."
+msgstr "Chargement de l'état actuel du cahier..."
+
+msgid "No usable HDF5 metadata detected yet."
+msgstr "Aucune métadonnée HDF5 exploitable détectée pour le moment."
+
+msgid "Detected HDF5 metadata"
+msgstr "Métadonnées HDF5 détectées"
+
+msgid "Expected changes"
+msgstr "Modifications attendues"
+
+msgid "Rules applied"
+msgstr "Règles appliquées"
+
+msgid "HDF5 points"
+msgstr "Points HDF5"
+
+msgid "Object analyses"
+msgstr "Analyses d'objet"
+
+msgid "Standard analyses"
+msgstr "Analyses de standard"
+
+msgid "Skipped entries"
+msgstr "Entrées ignorées"
+
+msgid "Points to create"
+msgstr "Points à créer"
+
+msgid "Existing points reused"
+msgstr "Points existants réutilisés"
+
+msgid "Comments to fill"
+msgstr "Commentaires à renseigner"
+
+msgid "Comments preserved"
+msgstr "Commentaires conservés"
+
+msgid "Objects to create"
+msgstr "Objets à créer"
+
+msgid "Objects reused/linked"
+msgstr "Objets réutilisés/liés"
+
+msgid "Standards attached/reused"
+msgstr "Standards rattachés/réutilisés"
+
+msgid "Missing standards"
+msgstr "Standards manquants"
+
+msgid "Existing comments are not overwritten."
+msgstr "Les commentaires existants ne sont pas écrasés."
+
+msgid "Existing object or standard assignments are not replaced if different."
+msgstr ""
+"Les rattachements existants à un objet ou à un standard ne sont pas "
+"remplacés s'ils sont différents."
+
+msgid "Existing objects are reused by label."
+msgstr "Les objets existants sont réutilisés par libellé."
+
+msgid ""
+"Standards are matched without case, spaces, hyphens, underscores, or other "
+"special characters."
+msgstr ""
+"Les standards sont comparés sans tenir compte de la casse, des espaces, des "
+"traits d'union, des tirets bas ou des autres caractères spéciaux."
+
+msgid "Missing standards are reported, not created."
+msgstr "Les standards manquants sont signalés, mais ne sont pas créés."
+
+msgid "The operation can be retried safely."
+msgstr "L'opération peut être relancée sans risque."
+
+msgid "No blocking issue detected."
+msgstr "Aucun problème bloquant détecté."
+
+msgid "Warnings"
+msgstr "Avertissements"
+
+msgid "Generation started."
+msgstr "Génération démarrée."
+
+msgid "Notebook generation completed."
+msgstr "Génération du cahier terminée."
+
+msgid "Detected points"
+msgstr "Points détectés"
+
+msgid "Current point"
+msgstr "Point en cours"
+
+msgid "Points created"
+msgstr "Points créés"
+
+msgid "Points updated/completed"
+msgstr "Points mis à jour/complétés"
+
+msgid "Objects created"
+msgstr "Objets créés"
+
+msgid "Objects reused"
+msgstr "Objets réutilisés"
+
+msgid "Standards reused"
+msgstr "Standards réutilisés"
+
+msgid "Errors"
+msgstr "Erreurs"
+
+msgid "Skipped HDF5 entries"
+msgstr "Entrées HDF5 ignorées"
 
 msgid "Available viewable files for this run"
 msgstr "Fichiers visualisables disponibles pour ce run"

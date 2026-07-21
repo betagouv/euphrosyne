@@ -1,18 +1,32 @@
 import type { HDF5NotebookGenerationProgress } from "../hdf5";
 import type { GenerationStatus } from "../hooks/useHDF5NotebookGenerationWorkflow";
-import type { HDF5NotebookGenerationLabels } from "./HDF5NotebookGenerationModal";
 
 export default function HDF5NotebookGenerationProgressPanel({
   progress,
   status,
   fatalError,
-  labels,
 }: {
   progress: HDF5NotebookGenerationProgress | null;
   status: GenerationStatus;
   fatalError: string | null;
-  labels: HDF5NotebookGenerationLabels;
 }) {
+  const t = {
+    started: window.gettext("Generation started."),
+    success: window.gettext("Notebook generation completed."),
+    error: window.gettext(
+      "Notebook generation stopped. You can retry after the issue is fixed.",
+    ),
+    detectedPoints: window.gettext("Detected points"),
+    currentPoint: window.gettext("Current point"),
+    pointsCreated: window.gettext("Points created"),
+    pointsUpdated: window.gettext("Points updated/completed"),
+    objectsCreated: window.gettext("Objects created"),
+    objectsReused: window.gettext("Objects reused"),
+    standardsReused: window.gettext("Standards reused"),
+    errors: window.gettext("Errors"),
+    skipped: window.gettext("Skipped HDF5 entries"),
+  };
+
   if (!progress && !fatalError && status !== "running") {
     return null;
   }
@@ -28,48 +42,48 @@ export default function HDF5NotebookGenerationProgressPanel({
     <div className={`${alertClass} fr-mt-2w`}>
       <p>
         {status === "idle"
-          ? labels.skipped
+          ? t.skipped
           : status === "success"
-            ? labels.success
+            ? t.success
             : status === "error"
-              ? labels.error
-              : labels.started}
+              ? t.error
+              : t.started}
       </p>
       {progress && (
         <dl className="hdf5-generation__progress">
           <div>
-            <dt>{labels.detectedPoints}</dt>
+            <dt>{t.detectedPoints}</dt>
             <dd>{progress.detectedPoints}</dd>
           </div>
           <div>
-            <dt>{labels.currentPoint}</dt>
+            <dt>{t.currentPoint}</dt>
             <dd>{progress.currentPointName || "-"}</dd>
           </div>
           <div>
-            <dt>{labels.pointsCreated}</dt>
+            <dt>{t.pointsCreated}</dt>
             <dd>{progress.pointsCreated}</dd>
           </div>
           <div>
-            <dt>{labels.pointsUpdated}</dt>
+            <dt>{t.pointsUpdated}</dt>
             <dd>{progress.pointsUpdated}</dd>
           </div>
           <div>
-            <dt>{labels.objectsCreated}</dt>
+            <dt>{t.objectsCreated}</dt>
             <dd>{progress.objectsCreated}</dd>
           </div>
           <div>
-            <dt>{labels.objectsReused}</dt>
+            <dt>{t.objectsReused}</dt>
             <dd>{progress.objectsReused}</dd>
           </div>
           <div>
-            <dt>{labels.standardsReused}</dt>
+            <dt>{t.standardsReused}</dt>
             <dd>{progress.standardsReused}</dd>
           </div>
         </dl>
       )}
       {progress && progress.errors.length > 0 && (
         <>
-          <p className="fr-mt-2w">{labels.errors}</p>
+          <p className="fr-mt-2w">{t.errors}</p>
           <ul>
             {progress.errors.map((error, index) => (
               <li key={`${index}-${error}`}>{error}</li>
@@ -79,7 +93,7 @@ export default function HDF5NotebookGenerationProgressPanel({
       )}
       {!progress && fatalError && (
         <>
-          <p className="fr-mt-2w">{labels.errors}</p>
+          <p className="fr-mt-2w">{t.errors}</p>
           <ul>
             <li>{fatalError}</li>
           </ul>
