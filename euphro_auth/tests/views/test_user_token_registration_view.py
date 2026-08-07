@@ -46,10 +46,15 @@ class TestUserTokenRegistrationView(TestCase):
         user = auth.get_user(self.client)
         self.assertTrue(user.is_authenticated)
 
-    def test_orcid_registration_link_is_valid(self):
+    def test_orcid_registration_uses_post_form(self):
         preresponse = self.client.get(self.view_url)
         response = self.client.get(preresponse.headers["Location"])
         self.assertContains(
             response,
-            f'href="{reverse("social:begin", args=("orcid",))}?user_id={self.user.pk}"',
+            f'<form action="{reverse("social:begin", args=("orcid",))}" method="post">',
+        )
+        self.assertContains(response, 'name="csrfmiddlewaretoken"')
+        self.assertContains(
+            response,
+            f'<input type="hidden" name="user_id" value="{self.user.pk}">',
         )

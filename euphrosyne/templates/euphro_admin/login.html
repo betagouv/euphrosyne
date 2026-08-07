@@ -36,10 +36,13 @@
     {% endif %}
 
     <div class="orcid-row fr-mt-6w fr-mb-4w">
-      <a class="button" href="{% url "social:begin" "orcid" %}">
-        <img alt="ORCID logo" src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_24x24.png" width="24" height="24" />
-        {% translate 'Log in with ORCID' %}
-      </a>
+      <form action="{% url "social:begin" "orcid" %}" method="post">
+        {% csrf_token %}
+        <button class="button" type="submit">
+          <img alt="ORCID logo" src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_24x24.png" width="24" height="24" />
+          {% translate 'Log in with ORCID' %}
+        </button>
+      </form>
     </div>
     
     <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}

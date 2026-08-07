@@ -14,7 +14,7 @@
   text-align: center;
 }
 
-.orcid-row a {
+.orcid-row .button {
   width: 17rem;
   display: flex;
   align-items: center;
@@ -26,14 +26,14 @@
     0 2px 2px 0 rgba(0, 0, 0, 0.14),
     0 1px 5px 0 rgba(0, 0, 0, 0.12);
 }
-.orcid-row a:hover {
+.orcid-row .button:hover {
   background-color: var(--background-alt-grey);
   border: 1px solid rgb(127, 170, 38);
   padding: 9px 14px;
 }
-.orcid-row a:focus {
+.orcid-row .button:focus {
   background-color: white;
 }
-.orcid-row a img {
+.orcid-row .button img {
   margin-right: 10px;
 }

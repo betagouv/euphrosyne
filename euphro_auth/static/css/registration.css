@@ -4,3 +4,12 @@
 .orcid-row img {
   vertical-align: middle;
 }
+.orcid-link {
+  padding: 0;
+  border: 0;
+  color: var(--text-action-high-blue-france);
+  background: none;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
