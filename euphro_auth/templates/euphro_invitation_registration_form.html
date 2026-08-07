@@ -52,12 +52,14 @@
 
 <div class="orcid-row">
     <h4>{% translate "Other registration providers" %}</h4>
-    <div>
+    <form action="{% url "social:begin" "orcid" %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="user_id" value="{{ user_id }}">
         <img alt="ORCID logo" src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_24x24.png" width="24" height="24" />
-        <a href="{% url "social:begin" "orcid" %}?user_id={{ user_id }}">
+        <button class="orcid-link" type="submit">
             {% translate 'Connect your ORCID ID' %}
-        </a>
-    </div>
+        </button>
+    </form>
 </div>
 
 {% else %}
