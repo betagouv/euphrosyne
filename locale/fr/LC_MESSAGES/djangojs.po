@@ -1178,3 +1178,42 @@ msgstr "Les données HDF5 n'ont pas pu être chargées."
 msgid "Some HDF5 measurement point metadata could not be loaded."
 msgstr ""
 "Certaines métadonnées des points de mesure HDF5 n'ont pas pu être chargées."
+
+msgid "Albert AI assistant"
+msgstr "Assistant Albert IA"
+
+msgid "Selected TRAUPIXE file:"
+msgstr "Fichier TRAUPIXE sélectionné :"
+
+msgid "TRAUPIXE file"
+msgstr "Fichier TRAUPIXE"
+
+msgid "Your question"
+msgstr "Votre question"
+
+msgid "Ask a question about the TRAUPIXE results..."
+msgstr "Posez une question sur les résultats TRAUPIXE…"
+
+msgid "Send"
+msgstr "Envoyer"
+
+msgid "Albert is preparing the visualization..."
+msgstr "Albert prépare la visualisation…"
+
+msgid "The request could not be processed. Please try again."
+msgstr "La demande n'a pas pu être traitée. Veuillez réessayer."
+
+msgid "Reason:"
+msgstr "Raison :"
+
+msgid "Request reference:"
+msgstr "Référence de la requête :"
+
+msgid "Visualization"
+msgstr "Visualisation"
+
+msgid "Albert's answer"
+msgstr "Réponse d'Albert"
+
+msgid "Each new question replaces the previous visualization."
+msgstr "Chaque nouvelle question remplace la visualisation précédente."

@@ -13,6 +13,7 @@ import useNotebookHDF5Data from "../hooks/useNotebookHDF5Data";
 import HDF5RunDataSection from "./HDF5RunDataSection";
 import { NotebookHDF5Context } from "../hdf5";
 import HDF5NotebookGenerationModal from "./HDF5NotebookGenerationModal";
+import TraupixeVisualizationAssistant from "./TraupixeVisualizationAssistant";
 
 interface NotebookProps {
   runId: string;
@@ -120,6 +121,11 @@ export default function Notebook({
                   fileSummaries={hdf5Data.fileSummaries}
                   isLoading={hdf5Data.isLoading}
                   error={hdf5Data.error}
+                />
+                <TraupixeVisualizationAssistant
+                  projectSlug={projectSlug}
+                  files={hdf5Data.traupixeFiles}
+                  fetchFn={toolsClient.fetchFn}
                 />
               </section>
               <div className="flex-container fr-mt-4w">
