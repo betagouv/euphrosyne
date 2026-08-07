@@ -1,10 +1,10 @@
 import { act } from "react";
 import type { Root } from "react-dom/client";
 import { createRoot } from "react-dom/client";
-import TraupixeChart, {
-  withTraupixeChartDefaults,
-} from "../assets/js/components/TraupixeChart";
-import type { TraupixeVisualization } from "../assets/js/traupixe/types";
+import DataVisualizationChart, {
+  withDataVisualizationDefaults,
+} from "../assets/js/components/DataVisualizationChart";
+import type { DataVisualization } from "../assets/js/data-visualization/types";
 
 const echarts = vi.hoisted(() => ({
   setOption: vi.fn(),
@@ -17,7 +17,7 @@ vi.mock("echarts", () => ({
   init: echarts.init,
 }));
 
-describe("TraupixeChart", () => {
+describe("DataVisualizationChart", () => {
   let container: HTMLDivElement;
   let root: Root;
 
@@ -55,13 +55,13 @@ describe("TraupixeChart", () => {
       visualMap: { min: 0, max: 1 },
       series: [{ type: "heatmap" as const, data: [[0, 0, 1]] }],
     };
-    const visualization: TraupixeVisualization = {
+    const visualization: DataVisualization = {
       title: "Matrice",
       option,
     };
 
     await act(async () => {
-      root.render(<TraupixeChart visualization={visualization} />);
+      root.render(<DataVisualizationChart visualization={visualization} />);
     });
 
     expect(echarts.setOption).toHaveBeenCalledWith(
@@ -98,7 +98,7 @@ describe("TraupixeChart", () => {
       yAxis: { type: "value" as const },
     };
 
-    expect(withTraupixeChartDefaults(option)).toEqual(
+    expect(withDataVisualizationDefaults(option)).toEqual(
       expect.objectContaining({
         grid: expect.objectContaining({ left: 120, containLabel: true }),
         xAxis: expect.objectContaining({

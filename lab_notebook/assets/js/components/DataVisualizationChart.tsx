@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import type { EChartsOption } from "echarts";
-import type { TraupixeVisualization } from "../traupixe/types";
+import type { DataVisualization } from "../data-visualization/types";
 
 type OptionObject = Record<string, unknown>;
 
@@ -38,7 +38,7 @@ function withAxisLabelDefaults(axis: OptionObject): OptionObject {
   };
 }
 
-export function withTraupixeChartDefaults(
+export function withDataVisualizationDefaults(
   option: EChartsOption,
 ): EChartsOption {
   const normalized: OptionObject = { ...(option as OptionObject) };
@@ -67,10 +67,10 @@ export function withTraupixeChartDefaults(
   return normalized as EChartsOption;
 }
 
-export default function TraupixeChart({
+export default function DataVisualizationChart({
   visualization,
 }: {
-  visualization: TraupixeVisualization;
+  visualization: DataVisualization;
 }) {
   const container = useRef<HTMLDivElement>(null);
 
@@ -81,7 +81,7 @@ export default function TraupixeChart({
     const chart = echarts.init(container.current, undefined, {
       renderer: "svg",
     });
-    chart.setOption(withTraupixeChartDefaults(visualization.option), {
+    chart.setOption(withDataVisualizationDefaults(visualization.option), {
       notMerge: true,
     });
     const resize = () => chart.resize();
@@ -99,7 +99,7 @@ export default function TraupixeChart({
   return (
     <div
       ref={container}
-      className="traupixe-assistant__chart"
+      className="data-visualization-assistant__chart"
       role="img"
       aria-label={visualization.title}
     />
