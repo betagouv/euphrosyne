@@ -3,14 +3,14 @@ import type { Root } from "react-dom/client";
 import { createRoot } from "react-dom/client";
 import type { EuphrosyneFile } from "../../lab/assets/js/file-service";
 import type { ToolsFetch } from "../../shared/js/euphrosyne-tools-client";
-import TraupixeVisualizationAssistant from "../assets/js/components/TraupixeVisualizationAssistant";
+import DataVisualizationAssistant from "../assets/js/components/DataVisualizationAssistant";
 
-vi.mock("../assets/js/components/TraupixeChart", () => ({
+vi.mock("../assets/js/components/DataVisualizationChart", () => ({
   default: ({ visualization }: { visualization: { title: string } }) =>
     createElement("div", { "data-testid": "chart" }, visualization.title),
 }));
 
-function file(name: string): EuphrosyneFile {
+function dataFile(name: string): EuphrosyneFile {
   return {
     name,
     path: `/run/raw_data/${name}`,
@@ -20,7 +20,7 @@ function file(name: string): EuphrosyneFile {
   };
 }
 
-describe("TraupixeVisualizationAssistant", () => {
+describe("DataVisualizationAssistant", () => {
   let container: HTMLDivElement;
   let root: Root;
 
@@ -47,9 +47,9 @@ describe("TraupixeVisualizationAssistant", () => {
     vi.restoreAllMocks();
   });
 
-  it("lets the user select a workbook and replaces the result with the response", async () => {
-    const first = file("TRAUPIXE-first.xlsx");
-    const second = file("TRAUPIXE-second.xlsx");
+  it("lets the user select a data file and replaces the result with the response", async () => {
+    const first = dataFile("TRAUPIXE-first.xlsx");
+    const second = dataFile("TRAUPIXE-second.xlsx");
     const fetchFn = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -72,7 +72,7 @@ describe("TraupixeVisualizationAssistant", () => {
 
     await act(async () => {
       root.render(
-        <TraupixeVisualizationAssistant
+        <DataVisualizationAssistant
           projectSlug="project"
           files={[first, second]}
           fetchFn={fetchFn}
@@ -112,7 +112,7 @@ describe("TraupixeVisualizationAssistant", () => {
     });
 
     expect(fetchFn).toHaveBeenCalledWith(
-      "/aglae/project/visualizations",
+      "/data/project/visualizations",
       expect.objectContaining({
         body: JSON.stringify({
           path: second.path,
@@ -126,7 +126,8 @@ describe("TraupixeVisualizationAssistant", () => {
       ),
     ).toEqual(["Fer et cuivre", "Cuivre et plomb"]);
     expect(
-      container.querySelector(".traupixe-assistant__answer")?.textContent,
+      container.querySelector(".data-visualization-assistant__answer")
+        ?.textContent,
     ).toContain("P: X0 / Fe : 2 points");
   });
 
@@ -153,9 +154,9 @@ describe("TraupixeVisualizationAssistant", () => {
 
     await act(async () => {
       root.render(
-        <TraupixeVisualizationAssistant
+        <DataVisualizationAssistant
           projectSlug="project"
-          files={[file("TRAUPIXE.xlsx")]}
+          files={[dataFile("TRAUPIXE.xlsx")]}
           fetchFn={fetchFn}
         />,
       );
