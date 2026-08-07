@@ -1179,20 +1179,20 @@ msgid "Some HDF5 measurement point metadata could not be loaded."
 msgstr ""
 "Certaines métadonnées des points de mesure HDF5 n'ont pas pu être chargées."
 
-msgid "Albert AI assistant"
-msgstr "Assistant Albert IA"
+msgid "Data visualization assistant"
+msgstr "Assistant de visualisation de données"
 
-msgid "Selected TRAUPIXE file:"
-msgstr "Fichier TRAUPIXE sélectionné :"
+msgid "Selected data file:"
+msgstr "Fichier de données sélectionné :"
 
-msgid "TRAUPIXE file"
-msgstr "Fichier TRAUPIXE"
+msgid "Data file"
+msgstr "Fichier de données"
 
 msgid "Your question"
 msgstr "Votre question"
 
-msgid "Ask a question about the TRAUPIXE results..."
-msgstr "Posez une question sur les résultats TRAUPIXE…"
+msgid "Ask a question about the data..."
+msgstr "Posez une question sur les données…"
 
 msgid "Send"
 msgstr "Envoyer"

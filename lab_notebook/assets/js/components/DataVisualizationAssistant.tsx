@@ -2,14 +2,14 @@ import { FormEvent, lazy, Suspense, useEffect, useState } from "react";
 import type { EuphrosyneFile } from "../../../../lab/assets/js/file-service";
 import type { ToolsFetch } from "../../../../shared/js/euphrosyne-tools-client";
 import {
-  createTraupixeVisualization,
-  TraupixeVisualizationError,
-} from "../traupixe/traupixe-service";
-import type { TraupixeVisualizationResponse } from "../traupixe/types";
+  createDataVisualization,
+  DataVisualizationError,
+} from "../data-visualization/data-visualization-service";
+import type { DataVisualizationResponse } from "../data-visualization/types";
 
-const TraupixeChart = lazy(() => import("./TraupixeChart"));
+const DataVisualizationChart = lazy(() => import("./DataVisualizationChart"));
 
-export default function TraupixeVisualizationAssistant({
+export default function DataVisualizationAssistant({
   projectSlug,
   files,
   fetchFn,
@@ -20,9 +20,7 @@ export default function TraupixeVisualizationAssistant({
 }) {
   const [selectedPath, setSelectedPath] = useState(files[0]?.path || "");
   const [question, setQuestion] = useState("");
-  const [result, setResult] = useState<TraupixeVisualizationResponse | null>(
-    null,
-  );
+  const [result, setResult] = useState<DataVisualizationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [requestError, setRequestError] = useState<{
     requestId: string | null;
@@ -53,31 +51,31 @@ export default function TraupixeVisualizationAssistant({
     setResult(null);
     try {
       setResult(
-        await createTraupixeVisualization({
+        await createDataVisualization({
           fetchFn,
           projectSlug,
-          path: selectedFile.path,
+          dataFile: selectedFile,
           question: normalizedQuestion,
         }),
       );
     } catch (error: unknown) {
       const details =
-        error instanceof TraupixeVisualizationError
+        error instanceof DataVisualizationError
           ? { requestId: error.requestId, reason: error.reason }
           : { requestId: null, reason: null };
       setRequestError(details);
-      console.error("TRAUPIXE visualization failed", { ...details, error });
+      console.error("Data visualization failed", { ...details, error });
     } finally {
       setIsLoading(false);
     }
   };
 
   const t = {
-    title: window.gettext("Albert AI assistant"),
-    selectedFile: window.gettext("Selected TRAUPIXE file:"),
-    file: window.gettext("TRAUPIXE file"),
+    title: window.gettext("Data visualization assistant"),
+    selectedFile: window.gettext("Selected data file:"),
+    file: window.gettext("Data file"),
     question: window.gettext("Your question"),
-    placeholder: window.gettext("Ask a question about the TRAUPIXE results..."),
+    placeholder: window.gettext("Ask a question about the data..."),
     send: window.gettext("Send"),
     loading: window.gettext("Albert is preparing the visualization..."),
     error: window.gettext(
@@ -94,11 +92,11 @@ export default function TraupixeVisualizationAssistant({
 
   return (
     <section
-      className="traupixe-assistant fr-mt-3w"
-      aria-labelledby="traupixe-assistant-title"
+      className="data-visualization-assistant fr-mt-3w"
+      aria-labelledby="data-visualization-assistant-title"
     >
-      <header className="traupixe-assistant__header">
-        <h4 id="traupixe-assistant-title">{t.title}</h4>
+      <header className="data-visualization-assistant__header">
+        <h4 id="data-visualization-assistant-title">{t.title}</h4>
         <span className="fr-badge fr-badge--sm fr-badge--blue-ecume">BETA</span>
       </header>
 
@@ -107,13 +105,13 @@ export default function TraupixeVisualizationAssistant({
           {t.selectedFile} <strong>{files[0].name}</strong>
         </p>
       ) : (
-        <div className="fr-select-group traupixe-assistant__file-select">
-          <label className="fr-label" htmlFor="traupixe-file">
+        <div className="fr-select-group data-visualization-assistant__file-select">
+          <label className="fr-label" htmlFor="data-visualization-file">
             {t.file}
           </label>
           <select
             className="fr-select"
-            id="traupixe-file"
+            id="data-visualization-file"
             value={selectedPath}
             disabled={isLoading}
             onChange={(event) => {
@@ -132,13 +130,13 @@ export default function TraupixeVisualizationAssistant({
       )}
 
       <form onSubmit={submit}>
-        <label className="fr-label" htmlFor="traupixe-question">
+        <label className="fr-label" htmlFor="data-visualization-question">
           {t.question}
         </label>
-        <div className="traupixe-assistant__question">
+        <div className="data-visualization-assistant__question">
           <input
             className="fr-input"
-            id="traupixe-question"
+            id="data-visualization-question"
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
             placeholder={t.placeholder}
@@ -175,13 +173,13 @@ export default function TraupixeVisualizationAssistant({
 
       {result && (
         <>
-          <div className="traupixe-assistant__result fr-mt-2w">
+          <div className="data-visualization-assistant__result fr-mt-2w">
             <section>
               <h5>{t.visualization}</h5>
               <Suspense fallback={<p>{t.loading}</p>}>
-                <div className="traupixe-assistant__charts">
+                <div className="data-visualization-assistant__charts">
                   {result.visualizations.map((visualization, index) => (
-                    <TraupixeChart
+                    <DataVisualizationChart
                       key={`${visualization.title}-${index}`}
                       visualization={visualization}
                     />
@@ -189,9 +187,9 @@ export default function TraupixeVisualizationAssistant({
                 </div>
               </Suspense>
             </section>
-            <section className="traupixe-assistant__answer">
+            <section className="data-visualization-assistant__answer">
               <h5>{t.answer}</h5>
-              <p className="traupixe-assistant__answer-content">
+              <p className="data-visualization-assistant__answer-content">
                 {result.answer}
               </p>
             </section>
