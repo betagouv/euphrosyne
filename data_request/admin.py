@@ -3,6 +3,7 @@ from django.db.models import Model, QuerySet
 from django.http import HttpRequest
 from django.http.response import HttpResponse
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -178,5 +179,7 @@ class DataRequestAdmin(LabAdminAllowedMixin, admin.ModelAdmin):
         if obj.request_viewed:
             return ""
         return mark_safe(
-            f'<p class="fr-badge fr-badge--new fr-badge--sm">{_("New")}</p>'
+            format_html(
+                '<p class="fr-badge fr-badge--new fr-badge--sm">{}</p>', _("New")
+            )
         )
