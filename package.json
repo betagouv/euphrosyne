@@ -68,7 +68,7 @@
     "react-dom": "^19.2.6",
     "remixicon": "^4.9.1",
     "source-map-loader": "^5.0.0",
-    "ts-loader": "^9.6.0",
+    "ts-loader": "^9.6.2",
     "webpack": "^5.109.2",
     "webpack-cli": "^7.0.3",
     "whatwg-fetch": "^3.6.20"
