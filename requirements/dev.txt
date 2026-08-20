@@ -7,7 +7,7 @@ ipython==9.16.1
 isort==8.0.1
 mypy==2.3.0
 pylint-django==2.8.0
-pylint==4.0.6
+pylint==4.0.7
 pytest-django==4.14.0
 pytest==9.1.1
 pytest-dotenv==0.5.2
