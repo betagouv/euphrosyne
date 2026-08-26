@@ -90,22 +90,18 @@ describe("data visualization service", () => {
     });
   });
 
-  it("keeps the rejection reason and request id", async () => {
+  it("keeps the rejection code and request id", async () => {
     const fetchFn = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({
           detail: {
-            message: "The request could not be processed.",
-            reason: "Invalid analysis plan.",
+            code: "INVALID_DATA_FILE",
             request_id: "body-request-id",
           },
         }),
         {
           status: 422,
-          headers: {
-            "Content-Type": "application/json",
-            "X-Request-ID": "header-request-id",
-          },
+          headers: { "Content-Type": "application/json" },
         },
       ),
     ) as ToolsFetch;
@@ -118,12 +114,12 @@ describe("data visualization service", () => {
         question: "Question",
       }),
     ).rejects.toMatchObject({
-      reason: "Invalid analysis plan.",
-      requestId: "header-request-id",
+      code: "INVALID_DATA_FILE",
+      requestId: "body-request-id",
     } satisfies Partial<DataVisualizationError>);
   });
 
-  it("uses a simple FastAPI detail as the rejection reason", async () => {
+  it("uses a generic error for responses outside the visualization error contract", async () => {
     const fetchFn = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ detail: "Chemin de fichier invalide." }), {
         status: 422,
@@ -139,7 +135,7 @@ describe("data visualization service", () => {
         question: "Question",
       }),
     ).rejects.toMatchObject({
-      reason: "Chemin de fichier invalide.",
+      code: null,
       requestId: null,
     } satisfies Partial<DataVisualizationError>);
   });

@@ -1203,8 +1203,17 @@ msgstr "Albert prépare la visualisation…"
 msgid "The request could not be processed. Please try again."
 msgstr "La demande n'a pas pu être traitée. Veuillez réessayer."
 
-msgid "Reason:"
-msgstr "Raison :"
+msgid "The selected data file path is invalid."
+msgstr "Le chemin du fichier de données sélectionné n'est pas valide."
+
+msgid "The selected data file type is not supported."
+msgstr "Le type du fichier de données sélectionné n'est pas pris en charge."
+
+msgid "The selected data file is too large."
+msgstr "Le fichier de données sélectionné est trop volumineux."
+
+msgid "The selected data file is invalid."
+msgstr "Le fichier de données sélectionné n'est pas valide."
 
 msgid "Request reference:"
 msgstr "Référence de la requête :"

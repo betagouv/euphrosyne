@@ -5,7 +5,10 @@ import {
   createDataVisualization,
   DataVisualizationError,
 } from "../data-visualization/data-visualization-service";
-import type { DataVisualizationResponse } from "../data-visualization/types";
+import type {
+  DataVisualizationErrorCode,
+  DataVisualizationResponse,
+} from "../data-visualization/types";
 
 const DataVisualizationChart = lazy(() => import("./DataVisualizationChart"));
 
@@ -23,8 +26,8 @@ export default function DataVisualizationAssistant({
   const [result, setResult] = useState<DataVisualizationResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [requestError, setRequestError] = useState<{
+    code: DataVisualizationErrorCode | null;
     requestId: string | null;
-    reason: string | null;
   } | null>(null);
 
   useEffect(() => {
@@ -61,8 +64,8 @@ export default function DataVisualizationAssistant({
     } catch (error: unknown) {
       const details =
         error instanceof DataVisualizationError
-          ? { requestId: error.requestId, reason: error.reason }
-          : { requestId: null, reason: null };
+          ? { code: error.code, requestId: error.requestId }
+          : { code: null, requestId: null };
       setRequestError(details);
       console.error("Data visualization failed", { ...details, error });
     } finally {
@@ -81,13 +84,24 @@ export default function DataVisualizationAssistant({
     error: window.gettext(
       "The request could not be processed. Please try again.",
     ),
-    reason: window.gettext("Reason:"),
+    invalidFilePath: window.gettext("The selected data file path is invalid."),
+    unsupportedFileType: window.gettext(
+      "The selected data file type is not supported.",
+    ),
+    fileTooLarge: window.gettext("The selected data file is too large."),
+    invalidDataFile: window.gettext("The selected data file is invalid."),
     requestReference: window.gettext("Request reference:"),
     visualization: window.gettext("Visualization"),
     answer: window.gettext("Albert's answer"),
     replacement: window.gettext(
       "Each new question replaces the previous visualization.",
     ),
+  };
+  const errorMessages: Record<DataVisualizationErrorCode, string> = {
+    INVALID_FILE_PATH: t.invalidFilePath,
+    UNSUPPORTED_FILE_TYPE: t.unsupportedFileType,
+    FILE_TOO_LARGE: t.fileTooLarge,
+    INVALID_DATA_FILE: t.invalidDataFile,
   };
 
   return (
@@ -156,12 +170,9 @@ export default function DataVisualizationAssistant({
         {isLoading && <p className="fr-mt-2w">{t.loading}</p>}
         {requestError && (
           <div className="fr-alert fr-alert--error fr-alert--sm fr-mt-2w">
-            <p>{t.error}</p>
-            {requestError.reason && (
-              <p className="fr-text--sm">
-                <strong>{t.reason}</strong> {requestError.reason}
-              </p>
-            )}
+            <p>
+              {requestError.code ? errorMessages[requestError.code] : t.error}
+            </p>
             {requestError.requestId && (
               <p className="fr-text--sm">
                 <strong>{t.requestReference}</strong> {requestError.requestId}
