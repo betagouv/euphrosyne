@@ -131,13 +131,12 @@ describe("DataVisualizationAssistant", () => {
     ).toContain("P: X0 / Fe : 2 points");
   });
 
-  it("shows the rejection reason and request reference", async () => {
+  it("shows the localized rejection code and request reference", async () => {
     const fetchFn = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({
           detail: {
-            message: "The request could not be processed.",
-            reason: "Invalid analysis plan.",
+            code: "INVALID_DATA_FILE",
             request_id: "request-id",
           },
         }),
@@ -182,7 +181,7 @@ describe("DataVisualizationAssistant", () => {
     });
 
     const alert = container.querySelector(".fr-alert--error");
-    expect(alert?.textContent).toContain("Invalid analysis plan.");
+    expect(alert?.textContent).toContain("The selected data file is invalid.");
     expect(alert?.textContent).toContain("request-id");
   });
 });
