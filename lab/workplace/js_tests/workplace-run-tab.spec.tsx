@@ -85,7 +85,11 @@ describe("WorkplaceRunTab", () => {
     );
     const assistant = container.querySelector(".data-visualization-assistant");
     expect(assistant).not.toBeNull();
-    expect(notebookLink?.nextElementSibling).toBe(assistant);
+    expect(notebookLink?.parentElement?.nextElementSibling).toBe(
+      assistant?.parentElement,
+    );
     expect(assistant?.textContent).toContain("TRAUPIXE-results.xlsx");
+    expect(rawDataFileService.listData).toHaveBeenCalledTimes(1);
+    expect(processedDataFileService.listData).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { EuphrosyneFile } from "../../../../assets/js/file-service";
 import { findVisualizableDataFiles } from "../../../../data_visualization/assets/js/data-visualization-service";
 import DataVisualizationAssistant from "../../../../data_visualization/assets/js/components/DataVisualizationAssistant";
@@ -48,6 +48,34 @@ export default function WorkplaceRunTab({
       ? findVisualizableDataFiles([...rawDataFiles, ...processedDataFiles])
       : [];
 
+  useEffect(() => {
+    let isCurrent = true;
+    setRawDataFiles(null);
+    setProcessedDataFiles(null);
+
+    const loadRootFiles = (
+      fileService: RawDataFileService | ProcessedDataFileService,
+    ) =>
+      fileService.listData().catch((error: unknown) => {
+        console.error("Failed to fetch workplace root files", error);
+        return [];
+      });
+
+    void Promise.all([
+      loadRootFiles(run.rawDataFileService),
+      loadRootFiles(run.processedDataFileService),
+    ]).then(([rawFiles, processedFiles]) => {
+      if (isCurrent) {
+        setRawDataFiles(rawFiles);
+        setProcessedDataFiles(processedFiles);
+      }
+    });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [run.rawDataFileService, run.processedDataFileService]);
+
   return (
     <WorkplaceContext.Provider value={{ project }}>
       <div>
@@ -61,6 +89,8 @@ export default function WorkplaceRunTab({
             >
               {t["Open run lab notebook"]}
             </a>
+          </div>
+          <div className="fr-col-12">
             <DataVisualizationAssistant
               projectSlug={project.slug}
               files={visualizableDataFiles}
@@ -72,9 +102,9 @@ export default function WorkplaceRunTab({
               projectId={project.id}
               dataLabel={t["Raw data"]}
               fileService={run.rawDataFileService}
+              rootFiles={rawDataFiles}
               canDelete={run.rawDataTable.canDelete}
               isSearchable={true}
-              onRootFilesLoaded={setRawDataFiles}
             />
           </div>
           <div className="fr-col-12 fr-col-lg-6">
@@ -82,9 +112,9 @@ export default function WorkplaceRunTab({
               projectId={project.id}
               dataLabel={t["Processed data"]}
               fileService={run.processedDataFileService}
+              rootFiles={processedDataFiles}
               canDelete={run.processedDataTable.canDelete}
               isSearchable={true}
-              onRootFilesLoaded={setProcessedDataFiles}
             />
           </div>
         </div>
