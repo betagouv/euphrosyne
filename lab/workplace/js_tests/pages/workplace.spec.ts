@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { renderComponent, downloadRunData, fetchProjectLifecycle } = vi.hoisted(() => ({
-  renderComponent: vi.fn(),
-  downloadRunData: vi.fn(),
-  fetchProjectLifecycle: vi.fn(),
-}));
+const { renderComponent, downloadRunData, fetchProjectLifecycle } = vi.hoisted(
+  () => ({
+    renderComponent: vi.fn(),
+    downloadRunData: vi.fn(),
+    fetchProjectLifecycle: vi.fn(),
+  }),
+);
 
 vi.mock("../../../../euphrosyne/assets/js/react", () => ({
   renderComponent,
@@ -122,6 +124,7 @@ describe("workplace page", () => {
       runs: [],
       isLabAdmin: false,
       isDataManagementEnabled: true,
+      isLabNotebookEnabled: true,
       labels: {
         dataManagementTitle: "Data management",
         loading: "Loading",
@@ -139,6 +142,7 @@ describe("workplace page", () => {
     });
     const runTabsProps = renderPropsFor("workplace-run-tabs");
     expect(runTabsProps.isDataManagementEnabled).toBe(false);
+    expect(runTabsProps.isLabNotebookEnabled).toBe(true);
     expect(runTabsProps.fetchProjectLifecyclePromise).toBeInstanceOf(Promise);
   });
 
@@ -157,6 +161,7 @@ describe("workplace page", () => {
       runs: [],
       isLabAdmin: true,
       isDataManagementEnabled: true,
+      isLabNotebookEnabled: true,
       labels: {
         dataManagementTitle: "Data management",
         loading: "Loading",
@@ -188,6 +193,7 @@ describe("workplace page", () => {
       runs: [],
       isLabAdmin: true,
       isDataManagementEnabled: false,
+      isLabNotebookEnabled: false,
       labels: {
         dataManagementTitle: "Data management",
         loading: "Loading",
@@ -200,5 +206,8 @@ describe("workplace page", () => {
     expect(renderPropsFor("project-lifecycle-banner")).toMatchObject({
       lifecycleState: "HOT",
     });
+    expect(renderPropsFor("workplace-run-tabs").isLabNotebookEnabled).toBe(
+      false,
+    );
   });
 });

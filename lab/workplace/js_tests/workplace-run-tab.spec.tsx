@@ -75,6 +75,7 @@ describe("WorkplaceRunTab", () => {
     await act(async () => {
       root.render(
         <WorkplaceRunTab
+          isLabNotebookEnabled={true}
           project={{ id: "project-id", name: "Project", slug: "project" }}
           run={{
             id: "run-id",
@@ -132,6 +133,7 @@ describe("WorkplaceRunTab", () => {
     await act(async () => {
       root.render(
         <WorkplaceRunTab
+          isLabNotebookEnabled={true}
           project={{ id: "project-id", name: "Project", slug: "project" }}
           run={{
             id: "run-id",
@@ -157,5 +159,39 @@ describe("WorkplaceRunTab", () => {
 
     expect(container.textContent).toContain("raw-data.xlsx");
     expect(container.querySelectorAll("tr.loading")).toHaveLength(0);
+  });
+
+  it("hides the lab notebook link when the feature is disabled", async () => {
+    const fetchFn = vi.fn();
+    const rawDataFileService = {
+      fetchFn,
+      listData: vi.fn().mockResolvedValue([]),
+    } as unknown as RawDataFileService;
+    const processedDataFileService = {
+      fetchFn,
+      listData: vi.fn().mockResolvedValue([]),
+    } as unknown as ProcessedDataFileService;
+
+    await act(async () => {
+      root.render(
+        <WorkplaceRunTab
+          isLabNotebookEnabled={false}
+          project={{ id: "project-id", name: "Project", slug: "project" }}
+          run={{
+            id: "run-id",
+            label: "Run",
+            rawDataTable: { canDelete: false },
+            processedDataTable: { canDelete: false },
+            rawDataFileService,
+            processedDataFileService,
+          }}
+        />,
+      );
+      await Promise.resolve();
+    });
+
+    expect(
+      container.querySelector('a[href="/lab/run/run-id/notebook"]'),
+    ).toBeNull();
   });
 });
