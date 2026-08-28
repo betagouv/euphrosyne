@@ -22,6 +22,14 @@ function dataFile(name: string): EuphrosyneFile {
   };
 }
 
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((promiseResolve) => {
+    resolve = promiseResolve;
+  });
+  return { promise, resolve };
+}
+
 describe("WorkplaceRunTab", () => {
   let container: HTMLDivElement;
   let root: Root;
@@ -107,5 +115,47 @@ describe("WorkplaceRunTab", () => {
     expect(processedDataFileService.deleteFile).toHaveBeenCalledTimes(1);
     expect(container.textContent).not.toContain("TRAUPIXE-results.xlsx");
     expect(processedDataFileService.listData).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders each file table as soon as its request resolves", async () => {
+    const rawDataFiles = deferred<EuphrosyneFile[]>();
+    const fetchFn = vi.fn();
+    const rawDataFileService = {
+      fetchFn,
+      listData: vi.fn().mockReturnValue(rawDataFiles.promise),
+    } as unknown as RawDataFileService;
+    const processedDataFileService = {
+      fetchFn,
+      listData: vi.fn().mockResolvedValue([dataFile("processed-data.xlsx")]),
+    } as unknown as ProcessedDataFileService;
+
+    await act(async () => {
+      root.render(
+        <WorkplaceRunTab
+          project={{ id: "project-id", name: "Project", slug: "project" }}
+          run={{
+            id: "run-id",
+            label: "Run",
+            rawDataTable: { canDelete: false },
+            processedDataTable: { canDelete: false },
+            rawDataFileService,
+            processedDataFileService,
+          }}
+        />,
+      );
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(container.textContent).toContain("processed-data.xlsx");
+    expect(container.querySelectorAll("tr.loading")).toHaveLength(1);
+
+    await act(async () => {
+      rawDataFiles.resolve([dataFile("raw-data.xlsx")]);
+      await rawDataFiles.promise;
+    });
+
+    expect(container.textContent).toContain("raw-data.xlsx");
+    expect(container.querySelectorAll("tr.loading")).toHaveLength(0);
   });
 });
