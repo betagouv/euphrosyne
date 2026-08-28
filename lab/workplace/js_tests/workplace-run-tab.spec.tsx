@@ -60,7 +60,9 @@ describe("WorkplaceRunTab", () => {
     const processedDataFileService = {
       fetchFn,
       listData: vi.fn().mockResolvedValue([dataFile("TRAUPIXE-results.xlsx")]),
+      deleteFile: vi.fn().mockResolvedValue(undefined),
     } as unknown as ProcessedDataFileService;
+    vi.spyOn(window, "confirm").mockReturnValue(true);
 
     await act(async () => {
       root.render(
@@ -70,7 +72,7 @@ describe("WorkplaceRunTab", () => {
             id: "run-id",
             label: "Run",
             rawDataTable: { canDelete: false },
-            processedDataTable: { canDelete: false },
+            processedDataTable: { canDelete: true },
             rawDataFileService,
             processedDataFileService,
           }}
@@ -90,6 +92,20 @@ describe("WorkplaceRunTab", () => {
     );
     expect(assistant?.textContent).toContain("TRAUPIXE-results.xlsx");
     expect(rawDataFileService.listData).toHaveBeenCalledTimes(1);
+    expect(processedDataFileService.listData).toHaveBeenCalledTimes(1);
+
+    const processedRow = [...container.querySelectorAll("tr")].find((row) =>
+      row.textContent?.includes("TRAUPIXE-results.xlsx"),
+    );
+    await act(async () => {
+      processedRow
+        ?.querySelector<HTMLButtonElement>(".fr-icon-delete-line")
+        ?.click();
+      await Promise.resolve();
+    });
+
+    expect(processedDataFileService.deleteFile).toHaveBeenCalledTimes(1);
+    expect(container.textContent).not.toContain("TRAUPIXE-results.xlsx");
     expect(processedDataFileService.listData).toHaveBeenCalledTimes(1);
   });
 });

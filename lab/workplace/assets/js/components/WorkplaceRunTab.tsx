@@ -99,20 +99,30 @@ export default function WorkplaceRunTab({
           </div>
           <div className="fr-col-12 fr-col-lg-6">
             <WorkplaceDataTypeDisplay
-              projectId={project.id}
               dataLabel={t["Raw data"]}
               fileService={run.rawDataFileService}
               rootFiles={rawDataFiles}
+              onRootFileDeleted={(fileName) =>
+                setRawDataFiles(
+                  (files) =>
+                    files?.filter((file) => file.name !== fileName) ?? null,
+                )
+              }
               canDelete={run.rawDataTable.canDelete}
               isSearchable={true}
             />
           </div>
           <div className="fr-col-12 fr-col-lg-6">
             <WorkplaceDataTypeDisplay
-              projectId={project.id}
               dataLabel={t["Processed data"]}
               fileService={run.processedDataFileService}
               rootFiles={processedDataFiles}
+              onRootFileDeleted={(fileName) =>
+                setProcessedDataFiles(
+                  (files) =>
+                    files?.filter((file) => file.name !== fileName) ?? null,
+                )
+              }
               canDelete={run.processedDataTable.canDelete}
               isSearchable={true}
             />
