@@ -1,5 +1,5 @@
 import type { EChartsOption } from "echarts";
-import type { EuphrosyneFile } from "../../../../lab/assets/js/file-service";
+import type { EuphrosyneFile } from "../../../assets/js/file-service";
 
 export interface DataVisualizationFormat {
   accepts(file: EuphrosyneFile): boolean;

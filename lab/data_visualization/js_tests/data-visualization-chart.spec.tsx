@@ -4,7 +4,7 @@ import { createRoot } from "react-dom/client";
 import DataVisualizationChart, {
   withDataVisualizationDefaults,
 } from "../assets/js/components/DataVisualizationChart";
-import type { DataVisualization } from "../assets/js/data-visualization/types";
+import type { DataVisualization } from "../assets/js/types";
 
 const echarts = vi.hoisted(() => ({
   setOption: vi.fn(),

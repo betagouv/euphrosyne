@@ -1,4 +1,4 @@
-import type { EuphrosyneFile } from "../../../../lab/assets/js/file-service";
+import type { EuphrosyneFile } from "../../../assets/js/file-service";
 import type { ToolsFetch } from "../../../../shared/js/euphrosyne-tools-client";
 import { TRAUPIXE_FORMAT } from "./formats/traupixe";
 import {

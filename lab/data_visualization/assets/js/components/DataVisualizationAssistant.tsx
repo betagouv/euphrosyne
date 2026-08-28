@@ -1,14 +1,14 @@
 import { FormEvent, lazy, Suspense, useEffect, useState } from "react";
-import type { EuphrosyneFile } from "../../../../lab/assets/js/file-service";
-import type { ToolsFetch } from "../../../../shared/js/euphrosyne-tools-client";
+import type { EuphrosyneFile } from "../../../../assets/js/file-service";
+import type { ToolsFetch } from "../../../../../shared/js/euphrosyne-tools-client";
 import {
   createDataVisualization,
   DataVisualizationError,
-} from "../data-visualization/data-visualization-service";
+} from "../data-visualization-service";
 import type {
   DataVisualizationErrorCode,
   DataVisualizationResponse,
-} from "../data-visualization/types";
+} from "../types";
 
 const DataVisualizationChart = lazy(() => import("./DataVisualizationChart"));
 
@@ -75,8 +75,15 @@ export default function DataVisualizationAssistant({
 
   const t = {
     title: window.gettext("Data visualization assistant"),
+    scope: window.gettext(
+      "Generate a visualization from a TRAUPIXE file in this run.",
+    ),
+    poweredBy: window.gettext("Powered by Albert"),
     selectedFile: window.gettext("Selected data file:"),
     file: window.gettext("Data file"),
+    fileHint: window.gettext(
+      "Select the file to use to generate the visualization.",
+    ),
     question: window.gettext("Your question"),
     placeholder: window.gettext("Ask a question about the data..."),
     send: window.gettext("Send"),
@@ -106,63 +113,81 @@ export default function DataVisualizationAssistant({
 
   return (
     <section
-      className="data-visualization-assistant fr-mt-3w"
+      className="data-visualization-assistant fr-mt-3w fr-p-2w"
       aria-labelledby="data-visualization-assistant-title"
     >
-      <header className="data-visualization-assistant__header">
-        <h4 id="data-visualization-assistant-title">{t.title}</h4>
-        <span className="fr-badge fr-badge--sm fr-badge--blue-ecume">BETA</span>
+      <header className="fr-grid-row fr-grid-row--middle fr-mb-1w">
+        <h4
+          className="fr-mb-0 fr-mr-1w"
+          id="data-visualization-assistant-title"
+        >
+          {t.title}
+        </h4>
+        <span className="fr-badge fr-badge--sm fr-badge--blue-ecume fr-mr-1w">
+          BETA
+        </span>
+        <span className="fr-hint-text fr-mb-0">{t.poweredBy}</span>
       </header>
+      <p className="fr-text--sm fr-mb-2w">{t.scope}</p>
 
       {files.length === 1 ? (
         <p className="fr-text--sm fr-mb-2w">
           {t.selectedFile} <strong>{files[0].name}</strong>
         </p>
       ) : (
-        <div className="fr-select-group data-visualization-assistant__file-select">
-          <label className="fr-label" htmlFor="data-visualization-file">
-            {t.file}
-          </label>
-          <select
-            className="fr-select"
-            id="data-visualization-file"
-            value={selectedPath}
-            disabled={isLoading}
-            onChange={(event) => {
-              setSelectedPath(event.target.value);
-              setResult(null);
-              setRequestError(null);
-            }}
-          >
-            {files.map((file) => (
-              <option value={file.path} key={file.path}>
-                {file.name}
-              </option>
-            ))}
-          </select>
+        <div className="fr-grid-row">
+          <div className="fr-select-group fr-col-12 fr-col-md-7 fr-mb-3w">
+            <label className="fr-label" htmlFor="data-visualization-file">
+              {t.file}
+              <span className="fr-hint-text">{t.fileHint}</span>
+            </label>
+            <select
+              className="fr-select"
+              id="data-visualization-file"
+              value={selectedPath}
+              disabled={isLoading}
+              onChange={(event) => {
+                setSelectedPath(event.target.value);
+                setResult(null);
+                setRequestError(null);
+              }}
+            >
+              {files.map((file) => (
+                <option value={file.path} key={file.path}>
+                  {file.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       )}
 
       <form onSubmit={submit}>
-        <label className="fr-label" htmlFor="data-visualization-question">
-          {t.question}
-        </label>
-        <div className="data-visualization-assistant__question">
-          <input
-            className="fr-input"
-            id="data-visualization-question"
-            value={question}
-            onChange={(event) => setQuestion(event.target.value)}
-            placeholder={t.placeholder}
-            disabled={isLoading}
-          />
-          <button
-            className="fr-btn"
-            type="submit"
-            disabled={!question.trim() || !selectedFile || isLoading}
-          >
-            {t.send}
-          </button>
+        <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
+          <div className="fr-col-12 fr-col-md-10">
+            <div className="fr-input-group">
+              <label className="fr-label" htmlFor="data-visualization-question">
+                {t.question}
+              </label>
+              <input
+                className="fr-input"
+                id="data-visualization-question"
+                value={question}
+                onChange={(event) => setQuestion(event.target.value)}
+                placeholder={t.placeholder}
+                disabled={isLoading}
+              />
+            </div>
+          </div>
+          <div className="fr-col-12 fr-col-md-2">
+            <button
+              className="fr-btn data-visualization-assistant__submit"
+              type="submit"
+              disabled={!question.trim() || !selectedFile || isLoading}
+            >
+              {t.send}
+            </button>
+          </div>
         </div>
       </form>
 
@@ -184,26 +209,32 @@ export default function DataVisualizationAssistant({
 
       {result && (
         <>
-          <div className="data-visualization-assistant__result fr-mt-2w">
-            <section>
-              <h5>{t.visualization}</h5>
-              <Suspense fallback={<p>{t.loading}</p>}>
-                <div className="data-visualization-assistant__charts">
-                  {result.visualizations.map((visualization, index) => (
-                    <DataVisualizationChart
-                      key={`${visualization.title}-${index}`}
-                      visualization={visualization}
-                    />
-                  ))}
-                </div>
-              </Suspense>
-            </section>
-            <section className="data-visualization-assistant__answer">
-              <h5>{t.answer}</h5>
-              <p className="data-visualization-assistant__answer-content">
-                {result.answer}
-              </p>
-            </section>
+          <div className="fr-grid-row fr-grid-row--gutters fr-mt-2w">
+            <div className="fr-col-12 fr-col-xl-8 fr-col--top">
+              <section className="data-visualization-assistant__panel fr-p-2w">
+                <h5>{t.visualization}</h5>
+                <Suspense fallback={<p>{t.loading}</p>}>
+                  <div className="fr-grid-row fr-grid-row--gutters">
+                    {result.visualizations.map((visualization, index) => (
+                      <div
+                        className="fr-col-12"
+                        key={`${visualization.title}-${index}`}
+                      >
+                        <DataVisualizationChart visualization={visualization} />
+                      </div>
+                    ))}
+                  </div>
+                </Suspense>
+              </section>
+            </div>
+            <div className="fr-col-12 fr-col-xl-4 fr-col--top">
+              <section className="data-visualization-assistant__panel data-visualization-assistant__answer fr-p-2w">
+                <h5>{t.answer}</h5>
+                <p className="data-visualization-assistant__answer-content">
+                  {result.answer}
+                </p>
+              </section>
+            </div>
           </div>
           <p className="fr-hint-text fr-mt-1w">{t.replacement}</p>
         </>

@@ -1,11 +1,11 @@
-import type { EuphrosyneFile } from "../../lab/assets/js/file-service";
-import type { ToolsFetch } from "../../shared/js/euphrosyne-tools-client";
+import type { EuphrosyneFile } from "../../assets/js/file-service";
+import type { ToolsFetch } from "../../../shared/js/euphrosyne-tools-client";
 import {
   createDataVisualization,
   DataVisualizationError,
   findVisualizableDataFiles,
-} from "../assets/js/data-visualization/data-visualization-service";
-import type { DataVisualization } from "../assets/js/data-visualization/types";
+} from "../assets/js/data-visualization-service";
+import type { DataVisualization } from "../assets/js/types";
 
 function file(
   name: string,

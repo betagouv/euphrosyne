@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as echarts from "echarts";
 import type { EChartsOption } from "echarts";
-import type { DataVisualization } from "../data-visualization/types";
+import type { DataVisualization } from "../types";
 
 type OptionObject = Record<string, unknown>;
 

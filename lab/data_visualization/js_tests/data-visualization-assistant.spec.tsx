@@ -1,8 +1,8 @@
 import { act, createElement } from "react";
 import type { Root } from "react-dom/client";
 import { createRoot } from "react-dom/client";
-import type { EuphrosyneFile } from "../../lab/assets/js/file-service";
-import type { ToolsFetch } from "../../shared/js/euphrosyne-tools-client";
+import type { EuphrosyneFile } from "../../assets/js/file-service";
+import type { ToolsFetch } from "../../../shared/js/euphrosyne-tools-client";
 import DataVisualizationAssistant from "../assets/js/components/DataVisualizationAssistant";
 
 vi.mock("../assets/js/components/DataVisualizationChart", () => ({
@@ -79,6 +79,14 @@ describe("DataVisualizationAssistant", () => {
         />,
       );
     });
+
+    expect(container.textContent).toContain(
+      "Generate a visualization from a TRAUPIXE file in this run.",
+    );
+    expect(container.textContent).toContain("Powered by Albert");
+    expect(container.textContent).toContain(
+      "Select the file to use to generate the visualization.",
+    );
 
     const select = container.querySelector("select");
     const input = container.querySelector("input");
