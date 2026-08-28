@@ -12,30 +12,30 @@ interface WorkplaceDataTypeDisplayProps {
   projectId: string;
   dataLabel: string;
   fileService: FileService;
+  rootFiles: EuphrosyneFile[] | null;
   isSearchable?: boolean;
   displayedCols?: Col<EuphrosyneFile>[];
   actionCell?: React.ReactElement<"td">;
   canDelete?: boolean;
-  onRootFilesLoaded?: (files: EuphrosyneFile[]) => void;
 }
 
 export default function WorkplaceDataTypeDisplay({
   dataLabel,
   fileService,
+  rootFiles,
   displayedCols,
   isSearchable,
   actionCell,
   canDelete,
-  onRootFilesLoaded,
 }: WorkplaceDataTypeDisplayProps) {
   const { project } = useWorkplaceContext();
 
   const [dataRows, setDataRows]: [
     EuphrosyneFile[],
     React.Dispatch<React.SetStateAction<EuphrosyneFile[]>>,
-  ] = useState<EuphrosyneFile[]>([]);
+  ] = useState<EuphrosyneFile[]>(rootFiles ?? []);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(rootFiles === null);
   const [folder, setFolder] = useState<string[]>([]);
 
   const appendFolder = (name: string) => {
@@ -47,25 +47,32 @@ export default function WorkplaceDataTypeDisplay({
   };
 
   useEffect(() => {
+    if (folder.length === 0) {
+      setDataRows(rootFiles ?? []);
+      setIsLoading(rootFiles === null);
+      return;
+    }
+    let isCurrent = true;
     setIsLoading(true);
     fileService
       .listData(folder.join("/"))
       .then((files) => {
-        setDataRows(files);
-        if (folder.length === 0) {
-          onRootFilesLoaded?.(files);
+        if (isCurrent) {
+          setDataRows(files);
+          setIsLoading(false);
         }
-        setIsLoading(false);
       })
       .catch((error) => {
-        console.error(`Failed to fetch workplace ${dataLabel}: ${error}`);
-        setDataRows([]);
-        if (folder.length === 0) {
-          onRootFilesLoaded?.([]);
+        if (isCurrent) {
+          console.error(`Failed to fetch workplace ${dataLabel}: ${error}`);
+          setDataRows([]);
+          setIsLoading(false);
         }
-        setIsLoading(false);
       });
-  }, [folder]);
+    return () => {
+      isCurrent = false;
+    };
+  }, [dataLabel, fileService, folder, rootFiles]);
 
   return (
     <div className="fr-background-default--grey">
