@@ -1,4 +1,4 @@
-import { FormEvent, lazy, Suspense, useEffect, useState } from "react";
+import { FormEvent, lazy, Suspense, useEffect, useId, useState } from "react";
 import type { EuphrosyneFile } from "../../../../assets/js/file-service";
 import type { ToolsFetch } from "../../../../../shared/js/euphrosyne-tools-client";
 import {
@@ -21,6 +21,10 @@ export default function DataVisualizationAssistant({
   files: EuphrosyneFile[];
   fetchFn: ToolsFetch;
 }) {
+  const assistantId = useId();
+  const titleId = `${assistantId}-title`;
+  const fileId = `${assistantId}-file`;
+  const questionId = `${assistantId}-question`;
   const [selectedPath, setSelectedPath] = useState(files[0]?.path || "");
   const [question, setQuestion] = useState("");
   const [result, setResult] = useState<DataVisualizationResponse | null>(null);
@@ -114,13 +118,10 @@ export default function DataVisualizationAssistant({
   return (
     <section
       className="data-visualization-assistant fr-mt-3w fr-p-2w"
-      aria-labelledby="data-visualization-assistant-title"
+      aria-labelledby={titleId}
     >
       <header className="fr-grid-row fr-grid-row--middle fr-mb-1w">
-        <h4
-          className="fr-mb-0 fr-mr-1w"
-          id="data-visualization-assistant-title"
-        >
+        <h4 className="fr-mb-0 fr-mr-1w" id={titleId}>
           {t.title}
         </h4>
         <span className="fr-badge fr-badge--sm fr-badge--blue-ecume fr-mr-1w">
@@ -137,13 +138,13 @@ export default function DataVisualizationAssistant({
       ) : (
         <div className="fr-grid-row">
           <div className="fr-select-group fr-col-12 fr-col-md-7 fr-mb-3w">
-            <label className="fr-label" htmlFor="data-visualization-file">
+            <label className="fr-label" htmlFor={fileId}>
               {t.file}
               <span className="fr-hint-text">{t.fileHint}</span>
             </label>
             <select
               className="fr-select"
-              id="data-visualization-file"
+              id={fileId}
               value={selectedPath}
               disabled={isLoading}
               onChange={(event) => {
@@ -166,12 +167,12 @@ export default function DataVisualizationAssistant({
         <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
           <div className="fr-col-12 fr-col-md-10">
             <div className="fr-input-group">
-              <label className="fr-label" htmlFor="data-visualization-question">
+              <label className="fr-label" htmlFor={questionId}>
                 {t.question}
               </label>
               <input
                 className="fr-input"
-                id="data-visualization-question"
+                id={questionId}
                 value={question}
                 onChange={(event) => setQuestion(event.target.value)}
                 placeholder={t.placeholder}

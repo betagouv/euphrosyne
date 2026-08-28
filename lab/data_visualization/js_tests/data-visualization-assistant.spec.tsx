@@ -192,4 +192,52 @@ describe("DataVisualizationAssistant", () => {
     expect(alert?.textContent).toContain("The selected data file is invalid.");
     expect(alert?.textContent).toContain("request-id");
   });
+
+  it("uses unique label and control ids for each assistant", async () => {
+    const files = [
+      dataFile("TRAUPIXE-first.xlsx"),
+      dataFile("TRAUPIXE-second.xlsx"),
+    ];
+    const fetchFn = vi.fn() as ToolsFetch;
+
+    await act(async () => {
+      root.render(
+        <>
+          <DataVisualizationAssistant
+            projectSlug="project"
+            files={files}
+            fetchFn={fetchFn}
+          />
+          <DataVisualizationAssistant
+            projectSlug="project"
+            files={files}
+            fetchFn={fetchFn}
+          />
+        </>,
+      );
+    });
+
+    const assistants = Array.from(
+      container.querySelectorAll<HTMLElement>(".data-visualization-assistant"),
+    );
+    const ids = assistants.flatMap((assistant) =>
+      Array.from(
+        assistant.querySelectorAll<HTMLElement>("[id]"),
+        (element) => element.id,
+      ),
+    );
+
+    expect(assistants).toHaveLength(2);
+    expect(new Set(ids).size).toBe(ids.length);
+    assistants.forEach((assistant) => {
+      expect(assistant.getAttribute("aria-labelledby")).toBe(
+        assistant.querySelector("h4")?.id,
+      );
+      assistant.querySelectorAll<HTMLLabelElement>("label").forEach((label) => {
+        expect(assistant.contains(document.getElementById(label.htmlFor))).toBe(
+          true,
+        );
+      });
+    });
+  });
 });
