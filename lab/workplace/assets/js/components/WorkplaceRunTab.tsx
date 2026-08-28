@@ -8,6 +8,7 @@ import WorkplaceDataTypeDisplay from "./WorkplaceDataTypeDisplay";
 import { WorkplaceContext } from "./WorkplaceContext";
 
 export interface WorkplaceRunTabProps {
+  isLabNotebookEnabled: boolean;
   project: {
     name: string;
     slug: string;
@@ -30,6 +31,7 @@ export interface WorkplaceRunTabProps {
 export default function WorkplaceRunTab({
   run,
   project,
+  isLabNotebookEnabled,
 }: WorkplaceRunTabProps) {
   const [rawDataFiles, setRawDataFiles] = useState<EuphrosyneFile[] | null>(
     null,
@@ -81,16 +83,18 @@ export default function WorkplaceRunTab({
     <WorkplaceContext.Provider value={{ project }}>
       <div>
         <div className="fr-grid-row fr-grid-row--gutters">
-          <div className="fr-col-12">
-            <a
-              className="fr-link fr-link--lg"
-              target="_blank"
-              rel="noreferrer"
-              href={`/lab/run/${run.id}/notebook`}
-            >
-              {t["Open run lab notebook"]}
-            </a>
-          </div>
+          {isLabNotebookEnabled && (
+            <div className="fr-col-12">
+              <a
+                className="fr-link fr-link--lg"
+                target="_blank"
+                rel="noreferrer"
+                href={`/lab/run/${run.id}/notebook`}
+              >
+                {t["Open run lab notebook"]}
+              </a>
+            </div>
+          )}
           <div className="fr-col-12">
             <DataVisualizationAssistant
               projectSlug={project.slug}

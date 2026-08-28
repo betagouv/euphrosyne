@@ -53,6 +53,7 @@ class WorkplaceView(ProjectMembershipRequiredMixin, TemplateView):
                     },
                     "isLabAdmin": user_is_lab_admin,
                     "isDataManagementEnabled": apps.is_installed("data_management"),
+                    "isLabNotebookEnabled": apps.is_installed("lab_notebook"),
                     "labels": {
                         "dataManagementTitle": str(_("Data management")),
                         "loading": str(_("Loading")),
