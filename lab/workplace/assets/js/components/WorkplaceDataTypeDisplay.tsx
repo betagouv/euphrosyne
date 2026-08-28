@@ -16,6 +16,7 @@ interface WorkplaceDataTypeDisplayProps {
   displayedCols?: Col<EuphrosyneFile>[];
   actionCell?: React.ReactElement<"td">;
   canDelete?: boolean;
+  onRootFilesLoaded?: (files: EuphrosyneFile[]) => void;
 }
 
 export default function WorkplaceDataTypeDisplay({
@@ -25,6 +26,7 @@ export default function WorkplaceDataTypeDisplay({
   isSearchable,
   actionCell,
   canDelete,
+  onRootFilesLoaded,
 }: WorkplaceDataTypeDisplayProps) {
   const { project } = useWorkplaceContext();
 
@@ -50,17 +52,23 @@ export default function WorkplaceDataTypeDisplay({
       .listData(folder.join("/"))
       .then((files) => {
         setDataRows(files);
+        if (folder.length === 0) {
+          onRootFilesLoaded?.(files);
+        }
         setIsLoading(false);
       })
       .catch((error) => {
         console.error(`Failed to fetch workplace ${dataLabel}: ${error}`);
         setDataRows([]);
+        if (folder.length === 0) {
+          onRootFilesLoaded?.([]);
+        }
         setIsLoading(false);
       });
   }, [folder]);
 
   return (
-    <div className="fr-background-default--grey fr-p-3v">
+    <div className="fr-background-default--grey">
       <h3>{dataLabel}</h3>
       <FileTable
         rows={dataRows}
