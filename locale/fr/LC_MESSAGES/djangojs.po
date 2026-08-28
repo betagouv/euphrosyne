@@ -531,6 +531,9 @@ msgstr "Données brutes"
 msgid "Processed data"
 msgstr "Données travaillées"
 
+msgid "Open run lab notebook"
+msgstr "Ouvrir le cahier de laboratoire du run"
+
 msgid "Create virtual office"
 msgstr "Créer le bureau virtuel"
 
