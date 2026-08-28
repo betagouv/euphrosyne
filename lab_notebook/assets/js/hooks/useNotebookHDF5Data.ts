@@ -22,11 +22,9 @@ import {
   normalizeMeasuringPointName,
   type NotebookHDF5ContextValue,
 } from "../hdf5";
-import { findVisualizableDataFiles } from "../data-visualization/data-visualization-service";
 
 interface NotebookHDF5Data {
   fileSummaries: HDF5FileSummary[];
-  visualizableDataFiles: EuphrosyneFile[];
   isLoading: boolean;
   error: string | null;
   contextValue: NotebookHDF5ContextValue;
@@ -46,9 +44,6 @@ export default function useNotebookHDF5Data({
   fetchFn: ToolsFetch;
 }): NotebookHDF5Data {
   const [files, setFiles] = useState<EuphrosyneFile[]>([]);
-  const [visualizableDataFiles, setVisualizableDataFiles] = useState<
-    EuphrosyneFile[]
-  >([]);
   const [mapFiles, setMapFiles] = useState<EuphrosyneFile[]>([]);
   const [discoveredMapEntries, setDiscoveredMapEntries] = useState<
     HDF5DatasetEntry[]
@@ -72,7 +67,6 @@ export default function useNotebookHDF5Data({
     let isCurrent = true;
     if (!projectSlug || !runName) {
       setFiles([]);
-      setVisualizableDataFiles([]);
       setMapFiles([]);
       setDiscoveredMapEntries([]);
       setRoots([]);
@@ -122,7 +116,6 @@ export default function useNotebookHDF5Data({
         ]) => {
           const runFiles = [...rawDataFiles, ...processedDataFiles];
           const hdf5Files = filterHDF5Files(runFiles);
-          const detectedVisualizableFiles = findVisualizableDataFiles(runFiles);
           const hdf5MapFiles = filterHDF5MapFiles([
             ...rawMapFiles,
             ...processedMapFiles,
@@ -147,7 +140,6 @@ export default function useNotebookHDF5Data({
           ).length;
 
           setFiles(hdf5Files);
-          setVisualizableDataFiles(detectedVisualizableFiles);
           setMapFiles(hdf5MapFiles);
           setRoots(loadedRoots);
           setError(
@@ -163,7 +155,6 @@ export default function useNotebookHDF5Data({
         }
         console.error(loadError);
         setFiles([]);
-        setVisualizableDataFiles([]);
         setRoots([]);
         setMapFiles([]);
         setDiscoveredMapEntries([]);
@@ -397,7 +388,6 @@ export default function useNotebookHDF5Data({
 
   return {
     fileSummaries: returnedFileSummaries,
-    visualizableDataFiles: hasRunContext ? visualizableDataFiles : [],
     isLoading: hasRunContext ? isLoading : false,
     error: hasRunContext ? error : null,
     contextValue,
