@@ -61,12 +61,13 @@ export default function WorkplaceRunTab({
         return [];
       });
 
-    void Promise.all([
-      loadRootFiles(run.rawDataFileService),
-      loadRootFiles(run.processedDataFileService),
-    ]).then(([rawFiles, processedFiles]) => {
+    void loadRootFiles(run.rawDataFileService).then((rawFiles) => {
       if (isCurrent) {
         setRawDataFiles(rawFiles);
+      }
+    });
+    void loadRootFiles(run.processedDataFileService).then((processedFiles) => {
+      if (isCurrent) {
         setProcessedDataFiles(processedFiles);
       }
     });
