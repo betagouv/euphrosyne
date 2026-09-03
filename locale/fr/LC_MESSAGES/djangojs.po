@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-21 18:05+0200\n"
+"POT-Creation-Date: 2026-08-28 15:16+0200\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -260,6 +260,63 @@ msgstr "Une erreur s'est produite lors de la demande d'URL de téléversement."
 msgid "Didn't receive upload URL from euphrosyne tools."
 msgstr "N'a pas reçu l'URL de téléversement de la part d'Euphrosyne Tools."
 
+msgid "Data visualization assistant"
+msgstr "Assistant de visualisation de données"
+
+msgid "Generate a visualization from a TRAUPIXE file in this run."
+msgstr "Générez une visualisation à partir d'un fichier TRAUPIXE de ce run."
+
+msgid "Powered by Albert"
+msgstr "Propulsé par Albert"
+
+msgid "Selected data file:"
+msgstr "Fichier de données sélectionné :"
+
+msgid "Data file"
+msgstr "Fichier de données"
+
+msgid "Select the file to use to generate the visualization."
+msgstr "Sélectionnez le fichier à utiliser pour générer la visualisation."
+
+msgid "Your question"
+msgstr "Votre question"
+
+msgid "Ask a question about the data..."
+msgstr "Posez une question sur les données…"
+
+msgid "Send"
+msgstr "Envoyer"
+
+msgid "Albert is preparing the visualization..."
+msgstr "Albert prépare la visualisation…"
+
+msgid "The request could not be processed. Please try again."
+msgstr "La demande n'a pas pu être traitée. Veuillez réessayer."
+
+msgid "The selected data file path is invalid."
+msgstr "Le chemin du fichier de données sélectionné n'est pas valide."
+
+msgid "The selected data file type is not supported."
+msgstr "Le type du fichier de données sélectionné n'est pas pris en charge."
+
+msgid "The selected data file is too large."
+msgstr "Le fichier de données sélectionné est trop volumineux."
+
+msgid "The selected data file is invalid."
+msgstr "Le fichier de données sélectionné n'est pas valide."
+
+msgid "Request reference:"
+msgstr "Référence de la requête :"
+
+msgid "Visualization"
+msgstr "Visualisation"
+
+msgid "Albert's answer"
+msgstr "Réponse d'Albert"
+
+msgid "Each new question replaces the previous visualization."
+msgstr "Chaque nouvelle question remplace la visualisation précédente."
+
 msgid "Last modified"
 msgstr "Modifié le"
 
@@ -473,6 +530,9 @@ msgstr "Données brutes"
 
 msgid "Processed data"
 msgstr "Données travaillées"
+
+msgid "Open run lab notebook"
+msgstr "Ouvrir le cahier de laboratoire du run"
 
 msgid "Create virtual office"
 msgstr "Créer le bureau virtuel"

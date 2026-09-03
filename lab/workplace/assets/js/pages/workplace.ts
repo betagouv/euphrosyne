@@ -31,6 +31,7 @@ export interface WorkplacePageData {
   runs: WorkplaceRunData[];
   isLabAdmin: boolean;
   isDataManagementEnabled: boolean;
+  isLabNotebookEnabled: boolean;
   labels: {
     dataManagementTitle: string;
     loading: string;
@@ -49,8 +50,14 @@ document.addEventListener("DOMContentLoaded", () => {
     throw new Error("Workplace data not found in workplace-data script tag.");
   }
 
-  const { project, runs, isLabAdmin, isDataManagementEnabled, labels } =
-    workplacePageData;
+  const {
+    project,
+    runs,
+    isLabAdmin,
+    isDataManagementEnabled,
+    isLabNotebookEnabled,
+    labels,
+  } = workplacePageData;
   const fetchProjectLifecyclePromise = fetchProjectLifecycle(project.slug);
 
   renderComponent(
@@ -59,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
       project,
       fetchProjectLifecyclePromise,
       isDataManagementEnabled: isDataManagementEnabled && isLabAdmin,
+      isLabNotebookEnabled,
       runs: runs.map((run) => ({
         ...run,
         rawDataFileService: new RawDataFileService(
