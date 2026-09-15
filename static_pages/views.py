@@ -19,7 +19,9 @@ class StaticPageResponse(TemplateResponse):
                 **site.each_context(request),
                 "is_nav_sidebar_enabled": request.user.is_authenticated,
                 "content": content,
-                "subtitle": title,
+                "redirect_to": request.get_full_path(),
+                "show_public_header": True,
+                "title": title,
             },
         )
 
@@ -69,7 +71,7 @@ def personal_data_view(request, html):
     return StaticPageResponse(request, _("Personal data and cookies"), html)
 
 
-@static_page(Path(__file__).resolve().parent / "pages/accessibility_declaration.md")
+@i18n_static_page(Path(__file__).resolve().parent / "pages/accessibility_declaration")
 def accessibility_declaration_view(request, html):
     return StaticPageResponse(request, _("Accessibility declaration"), html)
 
