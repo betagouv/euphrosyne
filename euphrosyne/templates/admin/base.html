@@ -49,15 +49,17 @@
         {% endblock %}
       {% endif %}
       <div class="content">
-        {% if not is_popup and user.is_authenticated %}
-        <!-- Header -->
-        {% block header %}
-        <header role="banner" class="fr-header">
-            <div id="header-main"></div> 
-            <div id="header-nav"></div> 
-        </header>
-        {% endblock %}
-        <!-- END Header -->
+        {% if not is_popup %}
+          {% if user.is_authenticated or show_public_header %}
+          <!-- Header -->
+          {% block header %}
+          <header role="banner" class="fr-header">
+              <div id="header-main"></div>
+              <div id="header-nav"></div>
+          </header>
+          {% endblock %}
+          <!-- END Header -->
+          {% endif %}
         {% endif %}
         {% block messages %}
           {% if messages %}

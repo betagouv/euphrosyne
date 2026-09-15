@@ -1,6 +1,54 @@
 {% extends "admin/base_site.html" %}
 {% load static i18n %}
 
+{% block header %}
+{% if user.is_authenticated %}
+    {{ block.super }}
+{% else %}
+    <header role="banner" class="fr-header">
+        <div class="fr-header__body">
+            <div class="fr-container">
+                <div class="fr-header__body-row">
+                    <div class="fr-header__brand">
+                        <div class="fr-header__brand-top">
+                            <div class="fr-header__service">
+                                <a href="{% url 'admin:index' %}">
+                                    <p class="fr-header__service-title">Euphrosyne</p>
+                                </a>
+                            </div>
+                            <div class="fr-header__navbar">
+                                <a href="{% url 'admin:login' %}"
+                                   class="fr-btn fr-icon-account-line"
+                                   title="{% translate 'Log in' %}">
+                                    {% translate "Log in" %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fr-header__tools">
+                        <div class="fr-header__tools-links">
+                            <ul class="fr-btns-group">
+                                <li>
+                                    <a href="{% url 'admin:login' %}" class="fr-btn fr-icon-account-line">
+                                        {% translate "Log in" %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+{% endif %}
+{% endblock %}
+
+{% block content_title %}
+<div class="fr-container">
+    {{ block.super }}
+</div>
+{% endblock %}
+
 {% block content_subtitle %}
 <div class="fr-container">
     {{ block.super }}
