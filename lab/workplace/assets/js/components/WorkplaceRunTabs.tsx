@@ -25,12 +25,14 @@ export interface WorkplaceRunTabsProps {
     processedDataFileService: ProcessedDataFileService;
   }[];
   fetchProjectLifecyclePromise: Promise<ProjectLifecycleSnapshot>;
+  isLabNotebookEnabled: boolean;
 }
 
 export default function WorkplaceRunTabs({
   runs,
   project,
   isDataManagementEnabled,
+  isLabNotebookEnabled,
   fetchProjectLifecyclePromise,
 }: WorkplaceRunTabsProps) {
   const t = {
@@ -105,6 +107,7 @@ export default function WorkplaceRunTabs({
           tabIndex={index}
         >
           <WorkplaceRunTab
+            isLabNotebookEnabled={isLabNotebookEnabled}
             run={{
               ...run,
               rawDataTable: {

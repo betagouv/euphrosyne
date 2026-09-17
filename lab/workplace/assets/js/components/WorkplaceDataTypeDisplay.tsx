@@ -9,9 +9,10 @@ import { workplaceTableCols } from "../../../../assets/js/components/FileTableCo
 import { useWorkplaceContext } from "./WorkplaceContext";
 
 interface WorkplaceDataTypeDisplayProps {
-  projectId: string;
   dataLabel: string;
   fileService: FileService;
+  rootFiles: EuphrosyneFile[] | null;
+  onRootFileDeleted: (fileName: string) => void;
   isSearchable?: boolean;
   displayedCols?: Col<EuphrosyneFile>[];
   actionCell?: React.ReactElement<"td">;
@@ -21,6 +22,8 @@ interface WorkplaceDataTypeDisplayProps {
 export default function WorkplaceDataTypeDisplay({
   dataLabel,
   fileService,
+  rootFiles,
+  onRootFileDeleted,
   displayedCols,
   isSearchable,
   actionCell,
@@ -28,13 +31,12 @@ export default function WorkplaceDataTypeDisplay({
 }: WorkplaceDataTypeDisplayProps) {
   const { project } = useWorkplaceContext();
 
-  const [dataRows, setDataRows]: [
-    EuphrosyneFile[],
-    React.Dispatch<React.SetStateAction<EuphrosyneFile[]>>,
-  ] = useState<EuphrosyneFile[]>([]);
-
-  const [isLoading, setIsLoading] = useState(false);
+  const [folderFiles, setFolderFiles] = useState<EuphrosyneFile[]>([]);
+  const [isFolderLoading, setIsFolderLoading] = useState(false);
   const [folder, setFolder] = useState<string[]>([]);
+  const isRootFolder = folder.length === 0;
+  const displayedFiles = isRootFolder ? (rootFiles ?? []) : folderFiles;
+  const isLoading = isRootFolder ? rootFiles === null : isFolderLoading;
 
   const appendFolder = (name: string) => {
     setFolder((prev) => [...prev, name]);
@@ -45,25 +47,36 @@ export default function WorkplaceDataTypeDisplay({
   };
 
   useEffect(() => {
-    setIsLoading(true);
+    if (isRootFolder) {
+      return;
+    }
+    let isCurrent = true;
+    setIsFolderLoading(true);
     fileService
       .listData(folder.join("/"))
       .then((files) => {
-        setDataRows(files);
-        setIsLoading(false);
+        if (isCurrent) {
+          setFolderFiles(files);
+          setIsFolderLoading(false);
+        }
       })
       .catch((error) => {
-        console.error(`Failed to fetch workplace ${dataLabel}: ${error}`);
-        setDataRows([]);
-        setIsLoading(false);
+        if (isCurrent) {
+          console.error(`Failed to fetch workplace ${dataLabel}: ${error}`);
+          setFolderFiles([]);
+          setIsFolderLoading(false);
+        }
       });
-  }, [folder]);
+    return () => {
+      isCurrent = false;
+    };
+  }, [dataLabel, fileService, folder, isRootFolder]);
 
   return (
-    <div className="fr-background-default--grey fr-p-3v">
+    <div className="fr-background-default--grey">
       <h3>{dataLabel}</h3>
       <FileTable
-        rows={dataRows}
+        rows={displayedFiles}
         isLoading={isLoading}
         cols={displayedCols || workplaceTableCols}
         isSearchable={isSearchable}
@@ -74,9 +87,15 @@ export default function WorkplaceDataTypeDisplay({
             <BaseTableActionCell
               projectId={project.id}
               canDelete={!!canDelete}
-              onDeleteSuccess={(fileName) =>
-                setDataRows(dataRows.filter((file) => file.name !== fileName))
-              }
+              onDeleteSuccess={(fileName) => {
+                if (isRootFolder) {
+                  onRootFileDeleted(fileName);
+                } else {
+                  setFolderFiles((files) =>
+                    files.filter((file) => file.name !== fileName),
+                  );
+                }
+              }}
               fileService={fileService}
               onFolderOpen={appendFolder}
             />
