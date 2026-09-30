@@ -44,7 +44,7 @@ class TestSendInvitationMailAction(TestCase):
 
     def test_send_email_to_non_registered_users(self):
         actions = self.model_admin.get_actions(self.request)
-        actions["send_invitation_mail_action"][0](
+        actions["send_invitation_mail_action"].func(
             self.model_admin, self.request, User.objects.all()
         )
         assert len(mail.outbox) == 1

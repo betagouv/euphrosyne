@@ -368,12 +368,18 @@ SOCIAL_AUTH_USER_MODEL = "euphro_auth.User"
 INTERNAL_IPS = ["127.0.0.1"]
 
 # Sending emails
-EMAIL_HOST_USER = os.environ["EMAIL_HOST_USER"]
-EMAIL_HOST_PASSWORD = os.environ["EMAIL_HOST_PASSWORD"]
-EMAIL_HOST = os.environ["EMAIL_HOST"]
-EMAIL_PORT = os.environ["EMAIL_PORT"]
-
-EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS") != "false"
+MAILERS = {
+    "default": {
+        "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+        "OPTIONS": {
+            "host": os.environ["EMAIL_HOST"],
+            "port": int(os.environ["EMAIL_PORT"]),
+            "username": os.environ["EMAIL_HOST_USER"],
+            "password": os.environ["EMAIL_HOST_PASSWORD"],
+            "use_tls": os.getenv("EMAIL_USE_TLS") != "false",
+        },
+    },
+}
 
 DEFAULT_FROM_EMAIL = os.environ["DEFAULT_FROM_EMAIL"]
 

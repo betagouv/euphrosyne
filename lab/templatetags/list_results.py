@@ -86,6 +86,7 @@ def project_results(
 @register.tag(name="project_result_list")
 def project_result_list_tag(parser, token):
     return InclusionAdminNode(
+        "project_result_list",
         parser,
         token,
         func=project_result_list,
