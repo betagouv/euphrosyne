@@ -98,7 +98,8 @@ def get_eros_object(request):
     return Response({"c2rmf_id": c2rmf_id, "label": obj["label"]})
 
 
-class ObjectGroupCreateView(IsAdminUser, generics.CreateAPIView):
+class ObjectGroupCreateView(generics.CreateAPIView):
+    permission_classes = [IsAdminUser]
     serializer_class = serializers.ObjectGroupCreateSerializer
     queryset = ObjectGroup.objects.all()
 
