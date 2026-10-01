@@ -10,16 +10,12 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from social_core.utils import PARTIAL_TOKEN_SESSION_NAME
-from social_django.models import UserSocialAuth
+from social_django.models import Partial, UserSocialAuth
 
 from euphro_auth.models import User
 
 from ..backends import ORCIDOAuth2
-from ..invitations import (
-    CONTEXT_MAX_AGE,
-    INVITATION_SESSION_KEY,
-    REGISTRATION_SESSION_KEY,
-)
+from ..invitations import CONTEXT_MAX_AGE, INVITATION_SESSION_KEY
 
 
 @override_settings(
@@ -325,7 +321,6 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
         self.client.get(self.callback_url)
         self.assertEqual(auth.get_user(self.client).pk, self.invited.pk)
         self.assertNotIn(INVITATION_SESSION_KEY, self.client.session)
-        self.assertNotIn(REGISTRATION_SESSION_KEY, self.client.session)
         self.assertNotIn(PARTIAL_TOKEN_SESSION_NAME, self.client.session)
         self.assertEqual(self.client.post(completion_url).url, reverse("admin:login"))
 
@@ -347,28 +342,25 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
         self.assertEqual(self.invited.email, "invited@example.com")
         self.assertIsNone(self.invited.invitation_completed_at)
 
-    def test_copied_registration_context_cannot_cross_sessions(self):
+    def test_native_partial_cannot_be_resumed_from_another_session(self):
         self.validate_invitation()
         self.client.post(self.register_url)
         completion_url = self.callback().url
         other_client = Client()
-        session = other_client.session
-        for key in (REGISTRATION_SESSION_KEY, PARTIAL_TOKEN_SESSION_NAME):
-            session[key] = deepcopy(self.client.session[key])
-        session.save()
         self.assertEqual(other_client.get(completion_url).url, reverse("admin:login"))
-        self.assertNotIn(REGISTRATION_SESSION_KEY, other_client.session)
+        token = self.client.session[PARTIAL_TOKEN_SESSION_NAME]
+        response = other_client.get(self.callback_url, {"partial_token": token})
+        self.assertEqual(response.url, reverse("admin:login"))
+        self.assertNotIn("_auth_user_id", other_client.session)
+        self.assertTrue(Partial.objects.filter(token=token).exists())
 
     def test_expired_registration_continuation_cannot_modify_account(self):
         self.validate_invitation()
         self.client.post(self.register_url)
         completion_url = self.callback().url
-        session = self.client.session
-        session[REGISTRATION_SESSION_KEY] = {
-            **session[REGISTRATION_SESSION_KEY],
-            "validated_at": int(timezone.now().timestamp()) - CONTEXT_MAX_AGE,
-        }
-        session.save()
+        Partial.objects.filter(
+            token=self.client.session[PARTIAL_TOKEN_SESSION_NAME]
+        ).update(timestamp=timezone.now() - timedelta(seconds=CONTEXT_MAX_AGE))
         response = self.client.post(
             completion_url,
             {
@@ -378,10 +370,52 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
             },
         )
         self.assertEqual(response.url, reverse("admin:login"))
-        self.assertNotIn(REGISTRATION_SESSION_KEY, self.client.session)
+        self.assertNotIn(PARTIAL_TOKEN_SESSION_NAME, self.client.session)
         self.invited.refresh_from_db()
         self.assertEqual(self.invited.email, "invited@example.com")
         self.assertIsNone(self.invited.invitation_completed_at)
+
+    def test_native_partial_resume_cannot_substitute_authenticated_browser_user(self):
+        self.validate_invitation()
+        self.client.post(self.register_url)
+        completion_url = self.callback().url
+        self.client.post(
+            completion_url,
+            {
+                "email": self.invited.email,
+                "first_name": "Invited",
+                "last_name": "User",
+            },
+        )
+        self.client.force_login(self.victim)
+        response = self.client.get(self.callback_url)
+        self.assertEqual(response.url, reverse("admin:login"))
+        self.assertEqual(UserSocialAuth.objects.get().user_id, self.invited.pk)
+        self.assertNotIn(PARTIAL_TOKEN_SESSION_NAME, self.client.session)
+
+    def test_expired_native_partial_cannot_be_resumed_or_renewed(self):
+        self.validate_invitation()
+        self.client.post(self.register_url)
+        completion_url = self.callback().url
+        token = self.client.session[PARTIAL_TOKEN_SESSION_NAME]
+        Partial.objects.filter(token=token).update(
+            timestamp=timezone.now() - timedelta(seconds=CONTEXT_MAX_AGE)
+        )
+        response = self.client.get(self.callback_url)
+        self.assertEqual(response.url, reverse("admin:login"))
+        self.assertNotIn(PARTIAL_TOKEN_SESSION_NAME, self.client.session)
+        self.assertFalse(Partial.objects.exists())
+        self.assertEqual(self.client.get(completion_url).url, reverse("admin:login"))
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+    def test_native_oauth_state_validation_rejects_wrong_state(self):
+        self.validate_invitation()
+        self.client.post(self.register_url)
+        response = self.client.get(
+            self.callback_url, {"state": "wrong-state", "code": "valid-test-code"}
+        )
+        self.assertEqual(response.url, reverse("admin:login"))
+        self.assert_no_association()
 
     def test_deleted_target_during_oauth_is_rejected(self):
         self.validate_invitation()

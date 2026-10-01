@@ -162,6 +162,7 @@ MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else 
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "euphro_auth.middleware.UserLanguageMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "social_django.middleware.SocialAuthExceptionMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.csp.ContentSecurityPolicyMiddleware",
     "euphro_auth.middlewares.CGUAcceptanceMiddleware",
@@ -347,6 +348,7 @@ ORCID_USE_SANDBOX = os.getenv("ORCID_USE_SANDBOX", "false") == "true"
 SOCIAL_AUTH_FIELDS_STORED_IN_SESSION: list[str] = []
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/"
+SOCIAL_AUTH_ORCID_LOGIN_ERROR_URL = "/login/"
 SOCIAL_AUTH_ORCID_KEY = os.getenv("SOCIAL_AUTH_ORCID_KEY")
 SOCIAL_AUTH_ORCID_SECRET = os.getenv("SOCIAL_AUTH_ORCID_SECRET")
 SOCIAL_AUTH_PIPELINE = (
@@ -354,7 +356,7 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.social_uid",
     "social_core.pipeline.social_auth.auth_allowed",
     "orcid_oauth.pipeline.social_user",
-    "orcid_oauth.pipeline.associate_user",
+    "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
     "social_core.pipeline.user.user_details",
     "orcid_oauth.pipeline.complete_information",

@@ -17,9 +17,10 @@ from social_django.views import auth
 from euphro_auth.models import User
 
 from .invitations import (
+    INVITATION_SESSION_KEY,
+    registration_partial,
     reject_invitation,
     validated_invitation_user,
-    validated_registration_partial,
 )
 
 
@@ -29,7 +30,15 @@ from .invitations import (
 def begin_registration(request: HttpRequest) -> HttpResponse:
     if validated_invitation_user(request) is None:
         return reject_invitation(request)
-    return auth(request, backend="orcid")
+    # Let Social Auth create and validate the OAuth state; remember only which
+    # generated attempt belongs to this validated invitation.
+    request.session.pop("orcid_state", None)
+    response = auth(request, backend="orcid")
+    request.session[INVITATION_SESSION_KEY] = {
+        **request.session[INVITATION_SESSION_KEY],
+        "oauth_state": request.session["orcid_state"],
+    }
+    return response
 
 
 class UserCompleteAccountView(UpdateView):
@@ -45,13 +54,10 @@ class UserCompleteAccountView(UpdateView):
     def dispatch(
         self, request: HttpRequest, *args: Any, **kwargs: Any
     ) -> HttpResponseBase:
-        registration_partial = validated_registration_partial(request, kwargs["token"])
-        if (
-            registration_partial is None
-            or registration_partial.kwargs["user"].invitation_completed_at
-        ):
+        saved = registration_partial(request, kwargs["token"])
+        if saved is None or saved.kwargs["user"].invitation_completed_at:
             return reject_invitation(request)
-        self.registration_partial = registration_partial
+        self.registration_partial = saved
         return super().dispatch(request, *args, **kwargs)
 
     def get_partial(self) -> Partial:

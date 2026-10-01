@@ -10,8 +10,6 @@ from social_django.models import Partial, UserSocialAuth
 
 from euphro_auth.models import User
 
-from ...invitations import REGISTRATION_SESSION_KEY
-
 
 class TestUserCompleteAccountView(TestCase):
     def setUp(self) -> None:
@@ -40,13 +38,6 @@ class TestUserCompleteAccountView(TestCase):
         )
         session = self.client.session
         session[PARTIAL_TOKEN_SESSION_NAME] = partial.token
-        session[REGISTRATION_SESSION_KEY] = {
-            "user_id": self.user.pk,
-            "uid": social.uid,
-            "partial_token": partial.token,
-            "session_key": session.session_key,
-            "validated_at": int(timezone.now().timestamp()),
-        }
         session.save()
 
     def test_get_response_has_prefilled_inputs(self):

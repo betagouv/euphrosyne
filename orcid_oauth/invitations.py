@@ -1,4 +1,4 @@
-"""Server-only authority for ORCID invitation and registration continuations."""
+"""The invitation is the server-side authority for a new ORCID association."""
 
 from typing import TypedDict, cast
 
@@ -15,7 +15,6 @@ from social_django.utils import load_strategy
 from euphro_auth.models import User
 
 INVITATION_SESSION_KEY = "orcid_invitation"
-REGISTRATION_SESSION_KEY = "orcid_registration"
 CONTEXT_MAX_AGE = 15 * 60
 
 
@@ -27,26 +26,34 @@ class InvitationContext(TypedDict):
     oauth_state: str | None
 
 
-class RegistrationContext(TypedDict):
-    user_id: int
-    uid: str
-    partial_token: str
-    validated_at: int
-    session_key: str | None
-
-
 def clear_invitation(request: HttpRequest) -> None:
     request.session.pop(INVITATION_SESSION_KEY, None)
 
 
-def clear_registration(request: HttpRequest) -> None:
-    request.session.pop(REGISTRATION_SESSION_KEY, None)
-    request.session.pop(PARTIAL_TOKEN_SESSION_NAME, None)
+def clear_partial(request: HttpRequest) -> None:
+    strategy = load_strategy(request)
+    token = strategy.session_get(PARTIAL_TOKEN_SESSION_NAME)
+    if token:
+        strategy.clean_partial_pipeline(token)
+
+
+def registration_partial(request: HttpRequest, token: str) -> Partial | None:
+    # The custom form is outside Social Auth's callback view, so check the
+    # session-owned token before loading its server-stored partial.
+    if token != request.session.get(PARTIAL_TOKEN_SESSION_NAME):
+        return None
+    saved = load_strategy(request).partial_load(token)
+    if saved and saved.backend == "orcid":
+        age = (timezone.now() - saved.timestamp).total_seconds()
+        user = saved.kwargs.get("user")
+        social = saved.kwargs.get("social")
+        if 0 <= age < CONTEXT_MAX_AGE and user and user.is_active:
+            if social and social.user_id == user.pk:
+                return saved
+    return None
 
 
 def invitation_is_usable(user: User, token: str) -> bool:
-    # The existing invitation token remains the source of truth. An association
-    # also makes it unusable, even before the information form is completed.
     return bool(
         user.is_active
         and user.invitation_completed_at is None
@@ -57,11 +64,11 @@ def invitation_is_usable(user: User, token: str) -> bool:
 
 def store_invitation(request: HttpRequest, user: User, token: str) -> None:
     clear_invitation(request)
-    clear_registration(request)
+    clear_partial(request)
     if not invitation_is_usable(user, token):
         return
-    # Only a validated invitation link can cross this security boundary. Never
-    # derive the target from form fields or Python Social Auth's generic session.
+    # Only a validated invitation link can authorize a target. Browser fields
+    # and Python Social Auth's generic session fields never cross this boundary.
     request.session.cycle_key()
     context: InvitationContext = {
         "user_id": user.pk,
@@ -73,50 +80,39 @@ def store_invitation(request: HttpRequest, user: User, token: str) -> None:
     request.session[INVITATION_SESSION_KEY] = context
 
 
-def context_is_current(request: HttpRequest, context: object) -> bool:
-    if not isinstance(context, dict):
-        return False
-    issued_at = context.get("validated_at")
-    return bool(
-        isinstance(issued_at, int)
-        and not isinstance(issued_at, bool)
-        and 0 <= timezone.now().timestamp() - issued_at < CONTEXT_MAX_AGE
-        and context.get("session_key")
-        and context["session_key"] == request.session.session_key
-        and isinstance(context.get("user_id"), int)
-        and not isinstance(context.get("user_id"), bool)
-    )
-
-
 def validated_invitation_user(
     request: HttpRequest, *, for_callback: bool = False, lock: bool = False
 ) -> User | None:
     context = request.session.get(INVITATION_SESSION_KEY)
-    if context_is_current(request, context):
-        context = cast(InvitationContext, context)
-        users = User.objects.select_for_update() if lock else User.objects
-        user = users.filter(pk=context["user_id"]).first()
-        token = context.get("token")
-        state = context.get("oauth_state")
-        state_valid = not for_callback or bool(
-            state
-            and state == request.session.get("orcid_state")
-            and state == (request.GET.get("state") or request.POST.get("state"))
+    if isinstance(context, dict):
+        issued_at = context.get("validated_at")
+        current = (
+            isinstance(issued_at, int)
+            and 0 <= timezone.now().timestamp() - issued_at < CONTEXT_MAX_AGE
+            and context.get("session_key")
+            and context["session_key"] == request.session.session_key
+            and isinstance(context.get("user_id"), int)
+            and isinstance(context.get("token"), str)
         )
-        if (
-            user
-            and isinstance(token, str)
-            and invitation_is_usable(user, token)
-            and state_valid
-        ):
-            return user
+        # Social Auth validates the incoming OAuth state. Here we only bind its
+        # server-generated state to the invitation selected at signup start.
+        started = not for_callback or bool(
+            context.get("oauth_state")
+            and context["oauth_state"] == request.session.get("orcid_state")
+        )
+        if current and started:
+            context = cast(InvitationContext, context)
+            users = User.objects.select_for_update() if lock else User.objects
+            user = users.filter(pk=context["user_id"]).first()
+            if user and invitation_is_usable(user, context["token"]):
+                return user
     clear_invitation(request)
     return None
 
 
 def reject_invitation(request: HttpRequest) -> HttpResponseRedirect:
     clear_invitation(request)
-    clear_registration(request)
+    clear_partial(request)
     messages.warning(
         request,
         _(
@@ -125,48 +121,3 @@ def reject_invitation(request: HttpRequest) -> HttpResponseRedirect:
         ),
     )
     return redirect("admin:login")
-
-
-def store_registration(
-    request: HttpRequest, user: User, uid: str, partial_token: str
-) -> None:
-    # The pipeline has already authenticated this ORCID identity and associated
-    # it with the validated target. This continuation cannot authorize another
-    # association; it only permits completing that same account's information.
-    context: RegistrationContext = {
-        "user_id": user.pk,
-        "uid": uid,
-        "partial_token": partial_token,
-        "validated_at": int(timezone.now().timestamp()),
-        "session_key": request.session.session_key,
-    }
-    request.session[REGISTRATION_SESSION_KEY] = context
-
-
-def validated_registration_partial(request: HttpRequest, token: str) -> Partial | None:
-    context = request.session.get(REGISTRATION_SESSION_KEY)
-    if not context_is_current(request, context):
-        clear_registration(request)
-        return None
-    context = cast(RegistrationContext, context)
-    if (
-        context.get("partial_token") != token
-        or request.session.get(PARTIAL_TOKEN_SESSION_NAME) != token
-    ):
-        clear_registration(request)
-        return None
-    partial = load_strategy(request).partial_load(token)
-    if partial and partial.backend == "orcid":
-        user = partial.kwargs.get("user")
-        social = partial.kwargs.get("social")
-        if (
-            user
-            and user.is_active
-            and user.pk == context["user_id"]
-            and social
-            and social.user_id == user.pk
-        ):
-            if social.provider == "orcid" and social.uid == context.get("uid"):
-                return partial
-    clear_registration(request)
-    return None
