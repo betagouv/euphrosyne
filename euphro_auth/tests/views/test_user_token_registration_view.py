@@ -51,10 +51,7 @@ class TestUserTokenRegistrationView(TestCase):
         response = self.client.get(preresponse.headers["Location"])
         self.assertContains(
             response,
-            f'<form action="{reverse("social:begin", args=("orcid",))}" method="post">',
+            '<button class="orcid-link" type="submit" name="provider" value="orcid">',
         )
         self.assertContains(response, 'name="csrfmiddlewaretoken"')
-        self.assertContains(
-            response,
-            f'<input type="hidden" name="user_id" value="{self.user.pk}">',
-        )
+        self.assertNotContains(response, 'name="user_id"')

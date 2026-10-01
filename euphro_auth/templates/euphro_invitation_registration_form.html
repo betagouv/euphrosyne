@@ -50,17 +50,18 @@
         <input type="submit" value="{% translate 'Save my information' %}" class="fr-mb-4w">
 </form>
 
+{% if orcid_registration_available %}
 <div class="orcid-row">
     <h4>{% translate "Other registration providers" %}</h4>
-    <form action="{% url "social:begin" "orcid" %}" method="post">
+    <form method="post">
         {% csrf_token %}
-        <input type="hidden" name="user_id" value="{{ user_id }}">
         <img alt="ORCID logo" src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_24x24.png" width="24" height="24" />
-        <button class="orcid-link" type="submit">
+        <button class="orcid-link" type="submit" name="provider" value="orcid">
             {% translate 'Connect your ORCID ID' %}
         </button>
     </form>
 </div>
+{% endif %}
 
 {% else %}
 <p class="errornote">

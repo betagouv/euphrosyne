@@ -1,83 +1,62 @@
 from http import HTTPStatus
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-from django.test.testcases import TestCase
+from django.conf import settings
+from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from social_core.utils import PARTIAL_TOKEN_SESSION_NAME
+from social_django.models import Partial, UserSocialAuth
 
 from euphro_auth.models import User
-
-from ...views import UserCompleteAccountView
-
-
-class PartialMock:
-    kwargs = {
-        "user": User(
-            id=1,
-            email="test@test.test",
-        ),
-        "details": {
-            "first_name": "John",
-            "last_name": "Doe",
-        },
-    }
-    backend = "orcid"
 
 
 class TestUserCompleteAccountView(TestCase):
     def setUp(self) -> None:
-        self.view_url = reverse(
-            "complete_registration_orcid", kwargs={"token": "token"}
+        self.user = User.objects.create(email="test@test.test")
+        social = UserSocialAuth.objects.create(
+            user=self.user, provider="orcid", uid="0000-0001-2345-6789"
         )
+        partial = Partial.prepare(
+            "orcid",
+            settings.SOCIAL_AUTH_PIPELINE.index(
+                "orcid_oauth.pipeline.complete_information"
+            ),
+            {
+                "args": [],
+                "kwargs": {
+                    "user": self.user.pk,
+                    "social": {"provider": "orcid", "uid": social.uid},
+                    "uid": social.uid,
+                    "details": {"first_name": "John", "last_name": "Doe"},
+                },
+            },
+        )
+        partial.save()
+        self.view_url = reverse(
+            "complete_registration_orcid", kwargs={"token": partial.token}
+        )
+        session = self.client.session
+        session[PARTIAL_TOKEN_SESSION_NAME] = partial.token
+        session.save()
 
-    @patch.object(
-        UserCompleteAccountView,
-        "get_partial",
-        new=MagicMock(return_value=PartialMock()),
-    )
     def test_get_response_has_prefilled_inputs(self):
         response = self.client.get(self.view_url)
-        content = str(response.content)
-        assert (
-            '<input type="text" name="first_name" value="John" maxlength="150" '
-            'required id="id_first_name"'
-        ) in content
-        assert (
-            '<input type="text" name="last_name" value="Doe" maxlength="150" '
-            'required id="id_last_name"'
-        ) in content
+        self.assertContains(response, 'name="first_name" value="John"')
+        self.assertContains(response, 'name="last_name" value="Doe"')
+        self.assertContains(response, 'name="email" value="test@test.test"')
 
-        assert (
-            '<input type="email" name="email" value="test@test.test" maxlength="254" '
-            'required id="id_email"'
-        ) in content
-
-    @patch.object(
-        UserCompleteAccountView,
-        "get_partial",
-        new=MagicMock(return_value=PartialMock()),
-    )
     def test_post_response_redirects(self):
         response = self.client.post(
             self.view_url,
-            data={
-                "email": "test@test.test",
-                "first_name": "John",
-                "last_name": "Doe",
-            },
+            data={"email": "test@test.test", "first_name": "John", "last_name": "Doe"},
         )
-        assert response.status_code == HTTPStatus.FOUND
-        assert response.url == reverse("social:complete", args=("orcid",))
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        self.assertEqual(response.url, reverse("social:complete", args=("orcid",)))
 
-    @patch.object(
-        UserCompleteAccountView,
-        "get_partial",
-        new=MagicMock(return_value=PartialMock()),
-    )
     def test_view_set_additional_values(self):
         now = timezone.now()
-        with patch("orcid_oauth.views.timezone") as timezone_mock:
-            timezone_mock.now.return_value = now
+        with patch("orcid_oauth.views.timezone.now", return_value=now):
             self.client.post(
                 self.view_url,
                 data={
@@ -86,10 +65,8 @@ class TestUserCompleteAccountView(TestCase):
                     "last_name": "Sparrow",
                 },
             )
-
-        user = User.objects.get(email="test@test.test")
-
-        assert user.first_name == "Jack"
-        assert user.last_name == "Sparrow"
-        assert user.is_staff
-        assert user.invitation_completed_at == now
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.first_name, "Jack")
+        self.assertEqual(self.user.last_name, "Sparrow")
+        self.assertTrue(self.user.is_staff)
+        self.assertEqual(self.user.invitation_completed_at, now)

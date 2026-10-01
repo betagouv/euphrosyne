@@ -1749,6 +1749,13 @@ msgid "Date"
 msgstr "Date"
 
 msgid ""
+"Your ORCID registration invitation is invalid or has expired. Please reopen "
+"a valid invitation link."
+msgstr ""
+"Votre invitation à vous inscrire avec ORCID est invalide ou a expiré. "
+"Veuillez rouvrir un lien d'invitation valide."
+
+msgid ""
 "Your ORCID account isn't connected to an existing account. Please use email/"
 "password to sign in, or register with ORCID first using the link you "
 "received in the invitation email."

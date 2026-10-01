@@ -162,6 +162,7 @@ MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else 
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "euphro_auth.middleware.UserLanguageMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "social_django.middleware.SocialAuthExceptionMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.csp.ContentSecurityPolicyMiddleware",
     "euphro_auth.middlewares.CGUAcceptanceMiddleware",
@@ -344,9 +345,10 @@ AUTH_USER_MODEL = "euphro_auth.User"
 
 ORCID_USE_SANDBOX = os.getenv("ORCID_USE_SANDBOX", "false") == "true"
 
-SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ["user_id"]
+SOCIAL_AUTH_FIELDS_STORED_IN_SESSION: list[str] = []
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/"
+SOCIAL_AUTH_ORCID_LOGIN_ERROR_URL = "/login/"
 SOCIAL_AUTH_ORCID_KEY = os.getenv("SOCIAL_AUTH_ORCID_KEY")
 SOCIAL_AUTH_ORCID_SECRET = os.getenv("SOCIAL_AUTH_ORCID_SECRET")
 SOCIAL_AUTH_PIPELINE = (
