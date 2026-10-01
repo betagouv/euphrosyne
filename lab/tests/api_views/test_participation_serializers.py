@@ -33,6 +33,8 @@ class TestParticipationSerializer(TestCase):
 
         participation = serializer.save(project=project)
         assert participation.user.email == "newuser@test.test"
+        participation.user.refresh_from_db()
+        assert participation.user.is_staff
         assert participation.institution.name == "New Institution"
         assert participation.institution.country == "France"
         assert participation.institution.ror_id == "123"
@@ -62,6 +64,8 @@ class TestParticipationSerializer(TestCase):
 
         participation = serializer.save(project=project)
         assert participation.user == existing_user
+        existing_user.refresh_from_db()
+        assert not existing_user.is_staff
 
         # Existing user should not get invitation email, only project invitation
         mock_send_invitation.assert_not_called()
@@ -141,6 +145,8 @@ class TestOnPremisesParticipationSerializer(TestCase):
 
         participation = serializer.save(project=project)
         assert participation.user.email == "newuser@test.test"
+        participation.user.refresh_from_db()
+        assert participation.user.is_staff
         assert participation.employer is not None
         assert participation.employer.email == "employer@test.test"
         assert participation.employer.first_name == "John"
@@ -223,6 +229,8 @@ class TestOnPremisesParticipationSerializer(TestCase):
 
         updated_participation = serializer.save()
         assert updated_participation.user.email == "newemail@test.test"
+        updated_participation.user.refresh_from_db()
+        assert updated_participation.user.is_staff
 
         # Should send project invitation to the new user
         mock_send_project_invitation.assert_called_once_with(
