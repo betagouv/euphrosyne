@@ -1760,6 +1760,13 @@ msgstr ""
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"
 
+msgid ""
+"Your ORCID registration invitation is invalid or has expired. Please reopen a "
+"valid invitation link."
+msgstr ""
+"Votre invitation à vous inscrire avec ORCID est invalide ou a expiré. Veuillez "
+"rouvrir un lien d'invitation valide."
+
 msgid "Related electrical signature process"
 msgstr "Processus de signature électronique associé"
 

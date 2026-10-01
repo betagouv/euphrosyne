@@ -344,7 +344,7 @@ AUTH_USER_MODEL = "euphro_auth.User"
 
 ORCID_USE_SANDBOX = os.getenv("ORCID_USE_SANDBOX", "false") == "true"
 
-SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ["user_id"]
+SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = []
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/"
 SOCIAL_AUTH_ORCID_KEY = os.getenv("SOCIAL_AUTH_ORCID_KEY")
@@ -354,7 +354,7 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.social_uid",
     "social_core.pipeline.social_auth.auth_allowed",
     "orcid_oauth.pipeline.social_user",
-    "social_core.pipeline.social_auth.associate_user",
+    "orcid_oauth.pipeline.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
     "social_core.pipeline.user.user_details",
     "orcid_oauth.pipeline.complete_information",

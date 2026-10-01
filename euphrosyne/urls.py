@@ -23,7 +23,7 @@ from django.views.i18n import JavaScriptCatalog
 
 from euphro_auth.views import UserTokenRegistrationView, cgu_acceptance_view
 from lab.participations.views import complete_employer_information
-from orcid_oauth.views import UserCompleteAccountView
+from orcid_oauth.views import UserCompleteAccountView, begin_registration
 
 urlpatterns = [
     path("", include("social_django.urls")),
@@ -52,6 +52,11 @@ urlpatterns = [
         "registration/<uidb64>/<token>/",
         UserTokenRegistrationView.as_view(),
         name="registration_token",
+    ),
+    path(
+        "registration/orcid/",
+        begin_registration,
+        name="begin_registration_orcid",
     ),
     path(
         "registration/orcid/verify/<token>",
