@@ -35,7 +35,10 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
         )
         self.invited = User.objects.create(pk=2, email="invited@example.com")
         self.begin_url = reverse("social:begin", args=("orcid",))
-        self.register_url = reverse("begin_registration_orcid")
+        self.register_url = reverse(
+            "registration_token",
+            args=(urlsafe_base64_encode(force_bytes(self.invited.pk)), "registration"),
+        )
         self.callback_url = reverse("social:complete", args=("orcid",))
 
     def invitation_url(self, user: User, token: str | None = None) -> str:
@@ -51,6 +54,12 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
         response = self.client.get(self.invitation_url(user or self.invited))
         self.assertEqual(response.status_code, 302)
         self.assertIn(INVITATION_SESSION_KEY, self.client.session)
+        self.register_url = response.headers["Location"]
+
+    def start_registration(self, data: dict | None = None):
+        return self.client.post(
+            self.register_url, {"provider": "orcid", **(data or {})}
+        )
 
     def callback(self, uid: str = "0000-0002-1234-5678", *, data: dict | None = None):
         # Only remote ORCID responses are mocked. OAuth state validation, the
@@ -124,10 +133,45 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
         self.assert_no_association()
 
     def test_registration_start_requires_valid_context(self):
-        response = self.client.post(self.register_url, {"user_id": "1"})
+        self.validate_invitation()
+        session = self.client.session
+        session.pop(INVITATION_SESSION_KEY)
+        session.save()
+        response = self.start_registration({"user_id": "1"})
         self.assertEqual(response.url, reverse("admin:login"))
         self.assert_no_association()
-        self.assertEqual(self.client.get(self.register_url).status_code, 405)
+        self.assertEqual(
+            self.client.get(self.register_url, {"provider": "orcid"}).status_code, 200
+        )
+        self.assertNotIn("orcid_state", self.client.session)
+
+    def test_orcid_post_without_a_validated_invitation_link_is_rejected(self):
+        response = self.start_registration({"user_id": "1"})
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context["validlink"])
+        self.assertNotIn("orcid_state", self.client.session)
+        self.assert_no_association()
+
+    def test_orcid_post_cannot_change_the_invitation_page_uid(self):
+        self.validate_invitation()
+        other_page = reverse(
+            "registration_token",
+            args=(urlsafe_base64_encode(force_bytes(self.victim.pk)), "registration"),
+        )
+        response = self.client.post(other_page, {"provider": "orcid"})
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(INVITATION_SESSION_KEY, self.client.session)
+        self.assertNotIn("orcid_state", self.client.session)
+        self.assert_no_association()
+
+    def test_orcid_post_requires_the_invitation_forms_csrf_token(self):
+        client = Client(enforce_csrf_checks=True)
+        page = client.get(self.invitation_url(self.invited)).url
+        client.get(page)
+        response = client.post(page, {"provider": "orcid"})
+        self.assertEqual(response.status_code, 403)
+        self.assertNotIn("orcid_state", client.session)
+        self.assertFalse(UserSocialAuth.objects.exists())
 
     def test_unknown_orcid_cannot_associate_authenticated_browser_user(self):
         self.client.force_login(self.victim)
@@ -166,7 +210,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
         original_key = self.client.session.session_key
         self.validate_invitation()
         self.assertNotEqual(self.client.session.session_key, original_key)
-        self.client.post(self.register_url)
+        self.start_registration()
         response = self.callback()
         self.assertIn("/registration/orcid/verify/", response.url)
         self.assertEqual(UserSocialAuth.objects.get().user_id, self.invited.pk)
@@ -176,7 +220,9 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
     def test_form_and_callback_identifiers_cannot_change_validated_target(self):
         self.validate_invitation()
         forged = {"user_id": "1", "uid": "1", "email": self.victim.email}
-        self.client.post(f"{self.register_url}?user_id=1", forged)
+        self.client.post(
+            f"{self.register_url}?user_id=1", {"provider": "orcid", **forged}
+        )
         self.callback(data=forged)
         self.assertEqual(UserSocialAuth.objects.get().user_id, self.invited.pk)
         self.assertFalse(UserSocialAuth.objects.filter(user=self.victim).exists())
@@ -198,14 +244,14 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
                     **changes,
                 }
                 session.save()
-                response = self.client.post(self.register_url)
+                response = self.start_registration()
                 self.assertEqual(response.url, reverse("admin:login"))
                 self.assertNotIn(INVITATION_SESSION_KEY, self.client.session)
                 self.assert_no_association()
 
     def test_context_is_rechecked_at_callback(self):
         self.validate_invitation()
-        self.client.post(self.register_url)
+        self.start_registration()
         session = self.client.session
         session[INVITATION_SESSION_KEY] = {
             **session[INVITATION_SESSION_KEY],
@@ -220,25 +266,26 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
     def test_invitation_context_cannot_be_transferred_to_another_session(self):
         self.validate_invitation()
         other_client = Client()
+        other_client.get(self.invitation_url(self.invited))
         session = other_client.session
         session[INVITATION_SESSION_KEY] = deepcopy(
             self.client.session[INVITATION_SESSION_KEY]
         )
         session.save()
-        response = other_client.post(self.register_url)
+        response = other_client.post(self.register_url, {"provider": "orcid"})
         self.assertEqual(response.url, reverse("admin:login"))
         self.assertNotIn(INVITATION_SESSION_KEY, other_client.session)
         self.assert_no_association()
 
     def test_context_is_single_use_even_with_an_old_session_snapshot(self):
         self.validate_invitation()
-        self.client.post(self.register_url)
+        self.start_registration()
         old_context = deepcopy(self.client.session[INVITATION_SESSION_KEY])
         self.callback()
         session = self.client.session
         session[INVITATION_SESSION_KEY] = old_context
         session.save()
-        response = self.client.post(self.register_url)
+        response = self.start_registration()
         self.assertEqual(response.url, reverse("admin:login"))
         self.assertNotIn(INVITATION_SESSION_KEY, self.client.session)
         self.client.post(self.begin_url)
@@ -258,7 +305,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
 
     def test_invitation_completed_during_oauth_is_rejected(self):
         self.validate_invitation()
-        self.client.post(self.register_url)
+        self.start_registration()
         self.invited.invitation_completed_at = timezone.now()
         self.invited.save()
         self.callback()
@@ -266,7 +313,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
 
     def test_changed_invitation_token_during_oauth_is_rejected(self):
         self.validate_invitation()
-        self.client.post(self.register_url)
+        self.start_registration()
         self.invited.set_password("changed-password")
         self.invited.save()
         self.callback()
@@ -274,7 +321,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
 
     def test_opening_another_link_during_oauth_cannot_change_target(self):
         self.validate_invitation()
-        self.client.post(self.register_url)
+        self.start_registration()
         self.validate_invitation(self.victim)
         self.callback()
         self.assert_no_association()
@@ -284,7 +331,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
             user=self.victim, provider="orcid", uid="0000-0002-1234-5678"
         )
         self.validate_invitation()
-        self.client.post(self.register_url)
+        self.start_registration()
         response = self.callback()
         self.assertEqual(response.url, reverse("admin:login"))
         self.assertEqual(UserSocialAuth.objects.get().user_id, self.victim.pk)
@@ -306,7 +353,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
 
     def test_registration_completion_and_callback_authenticate_only_invited_user(self):
         self.validate_invitation()
-        self.client.post(self.register_url, {"user_id": "1"})
+        self.start_registration({"user_id": "1"})
         completion_url = self.callback().url
         self.assertEqual(self.client.get(completion_url).status_code, 200)
         self.client.post(
@@ -326,7 +373,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
 
     def test_partial_form_cannot_be_used_in_another_session(self):
         self.validate_invitation()
-        self.client.post(self.register_url)
+        self.start_registration()
         completion_url = self.callback().url
         other_client = Client()
         response = other_client.post(
@@ -344,7 +391,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
 
     def test_native_partial_cannot_be_resumed_from_another_session(self):
         self.validate_invitation()
-        self.client.post(self.register_url)
+        self.start_registration()
         completion_url = self.callback().url
         other_client = Client()
         self.assertEqual(other_client.get(completion_url).url, reverse("admin:login"))
@@ -356,7 +403,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
 
     def test_expired_registration_continuation_cannot_modify_account(self):
         self.validate_invitation()
-        self.client.post(self.register_url)
+        self.start_registration()
         completion_url = self.callback().url
         Partial.objects.filter(
             token=self.client.session[PARTIAL_TOKEN_SESSION_NAME]
@@ -377,7 +424,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
 
     def test_native_partial_resume_cannot_substitute_authenticated_browser_user(self):
         self.validate_invitation()
-        self.client.post(self.register_url)
+        self.start_registration()
         completion_url = self.callback().url
         self.client.post(
             completion_url,
@@ -395,7 +442,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
 
     def test_expired_native_partial_cannot_be_resumed_or_renewed(self):
         self.validate_invitation()
-        self.client.post(self.register_url)
+        self.start_registration()
         completion_url = self.callback().url
         token = self.client.session[PARTIAL_TOKEN_SESSION_NAME]
         Partial.objects.filter(token=token).update(
@@ -410,7 +457,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
 
     def test_native_oauth_state_validation_rejects_wrong_state(self):
         self.validate_invitation()
-        self.client.post(self.register_url)
+        self.start_registration()
         response = self.client.get(
             self.callback_url, {"state": "wrong-state", "code": "valid-test-code"}
         )
@@ -419,7 +466,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
 
     def test_deleted_target_during_oauth_is_rejected(self):
         self.validate_invitation()
-        self.client.post(self.register_url)
+        self.start_registration()
         User.objects.filter(pk=self.invited.pk).delete()
         response = self.callback()
         self.assertEqual(response.url, reverse("admin:login"))
