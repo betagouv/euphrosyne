@@ -83,7 +83,7 @@ class ProjectMembershipRequiredMixin(Generic[T], IsAdminUser):
             raise PermissionDenied()
 
 
-class IsLeaderOrReadOnlyMixin(ProjectMembershipRequiredMixin):
+class IsLeaderOrReadOnlyMixin(ProjectMembershipRequiredMixin[T]):
     def get_related_project(self, obj: T | None = None) -> Optional[Project]:
         raise NotImplementedError()
 

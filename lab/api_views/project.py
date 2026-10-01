@@ -76,7 +76,7 @@ class UpcomingProjectList(generics.ListAPIView):
 
 # pylint: disable=too-many-ancestors
 class ProjectParticipationListCreateGroupView(
-    IsLeaderOrReadOnlyMixin, MemberParticipationListCreateGroupView
+    IsLeaderOrReadOnlyMixin[Participation], MemberParticipationListCreateGroupView
 ):
     def get_related_project(self, obj: Participation | None = None) -> Project | None:
         if obj:
@@ -128,7 +128,8 @@ class ProjectRemoteParticipationListCreateGroupView(
 
 
 class ProjectParticipationRetrieveUpdateDestroyGroupView(
-    IsLeaderOrReadOnlyMixin, MemberParticipationRetrieveUpdateDestroyGroupView
+    IsLeaderOrReadOnlyMixin[Participation],
+    MemberParticipationRetrieveUpdateDestroyGroupView,
 ):
     permission_classes = [IsAdminUser]
 
