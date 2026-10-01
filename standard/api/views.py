@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAdminUser
@@ -35,7 +36,7 @@ class RunMeasuringPointStandardView(  # pylint: disable=too-many-ancestors
     ) -> lab_models.Project | None:
         run_id = self.kwargs["run_id"]
         # pylint: disable=protected-access
-        return lab_models.Run.objects.get(id=run_id).project
+        return get_object_or_404(lab_models.Run, id=run_id).project
 
 
 class MeasuringPointStandardView(  # pylint: disable=too-many-ancestors
@@ -57,7 +58,9 @@ class MeasuringPointStandardView(  # pylint: disable=too-many-ancestors
         if not obj:
             point_id = self.kwargs["measuring_point_id"]
             # pylint: disable=protected-access
-            return MeasuringPoint._base_manager.get(id=point_id).run.project
+            return get_object_or_404(
+                MeasuringPoint._base_manager, id=point_id
+            ).run.project
         return obj.measuring_point.run.project if obj else None
 
     def perform_create(self, serializer):

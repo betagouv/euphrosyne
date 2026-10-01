@@ -3,6 +3,7 @@ from rest_framework import generics
 
 from lab.api_views.permissions import ProjectMembershipRequiredMixin
 from lab.projects.models import Project
+from lab.runs.models import Run
 
 from ...models import RunNotebook
 from . import serializers
@@ -16,7 +17,7 @@ class RunNotebookView(ProjectMembershipRequiredMixin, generics.UpdateAPIView):
 
     def get_related_project(self, obj: RunNotebook | None = None) -> Project | None:
         if not obj:
-            return None
+            return get_object_or_404(Run, id=self.kwargs["run_id"]).project
         return obj.run.project if obj else None
 
     def get_object(self):

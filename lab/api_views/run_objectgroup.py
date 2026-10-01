@@ -1,11 +1,13 @@
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from rest_framework import generics
 from rest_framework.permissions import IsAdminUser
 
 from .. import models
 from ..permissions import is_lab_admin
 from . import serializers
+from .permissions import ProjectMembershipRequiredMixin
 
 
 class RunObjectGroupMixin:
@@ -81,8 +83,19 @@ class RunObjectGroupAvailableListView(RunObjectGroupMixin, generics.ListAPIView)
         )
 
 
-class RunObjectGroupImagesView(generics.ListCreateAPIView):
+class RunObjectGroupImagesView(
+    ProjectMembershipRequiredMixin, generics.ListCreateAPIView
+):
     serializer_class = serializers.RunObjectGroupImageSerializer
+
+    def get_related_project(self, obj=None):
+        if obj:
+            return obj.run_object_group.run.project
+        group = get_object_or_404(
+            models.Run.run_object_groups.through,
+            id=self.kwargs["run_object_group_id"],
+        )
+        return group.run.project
 
     def get_queryset(self):
         run_object_group_id = self.kwargs["run_object_group_id"]

@@ -46,17 +46,39 @@ class IsProjectMemberOrLabAdminOrEuphrosyneBackend(BasePermission):
 
 
 class ProjectMembershipRequiredMixin(Generic[T], IsAdminUser):
+    """Check the URL's parent project before list/create and each fetched object.
+
+    Views must also resolve get_related_project() when no object is supplied.
+    """
+
+    permission_classes = [IsAdminUser]
+
     def get_related_project(self, obj: T | None = None) -> Optional[Project]:
         raise NotImplementedError()
 
+    def has_permission(self, request, view):
+        return super().has_permission(request, view) and self.has_object_permission(
+            request, view, None
+        )
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+        if not self.has_permission(request, self):
+            raise PermissionDenied()
+
     def has_object_permission(self, request, view, obj):
-        project = self.get_related_project(obj)
-        return super().has_object_permission(request, view, obj) and (
-            is_lab_admin(request.user)
-            or project.participation_set.filter(user=request.user).exists()
+        project = view.get_related_project(obj)
+        return (
+            project is not None
+            and super().has_object_permission(request, view, obj)
+            and (
+                is_lab_admin(request.user)
+                or project.participation_set.filter(user=request.user).exists()
+            )
         )
 
     def check_object_permissions(self, request, obj):
+        super().check_object_permissions(request, obj)
         if not self.has_object_permission(request, self, obj):
             raise PermissionDenied()
 
@@ -68,6 +90,7 @@ class IsLeaderOrReadOnlyMixin(ProjectMembershipRequiredMixin):
     def has_object_permission(self, request, view, obj):
         if request.method in SAFE_METHODS:
             return super().has_object_permission(request, view, obj)
-        return is_lab_admin(request.user) or is_project_leader(
-            request.user, self.get_related_project(obj)
+        project = view.get_related_project(obj)
+        return project is not None and (
+            is_lab_admin(request.user) or is_project_leader(request.user, project)
         )
