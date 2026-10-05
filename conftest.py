@@ -31,7 +31,8 @@ def mock_requests():
         delete=mock.DEFAULT,
         patch=mock.DEFAULT,
     )
-    patcher.start()
+    mocks = patcher.start()
+    mocks["post"].return_value.status_code = 200
     yield
     patcher.stop()
 
