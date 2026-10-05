@@ -34,13 +34,15 @@ class PDFExportTestCase(TestCase):
         # Verify permission denied
         assert response.status_code == 403
 
+    @mock.patch("lab_notebook.pdf_export.views.get_storage_info_for_project_images")
     @mock.patch("lab_notebook.pdf_export.views._prepare_images")
     @mock.patch("lab_notebook.pdf_export.views.create_pdf")
     def test_export_notebook_to_pdf_view__valid_request(
-        self, create_pdf_mock, prepare_images_mock
+        self, create_pdf_mock, prepare_images_mock, storage_info_mock
     ):
         """Test a valid request to the export PDF view"""
         # Setup mocks
+        storage_info_mock.return_value = {"base_url": "https://storage/", "token": ""}
         prepare_images_mock.return_value = [
             {
                 "file_name": "image.png",
@@ -201,7 +203,7 @@ class PDFExportFunctionTestCase(TestCase):
 
         # Call function
         result_run, result_images, result_storage_info, result_points = _get_run_data(
-            run.id
+            run
         )
 
         # Assertions

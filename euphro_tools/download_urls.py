@@ -2,9 +2,11 @@
 
 import typing
 from datetime import datetime
-from urllib.parse import urlencode
+from urllib.parse import quote, urlencode
 
 import requests
+
+from shared.http import DownloadError, get_download_response
 
 from .exceptions import EuphroToolsException
 from .utils import build_tools_api_url, get_run_data_path, get_tools_api_auth_header
@@ -61,14 +63,24 @@ def get_storage_info_for_project_images(
     project_slug: str,
 ) -> GetUrlAndTokenForProjectImagesResponse:
     """Get a download URL and token for a project's images."""
-    url = build_tools_api_url(f"/images/projects/{project_slug}/signed-url")
+    url = build_tools_api_url(
+        f"/images/projects/{quote(project_slug, safe='')}/signed-url"
+    )
     try:
-        request = requests.get(
+        request = get_download_response(
             url,
+            allowed_origins=[build_tools_api_url("/")],
             timeout=5,
             headers=get_tools_api_auth_header(),
         )
-        request.raise_for_status()
-    except (requests.HTTPError, requests.ConnectionError) as error:
-        raise EuphroToolsException from error
-    return request.json()
+        try:
+            data = request.json()
+        finally:
+            request.close()
+    except (DownloadError, ValueError):
+        raise EuphroToolsException from None
+    if not isinstance(data, dict) or not all(
+        isinstance(data.get(key), str) for key in ("base_url", "token")
+    ):
+        raise EuphroToolsException
+    return typing.cast(GetUrlAndTokenForProjectImagesResponse, data)

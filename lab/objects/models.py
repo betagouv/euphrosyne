@@ -1,3 +1,5 @@
+import typing
+
 from django.contrib.postgres.fields import ArrayField
 from django.core.files.storage import storages
 from django.db import models
@@ -228,19 +230,27 @@ class RunObjetGroupImage(TimestampedModel):
         return self.path.rsplit("/", maxsplit=1)[-1].split("?")[0]
 
 
+def get_image_provider_from_path(path: str) -> typing.Literal["azure", "eros", "pop"]:
+    if (
+        path.startswith("C2RMF") or path.startswith("FZ") or path.startswith("F")
+    ) and len(path.split("/")) == 2:
+        return "eros"
+
+    if path.startswith("/iiif/3/joconde"):
+        return "pop"
+
+    return "azure"
+
+
 def construct_image_url_from_path(
     path: str, storage_base_url: str, storage_token: str | None = None
 ) -> str:
     # pylint: disable=import-outside-toplevel
     from .providers import construct_image_url
 
-    if (
-        path.startswith("C2RMF") or path.startswith("FZ") or path.startswith("F")
-    ) and len(path.split("/")) == 2:
-        return construct_image_url("eros", path)
-
-    if path.startswith("/iiif/3/joconde"):
-        return construct_image_url("pop", path)
+    provider = get_image_provider_from_path(path)
+    if provider != "azure":
+        return construct_image_url(provider, path)
 
     return (
         f"{storage_base_url}{path}?{storage_token}"

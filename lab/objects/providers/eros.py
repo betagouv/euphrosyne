@@ -1,6 +1,7 @@
 import os
 import typing
 from functools import lru_cache
+from urllib.parse import quote
 
 import requests
 from django.conf import settings
@@ -130,6 +131,9 @@ class ErosProvider(ObjectProvider):
             settings.EROS_BASE_IMAGE_URL or f"{settings.EUPHROSYNE_TOOLS_API_URL}/eros"
         )
 
+        eros_id = quote(eros_id, safe="")
+        image_id = quote(image_id, safe="")
+        image_category = quote(image_category, safe="")
         url = f"{eros_base_url}/iiif/{image_category}/{eros_id}/{image_id}.tif/full/500,/0/default.jpg"  # pylint: disable=line-too-long
 
         # Add token to the URL if using EROS direct URL. Else we use the EuphroTools API

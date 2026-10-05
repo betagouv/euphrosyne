@@ -73,6 +73,12 @@ You can copy this file to a new `.env` file to easily set up your environment.
 | SOCIAL_AUTH_ORCID_KEY                               | ORCID application credentials for user authentication                                                                                                                                                                                             |
 | SOCIAL_AUTH_ORCID_SECRET                            | ORCID application credentials for user authentication                                                                                                                                                                                             |
 
+PDF exports restrict image downloads to the configured provider origins.
+Configure `PDF_EXPORT_AZURE_IMAGE_ORIGINS` with the exact HTTPS origins of the
+Azure accounts used by Tools API before deployment; the default denies Azure
+image downloads. See [the PDF download policy](docs/pdf_export_download_policy.md)
+for EROS, POP, redirects and audit traceability.
+
 ### Optional modules
 
 Euphrosyne ships optional modules that can be enabled per instance. By default all optional modules are enabled.
