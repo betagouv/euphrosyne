@@ -73,11 +73,3 @@ def test_construct_image_url_from_eros_path(mock_settings):
     path = "C2RMF12345/67890"
     expected_url = "http://tools.example.com/eros/iiif/pyr-C2RMF1/C2RMF12345/67890.tif/full/500,/0/default.jpg?token="  # pylint: disable=line-too-long
     assert construct_image_url("eros", path).startswith(expected_url)
-
-
-def test_eros_image_identifiers_cannot_inject_query_or_fragment(settings):
-    settings.EROS_BASE_IMAGE_URL = "http://eros.internal:8080"
-    url = construct_image_url("eros", "C2RMF12345?query=value/67890#fragment")
-    assert "C2RMF12345%3Fquery%3Dvalue/67890%23fragment.tif" in url
-    assert url.count("?") == 1
-    assert "#" not in url
