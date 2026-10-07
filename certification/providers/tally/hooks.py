@@ -44,7 +44,6 @@ def _validate_signature(request: HttpRequest, secret_key: str | None) -> bool:
 
 
 # Server-to-server webhook: HMAC authenticates the raw body before any side effect.
-# See README.md for the justification of both CSRF exemptions and deployment checks.
 @csrf_exempt
 @require_POST
 def tally_webhook(
