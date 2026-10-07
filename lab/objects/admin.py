@@ -15,6 +15,7 @@ from django.http.request import HttpRequest
 from django.template.response import TemplateResponse
 from django.utils.datastructures import MultiValueDict
 from django.utils.html import format_html
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
 
 from lab.models import Project, Run
@@ -441,8 +442,14 @@ class ObjectGroupAdmin(ModelAdmin):
         self, request: HttpRequest, obj: AnnotatedObjectGroup
     ) -> HttpResponse:
         response = super().response_change(request, obj)
-        if "next" in request.GET:
-            return HttpResponseRedirect(request.GET["next"])
+        next_url = request.GET.get("next", "")
+        # Return links use root-relative paths; never accept a host or backslashes.
+        if (
+            next_url.startswith("/")
+            and "\\" not in next_url
+            and url_has_allowed_host_and_scheme(next_url, allowed_hosts=set())
+        ):
+            return HttpResponseRedirect(next_url)
         return response
 
     @admin.display(description=_("# in projects"), ordering="runs_project_count")
