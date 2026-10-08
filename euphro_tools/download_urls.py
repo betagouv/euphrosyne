@@ -50,25 +50,3 @@ def fetch_token_for_run_data(
     except (requests.HTTPError, requests.ConnectionError) as error:
         raise EuphroToolsException from error
     return request.json()["token"]
-
-
-class GetUrlAndTokenForProjectImagesResponse(typing.TypedDict):
-    base_url: str
-    token: str
-
-
-def get_storage_info_for_project_images(
-    project_slug: str,
-) -> GetUrlAndTokenForProjectImagesResponse:
-    """Get a download URL and token for a project's images."""
-    url = build_tools_api_url(f"/images/projects/{project_slug}/signed-url")
-    try:
-        request = requests.get(
-            url,
-            timeout=5,
-            headers=get_tools_api_auth_header(),
-        )
-        request.raise_for_status()
-    except (requests.HTTPError, requests.ConnectionError) as error:
-        raise EuphroToolsException from error
-    return request.json()

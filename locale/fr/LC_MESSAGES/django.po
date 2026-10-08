@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-12 10:39+0200\n"
+"POT-Creation-Date: 2026-10-07 15:58+0200\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -1691,43 +1691,8 @@ msgstr "Gestion des données"
 msgid "Loading"
 msgstr "Chargement"
 
-#, python-format
-msgid "Project: %s"
-msgstr "Projet: %s"
-
-#, python-format
-msgid "Run: %s"
-msgstr "Run: %s"
-
-msgid ":"
-msgstr " :"
-
-msgid "Detector"
-msgstr "Détecteur"
-
-msgid "Table of contents"
-msgstr "Table des matières"
-
-msgid "Run images with point locations"
-msgstr "Images du run avec localisation des points"
-
-msgid "Measuring points"
-msgstr "Points de mesure"
-
-msgid "Analysis type"
-msgstr "Type d'analyse"
-
-msgid "Reference"
-msgstr "Référence"
-
-msgid "Standard"
-msgstr "Standard"
-
 msgid "Notebook"
 msgstr "Cahier de laboratoire"
-
-msgid "Export"
-msgstr "Export"
 
 msgid "Timestamp request"
 msgstr "Requête d'horodatage"
@@ -1747,6 +1712,13 @@ msgstr "Objet"
 
 msgid "Date"
 msgstr "Date"
+
+msgid ""
+"Your ORCID registration invitation is invalid or has expired. Please reopen "
+"a valid invitation link."
+msgstr ""
+"Votre invitation à vous inscrire avec ORCID est invalide ou a expiré. "
+"Veuillez rouvrir un lien d'invitation valide."
 
 msgid ""
 "Your ORCID account isn't connected to an existing account. Please use email/"

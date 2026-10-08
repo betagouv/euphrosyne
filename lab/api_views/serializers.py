@@ -334,7 +334,9 @@ class ParticipationSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
     def _handle_user_data(self, user_data: dict) -> User:
-        user, created = get_user_model().objects.get_or_create(email=user_data["email"])
+        user, created = get_user_model().objects.get_or_create(
+            email=user_data["email"], defaults={"is_staff": True}
+        )
         if created:
             send_invitation_email(user)
         return user

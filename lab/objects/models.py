@@ -226,24 +226,3 @@ class RunObjetGroupImage(TimestampedModel):
             image_id = self.path.split("/")[1]
             return f"{image_id}.tiff"
         return self.path.rsplit("/", maxsplit=1)[-1].split("?")[0]
-
-
-def construct_image_url_from_path(
-    path: str, storage_base_url: str, storage_token: str | None = None
-) -> str:
-    # pylint: disable=import-outside-toplevel
-    from .providers import construct_image_url
-
-    if (
-        path.startswith("C2RMF") or path.startswith("FZ") or path.startswith("F")
-    ) and len(path.split("/")) == 2:
-        return construct_image_url("eros", path)
-
-    if path.startswith("/iiif/3/joconde"):
-        return construct_image_url("pop", path)
-
-    return (
-        f"{storage_base_url}{path}?{storage_token}"
-        if storage_token
-        else f"{storage_base_url}{path}"
-    )

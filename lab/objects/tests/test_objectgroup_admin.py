@@ -1,6 +1,8 @@
 import json
 from unittest import mock
+from urllib.parse import urlencode
 
+import pytest
 from django.contrib.admin.sites import AdminSite
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
@@ -14,6 +16,80 @@ from ..models import ObjectGroup
 
 CHANGE_VIEWNAME = "admin:lab_objectgroup_change"
 ADD_VIEWNAME = "admin:lab_objectgroup_add"
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("is_lab_admin", [False, True])
+@pytest.mark.parametrize(
+    "next_url, allowed",
+    [
+        ("{run_url}", True),
+        ("{run_url}?tab=objects#objects", True),
+        ("/lab/objectgroup/", True),
+        ("/lab/?next=https://example.org/", True),
+        (None, False),
+        ("", False),
+        ("   ", False),
+        ("https://example.org/", False),
+        ("http://example.org/", False),
+        ("https://testserver{run_url}", False),
+        ("//example.org/", False),
+        ("//testserver{run_url}", False),
+        ("///example.org/", False),
+        ("https:///example.org/", False),
+        ("javascript:alert(1)", False),
+        ("data:text/html,redirect", False),
+        ("ftp://example.org/", False),
+        ("file:///etc/passwd", False),
+        ("http://[invalid/", False),
+        (r"\example.org/", False),
+        (r"\\example.org/", False),
+        (r"/\example.org/", False),
+        (r"\/example.org/", False),
+        (r"/lab\run\1/change/", False),
+        (r"https:\\example.org/", False),
+        ("\n//example.org/", False),
+        ("/\n/example.org/", False),
+        ("/\t/example.org/", False),
+        ("lab/run/1/change/", False),
+    ],
+)
+def test_change_redirect_after_save(client, next_url, allowed, is_lab_admin):
+    run = factories.RunFactory(project=factories.ProjectWithLeaderFactory())
+    object_group = factories.ObjectGroupFactory(object_count=1)
+    object_group.runs.add(run)
+    user = (
+        auth_factories.LabAdminUserFactory()
+        if is_lab_admin
+        else run.project.leader.user
+    )
+    client.force_login(user)
+    run_url = reverse("admin:lab_run_change", args=[run.id])
+    query = {"run": str(run.id)}
+    if next_url is not None:
+        next_url = next_url.format(run_url=run_url)
+        query["next"] = next_url
+
+    response = client.post(
+        reverse(CHANGE_VIEWNAME, args=[object_group.id]) + "?" + urlencode(query),
+        {
+            "label": "Saved object group",
+            "object_count": "1",
+            "object_set-TOTAL_FORMS": "0",
+            "object_set-INITIAL_FORMS": "0",
+            "objectgroupthumbnail_set-TOTAL_FORMS": "0",
+            "objectgroupthumbnail_set-INITIAL_FORMS": "0",
+            "_save": "Save",
+        },
+    )
+
+    object_group.refresh_from_db()
+    assert object_group.label == "Saved object group"
+    assert response.status_code == 302
+    default_url = reverse(
+        "admin:lab_objectgroup_changelist" if is_lab_admin else "admin:index"
+    )
+    assert response.url == (next_url if allowed else default_url)
 
 
 class TesObjectGroupAdminPermissions(TestCase):

@@ -74,14 +74,15 @@ class UpcomingProjectList(generics.ListAPIView):
     permission_classes = [IsLabAdminUser]
 
 
-class ProjectParticipationListCreateGroupView(MemberParticipationListCreateGroupView):
-    permission_classes = [IsLeaderOrReadOnlyMixin]
-
+# pylint: disable=too-many-ancestors
+class ProjectParticipationListCreateGroupView(
+    IsLeaderOrReadOnlyMixin[Participation], MemberParticipationListCreateGroupView
+):
     def get_related_project(self, obj: Participation | None = None) -> Project | None:
         if obj:
             return obj.project
         project_id = self.kwargs.get("project_id")
-        return Project.objects.filter(id=project_id).first()
+        return get_object_or_404(Project, id=project_id)
 
     def get_queryset(self):
         return (
@@ -126,9 +127,9 @@ class ProjectRemoteParticipationListCreateGroupView(
         serializer.save(on_premises=False, project=self.get_related_project())
 
 
-# pylint: disable=too-many-ancestors
 class ProjectParticipationRetrieveUpdateDestroyGroupView(
-    IsLeaderOrReadOnlyMixin, MemberParticipationRetrieveUpdateDestroyGroupView
+    IsLeaderOrReadOnlyMixin[Participation],
+    MemberParticipationRetrieveUpdateDestroyGroupView,
 ):
     permission_classes = [IsAdminUser]
 
@@ -146,7 +147,7 @@ class ProjectParticipationRetrieveUpdateDestroyGroupView(
         if obj:
             return obj.project
         project_id = self.kwargs.get("project_id")
-        return Project.objects.filter(id=project_id).first()
+        return get_object_or_404(Project, id=project_id)
 
 
 class ProjectLeaderParticipationRetrieveCreateUpdateGroupView(

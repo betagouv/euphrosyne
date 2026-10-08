@@ -3,14 +3,19 @@ from typing import Any, Dict
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.forms.models import ModelForm
-from django.http.response import HttpResponse
+from django.http import HttpRequest, HttpResponse
+from django.http.response import HttpResponseBase
 from django.urls.base import reverse
 from django.utils import timezone
 from django.views.generic.edit import UpdateView
 from social_django.models import Partial
-from social_django.utils import load_strategy
 
 from euphro_auth.models import User
+
+from .invitations import (
+    registration_partial,
+    reject_invitation,
+)
 
 
 class UserCompleteAccountView(UpdateView):
@@ -21,11 +26,19 @@ class UserCompleteAccountView(UpdateView):
     template_name = "oauth_complete_information_form.html"
     model = get_user_model()
     fields = ["email", "first_name", "last_name"]
+    registration_partial: Partial
+
+    def dispatch(
+        self, request: HttpRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponseBase:
+        saved = registration_partial(request, kwargs["token"])
+        if saved is None or saved.kwargs["user"].invitation_completed_at:
+            return reject_invitation(request)
+        self.registration_partial = saved
+        return super().dispatch(request, *args, **kwargs)
 
     def get_partial(self) -> Partial:
-        strategy = load_strategy()
-        partial_token = self.kwargs.get("token")
-        return strategy.partial_load(partial_token)
+        return self.registration_partial
 
     def get_object(self, queryset: models.query.QuerySet | None = None) -> User:
         partial = self.get_partial()

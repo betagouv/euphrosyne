@@ -160,7 +160,7 @@ To reference JavaScript and CSS files in Django templates, use the following scr
 
 ### Contributing
 
-Contributions to Euphrosyne are welcome! Please follow the code style guidelines in the CLAUDE.md file and ensure all tests pass before submitting pull requests.
+Contributions to Euphrosyne are welcome! Run translation catalogue generation and full Python type checking, and ensure all tests pass before submitting pull requests. The required CI checks are defined in [.github/workflows/test.yaml](.github/workflows/test.yaml).
 
 ### License
 

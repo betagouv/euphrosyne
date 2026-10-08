@@ -20,25 +20,41 @@ from ...models import Certification
 logger = logging.getLogger(__name__)
 
 
-def _validate_signature(request: HttpRequest, secret_key: str) -> bool:
+def _validate_signature(request: HttpRequest, secret_key: str | None) -> bool:
+    if not secret_key:
+        return False
+
     # Get the Tally-Signature header value
     signature_header = request.headers.get("Tally-Signature")
 
     if not signature_header:
-        raise ValueError("Tally webhook : missing Tally-Signature header")
+        return False
+
+    try:
+        signature = signature_header.encode("ascii")
+    except UnicodeEncodeError:
+        return False
 
     digest = hmac.new(
         secret_key.encode("utf-8"), request.body, digestmod=hashlib.sha256
     ).digest()
     computed_hmac = base64.b64encode(digest)
-    return hmac.compare_digest(computed_hmac, signature_header.encode("utf-8"))
+    # Comparing the canonical base64 also rejects malformed signature encodings.
+    return hmac.compare_digest(computed_hmac, signature)
 
 
+# Server-to-server webhook: HMAC authenticates the raw body before any side effect.
 @csrf_exempt
 @require_POST
 def tally_webhook(
-    request: HttpRequest, secret_key: str
+    request: HttpRequest, secret_key: str | None
 ):  # pylint: disable=too-many-return-statements
+    if not secret_key:
+        logger.error(
+            "Tally webhook : signing secret is not configured; processing disabled"
+        )
+        return JsonResponse({"error": "Webhook unavailable"}, status=503)
+
     is_signature_valid = _validate_signature(request, secret_key)
     if not is_signature_valid:
         logger.error("Tally webhook : invalid signature")
