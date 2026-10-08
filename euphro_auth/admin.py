@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin, messages
-from django.contrib.admin import ModelAdmin
+from django.contrib.admin import ActionLocation, ModelAdmin
 from django.contrib.admin.options import ShowFacets
 from django.contrib.auth import login, logout
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
@@ -195,8 +195,8 @@ class UserAdmin(DjangoUserAdmin):
         qs = super().get_queryset(request)
         return qs.prefetch_related("groups")
 
-    def get_actions(self, request):
-        actions = super().get_actions(request)
+    def get_actions(self, request, action_location=ActionLocation.CHANGE_LIST):
+        actions = super().get_actions(request, action_location)
         if request.user.is_superuser is not True:
             actions.pop("impersonate_selected_user", None)
         return actions

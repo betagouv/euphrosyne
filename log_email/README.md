@@ -49,11 +49,21 @@ INSTALLED_APPS = [
 ]
 ```
 
-2. For now, provider credentials are set using Django email environment variables : `EMAIL_HOST_USER` & `EMAIL_HOST_PASSWORD` :
+2. The provider finds the `MAILERS` entry whose SMTP host contains `mailjet`
+   and uses its `username` and `password` options for the Mailjet API. The
+   existing email environment variables can populate that configuration:
 
 ```python
-MAILJET_API_KEY = "your_api_key"
-MAILJET_SECRET_KEY = "your_secret"
+MAILERS = {
+    "default": {
+        "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+        "OPTIONS": {
+            "host": os.environ["EMAIL_HOST"],
+            "username": os.environ["EMAIL_HOST_USER"],
+            "password": os.environ["EMAIL_HOST_PASSWORD"],
+        },
+    },
+}
 ```
 
 3. Run the server and navigate to the Django admin to see the email log.
