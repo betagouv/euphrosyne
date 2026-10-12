@@ -1,0 +1,35 @@
+flowchart LR
+  user["Navigateur<br/>Chercheur / administrateur"]
+  subgraph scale["SCALINGO · Paris · osc-secnum-fr1"]
+    portal["Plateforme Euphrosyne<br/>Gestion utilisateurs<br/>et projets de recherche<br/>Django / DRF"]
+    tools["Tools API<br/>Données scientifiques<br/>Accès aux VM<br/>FastAPI"]
+    pg[("PostgreSQL<br/>Utilisateurs / projets / métadonnées")]
+    portal <-->|"HTTPS / JWT<br/>Opérations / callbacks"| tools
+    portal -->|"SQL"| pg
+  end
+  subgraph scientific["STOCKAGE SCIENTIFIQUE · westeurope"]
+    hot[("Azure Files · HOT<br/>Données brutes / traitées")]
+    cool[("Azure Blob · COOL<br/>Archivage scientifique")]
+  end
+  subgraph media["IMAGES / ASSETS · westeurope"]
+    assets[("Azure Blob<br/>Images / fichiers assets")]
+  end
+  mailjet["Mailjet<br/>Envoi des e-mails<br/>Invitations / notifications"]
+  user -->|"HTTPS / session"| portal
+  user -->|"HTTPS / JWT"| tools
+  user -->|"HTTPS / SAS<br/>Accès direct autorisé"| scientific
+  tools -->|"HTTPS / fichiers"| hot
+  tools -->|"HTTPS / archivage<br/>Restauration"| cool
+  tools -->|"HTTPS / images"| assets
+  portal -->|"HTTPS / images · assets"| assets
+  portal -->|"SMTP 587 / STARTTLS"| mailjet
+
+  classDef app fill:#e9f1ff,stroke:#6b87b0,color:#18324f;
+  classDef data fill:#e7f5ee,stroke:#669681,color:#17402d;
+  classDef access fill:#f5f6f8,stroke:#97a2b1,color:#243143;
+  classDef external fill:#fff3e3,stroke:#b69969,color:#593f19;
+  classDef control fill:#f0ebfa,stroke:#9480b1,color:#403057;
+  class portal,tools app;
+  class pg,hot,cool,assets data;
+  class user access;
+  class mailjet external;

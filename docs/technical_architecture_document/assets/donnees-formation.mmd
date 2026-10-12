@@ -1,0 +1,77 @@
+erDiagram
+  direction TB
+  euphro_auth_user["User"] {
+    bigint id PK
+    boolean is_active
+    varchar email UK
+    varchar first_name
+    varchar last_name
+  }
+  lab_participation["Participation"] {
+    bigint id PK
+    bigint project_id FK
+    bigint user_id FK
+    bigint institution_id FK "nullable"
+    bigint employer_id FK "nullable"
+    boolean is_leader
+    boolean on_premises
+  }
+  lab_run["Run"] {
+    bigint id PK
+    bigint project_id FK
+    varchar label
+    varchar beamline
+    date embargo_date "nullable"
+    integer status
+  }
+  certification_certification["Certification"] {
+    bigint id PK
+    varchar name UK
+    text description "nullable"
+    varchar type_of
+    integer num_days_valid "nullable"
+  }
+  certification_quizcertification["QuizCertification"] {
+    bigint id PK
+    bigint certification_id FK
+    varchar url
+    float8 passing_score
+  }
+  certification_quizresult["QuizResult"] {
+    bigint id PK
+    bigint quiz_id FK
+    bigint user_id FK
+    float8 score
+    boolean is_passed
+  }
+  certification_certificationnotification["CertificationNotification"] {
+    bigint id PK
+    bigint certification_id FK
+    bigint user_id FK
+    bigint quiz_result_id FK,UK "nullable"
+    varchar type_of
+    boolean is_sent
+  }
+  radiation_protection_riskpreventionplan["RiskPreventionPlan"] {
+    bigint id PK
+    bigint participation_id FK
+    bigint run_id FK
+    boolean electrical_signature_exempt
+  }
+  radiation_protection_electricalsignatureprocess["ElectricalSignatureProcess"] {
+    bigint id PK
+    bigint risk_prevention_plan_id FK
+    varchar provider_name
+    varchar provider_workflow_id
+    boolean is_completed
+  }
+  euphro_auth_user ||..o{ lab_participation : "user_id"
+  certification_certification ||..o{ certification_quizcertification : "certification_id"
+  certification_quizcertification ||..o{ certification_quizresult : "quiz_id"
+  euphro_auth_user ||..o{ certification_quizresult : "user_id"
+  certification_certification ||..o{ certification_certificationnotification : "certification_id"
+  euphro_auth_user ||..o{ certification_certificationnotification : "user_id"
+  certification_quizresult |o..o| certification_certificationnotification : "quiz_result_id"
+  lab_participation ||..o{ radiation_protection_riskpreventionplan : "participation_id"
+  lab_run ||..o{ radiation_protection_riskpreventionplan : "run_id"
+  radiation_protection_riskpreventionplan ||..o{ radiation_protection_electricalsignatureprocess : "risk_prevention_plan_id"

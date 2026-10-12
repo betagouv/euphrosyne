@@ -1,0 +1,51 @@
+erDiagram
+  direction TB
+  euphro_auth_user["User"] {
+    bigint id PK
+    boolean is_active
+    varchar email UK
+    varchar first_name
+    varchar last_name
+  }
+  lab_project["Project"] {
+    bigint id PK
+    bigint admin_id FK "nullable"
+    varchar name UK
+    varchar slug UK
+    boolean confidential
+  }
+  lab_participation["Participation"] {
+    bigint id PK
+    bigint project_id FK
+    bigint user_id FK
+    bigint institution_id FK "nullable"
+    bigint employer_id FK "nullable"
+    boolean is_leader
+    boolean on_premises
+  }
+  lab_institution["Institution"] {
+    bigint id PK
+    varchar name
+    varchar country "nullable"
+    varchar ror_id "nullable"
+  }
+  lab_employer["Employer"] {
+    bigint id PK
+    varchar email
+    varchar first_name
+    varchar last_name
+    varchar function
+  }
+  lab_beamtimerequest["BeamTimeRequest"] {
+    bigint id PK
+    bigint project_id FK,UK
+    varchar request_type
+    varchar request_id
+    varchar form_type
+  }
+  euphro_auth_user |o..o{ lab_project : "admin_id"
+  lab_project ||..o{ lab_participation : "project_id"
+  euphro_auth_user ||..o{ lab_participation : "user_id"
+  lab_institution |o..o{ lab_participation : "institution_id"
+  lab_employer |o..o{ lab_participation : "employer_id"
+  lab_project ||..o| lab_beamtimerequest : "project_id"

@@ -1,0 +1,21 @@
+flowchart LR
+  herma["Herma<br/>Poste des lab admins<br/>Logiciel Python pour upload des données scientifiques"]
+  portal["Plateforme Euphrosyne<br/>Authentification"]
+  tools["Tools API<br/>Initialisation dossiers / SAS"]
+  hot[("Azure Files · HOT<br/>Données scientifiques")]
+  microsoft["Microsoft<br/>AzCopy"]
+  herma -->|"HTTPS / auth · projets"| portal
+  herma -->|"HTTPS / JWT"| tools
+  herma -->|"HTTPS / téléchargement"| microsoft
+  microsoft -->|"HTTPS / SAS<br/>Copie directe AzCopy"| hot
+
+
+  classDef app fill:#e9f1ff,stroke:#6b87b0,color:#18324f;
+  classDef data fill:#e7f5ee,stroke:#669681,color:#17402d;
+  classDef access fill:#f5f6f8,stroke:#97a2b1,color:#243143;
+  classDef external fill:#fff3e3,stroke:#b69969,color:#593f19;
+  classDef control fill:#f0ebfa,stroke:#9480b1,color:#403057;
+  class portal,tools app;
+  class hot data;
+  class herma access;
+  class microsoft external;
