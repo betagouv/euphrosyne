@@ -1,0 +1,100 @@
+erDiagram
+  direction TB
+  euphro_auth_user["User"] {
+    bigint id PK
+    boolean is_active
+    varchar email UK
+    varchar first_name
+    varchar last_name
+  }
+  auth_group["Group"] {
+    integer id PK
+    varchar name UK
+  }
+  auth_permission["Permission"] {
+    integer id PK
+    integer content_type_id FK
+    varchar name
+    varchar codename
+  }
+  auth_group_permissions["Group_permissions"] {
+    bigint id PK
+    integer group_id FK
+    integer permission_id FK
+  }
+  euphro_auth_user_groups["User_groups"] {
+    bigint id PK
+    bigint user_id FK
+    integer group_id FK
+  }
+  euphro_auth_user_user_permissions["User_user_permissions"] {
+    bigint id PK
+    bigint user_id FK
+    integer permission_id FK
+  }
+  social_auth_usersocialauth["UserSocialAuth"] {
+    bigint id PK
+    bigint user_id FK
+    varchar provider
+    varchar uid
+    timestamptz created
+  }
+  social_auth_association["Association"] {
+    bigint id PK
+    varchar server_url
+    varchar handle
+    integer issued
+    integer lifetime
+  }
+  social_auth_code["Code"] {
+    bigint id PK
+    varchar email
+    varchar code
+    boolean verified
+    timestamptz timestamp
+  }
+  social_auth_nonce["Nonce"] {
+    bigint id PK
+    varchar server_url
+    integer timestamp
+    varchar salt
+  }
+  social_auth_partial["Partial"] {
+    bigint id PK
+    smallint next_step
+    varchar backend
+    timestamptz timestamp
+    jsonb data
+  }
+  django_admin_log["LogEntry"] {
+    integer id PK
+    integer content_type_id FK "nullable"
+    bigint user_id FK
+    timestamptz action_time
+    text object_id "nullable"
+  }
+  django_content_type["ContentType"] {
+    integer id PK
+    varchar app_label
+    varchar model
+  }
+  django_session["Session"] {
+    varchar session_key PK
+    timestamptz expire_date
+  }
+  django_migrations["django_migrations"] {
+    bigint id PK
+    varchar app
+    varchar name
+    timestamptz applied
+  }
+  django_content_type ||..o{ auth_permission : "content_type_id"
+  auth_group ||..o{ auth_group_permissions : "group_id"
+  auth_permission ||..o{ auth_group_permissions : "permission_id"
+  euphro_auth_user ||..o{ euphro_auth_user_groups : "user_id"
+  auth_group ||..o{ euphro_auth_user_groups : "group_id"
+  euphro_auth_user ||..o{ euphro_auth_user_user_permissions : "user_id"
+  auth_permission ||..o{ euphro_auth_user_user_permissions : "permission_id"
+  euphro_auth_user ||..o{ social_auth_usersocialauth : "user_id"
+  django_content_type |o..o{ django_admin_log : "content_type_id"
+  euphro_auth_user ||..o{ django_admin_log : "user_id"

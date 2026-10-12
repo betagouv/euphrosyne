@@ -1,0 +1,17 @@
+flowchart LR
+  participant["Navigateur participant<br/>Formation radioprotection"]
+  tally["Tally<br/>Questionnaire radioprotection"]
+  radio["Plateforme Euphrosyne<br/>Service radioprotection<br/>Résultats / documents"]
+  goodflag["Instance Goodflag du ministère<br/>Signature électronique"]
+  participant -->|"HTTPS"| tally
+  tally -->|"Webhook HTTPS signé<br/>Résultats de quiz"| radio
+  radio -->|"HTTPS / signature"| goodflag
+
+  classDef app fill:#e9f1ff,stroke:#6b87b0,color:#18324f;
+  classDef data fill:#e7f5ee,stroke:#669681,color:#17402d;
+  classDef access fill:#f5f6f8,stroke:#97a2b1,color:#243143;
+  classDef external fill:#fff3e3,stroke:#b69969,color:#593f19;
+  classDef control fill:#f0ebfa,stroke:#9480b1,color:#403057;
+  class radio app;
+  class participant access;
+  class tally,goodflag external;

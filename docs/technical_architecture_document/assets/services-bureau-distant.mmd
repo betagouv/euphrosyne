@@ -1,0 +1,33 @@
+flowchart LR
+  user["Navigateur<br/>Utilisateur Euphrosyne authentifié & membre du projet"]
+  tools["Tools API<br/>Déploiement & accès VM"]
+  control["Contrôle Azure<br/>API · Key Vault"]
+  subgraph vnet["AZURE VNET · 10.0.0.0/16 · westeurope"]
+    guac["Guacamole<br/>App Service · HTTPS public<br/>Subnet 10.0.2.0/24"]
+    guacd["guacd · ACI privé<br/>Subnet 10.0.4.0/24"]
+    mysql[("MySQL privé<br/>Subnet 10.0.3.0/24")]
+    vm["VM Windows par projet<br/>NIC privée · 10.0.1.0/24"]
+    guac -->|"TCP 4822"| guacd
+    guac -->|"TCP 3306"| mysql
+    guacd -->|"RDP 3389"| vm
+  end
+  hot[("Azure Files · HOT<br/>Stockage scientifique")]
+  user -->|"HTTPS /  JWT"| tools
+  user -->|"HTTPS / jeton de session"| guac
+  tools -->|"REST HTTPS / droits"| guac
+  tools -->|"HTTPS"| control
+  control -->|"Gestion VM"| vm
+  control -->|"Webhook"| tools
+  guacd -->|"Volume Files / SMB"| hot
+  vm -->|"SMB 445 / volume Z:"| hot
+  style vnet fill:#edf3fb,stroke:#5578a7,stroke-width:2px
+
+  classDef app fill:#e9f1ff,stroke:#6b87b0,color:#18324f;
+  classDef data fill:#e7f5ee,stroke:#669681,color:#17402d;
+  classDef access fill:#f5f6f8,stroke:#97a2b1,color:#243143;
+  classDef external fill:#fff3e3,stroke:#b69969,color:#593f19;
+  classDef control fill:#f0ebfa,stroke:#9480b1,color:#403057;
+  class tools,guac,guacd app;
+  class mysql,hot data;
+  class control,vm control;
+  class user access;

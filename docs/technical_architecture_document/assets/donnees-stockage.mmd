@@ -1,0 +1,54 @@
+erDiagram
+  direction TB
+  lab_project["Project"] {
+    bigint id PK
+    bigint admin_id FK "nullable"
+    varchar name UK
+    varchar slug UK
+    boolean confidential
+  }
+  lab_run["Run"] {
+    bigint id PK
+    bigint project_id FK
+    varchar label
+    varchar beamline
+    date embargo_date "nullable"
+    integer status
+  }
+  data_request_datarequest["DataRequest"] {
+    bigint id PK
+    boolean request_viewed
+    timestamptz sent_at "nullable"
+    varchar user_email
+  }
+  data_request_datarequest_runs["DataRequest_runs"] {
+    bigint id PK
+    bigint datarequest_id FK
+    bigint run_id FK
+  }
+  data_request_dataaccessevent["DataAccessEvent"] {
+    bigint id PK
+    bigint data_request_id FK
+    varchar path
+    timestamptz access_time
+    timestamptz modified
+  }
+  data_management_projectdata["ProjectData"] {
+    bigint id PK
+    bigint project_id FK,UK
+    varchar lifecycle_state
+    date cooling_eligible_at "nullable"
+  }
+  data_management_lifecycleoperation["LifecycleOperation"] {
+    uuid operation_id PK
+    bigint project_data_id FK
+    varchar type
+    varchar status
+    varchar from_data_deletion_status
+  }
+  lab_project ||..o{ lab_run : "project_id"
+  data_request_datarequest ||..o{ data_request_datarequest_runs : "datarequest_id"
+  lab_run ||..o{ data_request_datarequest_runs : "run_id"
+  data_request_datarequest ||..o{ data_request_dataaccessevent : "data_request_id"
+  lab_project ||..o| data_management_projectdata : "project_id"
+  data_management_projectdata ||..o{ data_management_lifecycleoperation : "project_data_id"

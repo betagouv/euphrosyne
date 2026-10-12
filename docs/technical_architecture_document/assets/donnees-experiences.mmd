@@ -1,0 +1,117 @@
+erDiagram
+  direction TB
+  lab_project["Project"] {
+    bigint id PK
+    bigint admin_id FK "nullable"
+    varchar name UK
+    varchar slug UK
+    boolean confidential
+  }
+  lab_run["Run"] {
+    bigint id PK
+    bigint project_id FK
+    varchar label
+    varchar beamline
+    date embargo_date "nullable"
+    integer status
+  }
+  lab_notebook_runnotebook["RunNotebook"] {
+    bigint id PK
+    bigint run_id FK,UK
+    text comments
+  }
+  lab_runobjectgroup["RunObjectGroup"] {
+    bigint id PK
+    bigint objectgroup_id FK
+    bigint run_id FK
+  }
+  lab_objectgroup["ObjectGroup"] {
+    bigint id PK
+    bigint discovery_place_location_id FK "nullable"
+    bigint dating_era_id FK "nullable"
+    bigint dating_period_id FK "nullable"
+    varchar label
+    varchar inventory
+    varchar[] materials
+  }
+  lab_object["Object"] {
+    bigint id PK
+    bigint group_id FK
+    varchar label
+    varchar collection
+    varchar inventory
+  }
+  lab_location["Location"] {
+    bigint id PK
+    varchar label UK
+    float8 latitude "nullable"
+    float8 longitude "nullable"
+    integer geonames_id UK "nullable"
+  }
+  lab_era["Era"] {
+    bigint id PK
+    varchar concept_id UK "nullable"
+    varchar label
+  }
+  lab_period["Period"] {
+    bigint id PK
+    varchar label
+    varchar concept_id UK "nullable"
+  }
+  lab_externalobjectreference["ExternalObjectReference"] {
+    bigint id PK
+    bigint object_group_id FK,UK
+    varchar provider_name
+    varchar provider_object_id
+  }
+  lab_objectgroupthumbnail["ObjectGroupThumbnail"] {
+    bigint id PK
+    bigint object_group_id FK,UK
+    varchar image
+    varchar copyright
+  }
+  lab_runobjetgroupimage["RunObjetGroupImage"] {
+    bigint id PK
+    bigint run_object_group_id FK
+    varchar path
+    jsonb transform "nullable"
+  }
+  lab_measuringpoint["MeasuringPoint"] {
+    bigint id PK
+    bigint object_group_id FK "nullable"
+    bigint run_id FK
+    varchar name
+    text comments
+  }
+  lab_measuringpointimage["MeasuringPointImage"] {
+    bigint id PK
+    bigint measuring_point_id FK,UK
+    bigint run_object_group_image_id FK
+    jsonb point_location "nullable"
+  }
+  standard_measuringpointstandard["MeasuringPointStandard"] {
+    bigint id PK
+    bigint measuring_point_id FK,UK
+    bigint standard_id FK
+  }
+  standard_standard["Standard"] {
+    bigint id PK
+    varchar label UK
+  }
+  lab_project ||..o{ lab_run : "project_id"
+  lab_run ||..o| lab_notebook_runnotebook : "run_id"
+  lab_objectgroup ||..o{ lab_runobjectgroup : "objectgroup_id"
+  lab_run ||..o{ lab_runobjectgroup : "run_id"
+  lab_location |o..o{ lab_objectgroup : "discovery_place_location_id"
+  lab_era |o..o{ lab_objectgroup : "dating_era_id"
+  lab_period |o..o{ lab_objectgroup : "dating_period_id"
+  lab_objectgroup ||..o{ lab_object : "group_id"
+  lab_objectgroup ||..o| lab_externalobjectreference : "object_group_id"
+  lab_objectgroup ||..o| lab_objectgroupthumbnail : "object_group_id"
+  lab_runobjectgroup ||..o{ lab_runobjetgroupimage : "run_object_group_id"
+  lab_objectgroup |o..o{ lab_measuringpoint : "object_group_id"
+  lab_run ||..o{ lab_measuringpoint : "run_id"
+  lab_measuringpoint ||..o| lab_measuringpointimage : "measuring_point_id"
+  lab_runobjetgroupimage ||..o{ lab_measuringpointimage : "run_object_group_image_id"
+  lab_measuringpoint ||..o| standard_measuringpointstandard : "measuring_point_id"
+  standard_standard ||..o{ standard_measuringpointstandard : "standard_id"
