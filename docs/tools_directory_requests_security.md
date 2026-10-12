@@ -50,7 +50,11 @@ Encoding raw slashes would be insufficient because the ASGI server decodes
 them before route matching. Query/fragment delimiters are encoded as data. The
 admin's existing, stricter filename rules remain unchanged.
 
-The configured base must be an absolute HTTP(S) URL without userinfo,
+The configured base is validated once when Django loads its settings, using
+`euphro_tools.config.validate_tools_api_url`. Invalid values prevent startup with
+`ImproperlyConfigured`; directory hooks read the validated Django setting instead
+of re-reading and validating the environment on each call. The base must be an
+absolute HTTP(S) URL without userinfo,
 query, fragment, backslashes, whitespace or ASCII controls. A deployment prefix
 and optional trailing slash are supported. This configuration, its DNS and its
 network/proxy environment remain trusted: this is not a defense against a

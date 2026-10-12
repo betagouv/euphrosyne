@@ -1,14 +1,16 @@
 import logging
-import os
+import re
 from typing import Optional
-from urllib.parse import quote, urlsplit
+from urllib.parse import quote
 
 import requests
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 from euphro_auth.jwt.tokens import EuphroToolsAPIToken
 
 logger = logging.getLogger(__name__)
+INVALID_SEGMENT_CHARS = re.compile(r"[/\\\x00-\x1f\x7f]")
 
 
 class RenameFailedError(Exception):
@@ -17,31 +19,11 @@ class RenameFailedError(Exception):
 
 def _directory_url(*segments: str) -> str:
     """Keep directory names as literal segments of the configured Tools API URL."""
-    base_url = os.environ["EUPHROSYNE_TOOLS_API_URL"].rstrip("/")
-    parsed = urlsplit(base_url)
-    if (
-        parsed.scheme not in {"http", "https"}
-        or not parsed.hostname
-        or parsed.username is not None
-        or any(
-            char in "?#\\" or ord(char) <= 32 or ord(char) == 127 for char in base_url
-        )
-    ):
-        raise ValueError("Invalid EUPHROSYNE_TOOLS_API_URL")
-    encoded_segments = [_quote_directory_segment(segment) for segment in segments]
-    return f"{base_url}/{'/'.join(encoded_segments)}"
-
-
-def _quote_directory_segment(segment: str) -> str:
-    # Encoded slashes are decoded before Tools API route matching; reject them
-    # in raw names. Encode literal percent signs without decoding user input.
-    if (
-        not segment
-        or segment in {".", ".."}
-        or any(char in "/\\" or ord(char) < 32 or ord(char) == 127 for char in segment)
-    ):
-        raise ValueError("Invalid Tools API directory path segment")
-    return quote(segment, safe="")
+    for segment in segments:
+        if segment in {"", ".", ".."} or INVALID_SEGMENT_CHARS.search(segment):
+            raise ValueError("Invalid Tools API directory path segment")
+    base_url = settings.EUPHROSYNE_TOOLS_API_URL.rstrip("/")
+    return f"{base_url}/{'/'.join(quote(segment, safe='') for segment in segments)}"
 
 
 def _make_request(

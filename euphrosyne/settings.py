@@ -26,7 +26,12 @@ from django.utils.csp import CSP
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
+from euphro_tools.config import validate_tools_api_url
 from euphrosyne.features import add_feature_apps, enabled_features
+
+EUPHROSYNE_TOOLS_API_URL = validate_tools_api_url(
+    os.environ["EUPHROSYNE_TOOLS_API_URL"]
+)
 
 # pylint: disable=abstract-class-instantiated
 sentry_sdk.init(
@@ -36,8 +41,6 @@ sentry_sdk.init(
     send_default_pii=True,
     environment=os.getenv("SENTRY_ENVIRONMENT"),
 )
-
-EUPHROSYNE_TOOLS_API_URL = os.environ["EUPHROSYNE_TOOLS_API_URL"]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import requests
-from pytest import MonkeyPatch
 
 from ..hooks import (
     _make_request,
@@ -13,10 +12,8 @@ from ..hooks import (
 
 
 @patch("euphro_tools.hooks.requests")
-def test_initialize_project_directory(
-    requests_mock: MagicMock, monkeypatch: MonkeyPatch
-):
-    monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "http://euphro.tools")
+def test_initialize_project_directory(requests_mock: MagicMock, settings):
+    settings.EUPHROSYNE_TOOLS_API_URL = "http://euphro.tools"
     requests_mock.post.return_value.status_code = 204
     initialize_project_directory("project")
 
@@ -25,8 +22,8 @@ def test_initialize_project_directory(
 
 
 @patch("euphro_tools.hooks.requests")
-def test_initialize_run_directory(requests_mock: MagicMock, monkeypatch: MonkeyPatch):
-    monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "http://euphro.tools")
+def test_initialize_run_directory(requests_mock: MagicMock, settings):
+    settings.EUPHROSYNE_TOOLS_API_URL = "http://euphro.tools"
     requests_mock.post.return_value.status_code = 204
     initialize_run_directory("project", "run")
 
@@ -37,8 +34,8 @@ def test_initialize_run_directory(requests_mock: MagicMock, monkeypatch: MonkeyP
 
 
 @patch("euphro_tools.hooks.requests")
-def test_rename_run_directory(requests_mock: MagicMock, monkeypatch: MonkeyPatch):
-    monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "http://euphro.tools")
+def test_rename_run_directory(requests_mock: MagicMock, settings):
+    settings.EUPHROSYNE_TOOLS_API_URL = "http://euphro.tools"
     requests_mock.post.return_value.status_code = 204
     rename_run_directory("project", "run", "newname")
 
@@ -49,8 +46,8 @@ def test_rename_run_directory(requests_mock: MagicMock, monkeypatch: MonkeyPatch
 
 
 @patch("euphro_tools.hooks.requests")
-def test_rename_project_directory(requests_mock: MagicMock, monkeypatch: MonkeyPatch):
-    monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "http://euphro.tools")
+def test_rename_project_directory(requests_mock: MagicMock, settings):
+    settings.EUPHROSYNE_TOOLS_API_URL = "http://euphro.tools"
     requests_mock.post.return_value.status_code = 204
     rename_project_directory("project", "newname")
 

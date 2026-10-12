@@ -23,7 +23,7 @@ from ..hooks import (
 
 
 @pytest.fixture(name="http_mock")
-def simulated_http(monkeypatch: MonkeyPatch) -> Iterator[MagicMock]:
+def simulated_http(monkeypatch: MonkeyPatch, settings) -> Iterator[MagicMock]:
     """Exercise real Requests preparation and redirects without network or real JWTs."""
     with (
         requests.Session() as session,
@@ -33,7 +33,7 @@ def simulated_http(monkeypatch: MonkeyPatch) -> Iterator[MagicMock]:
         session.trust_env = False
         token.return_value.access_token = "test-service-token"
         monkeypatch.setattr(requests, "post", session.post)
-        monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "https://tools.example/api/")
+        settings.EUPHROSYNE_TOOLS_API_URL = "https://tools.example/api/"
         response = requests.Response()
         response.status_code = 204
         response._content = b""  # pylint: disable=protected-access
@@ -47,6 +47,15 @@ def simulated_http(monkeypatch: MonkeyPatch) -> Iterator[MagicMock]:
 
         send.side_effect = respond
         yield send
+
+
+def test_directory_hooks_use_the_validated_django_setting(http_mock, monkeypatch):
+    monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "https://other.example")
+    initialize_run_directory("project", "run")
+    http_mock.assert_called_once()
+    assert http_mock.call_args[0][0].url == (
+        "https://tools.example/api/data/project/runs/run/init"
+    )
 
 
 @pytest.mark.parametrize(
@@ -123,26 +132,6 @@ def test_invalid_segments_never_send_a_token(
     arguments[position] = name
     with pytest.raises(ValueError, match="directory path segment"):
         operation(*arguments)
-    http_mock.assert_not_called()
-
-
-@pytest.mark.parametrize(
-    "base_url",
-    [
-        "//evil.example",
-        "file:///tmp/tools",
-        "https:///api",
-        "https://user:password@tools.example",
-        "https://tools.example?query",
-        "https://tools.example#fragment",
-        "https://tools.example\\evil",
-        "https://tools.example/\napi",
-    ],
-)
-def test_invalid_config_never_sends_a_token(http_mock, monkeypatch, base_url):
-    monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", base_url)
-    with pytest.raises(ValueError, match="EUPHROSYNE_TOOLS_API_URL"):
-        initialize_run_directory("project", "run")
     http_mock.assert_not_called()
 
 
