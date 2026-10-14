@@ -45,5 +45,4 @@ class EmailLogAdmin(admin.ModelAdmin):
             sortable_by,
             self.search_help_text,
         )
-        cl.queryset = self.get_queryset(request)
         return cl

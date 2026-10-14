@@ -9,6 +9,9 @@ class EmailLogQuerySetQuery:
 
 class EmailLogQuerySet:
     query = EmailLogQuerySetQuery()
+    # The provider's ordering is fixed within this in-memory snapshot.
+    ordered = True
+    totally_ordered = True
 
     def __init__(self, model, data):
         self.model = model
