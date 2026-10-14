@@ -14,8 +14,8 @@ Scalingo héberge les trois applications web : Plateforme Euphrosyne, Catalogue
 de données et Tools API. Microsoft Azure héberge les fichiers scientifiques et
 les services de bureau distant.
 
-- **Production**, utilisée par les équipes : Scalingo `osc-secnum-fr1` (Paris) ; Azure principalement en `westeurope`.
-- **Staging**, utilisé pour tester les évolutions : Scalingo `osc-fr1` (Paris) ; Azure `westeurope`, avec des ressources supplémentaires en `polandcentral`.
+- **Production**, utilisée par les équipes : Scalingo `osc-secnum-fr1` (Paris) ; Azure en `westeurope`, avec des ressources supplémentaires en `polandcentral`.
+- **Staging**, utilisé pour tester les évolutions : Scalingo `osc-fr1` (Paris) ; Azure en `westeurope`, avec des ressources supplémentaires en `polandcentral`.
 
 **Homologation :** en préparation ; commission prévue en décembre 2026.
 
