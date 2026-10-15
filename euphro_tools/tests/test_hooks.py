@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock, patch
 
 import requests
-from pytest import MonkeyPatch
 
 from ..hooks import (
     _make_request,
@@ -13,10 +12,9 @@ from ..hooks import (
 
 
 @patch("euphro_tools.hooks.requests")
-def test_initialize_project_directory(
-    requests_mock: MagicMock, monkeypatch: MonkeyPatch
-):
-    monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "http://euphro.tools")
+def test_initialize_project_directory(requests_mock: MagicMock, settings):
+    settings.EUPHROSYNE_TOOLS_API_URL = "http://euphro.tools"
+    requests_mock.post.return_value.status_code = 204
     initialize_project_directory("project")
 
     requests_mock.post.assert_called_once()
@@ -24,8 +22,9 @@ def test_initialize_project_directory(
 
 
 @patch("euphro_tools.hooks.requests")
-def test_initialize_run_directory(requests_mock: MagicMock, monkeypatch: MonkeyPatch):
-    monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "http://euphro.tools")
+def test_initialize_run_directory(requests_mock: MagicMock, settings):
+    settings.EUPHROSYNE_TOOLS_API_URL = "http://euphro.tools"
+    requests_mock.post.return_value.status_code = 204
     initialize_run_directory("project", "run")
 
     requests_mock.post.assert_called_once()
@@ -35,8 +34,9 @@ def test_initialize_run_directory(requests_mock: MagicMock, monkeypatch: MonkeyP
 
 
 @patch("euphro_tools.hooks.requests")
-def test_rename_run_directory(requests_mock: MagicMock, monkeypatch: MonkeyPatch):
-    monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "http://euphro.tools")
+def test_rename_run_directory(requests_mock: MagicMock, settings):
+    settings.EUPHROSYNE_TOOLS_API_URL = "http://euphro.tools"
+    requests_mock.post.return_value.status_code = 204
     rename_run_directory("project", "run", "newname")
 
     requests_mock.post.assert_called_once()
@@ -46,8 +46,9 @@ def test_rename_run_directory(requests_mock: MagicMock, monkeypatch: MonkeyPatch
 
 
 @patch("euphro_tools.hooks.requests")
-def test_rename_project_directory(requests_mock: MagicMock, monkeypatch: MonkeyPatch):
-    monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "http://euphro.tools")
+def test_rename_project_directory(requests_mock: MagicMock, settings):
+    settings.EUPHROSYNE_TOOLS_API_URL = "http://euphro.tools"
+    requests_mock.post.return_value.status_code = 204
     rename_project_directory("project", "newname")
 
     requests_mock.post.assert_called_once()
@@ -61,6 +62,7 @@ def test_rename_project_directory(requests_mock: MagicMock, monkeypatch: MonkeyP
 def test_make_request_has_auth_header(
     token_class_mock: MagicMock, request_mock: MagicMock
 ):
+    request_mock.post.return_value.status_code = 204
     _make_request("https://url")
     token_class_mock.for_euphrosyne.assert_called()
     assert "Authorization" in request_mock.post.call_args[1]["headers"]

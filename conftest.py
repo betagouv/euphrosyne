@@ -18,6 +18,7 @@ logging.getLogger("faker").setLevel(logging.WARNING)
 @pytest.fixture(autouse=True)
 def setup_django_conf(monkeypatch: pytest.MonkeyPatch, settings):
     monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "https://tools")
+    settings.EUPHROSYNE_TOOLS_API_URL = "https://tools"
     settings.FORCE_LAST_CGU_ACCEPTANCE_DT = None
 
 
@@ -31,7 +32,8 @@ def mock_requests():
         delete=mock.DEFAULT,
         patch=mock.DEFAULT,
     )
-    patcher.start()
+    mocks = patcher.start()
+    mocks["post"].return_value.status_code = 200
     yield
     patcher.stop()
 
