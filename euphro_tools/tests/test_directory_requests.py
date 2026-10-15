@@ -49,7 +49,7 @@ def simulated_http(monkeypatch: MonkeyPatch, settings) -> Iterator[MagicMock]:
         yield send
 
 
-def test_directory_hooks_use_the_validated_django_setting(http_mock, monkeypatch):
+def test_directory_hooks_use_the_configured_django_setting(http_mock, monkeypatch):
     monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "https://other.example")
     initialize_run_directory("project", "run")
     http_mock.assert_called_once()
