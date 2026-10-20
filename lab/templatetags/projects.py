@@ -1,5 +1,3 @@
-import json
-
 from django import template
 from django.http import HttpRequest
 from django.urls import ResolverMatch, reverse
@@ -65,14 +63,11 @@ def _get_is_active(
 
 
 @register.simple_tag
-def project_header_json_data(project_id: int):
-    if not project_id and not isinstance(project_id, int):
-        return ""
+def project_header_json_data(project_id: int | str | None = None):
+    if not project_id:
+        return {"project": None, "backLink": None}
 
     project = Project.objects.get(pk=project_id)
-
-    if not project:
-        return ""
 
     project_status = project.status
     choice_identifier = project_status.name
@@ -89,4 +84,9 @@ def project_header_json_data(project_id: int):
             "status": {"label": str(project_status.value[1]), "className": class_name},
         },
     }
-    return json.dumps(data)
+    return data
+
+
+@register.simple_tag
+def back_link_header_data(href: str, title: str):
+    return {"project": None, "backLink": {"href": href, "title": title}}

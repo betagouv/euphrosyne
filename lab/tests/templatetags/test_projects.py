@@ -1,5 +1,3 @@
-import json
-
 import pytest
 from django.test import RequestFactory
 from django.urls import get_resolver, reverse
@@ -40,7 +38,7 @@ def test_project_tags_is_active_value(url):
 @pytest.mark.django_db
 def test_project_header_json_data():
     project = ProjectWithLeaderFactory()
-    data = json.loads(project_header_json_data(project.id))
+    data = project_header_json_data(project.id)
 
     assert "project" in data
     assert "backLink" in data

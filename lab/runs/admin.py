@@ -225,6 +225,14 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
                 instance=self.get_object(request, object_id),
             )
 
+        run = schedule_form.instance
+        extra_context["json_data"] = {
+            "run": {
+                "id": str(run.id) if run.id else "",
+                "label": run.label,
+            }
+        }
+
         if object_id is not None:
             extra_context["schedule_modal"] = {
                 "id": "schedule-modal",

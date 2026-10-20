@@ -1,4 +1,4 @@
-{% load i18n static nav admin_urls %}<!DOCTYPE html>
+{% load i18n static nav projects admin_urls %}<!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
 <head>
@@ -92,34 +92,16 @@
 
 <!-- END Container -->
 {%if not is_popup and user.is_authenticated %}
-  <script id="top-header-data" type="application/json">
-    {% autoescape off %}
-    {% block top_header_data %}
-      {"project": null, "backLink": null}
-    {% endblock %}
-    {% endautoescape %}
-  </script>
-  <script id="nav-items-data" type="application/json">
-    {% if request.user and request.user.is_authenticated %}
-    {% autoescape off %}
-    {% nav_items_json request %}
-    {% endautoescape %}
-    {% endif %}
-  </script>
-  <script id="user-data" type="application/json">
-    {
-      "fullName": "{{ user.get_full_name }}",
-      "isLabAdmin": {{ user.is_lab_admin|yesno:"true,false" }},
-      "id": {{ user.id }},
-      "accountURL": "{% url 'admin:euphro_auth_user_change' user.id %}",
-      "email": "{{ user.email }}"
-    }
-  </script>
-  <script id="feature-flags" type="application/json">
-    {% autoescape off %}
-    {% feature_flags_json %}
-    {% endautoescape %}
-  </script>
+  {% block top_header_data %}
+    {% project_header_json_data as header_data %}
+    {{ header_data|json_script:"top-header-data" }}
+  {% endblock %}
+  {% nav_items_json request as nav_data %}
+  {{ nav_data|json_script:"nav-items-data" }}
+  {% user_json_data user as user_data %}
+  {{ user_data|json_script:"user-data" }}
+  {% feature_flags_json as feature_flags %}
+  {{ feature_flags|json_script:"feature-flags" }}
 {% endif %}
 </body>
 </html>

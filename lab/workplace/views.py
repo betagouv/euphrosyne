@@ -1,4 +1,3 @@
-import json
 from typing import Any, Dict
 
 from django.apps import apps
@@ -44,32 +43,30 @@ class WorkplaceView(ProjectMembershipRequiredMixin, TemplateView):
             "subtitle": "{} | {}".format(self.project.name, _("Workplace")),
             "runs": runs,
             "can_start_vm": can_start_vm,
-            "json_data": json.dumps(
-                {
-                    "project": {
-                        "name": self.project.name,
-                        "slug": self.project.slug,
-                        "id": self.project.id,
-                    },
-                    "isLabAdmin": user_is_lab_admin,
-                    "isDataManagementEnabled": apps.is_installed("data_management"),
-                    "labels": {
-                        "dataManagementTitle": str(_("Data management")),
-                        "loading": str(_("Loading")),
-                    },
-                    "runs": [
-                        {
-                            "id": run["id"],
-                            "label": run["label"],
-                            "rawDataTable": {
-                                "canDelete": can_write,
-                            },
-                            "processedDataTable": {
-                                "canDelete": can_write,
-                            },
-                        }
-                        for run in runs
-                    ],
-                }
-            ),
+            "json_data": {
+                "project": {
+                    "name": self.project.name,
+                    "slug": self.project.slug,
+                    "id": self.project.id,
+                },
+                "isLabAdmin": user_is_lab_admin,
+                "isDataManagementEnabled": apps.is_installed("data_management"),
+                "labels": {
+                    "dataManagementTitle": str(_("Data management")),
+                    "loading": str(_("Loading")),
+                },
+                "runs": [
+                    {
+                        "id": run["id"],
+                        "label": run["label"],
+                        "rawDataTable": {
+                            "canDelete": can_write,
+                        },
+                        "processedDataTable": {
+                            "canDelete": can_write,
+                        },
+                    }
+                    for run in runs
+                ],
+            },
         }

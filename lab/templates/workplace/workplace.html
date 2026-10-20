@@ -10,7 +10,8 @@
 {% endblock %}
 
 {%  block top_header_data %}
-    {% project_header_json_data project.id %}
+    {% project_header_json_data project.id as header_data %}
+    {{ header_data|json_script:"top-header-data" }}
 {% endblock %}
 
 {% block content %}
@@ -106,9 +107,7 @@
 
 {% block footer %}
 {{ block.super }}
-<script id="workplace-data" type="application/json">
-    {{ json_data|safe }}
-</script>
+{{ json_data|json_script:"workplace-data" }}
 
 <script src="{% static 'pages/workplace.js' %}"></script>
 {% endblock %}

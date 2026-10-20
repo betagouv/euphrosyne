@@ -1,4 +1,3 @@
-import json
 from unittest import mock
 
 import pytest
@@ -10,12 +9,10 @@ from lab.templatetags.nav import nav_items_json
 
 
 def test_nav_items_json_when_user():
-    data = json.loads(
-        nav_items_json(
-            mock.MagicMock(
-                user=User(is_lab_admin=False, is_superuser=False, id=1),
-                path="/path",
-            )
+    data = nav_items_json(
+        mock.MagicMock(
+            user=User(is_lab_admin=False, is_superuser=False, id=1),
+            path="/path",
         )
     )
     assert len(data["items"]) == 1
@@ -33,10 +30,8 @@ def test_nav_items_json_when_user():
 
 @pytest.mark.django_db
 def test_nav_items_json_when_admin():
-    data = json.loads(
-        nav_items_json(
-            mock.MagicMock(user=mock.MagicMock(is_lab_admin=True), path="/path")
-        )
+    data = nav_items_json(
+        mock.MagicMock(user=mock.MagicMock(is_lab_admin=True), path="/path")
     )
     assert len(data["items"]) == 5
     assert data["items"][0]["title"] == str(_("Dashboard"))
