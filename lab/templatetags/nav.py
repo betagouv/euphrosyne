@@ -12,21 +12,21 @@ register = template.Library()
 
 
 @register.simple_tag()
-def nav_items_json(request: HttpRequest):
+def nav_items_data(request: HttpRequest):
     items: list[NavElementJson] = settings.NAV_GET_NAV_ITEMS(request)
 
     return {"currentPath": request.path, "items": items}
 
 
 @register.simple_tag()
-def feature_flags_json():
+def feature_flags_data():
     enabled_features = set(getattr(settings, "EUPHROSYNE_FEATURES", []))
     flags = {feature: feature in enabled_features for feature in FEATURE_APPS}
     return flags
 
 
 @register.simple_tag
-def user_json_data(user: User):
+def user_data(user: User):
     return {
         "fullName": user.get_full_name(),
         "isLabAdmin": user.is_lab_admin,

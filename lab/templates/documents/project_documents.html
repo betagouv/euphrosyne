@@ -6,7 +6,7 @@
 {% block content_subtitle %}{% endblock %}
 
 {%  block top_header_data %}
-    {% project_header_json_data project.id as header_data %}
+    {% project_header_data project.id as header_data %}
     {{ header_data|json_script:"top-header-data" }}
 {% endblock %}
 

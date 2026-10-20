@@ -63,7 +63,7 @@ def _get_is_active(
 
 
 @register.simple_tag
-def project_header_json_data(project_id: int | str | None = None):
+def project_header_data(project_id: int | str | None = None):
     if not project_id:
         return {"project": None, "backLink": None}
 

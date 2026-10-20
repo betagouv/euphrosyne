@@ -5,11 +5,11 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from euphro_auth.models import User
-from lab.templatetags.nav import nav_items_json
+from lab.templatetags.nav import nav_items_data
 
 
-def test_nav_items_json_when_user():
-    data = nav_items_json(
+def test_nav_items_data_when_user():
+    data = nav_items_data(
         mock.MagicMock(
             user=User(is_lab_admin=False, is_superuser=False, id=1),
             path="/path",
@@ -29,8 +29,8 @@ def test_nav_items_json_when_user():
 
 
 @pytest.mark.django_db
-def test_nav_items_json_when_admin():
-    data = nav_items_json(
+def test_nav_items_data_when_admin():
+    data = nav_items_data(
         mock.MagicMock(user=mock.MagicMock(is_lab_admin=True), path="/path")
     )
     assert len(data["items"]) == 5

@@ -93,14 +93,14 @@
 <!-- END Container -->
 {%if not is_popup and user.is_authenticated %}
   {% block top_header_data %}
-    {% project_header_json_data as header_data %}
+    {% project_header_data as header_data %}
     {{ header_data|json_script:"top-header-data" }}
   {% endblock %}
-  {% nav_items_json request as nav_data %}
+  {% nav_items_data request as nav_data %}
   {{ nav_data|json_script:"nav-items-data" }}
-  {% user_json_data user as user_data %}
+  {% user_data user as user_data %}
   {{ user_data|json_script:"user-data" }}
-  {% feature_flags_json as feature_flags %}
+  {% feature_flags_data as feature_flags %}
   {{ feature_flags|json_script:"feature-flags" }}
 {% endif %}
 </body>

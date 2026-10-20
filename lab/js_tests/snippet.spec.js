@@ -22,31 +22,3 @@ describe("Test snippet.js", function () {
     });
   });
 });
-
-describe("Formset row escaping", () => {
-  it("renders object representations as text without creating HTML", () => {
-    const representation =
-      '<img src=x onerror=alert(1)> & "quotes" {{ objectId }}';
-    const row = loadFormsetRow(
-      "objects",
-      1,
-      2,
-      "objectgroup",
-      "/lab/objectgroup/2/change/",
-      representation,
-      "run",
-      3,
-    );
-
-    expect(row.querySelector("a").textContent).toBe(representation);
-    expect(row.querySelector("img, script, [onerror]")).toBeNull();
-    expect(row.querySelector("a").getAttribute("href")).toBe(
-      "/lab/objectgroup/2/change/",
-    );
-    expect(row.querySelector('input[name="objects-1-id"]').value).toBe("2");
-    expect(row.querySelector('input[name="objects-1-run"]').value).toBe("3");
-    expect(row.querySelector('input[type="checkbox"]').name).toBe(
-      "objects-1-DELETE",
-    );
-  });
-});

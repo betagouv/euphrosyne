@@ -4,10 +4,8 @@
 {% block top_header_data %}
 {% if objectgroup_run %}
   {% url 'admin:lab_run_change' objectgroup_run.id as back_link_url %}
-  {% with back_link_title=objectgroup_run.label %}
-    {% back_link_header_data back_link_url back_link_title as header_data %}
-    {{ header_data|json_script:"top-header-data" }}
-  {% endwith %}
+  {% back_link_header_data back_link_url objectgroup_run.label as header_data %}
+  {{ header_data|json_script:"top-header-data" }}
 {% else %}
   {% if request.user.is_lab_admin %}
     {% url 'admin:lab_objectgroup_changelist' as back_link_url %}
