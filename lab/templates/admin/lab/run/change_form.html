@@ -92,19 +92,13 @@
 
 {% if project %}
 {%  block top_header_data %}
-    {% project_header_json_data project.id %}
+    {% project_header_data project.id as header_data %}
+    {{ header_data|json_script:"top-header-data" }}
 {% endblock %}
 {% endif %}
 
 {% block footer %}
 {{ block.super }}
 <script type="text/javascript" src="{% static 'pages/run-change-form.js' %}"></script>
-<script id="run-change-form-data" type="application/json">
-    {
-      "run": {
-        "id": "{{ original.id }}",
-        "label": "{{ original.label }}"
-      }
-    }
-</script>
+{{ json_data|json_script:"run-change-form-data" }}
 {% endblock %}

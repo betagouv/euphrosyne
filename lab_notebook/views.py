@@ -1,4 +1,3 @@
-import json
 from typing import Any, Dict
 
 from django.contrib.admin import site
@@ -33,14 +32,12 @@ class NotebookView(ProjectMembershipRequiredMixin, TemplateView):
             "run": self.run,
             "project": self.run.project,
             "notebook": self.run.run_notebook,
-            "json_data": json.dumps(
-                {
-                    "runId": str(self.run.id),
-                    "projectSlug": self.run.project.slug,
-                    "projectId": str(self.run.project.id),
-                    "runName": self.run.label,
-                    "isLabAdmin": user_is_lab_admin,
-                    "canWriteNotebook": can_write_notebook,
-                }
-            ),
+            "json_data": {
+                "runId": str(self.run.id),
+                "projectSlug": self.run.project.slug,
+                "projectId": str(self.run.project.id),
+                "runName": self.run.label,
+                "isLabAdmin": user_is_lab_admin,
+                "canWriteNotebook": can_write_notebook,
+            },
         }

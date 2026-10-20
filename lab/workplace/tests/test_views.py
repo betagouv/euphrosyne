@@ -1,5 +1,3 @@
-import json
-
 import pytest
 from django.test import RequestFactory
 from django.utils.translation import gettext as _
@@ -21,7 +19,7 @@ def test_workplace_view_exposes_data_management_feature_flag_for_lab_admin():
     view.project = project
 
     context = view.get_context_data()
-    data = json.loads(context["json_data"])
+    data = context["json_data"]
 
     assert len(data["runs"]) == 1
     assert data["runs"][0]["rawDataTable"]["canDelete"] is True
@@ -57,7 +55,7 @@ def test_workplace_view_uses_feature_flag_when_data_management_is_disabled(
     view.project = project
 
     context = view.get_context_data()
-    data = json.loads(context["json_data"])
+    data = context["json_data"]
 
     assert data["runs"][0]["rawDataTable"]["canDelete"] is True
     assert data["runs"][0]["processedDataTable"]["canDelete"] is True

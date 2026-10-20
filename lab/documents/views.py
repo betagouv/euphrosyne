@@ -1,4 +1,3 @@
-import json
 from typing import Any, Dict
 
 from django.contrib.admin import site
@@ -33,21 +32,19 @@ class ProjectDocumentsView(ProjectMembershipRequiredMixin, TemplateView):
             **site.each_context(self.request),
             "subtitle": self.project.name + " | " + _("Upload documents"),
             "project": self.project,
-            "json_data": json.dumps(
-                {
-                    "project": {
-                        "id": str(self.project.id),
-                        "name": self.project.name,
-                        "slug": self.project.slug,
-                    },
-                    "table": {"canDelete": can_write},
-                    "form": {
-                        "canUpload": can_write,
-                        "hintText": gettext(
-                            "Multiple files allowed. "
-                            "Allowed files: images, documents and archives."
-                        ),
-                    },
-                }
-            ),
+            "json_data": {
+                "project": {
+                    "id": str(self.project.id),
+                    "name": self.project.name,
+                    "slug": self.project.slug,
+                },
+                "table": {"canDelete": can_write},
+                "form": {
+                    "canUpload": can_write,
+                    "hintText": gettext(
+                        "Multiple files allowed. "
+                        "Allowed files: images, documents and archives."
+                    ),
+                },
+            },
         }

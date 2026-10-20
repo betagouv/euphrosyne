@@ -1,5 +1,3 @@
-import json
-
 import pytest
 from django.test import RequestFactory
 
@@ -18,7 +16,7 @@ def test_notebook_view_exposes_hdf5_generation_flags_for_lab_admin():
     view.run = run
 
     context = view.get_context_data()
-    data = json.loads(context["json_data"])
+    data = context["json_data"]
 
     assert data["isLabAdmin"] is True
     assert data["canWriteNotebook"] is True
@@ -35,7 +33,7 @@ def test_notebook_view_disables_hdf5_generation_for_non_lab_admin():
     view.run = run
 
     context = view.get_context_data()
-    data = json.loads(context["json_data"])
+    data = context["json_data"]
 
     assert data["isLabAdmin"] is False
     assert data["canWriteNotebook"] is True
@@ -55,7 +53,7 @@ def test_notebook_view_disables_hdf5_generation_when_project_is_immutable(
     monkeypatch.setattr("lab_notebook.views.is_project_data_immutable", lambda _: True)
 
     context = view.get_context_data()
-    data = json.loads(context["json_data"])
+    data = context["json_data"]
 
     assert data["isLabAdmin"] is True
     assert data["canWriteNotebook"] is False

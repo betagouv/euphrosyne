@@ -12,7 +12,8 @@
 {% endblock %}
 
 {%  block top_header_data %}
-{% project_header_json_data project.id %}
+{% project_header_data project.id as header_data %}
+    {{ header_data|json_script:"top-header-data" }}
 {% endblock %}
 
 {% block content %}
@@ -31,7 +32,7 @@
 {{ block.super }}
 <script src="{% url 'javascript-catalog' %}"></script>
 <script>
-    window.projectName = "{{ project.name }}"
+    window.projectName = "{{ project.name|escapejs }}"
 </script>
 <script src="{% static 'pages/hdf5-viewer.js' %}"></script>
 {% endblock %}

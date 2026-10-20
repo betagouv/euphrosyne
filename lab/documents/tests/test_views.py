@@ -1,5 +1,3 @@
-import json
-
 import pytest
 from django.test import RequestFactory
 
@@ -34,7 +32,7 @@ def test_documents_view_write_flags_follow_project_lifecycle(
     view.project = project
 
     context = view.get_context_data()
-    data = json.loads(context["json_data"])
+    data = context["json_data"]
 
     assert data["table"]["canDelete"] is expected_can_write
     assert data["form"]["canUpload"] is expected_can_write

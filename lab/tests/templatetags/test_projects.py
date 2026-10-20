@@ -1,11 +1,9 @@
-import json
-
 import pytest
 from django.test import RequestFactory
 from django.urls import get_resolver, reverse
 from django.utils.translation import gettext_lazy as _
 
-from lab.templatetags.projects import project_header_json_data, project_tabs
+from lab.templatetags.projects import project_header_data, project_tabs
 from lab.tests.factories import ProjectWithLeaderFactory
 
 URLS_MAPPING = {
@@ -38,9 +36,9 @@ def test_project_tags_is_active_value(url):
 
 
 @pytest.mark.django_db
-def test_project_header_json_data():
+def test_project_header_data():
     project = ProjectWithLeaderFactory()
-    data = json.loads(project_header_json_data(project.id))
+    data = project_header_data(project.id)
 
     assert "project" in data
     assert "backLink" in data

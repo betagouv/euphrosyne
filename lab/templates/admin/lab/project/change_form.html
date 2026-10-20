@@ -3,7 +3,8 @@
 
 {% if not add %}
 {%  block top_header_data %}
-    {% project_header_json_data object_id %}
+    {% project_header_data object_id as header_data %}
+    {{ header_data|json_script:"top-header-data" }}
 {% endblock %}
 {% endif %}
 
@@ -105,7 +106,5 @@
 
 {% block footer %}
 {{ block.super }}
-<script id="project-changeform-data" type="application/json">
-    {{ json_data|safe }}
-</script>
+{{ json_data|json_script:"project-changeform-data" }}
 {% endblock %}
