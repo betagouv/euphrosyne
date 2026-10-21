@@ -33,7 +33,7 @@ sentry_sdk.init(
     dsn=os.getenv("SENTRY_DSN"),
     integrations=[DjangoIntegration()],
     traces_sample_rate=0.1,
-    send_default_pii=True,
+    send_default_pii=False,
     environment=os.getenv("SENTRY_ENVIRONMENT"),
 )
 

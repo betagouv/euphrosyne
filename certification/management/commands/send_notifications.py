@@ -28,11 +28,11 @@ class Command(BaseCommand):
                 notification.send_notification()
             except Exception as e:
                 error_message = (
-                    "Error sending notification for certification %s to %s. Reason: %s"
+                    "Error sending notification %s for certification %s. Reason: %s"
                     % (
+                        notification.pk,
                         notification.certification.name,
-                        notification.user.email,
-                        str(e),
+                        type(e).__name__,
                     )
                 )
                 self.stderr.write(self.style.ERROR(error_message))
@@ -41,7 +41,7 @@ class Command(BaseCommand):
             notification.save()
             self.stdout.write(
                 self.style.SUCCESS(
-                    "Notification for certification %s sent to %s."
-                    % (notification.certification.name, notification.user.email)
+                    "Notification %s for certification %s sent."
+                    % (notification.pk, notification.certification.name)
                 )
             )

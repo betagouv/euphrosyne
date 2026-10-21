@@ -42,10 +42,6 @@ class Command(BaseCommand):
         )
 
         for plan in plans:
-            user = plan.participation.user
-            sentry_sdk.set_extra("user", user.email)
-            sentry_sdk.set_extra("run", plan.run.id)
-
             if not participation_has_required_employer_for_risk_prevention(
                 plan.participation
             ):
@@ -61,15 +57,20 @@ class Command(BaseCommand):
                 for process in processes:
                     self.stdout.write(
                         "[send-electrical-signature-processes] Started electrical signature process %s."  # pylint: disable=line-too-long
-                        % process
+                        % process.pk
                     )
             except Exception as e:
                 logger.error(
                     "Error starting electrical signature process for plan %s: %s",
                     plan.id,
-                    str(e),
+                    type(e).__name__,
                 )
-                sentry_sdk.capture_exception(e)
+                with sentry_sdk.new_scope() as scope:
+                    scope.set_context(
+                        "electrical_signature",
+                        {"plan_id": plan.pk, "run_id": plan.run_id},
+                    )
+                    sentry_sdk.capture_exception(e)
                 continue
 
             # Mark the plan as sent

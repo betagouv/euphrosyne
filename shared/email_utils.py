@@ -70,8 +70,7 @@ def send_email_with_language(
             return True
         except (smtplib.SMTPException, ConnectionError) as e:
             logger.error(
-                "Error sending email to %s. Reason: %s",
-                to_emails,
-                str(e),
+                "Error sending email. Reason: %s",
+                type(e).__name__,
             )
             return False

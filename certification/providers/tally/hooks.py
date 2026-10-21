@@ -122,7 +122,4 @@ def _update_user_name_with_form(data: TallyWebhookData):
             user.last_name = last_name  # type: ignore
             user.save()
         else:
-            logger.warning(
-                "Tally webhook : user with email %s not found, cannot update name",
-                data.user_email,
-            )
+            logger.warning("Tally webhook : user not found, cannot update name")

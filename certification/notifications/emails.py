@@ -28,9 +28,8 @@ def send_notification(
         )
     except (smtplib.SMTPException, ConnectionError) as e:
         logger.error(
-            "Error sending %s certification invitation to %s. Reason: %s",
+            "Error sending %s certification invitation. Reason: %s",
             certification_name,
-            email,
-            str(e),
+            type(e).__name__,
         )
         raise e
