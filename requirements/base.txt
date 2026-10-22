@@ -14,7 +14,7 @@ drf-spectacular==0.30.0
 gunicorn==26.2.0
 markdown==3.11.1
 opensearch-py==3.2.0
-pillow==12.3.0
+pillow==13.0.0
 psycopg2==2.9.13
 python-dotenv==1.2.3
 python3-openid==3.2.0
