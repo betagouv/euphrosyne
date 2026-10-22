@@ -56,10 +56,8 @@ def test_send_electrical_signature_processes_command(
 ):
     """Test the send_electrical_signature_processes management command."""
     # Mock the electrical signature processes that will be created
-    mock_process_1 = mock.Mock(spec=ElectricalSignatureProcess)
-    mock_process_1.__str__ = mock.Mock(return_value="Process 1")
-    mock_process_2 = mock.Mock(spec=ElectricalSignatureProcess)
-    mock_process_2.__str__ = mock.Mock(return_value="Process 2")
+    mock_process_1 = mock.Mock(spec=ElectricalSignatureProcess, pk=101)
+    mock_process_2 = mock.Mock(spec=ElectricalSignatureProcess, pk=102)
     mock_start_processes.return_value = [mock_process_1, mock_process_2]
 
     out = StringIO()
@@ -70,6 +68,8 @@ def test_send_electrical_signature_processes_command(
     assert "Sending documents to sign" in output
     assert "Found 1 risk prevention plans to process" in output
     assert "Started electrical signature process" in output
+    assert "process 101." in output
+    assert "process 102." in output
 
     # Verify start_electrical_signature_processes was called
     mock_start_processes.assert_called_once_with(risk_prevention_plan)

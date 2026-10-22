@@ -30,15 +30,6 @@ from .models import User, UserInvitation
 logger = logging.getLogger(__name__)
 
 
-def get_request_ip(request: HttpRequest) -> str:
-    remote_addr = request.META.get(
-        "HTTP_X_FORWARDED_FOR", request.META.get("REMOTE_ADDR", "")
-    )
-    if "," in remote_addr:
-        remote_addr = remote_addr.split(",", 1)[0].strip()
-    return remote_addr
-
-
 class ProjectInline(admin.TabularInline):
     model = Participation
     verbose_name = _("Related project")
@@ -387,18 +378,12 @@ class UserAdmin(DjangoUserAdmin):
         impersonator_user_id = request.user.pk
         impersonated_user_id = target_user.pk
         impersonation_started_at = timezone.now().isoformat()
-        remote_addr = get_request_ip(request)
         backend = settings.AUTHENTICATION_BACKENDS[0]
 
-        logger.warning(
-            "Starting user impersonation",
-            extra={
-                "impersonator_user_id": impersonator_user_id,
-                "impersonated_user_id": impersonated_user_id,
-                "impersonation_started_at": impersonation_started_at,
-                "remote_addr": remote_addr,
-            },
-        )
+        # Keep the actor, target and timestamp in the local administration audit
+        # trail rather than in logs forwarded to diagnostic services.
+        self.log_change(request, target_user, "Starting user impersonation")
+        logger.warning("Starting user impersonation")
 
         logout(request)
         login(request, target_user, backend=backend)

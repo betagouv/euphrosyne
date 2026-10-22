@@ -1,6 +1,7 @@
 from unittest import mock
 
 from django.contrib import messages
+from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.admin.sites import AdminSite
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory, TestCase
@@ -136,11 +137,11 @@ class TestImpersonateSelectedUserAction(TestCase):
                 False,
             )
         ]
-        log_warning.assert_called_once()
-        assert log_warning.call_args.args == ("Starting user impersonation",)
-        assert log_warning.call_args.kwargs["extra"] == {
-            "impersonator_user_id": admin_user.pk,
-            "impersonated_user_id": target_user.pk,
-            "impersonation_started_at": request.session["impersonation_started_at"],
-            "remote_addr": "203.0.113.10",
-        }
+        log_warning.assert_called_once_with("Starting user impersonation")
+        audit_entry = LogEntry.objects.get(
+            user=admin_user,
+            object_id=str(target_user.pk),
+            action_flag=CHANGE,
+        )
+        assert audit_entry.change_message == "Starting user impersonation"
+        assert audit_entry.action_time is not None

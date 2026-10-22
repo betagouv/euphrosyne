@@ -55,9 +55,10 @@ def test_command_send_notification(temp_template_path: str):
     assert notification.is_sent
 
     assert (
-        f"Notification for certification certification sent to {user.email}."
+        f"Notification {notification.pk} for certification certification sent."
         in out.getvalue()
     )
+    assert user.email not in out.getvalue()
 
     assert len(mail.outbox) == 1
     assert mail.outbox[0].recipients() == [user.email]
@@ -78,8 +79,8 @@ def test_command_continue_if_error(temp_template_path: str):
         # pylint: disable=line-too-long
         "certification.management.commands.send_notifications.CertificationNotification.send_notification"
     ) as mock_fn:
-        mock_fn.side_effect = [Exception("Error"), None]
         users = [StaffUserFactory(), StaffUserFactory()]
+        mock_fn.side_effect = [Exception(f"SMTP rejected {users[0].email}"), None]
         for user in users:
             notifications.append(
                 CertificationNotification.objects.create(
@@ -90,7 +91,12 @@ def test_command_continue_if_error(temp_template_path: str):
             )
 
         out = StringIO()
-        call_command("send_notifications", stdout=out)
+        err = StringIO()
+        call_command("send_notifications", stdout=out, stderr=err)
+
+        assert "Reason: Exception" in err.getvalue()
+        for user in users:
+            assert user.email not in out.getvalue() + err.getvalue()
 
         for notification in notifications:
             notification.refresh_from_db()
