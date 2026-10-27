@@ -48,6 +48,8 @@ You can copy this file to a new `.env` file to easily set up your environment.
 | DB\_\*                                              | Database configuration variables                                                                                                                                                                                                                  |
 | DJANGO_SECRET_KEY                                   | [Secret key](https://docs.djangoproject.com/en/4.1/ref/settings/#std-setting-SECRET_KEY) used by Django for cryptographic signing; also used to sign JWT tokens                                                                                   |
 | DJANGO_DEBUG                                        | Optional. Django debug mode                                                                                                                                                                                                                       |
+| LOGIN_FAILURE_LIMIT                                | Optional. Password failures before an account is temporarily blocked. Default: 5                                                                                                                                                                  |
+| LOGIN_LOCKOUT_SECONDS                              | Optional. Password lockout duration and inactivity period after which earlier failures expire, in seconds. Default: 900                                                                                                                           |
 | ELASTICSEARCH_HOST                                  | Elasticsearch instance host (data catalog)                                                                                                                                                                                                        |
 | ELASTICSEARCH_USERNAME                              | Elasticsearch credentials                                                                                                                                                                                                                         |
 | ELASTICSEARCH_PASSWORD                              | Elasticsearch credentials                                                                                                                                                                                                                         |
@@ -98,6 +100,28 @@ Available optional modules:
 
 For implementation and operational details of project archive/restore flows, see
 [`docs/project_data_lifecycle.md`](docs/project_data_lifecycle.md).
+
+### Password login protection
+
+The web login and password-based token APIs share a database counter per email
+address, normalized to lowercase. After five failed password checks, further
+password checks return HTTP `429` for fifteen minutes, including when the client
+changes IP address. Blocked requests do not extend this period. A successful
+password check resets the counter; failures also expire after fifteen minutes
+without a failure. Unknown identifiers and inactive accounts follow the same rules.
+
+The API response contains a generic `detail` message. Both HTML and JSON lockout
+responses include `Retry-After`, the remaining delay in seconds, and are not
+cacheable. Clients should wait for that delay before retrying. ORCID, password
+recovery, invitations, existing sessions and JWT refresh remain available.
+
+Counters store an HMAC of the submitted email, counts and timestamps, without
+storing passwords or client IP addresses. A daily job at `0 3 * * *` runs
+`python manage.py purge_login_attempts` to remove counters inactive for more than
+24 hours, preserving any active lockout.
+
+Deploy the `euphro_auth` migration with `python manage.py migrate` before serving
+the updated application. No additional service or dependency is required.
 
 ### Data request Origin protection
 

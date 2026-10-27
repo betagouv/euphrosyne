@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-07 15:58+0200\n"
+"POT-Creation-Date: 2026-10-27 17:47+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -563,9 +563,11 @@ msgstr "Utilisateurs"
 msgid "Send invitation e-mail again"
 msgstr "Ré-envoyer les invitations"
 
+#, python-brace-format
 msgid "Invitations sent to : {}."
 msgstr "Invitations envoyées à : {}."
 
+#, python-brace-format
 msgid ""
 "Invitations were not sent to the following accounts, the registrations have "
 "already been completed : {}"
@@ -586,6 +588,7 @@ msgstr "Sélectionnez seulement un utilisateur à la fois."
 msgid "Impersonating superusers is not allowed."
 msgstr "Se connecter en tant que superadmin n'est pas autorisé."
 
+#, python-brace-format
 msgid "You are now impersonating {}."
 msgstr "Vous êtes connecté en tant que {}."
 
@@ -604,9 +607,11 @@ msgstr "Mot de passe"
 msgid "this form"
 msgstr "ce formulaire"
 
+#, python-brace-format
 msgid "Change password using {}."
 msgstr "Modifier le mot de passe en utilisant {}."
 
+#, python-brace-format
 msgid "No password. You can set one using {}."
 msgstr "Aucun mot de passe. Vous pouvez en définir un en utilisant {}."
 
@@ -627,6 +632,12 @@ msgstr "Un compte avec cet email existe déjà."
 
 msgid "I have read and accept the Terms and Conditions."
 msgstr "J'ai lu et j'accepte les conditions générales d'Euphrosyne."
+
+msgid "Too many login attempts. Please try again later."
+msgstr "Trop de tentatives de connexion. Veuillez réessayer plus tard."
+
+msgid "Too many login attempts"
+msgstr "Trop de tentatives de connexion"
 
 msgid "The Email must be set"
 msgstr "L'email doit être défini"
@@ -692,6 +703,15 @@ msgstr "Lire les CGU."
 
 msgid "Accept"
 msgstr "Accepter"
+
+msgid "Log in with ORCID"
+msgstr "Se connecter avec ORCID"
+
+msgid "Forgotten your password or username?"
+msgstr "Mot de passe oublié ?"
+
+msgid "Go back to login page"
+msgstr "Retour à la page de connexion"
 
 msgid "Create your account"
 msgstr "Créer votre compte"
@@ -831,12 +851,6 @@ msgstr ""
 "Vous êtes connecté.e en tant que %(username)s, mais n'êtres pas autorisé.e à "
 "accéderà ce contenu. Voulez-vous vous connnecter avec un compte différent?"
 
-msgid "Log in with ORCID"
-msgstr "Se connecter avec ORCID"
-
-msgid "Forgotten your password or username?"
-msgstr "Mot de passe oublié ?"
-
 #, python-format
 msgid "Euphrosyne, open %(aglae_link)s data."
 msgstr "Euphrosyne, ouvrir les données de %(aglae_link)s."
@@ -900,9 +914,6 @@ msgstr ""
 "Si vous ne recevez aucun email, vérifiez que vous avez entré le bon email et "
 "vérifiez dans vos courriers indésirables."
 
-msgid "Go back to login page"
-msgstr "Retour à la page de connexion"
-
 msgid "Reset password"
 msgstr "Mettre à jour le mot de passe"
 
@@ -956,18 +967,22 @@ msgstr "Commentaires"
 msgid "Point location of image"
 msgstr "Localisation du point sur l'image"
 
+#, python-brace-format
 msgid "{} analysis technique"
 msgstr "technique d'analyse {}"
 
 msgid "other detector"
 msgstr "autre détecteur"
 
+#, python-brace-format
 msgid "{} / {} detector"
 msgstr "détecteur {} / {}"
 
+#, python-brace-format
 msgid "{} filters"
 msgstr "filtres {}"
 
+#, python-brace-format
 msgid "{} / {} filters choice"
 msgstr "choix de filtres {} / {}"
 
@@ -1326,6 +1341,7 @@ msgstr "Seuls les utilisateurs Admin peuvents valider et éxécuter les runs."
 msgid "Change state"
 msgstr "Modification du chef de projet"
 
+#, python-brace-format
 msgid "Run {} successfully moved to status: {}."
 msgstr "Le Run {} a maintenant le statut: {}."
 

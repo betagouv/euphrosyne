@@ -18,6 +18,10 @@ class TestCronJsonConfig(TestCase):
                 "pattern": "0 0 * * *",
                 "command_fragment": "python manage.py run_checks",
             },
+            "purge_login_attempts": {
+                "pattern": "0 3 * * *",
+                "command_fragment": "python manage.py purge_login_attempts",
+            },
             "every_week_job": {
                 "pattern": "0 7 * * 1",
                 "command_fragment": "python manage.py every_week_job",

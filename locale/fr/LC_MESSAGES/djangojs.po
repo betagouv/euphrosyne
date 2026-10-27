@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-21 18:05+0200\n"
+"POT-Creation-Date: 2026-10-27 17:51+0100\n"
 "PO-Revision-Date: 2021-12-20 11:13+0100\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -28,6 +28,9 @@ msgstr "Déconnexion"
 
 msgid "Admin"
 msgstr "Admin"
+
+msgid "Close"
+msgstr "Fermer"
 
 msgid "Leader"
 msgstr "Chef.fe de projet"
@@ -195,9 +198,6 @@ msgstr "Ajouter un membre au projet"
 
 msgid "Edit project member"
 msgstr "Modifier un membre du projet"
-
-msgid "Close"
-msgstr "Fermer"
 
 msgid "Delete participation"
 msgstr "Supprimer la participation"
@@ -833,6 +833,9 @@ msgstr "Aucun problème bloquant détecté."
 msgid "Warnings"
 msgstr "Avertissements"
 
+msgid "Skipped HDF5 entries"
+msgstr "Entrées HDF5 ignorées"
+
 msgid "Generation started."
 msgstr "Génération démarrée."
 
@@ -862,9 +865,6 @@ msgstr "Standards réutilisés"
 
 msgid "Errors"
 msgstr "Erreurs"
-
-msgid "Skipped HDF5 entries"
-msgstr "Entrées HDF5 ignorées"
 
 msgid "Available viewable files for this run"
 msgstr "Fichiers visualisables disponibles pour ce run"

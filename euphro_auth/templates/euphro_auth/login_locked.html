@@ -1,0 +1,19 @@
+{% extends "unauthorized.html" %}
+{% load i18n %}
+
+{% block content_panel %}
+  <h3>{% translate "Too many login attempts" %}</h3>
+  <p role="alert">{{ lockout_message }}</p>
+  <div class="fr-mt-4w">
+    <form action="{% url 'social:begin' 'orcid' %}" method="post">
+      {% csrf_token %}
+      <button class="button" type="submit">{% translate "Log in with ORCID" %}</button>
+    </form>
+  </div>
+  <p class="fr-mt-4w">
+    <a class="fr-link" href="{% url 'admin_password_reset' %}">{% translate 'Forgotten your password or username?' %}</a>
+  </p>
+  <p>
+    <a class="fr-link" href="{% url 'admin:login' %}">{% translate 'Go back to login page' %}</a>
+  </p>
+{% endblock %}

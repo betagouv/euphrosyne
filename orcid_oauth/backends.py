@@ -1,3 +1,4 @@
+from asgiref.sync import sync_to_async
 from django.conf import settings
 from social_core.backends.orcid import ORCIDOAuth2 as SocialORCIDOAuth2
 
@@ -14,4 +15,10 @@ class ORCIDOAuth2(SocialORCIDOAuth2):  # pylint: disable=abstract-method
         return (
             getattr(settings, "SOCIAL_AUTH_ORCID_KEY"),
             getattr(settings, "SOCIAL_AUTH_ORCID_SECRET"),
+        )
+
+    async def aauthenticate(self, *args, **kwargs):
+        # Let Django's async authentication reach the password backend as well.
+        return await sync_to_async(self.authenticate, thread_sensitive=True)(
+            *args, **kwargs
         )

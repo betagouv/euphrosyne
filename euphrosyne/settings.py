@@ -174,6 +174,8 @@ if "radiation_protection" in EUPHROSYNE_FEATURES:
         "lab.participations.middleware.ParticipationEmployerCompletionMiddleware"
     )
 
+MIDDLEWARE.append("euphro_auth.login_middleware.LoginLockoutMiddleware")
+
 ROOT_URLCONF = "euphrosyne.urls"
 
 TEMPLATES = [
@@ -282,6 +284,9 @@ AUTHENTICATION_BACKENDS = [
     "orcid_oauth.backends.ORCIDOAuth2",
     "euphro_auth.backends.LowercaseEmailBackend",
 ]
+
+LOGIN_FAILURE_LIMIT: int = int(os.getenv("LOGIN_FAILURE_LIMIT", "5"))
+LOGIN_LOCKOUT_SECONDS: int = int(os.getenv("LOGIN_LOCKOUT_SECONDS", "900"))
 
 
 # Internationalization

@@ -7,6 +7,16 @@ from shared.names import normalize_person_name
 from .managers import UserManager
 
 
+class LoginAttempt(models.Model):
+    """Shared password failure counter, without storing the submitted email."""
+
+    identifier_hash = models.CharField(max_length=64, unique=True)
+    failures = models.PositiveIntegerField(default=0)
+    last_failure_at = models.DateTimeField(null=True)
+    locked_until = models.DateTimeField(null=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+
+
 class User(AbstractUser):
     """Custom User model for authentication with email as identifier."""
 
