@@ -129,6 +129,7 @@ class TestImpersonateSelectedUserAction(TestCase):
         assert request.session["impersonated_user_id"] == target_user.pk
         assert request.session["impersonation_started_at"]
         assert request.user == target_user
+        assert request.session.get_expiry_age() == 3600
         assert request._messages == [  # pylint: disable=protected-access
             (
                 messages.SUCCESS,

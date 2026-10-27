@@ -38,3 +38,4 @@ class TestAdmin(SimpleTestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.url.startswith("https://orcid.org/oauth/authorize?"))
+        self.assertNotIn("_session_expiry", self.client.session)

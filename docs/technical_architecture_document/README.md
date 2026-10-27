@@ -225,6 +225,17 @@ et les droits projet ; les SAS autorisent certains accès temporaires au stockag
 Les pages du Catalogue de données sont actuellement protégées par un identifiant
 et un mot de passe distincts, au moyen de l’authentification HTTP Basic.
 
+Les sessions web de la Plateforme Euphrosyne expirent après 15 minutes
+d’inactivité pour les administrateurs du laboratoire et les superutilisateurs,
+et après 60 minutes pour les autres utilisateurs. Chaque requête authentifiée
+par le cookie de session, y compris un appel automatique en arrière-plan,
+renouvelle ce délai. Une session expirée impose une reconnexion lors du prochain
+accès protégé ; une page déjà ouverte reste affichée jusqu’à la requête suivante.
+Les sessions existantes adoptent cette politique à leur prochaine requête
+authentifiée. Les paramètres Django `SESSION_IDLE_TIMEOUT_ADMIN` et
+`SESSION_IDLE_TIMEOUT_USER` définissent ces durées en secondes. Cette expiration
+ne modifie pas la durée de validité des JWT ni les règles des bureaux distants.
+
 Pour les bureaux distants, les JWT d’accès expirent
 après cinq minutes par défaut au code, le jeton
 Guacamole au bout de 60 minutes après inactivité.

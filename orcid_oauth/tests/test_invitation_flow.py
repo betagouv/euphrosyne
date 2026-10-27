@@ -349,6 +349,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
         self.client.post(self.begin_url, {"user_id": "1"})
         self.callback(data={"user_id": "1"})
         self.assertEqual(auth.get_user(self.client).pk, self.invited.pk)
+        self.assertEqual(self.client.session.get_expiry_age(), 3600)
         self.assertEqual(UserSocialAuth.objects.count(), 1)
 
     def test_registration_completion_and_callback_authenticate_only_invited_user(self):
