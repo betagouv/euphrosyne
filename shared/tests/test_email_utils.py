@@ -17,21 +17,21 @@ class EmailUtilsTests(TestCase):
         """Set up test data with users having different language preferences."""
         self.user_en = User.objects.create_user(
             email="english@example.com",
-            password="testpassword",
+            password="T8!vQ2#rM6@zL9$p",
             first_name="English",
             last_name="User",
             preferred_language="en",
         )
         self.user_fr = User.objects.create_user(
             email="french@example.com",
-            password="testpassword",
+            password="T8!vQ2#rM6@zL9$p",
             first_name="French",
             last_name="User",
             preferred_language="fr",
         )
         self.user_no_pref = User.objects.create_user(
             email="default@example.com",
-            password="testpassword",
+            password="T8!vQ2#rM6@zL9$p",
             first_name="Default",
             last_name="User",
         )

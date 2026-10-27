@@ -64,7 +64,7 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
 
         self.project_participant_user = get_user_model().objects.create_user(
             email="project_participant_user@test.com",
-            password="project_participant_user",
+            password="T8!vQ2#rM6@zL9$p",
             is_staff=True,
         )
         self.client.force_login(self.admin_user)
@@ -177,7 +177,7 @@ class TestProjectAdminViewAsProjectLeader(BaseTestCases.BaseTestProjectAdmin):
         super().setUp()
         self.project_leader = get_user_model().objects.create_user(
             email="leader@test.com",
-            password="leader",
+            password="T8!vQ2#rM6@zL9$p",
             is_staff=True,
         )
         self.leader_participation = self.change_project.participation_set.create(
@@ -452,7 +452,7 @@ class TestProjectAdminViewAsProjectMember(BaseTestCases.BaseTestProjectAdmin):
 
         self.project_member = get_user_model().objects.create_user(
             email="project_participant_user@test.com",
-            password="project_participant_user",
+            password="T8!vQ2#rM6@zL9$p",
             is_staff=True,
         )
         self.change_project.participation_set.create(

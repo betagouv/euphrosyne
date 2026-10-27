@@ -56,6 +56,13 @@ class UserInvitationRegistrationForm(DjangoSetPasswordForm):
             )
         return email
 
+    def clean(self):
+        # Set the submitted identity before Django checks password similarity.
+        for field in ("email", "first_name", "last_name"):
+            if field in self.cleaned_data:
+                setattr(self.user, field, self.cleaned_data[field])
+        return super().clean()
+
     def save(self, commit: bool = True) -> AbstractBaseUser:
         self.user.email = self.cleaned_data["email"]
         self.user.first_name = self.cleaned_data["first_name"]

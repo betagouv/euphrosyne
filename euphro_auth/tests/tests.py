@@ -5,7 +5,9 @@ from django.test import TestCase
 class UsersManagersTests(TestCase):
     def test_create_user(self):
         user_model = get_user_model()
-        user = user_model.objects.create_user(email="normal@user.com", password="foo")
+        user = user_model.objects.create_user(
+            email="normal@user.com", password="T8!vQ2#rM6@zL9$p"
+        )
         self.assertEqual(user.email, "normal@user.com")
         self.assertTrue(user.is_active)
         self.assertFalse(user.is_staff)
@@ -22,12 +24,12 @@ class UsersManagersTests(TestCase):
         with self.assertRaises(TypeError):
             user_model.objects.create_user(email="")
         with self.assertRaises(ValueError):
-            user_model.objects.create_user(email="", password="foo")
+            user_model.objects.create_user(email="", password="T8!vQ2#rM6@zL9$p")
 
     def test_create_superuser(self):
         user_model = get_user_model()
         admin_user = user_model.objects.create_superuser(
-            email="super@user.com", password="foo"
+            email="super@user.com", password="T8!vQ2#rM6@zL9$p"
         )
         self.assertEqual(admin_user.email, "super@user.com")
         self.assertTrue(admin_user.is_active)
@@ -41,5 +43,5 @@ class UsersManagersTests(TestCase):
             pass
         with self.assertRaises(ValueError):
             user_model.objects.create_superuser(
-                email="super@user.com", password="foo", is_superuser=False
+                email="super@user.com", password="T8!vQ2#rM6@zL9$p", is_superuser=False
             )

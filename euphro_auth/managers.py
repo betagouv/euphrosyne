@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.password_validation import validate_password
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -24,6 +25,8 @@ class UserManager(BaseUserManager):
             raise ValueError(_("The Email must be set"))
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
+        if password is not None:
+            validate_password(password, user)
         user.set_password(password)
         user.save()
         return user

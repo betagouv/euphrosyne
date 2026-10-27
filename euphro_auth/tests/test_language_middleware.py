@@ -18,7 +18,7 @@ class UserLanguageModelTest(TestCase):
         """Set up test data."""
         self.user = User.objects.create_user(
             email="test@example.com",
-            password="testpassword",
+            password="T8!vQ2#rM6@zL9$p",
             first_name="Test",
             last_name="User",
         )
@@ -46,7 +46,7 @@ class UserLanguageMiddlewareTest(TestCase):
         self.middleware = UserLanguageMiddleware(get_response=MagicMock())
         self.user = User.objects.create_user(
             email="test@example.com",
-            password="testpassword",
+            password="T8!vQ2#rM6@zL9$p",
             first_name="Test",
             last_name="User",
         )

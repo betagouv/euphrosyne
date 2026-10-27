@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-07 15:58+0200\n"
+"POT-Creation-Date: 2026-10-27 17:23+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -563,9 +563,11 @@ msgstr "Utilisateurs"
 msgid "Send invitation e-mail again"
 msgstr "Ré-envoyer les invitations"
 
+#, python-brace-format
 msgid "Invitations sent to : {}."
 msgstr "Invitations envoyées à : {}."
 
+#, python-brace-format
 msgid ""
 "Invitations were not sent to the following accounts, the registrations have "
 "already been completed : {}"
@@ -586,6 +588,7 @@ msgstr "Sélectionnez seulement un utilisateur à la fois."
 msgid "Impersonating superusers is not allowed."
 msgstr "Se connecter en tant que superadmin n'est pas autorisé."
 
+#, python-brace-format
 msgid "You are now impersonating {}."
 msgstr "Vous êtes connecté en tant que {}."
 
@@ -604,9 +607,11 @@ msgstr "Mot de passe"
 msgid "this form"
 msgstr "ce formulaire"
 
+#, python-brace-format
 msgid "Change password using {}."
 msgstr "Modifier le mot de passe en utilisant {}."
 
+#, python-brace-format
 msgid "No password. You can set one using {}."
 msgstr "Aucun mot de passe. Vous pouvez en définir un en utilisant {}."
 
@@ -663,6 +668,20 @@ msgstr "Invitation utilisateur"
 
 msgid "User invitations"
 msgstr "Invitations utilisateur"
+
+msgid ""
+"Your password must contain at least 12 characters (16 for administrators)."
+msgstr ""
+"Votre mot de passe doit contenir au moins 12 caractères (16 pour les "
+"administrateurs)."
+
+#, python-format
+msgid ""
+"Your password must contain at least one lowercase letter, one uppercase "
+"letter, one digit and one special character from this list: %(characters)s."
+msgstr ""
+"Votre mot de passe doit contenir au moins une minuscule, une majuscule, un "
+"chiffre et un caractère spécial de cette liste : %(characters)s."
 
 msgid "Invite user"
 msgstr "Inviter un utilisateur"
@@ -956,18 +975,22 @@ msgstr "Commentaires"
 msgid "Point location of image"
 msgstr "Localisation du point sur l'image"
 
+#, python-brace-format
 msgid "{} analysis technique"
 msgstr "technique d'analyse {}"
 
 msgid "other detector"
 msgstr "autre détecteur"
 
+#, python-brace-format
 msgid "{} / {} detector"
 msgstr "détecteur {} / {}"
 
+#, python-brace-format
 msgid "{} filters"
 msgstr "filtres {}"
 
+#, python-brace-format
 msgid "{} / {} filters choice"
 msgstr "choix de filtres {} / {}"
 
@@ -1326,6 +1349,7 @@ msgstr "Seuls les utilisateurs Admin peuvents valider et éxécuter les runs."
 msgid "Change state"
 msgstr "Modification du chef de projet"
 
+#, python-brace-format
 msgid "Run {} successfully moved to status: {}."
 msgstr "Le Run {} a maintenant le statut: {}."
 
