@@ -56,6 +56,9 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(os.getenv("DJANGO_DEBUG", ""))
 
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split() or (
     ["localhost", ".scalingo.io"] if not DEBUG else []
 )
