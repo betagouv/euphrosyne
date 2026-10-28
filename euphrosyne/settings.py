@@ -107,6 +107,9 @@ SECURE_CSP_REPORT_ONLY = {
     "base-uri": [CSP.SELF],
     "form-action": [CSP.SELF],
 }
+csp_report_uri = os.getenv("SENTRY_CSP_REPORT_URI")
+if csp_report_uri:
+    SECURE_CSP_REPORT_ONLY["report-uri"] = [csp_report_uri]
 SECURE_CSP = SECURE_CSP_REPORT_ONLY if CSP_ENFORCE else None
 
 
