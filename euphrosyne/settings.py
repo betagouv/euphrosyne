@@ -296,14 +296,11 @@ AUTHENTICATION_BACKENDS = [
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = timedelta(minutes=15)
 AXES_LOCKOUT_PARAMETERS = ["username"]
-AXES_USERNAME_CALLABLE = "euphro_auth.axes.account_username"
-AXES_WHITELIST_CALLABLE = "euphro_auth.axes.is_passwordless_authentication"
-AXES_LOCKOUT_CALLABLE = "euphro_auth.axes.password_lockout_response"
-AXES_HANDLER = "euphro_auth.axes.AccountAxesHandler"
+AXES_USERNAME_CALLABLE = "euphro_auth.password_lockout.account_username"
+AXES_WHITELIST_CALLABLE = "euphro_auth.password_lockout.is_passwordless_authentication"
+AXES_LOCKOUT_CALLABLE = "euphro_auth.password_lockout.password_lockout_response"
+AXES_HANDLER = "euphro_auth.password_lockout.AccountAxesHandler"
 AXES_RESET_COOL_OFF_ON_FAILURE_DURING_LOCKOUT = False
-# The password backend resets successes for web, Basic and JWT alike. ORCID
-# and existing sessions must not clear a password lockout.
-AXES_RESET_ON_SUCCESS = False
 AXES_DISABLE_ACCESS_LOG = True
 AXES_SENSITIVE_PARAMETERS = ["username", "email", "ip_address"]
 # Account-only limits are intentional: changing IP or User-Agent cannot bypass

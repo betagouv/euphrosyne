@@ -1,3 +1,10 @@
+"""Share password failures by lowercased email across web, Basic and JWT.
+
+Axes manages expiry with its standard cool-off. ORCID, existing sessions and
+JWT refresh remain available. Password successes reset failures in
+LowercaseEmailBackend; passwordless logins leave them intact.
+"""
+
 from axes.handlers.database import AxesDatabaseHandler
 from django.contrib import admin
 from django.http import HttpRequest, HttpResponse, JsonResponse

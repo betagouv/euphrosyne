@@ -127,28 +127,6 @@ RADIATION_PROTECTION_SETTINGS = {
 }
 ```
 
-### Password login protection
-
-django-axes shares a database-backed failure counter between the web login,
-HTTP Basic authentication on `/api/auth/token/` and `/api/auth/long-token/`,
-and password authentication on `/api/auth/long-token/` (JSON or form data).
-The account email is lowercased before counting; IP addresses and User-Agent
-headers do not affect the limit. Five failed password checks trigger a block
-with Axes' standard 15-minute cool-off. Each IP/User-Agent record expires
-according to its last failure, so the block ends once the account's unexpired
-total falls below five. Attempts during the block do not extend it. A successful
-password authentication resets the counter.
-
-ORCID login, authenticated sessions and JWT refresh remain available during a
-password lockout and do not clear it. Lockout responses use HTTP 429, with a JSON
-`detail` for APIs and an ORCID login button on the web page.
-
-After installing the Python requirements, run `python manage.py migrate` to
-create the django-axes tables. Counters use the shared database, so the policy
-also applies across application workers and restarts. An administrator can
-clear a counter with `python manage.py axes_reset_username user@example.com`
-(use the lowercased email).
-
 ## Development
 
 To start the Django development server, run:
