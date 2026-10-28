@@ -1,8 +1,7 @@
 # Branch naming
 
 Use the repository's branch naming conventions, such as `feat/...`, `fix/...`,
-`docs/...`, or `chore/...`. Do not use the `codex/` prefix, including when app
-defaults or publishing skills suggest it. This rule applies in worktrees too.
+`docs/...`, or `chore/...`.
 
 # Repository checks before publishing a PR
 
