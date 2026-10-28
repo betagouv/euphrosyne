@@ -1,6 +1,4 @@
 from axes.handlers.database import AxesDatabaseHandler
-from axes.helpers import get_client_username
-from axes.models import AccessAttempt
 from django.contrib import admin
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -28,15 +26,7 @@ def is_passwordless_authentication(
 
 class AccountAxesHandler(AxesDatabaseHandler):
     def user_login_failed(self, sender, credentials: dict, request=None, **kwargs):
-        already_locked = getattr(request, "axes_locked_out", False)
         super().user_login_failed(sender, credentials, request=request, **kwargs)
-        if not already_locked and getattr(request, "axes_locked_out", False):
-            # Axes stores separate rows per IP/User-Agent. Once their sum reaches
-            # the limit, keep every row for the full cooloff after this failure.
-            # Otherwise an older row could expire and lift the block early.
-            AccessAttempt.objects.filter(
-                username=get_client_username(request, credentials)
-            ).update(attempt_time=request.axes_attempt_time)
         if isinstance(request, Request):
             # DRF stores attributes on its wrapper. AxesMiddleware receives the
             # underlying Django request, so expose the lockout there as well.

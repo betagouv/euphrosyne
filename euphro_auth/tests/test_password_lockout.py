@@ -132,13 +132,11 @@ def test_successful_password_authentication_resets_shared_failures(
     assert failures(user.email) == 0
 
 
-def test_full_fifteen_minute_lockout_from_fifth_failure(client, user, clock):
+def test_lockout_expires_after_fifteen_minute_cooloff(client, user, clock):
     started = clock.return_value
     for index, channel in enumerate(CHANNELS):
         clock.return_value = started + timedelta(minutes=index)
-        response = password_request(
-            client, channel, user.email, "wrong-password", f"192.0.2.{index + 1}"
-        )
+        response = password_request(client, channel, user.email, "wrong-password")
     assert response.status_code == 429
     locked_at = clock.return_value
     clock.return_value = locked_at + timedelta(minutes=14, seconds=59)
@@ -150,6 +148,23 @@ def test_full_fifteen_minute_lockout_from_fifth_failure(client, user, clock):
     )
     assert failures(user.email) == 5
     clock.return_value = locked_at + timedelta(minutes=15, seconds=1)
+    assert password_request(client, "jwt-json", user.email, PASSWORD).status_code == 200
+    assert failures(user.email) == 0
+
+
+def test_lockout_uses_axes_expiry_for_each_ip(client, user, clock):
+    started = clock.return_value
+    for index, channel in enumerate(CHANNELS):
+        clock.return_value = started + timedelta(minutes=index)
+        response = password_request(
+            client, channel, user.email, "wrong-password", f"192.0.2.{index + 1}"
+        )
+    assert response.status_code == 429
+    clock.return_value = started + timedelta(minutes=14, seconds=59)
+    assert password_request(client, "basic", user.email, PASSWORD).status_code == 429
+    # Axes expires the oldest IP's row after its own cooloff. The account then
+    # has fewer than five unexpired failures and can authenticate again.
+    clock.return_value = started + timedelta(minutes=15, seconds=1)
     assert password_request(client, "jwt-json", user.email, PASSWORD).status_code == 200
     assert failures(user.email) == 0
 

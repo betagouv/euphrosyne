@@ -133,9 +133,11 @@ django-axes shares a database-backed failure counter between the web login,
 HTTP Basic authentication on `/api/auth/token/` and `/api/auth/long-token/`,
 and password authentication on `/api/auth/long-token/` (JSON or form data).
 The account email is lowercased before counting; IP addresses and User-Agent
-headers do not affect the limit. Five failed password checks block password
-authentication for 15 minutes from the fifth failure. Attempts during that
-period do not extend it. A successful password authentication resets the counter.
+headers do not affect the limit. Five failed password checks trigger a block
+with Axes' standard 15-minute cool-off. Each IP/User-Agent record expires
+according to its last failure, so the block ends once the account's unexpired
+total falls below five. Attempts during the block do not extend it. A successful
+password authentication resets the counter.
 
 ORCID login, authenticated sessions and JWT refresh remain available during a
 password lockout and do not clear it. Lockout responses use HTTP 429, with a JSON
