@@ -1,4 +1,4 @@
-from rest_framework import exceptions, serializers
+from rest_framework import exceptions
 from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer,
     TokenObtainSerializer,
@@ -7,18 +7,8 @@ from rest_framework_simplejwt.settings import api_settings as simplejwt_api_sett
 
 from .tokens import EuphroRefreshToken, LongEuphroRefreshToken
 
+
 # pylint: disable=abstract-method
-
-
-class TokenPairResponseSerializer(serializers.Serializer):
-    access = serializers.CharField()
-    refresh = serializers.CharField()
-
-
-class LoginLockoutSerializer(serializers.Serializer):
-    detail = serializers.CharField()
-
-
 class SessionTokenObtainSerializer(TokenObtainSerializer):
     """Generate token based on session user"""
 

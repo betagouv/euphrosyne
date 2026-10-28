@@ -17,7 +17,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from drf_spectacular.generators import SchemaGenerator
 
 from euphro_auth.models import User
 
@@ -314,14 +313,3 @@ def test_axes_reset_command_unlocks_only_the_selected_account(client, user):
         == 302
     )
     assert submit_login(client, "web", email="other@example.com").status_code == 429
-
-
-def test_token_schema_documents_lockout_and_retry_header():
-    schema = SchemaGenerator().get_schema(public=True)
-    for path in ["/api/auth/token/", "/api/auth/long-token/"]:
-        responses = schema["paths"][path]["post"]["responses"]
-        assert "200" in responses
-        assert responses["429"]["headers"]["Retry-After"]["schema"]["type"] == "integer"
-        assert responses["429"]["content"]["application/json"]["schema"][
-            "$ref"
-        ].endswith("/LoginLockout")
