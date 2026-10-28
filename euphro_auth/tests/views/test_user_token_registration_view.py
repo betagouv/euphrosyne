@@ -46,6 +46,29 @@ class TestUserTokenRegistrationView(TestCase):
         user = auth.get_user(self.client)
         self.assertTrue(user.is_authenticated)
 
+    def test_admin_invitation_reports_sixteen_character_minimum(self):
+        self.user.is_lab_admin = True
+        self.user.save(update_fields=["is_lab_admin"])
+        response = self.client.get(self.view_url, follow=True)
+        response = self.client.post(
+            response.request["PATH_INFO"],
+            data={
+                "email": self.user.email,
+                "new_password1": "Q7!vR2#xM9@z",
+                "new_password2": "Q7!vR2#xM9@z",
+                "first_name": "John",
+                "last_name": "Doe",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(
+            response.context["form"].has_error("new_password2", "password_too_short")
+        )
+        self.assertContains(response, "16")
+        self.user.refresh_from_db()
+        self.assertIsNone(self.user.invitation_completed_at)
+        self.assertFalse(auth.get_user(self.client).is_authenticated)
+
     def test_orcid_registration_uses_post_form(self):
         preresponse = self.client.get(self.view_url)
         response = self.client.get(preresponse.headers["Location"])

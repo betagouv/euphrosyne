@@ -11,8 +11,8 @@ def test_form_save_success():
     form = UserInvitationRegistrationForm(
         data={
             "email": "TEST@Test.Test",
-            "new_password1": "abcdef102",
-            "new_password2": "abcdef102",
+            "new_password1": "T8!vQ2#rM6@zL9$p",
+            "new_password2": "T8!vQ2#rM6@zL9$p",
             "first_name": "John",
             "last_name": "Doe",
         },
@@ -31,8 +31,8 @@ def test_email_can_be_changed():
     form = UserInvitationRegistrationForm(
         data={
             "email": "New_Email@Test.Test",
-            "new_password1": "abcdef102",
-            "new_password2": "abcdef102",
+            "new_password1": "T8!vQ2#rM6@zL9$p",
+            "new_password2": "T8!vQ2#rM6@zL9$p",
             "first_name": "John",
             "last_name": "Doe",
         },
@@ -50,8 +50,8 @@ def test_email_should_be_unique():
     form = UserInvitationRegistrationForm(
         data={
             "email": "anotheruser@test.test",
-            "new_password1": "abcdef102",
-            "new_password2": "abcdef102",
+            "new_password1": "T8!vQ2#rM6@zL9$p",
+            "new_password2": "T8!vQ2#rM6@zL9$p",
             "first_name": "John",
             "last_name": "Doe",
         },
@@ -67,8 +67,8 @@ def test_complete_invitation_on_save():
     form = UserInvitationRegistrationForm(
         data={
             "email": "test@test.test",
-            "new_password1": "abcdef102",
-            "new_password2": "abcdef102",
+            "new_password1": "T8!vQ2#rM6@zL9$p",
+            "new_password2": "T8!vQ2#rM6@zL9$p",
             "first_name": "John",
             "last_name": "Doe",
         },

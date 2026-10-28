@@ -1,3 +1,8 @@
+# Branch naming
+
+Use the repository's branch naming conventions, such as `feat/...`, `fix/...`,
+`docs/...`, or `chore/...`.
+
 # Repository checks before publishing a PR
 
 Use `.github/workflows/test.yaml` as the source of truth for required checks.

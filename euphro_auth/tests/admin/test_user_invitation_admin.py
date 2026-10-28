@@ -18,7 +18,7 @@ class TestUserInvitationAdmin(TestCase):
         self.model_admin = UserInvitationAdmin(UserInvitation, AdminSite())
         self.admin_user = get_user_model().objects.create_user(
             email="admin_user@test.com",
-            password="admin_user",
+            password="T8!vQ2#rM6@zL9$p",
             is_staff=True,
             is_lab_admin=True,
         )

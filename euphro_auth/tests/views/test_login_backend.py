@@ -7,14 +7,14 @@ class TestLowercaseEmailBackend(TestCase):
     def test_admin_login_lowercases_email(self):
         user_model = get_user_model()
         user = user_model.objects.create_user(
-            email="user@example.com", password="test-pass-123"
+            email="user@example.com", password="T8!vQ2#rM6@zL9$p"
         )
         user.is_staff = True
         user.save()
 
         response = self.client.post(
             reverse("admin:login"),
-            data={"username": "USER@EXAMPLE.COM", "password": "test-pass-123"},
+            data={"username": "USER@EXAMPLE.COM", "password": "T8!vQ2#rM6@zL9$p"},
             follow=True,
         )
 

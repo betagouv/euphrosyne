@@ -9,7 +9,7 @@ class TestInstitutionAdminViewAsParticipant(TestCase):
     def setUp(self):
         self.client = Client()
         self.participant_user = get_user_model().objects.create_user(
-            email="participant@test.com", password="password", is_staff=True
+            email="participant@test.com", password="T8!vQ2#rM6@zL9$p", is_staff=True
         )
         self.client.force_login(self.participant_user)
 

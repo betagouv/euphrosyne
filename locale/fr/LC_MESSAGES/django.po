@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-07 15:58+0200\n"
+"POT-Creation-Date: 2026-10-28 11:03+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -663,6 +663,14 @@ msgstr "Invitation utilisateur"
 
 msgid "User invitations"
 msgstr "Invitations utilisateur"
+
+#, python-format
+msgid ""
+"Your password must contain at least one lowercase letter, one uppercase "
+"letter, one digit and one special character from this list: %(characters)s."
+msgstr ""
+"Votre mot de passe doit contenir au moins une minuscule, une majuscule, un "
+"chiffre et un caractère spécial de cette liste : %(characters)s."
 
 msgid "Invite user"
 msgstr "Inviter un utilisateur"
