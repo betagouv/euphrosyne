@@ -7,6 +7,9 @@ class EuphroAuthConfig(AppConfig):
     name = "euphro_auth"
 
     def ready(self) -> None:
+        # Register the DRF lockout bridge after Django has loaded the models.
+        # pylint: disable=import-outside-toplevel,unused-import
+        from . import axes  # noqa: F401
         from .sessions import (  # pylint: disable=import-outside-toplevel
             set_session_idle_timeout,
         )

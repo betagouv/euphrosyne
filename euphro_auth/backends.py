@@ -1,11 +1,37 @@
-from functools import partial
-
 from asgiref.sync import sync_to_async
+from axes.backends import AxesStandaloneBackend
+from axes.utils import reset
+from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
-from django.core.exceptions import PermissionDenied
 from django.views.decorators.debug import sensitive_variables
 
-from .login_protection import verify_login
+from .axes import get_username
+
+
+class PasswordAxesBackend(AxesStandaloneBackend):
+    """Run Axes for password checks, leaving OAuth authentication independent."""
+
+    @sensitive_variables("password", "kwargs")
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        username = username if username is not None else kwargs.get("email")
+        password_attempt = (
+            isinstance(username, str)
+            and bool(username.strip())
+            and isinstance(password, str)
+        )
+        raw_request = getattr(request, "_request", request)
+        if raw_request is not None:
+            raw_request.axes_password_attempt = password_attempt
+        if password_attempt:
+            return super().authenticate(
+                raw_request, username=username, password=password, **kwargs
+            )
+        return None
+
+    async def aauthenticate(self, request, username=None, password=None, **kwargs):
+        return await sync_to_async(self.authenticate, thread_sensitive=True)(
+            request, username=username, password=password, **kwargs
+        )
 
 
 class LowercaseEmailBackend(ModelBackend):
@@ -18,23 +44,12 @@ class LowercaseEmailBackend(ModelBackend):
         if not isinstance(password, str):
             return None
         username = username.lower()
-        user, locked_until = verify_login(
-            username,
-            partial(
-                super().authenticate,
-                request,
-                username=username,
-                password=password,
-                **kwargs,
-            ),
+        user = super().authenticate(
+            request, username=username, password=password, **kwargs
         )
-        if locked_until is not None:
-            # DRF wraps HttpRequest; response middleware receives the original.
-            raw_request = getattr(request, "_request", request)
-            if raw_request is not None:
-                raw_request.login_locked_until = locked_until
-            # Raise after the transaction commits, preserving the fifth failure.
-            raise PermissionDenied("Too many login attempts")
+        if user is not None and settings.AXES_ENABLED:
+            # Basic and JWT password checks do not emit user_logged_in.
+            reset(username=get_username(request, {"email": username}))
         return user
 
     async def aauthenticate(self, request, username=None, password=None, **kwargs):

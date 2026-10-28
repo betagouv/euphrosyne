@@ -2,6 +2,7 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
+from axes.models import AccessAttempt
 from django.contrib import auth
 from django.contrib.auth.tokens import default_token_generator
 from django.test import Client, TestCase, override_settings
@@ -12,7 +13,7 @@ from django.utils.http import urlsafe_base64_encode
 from social_core.utils import PARTIAL_TOKEN_SESSION_NAME
 from social_django.models import Partial, UserSocialAuth
 
-from euphro_auth.models import LoginAttempt, User
+from euphro_auth.models import User
 
 from ..backends import ORCIDOAuth2
 from ..invitations import CONTEXT_MAX_AGE, INVITATION_SESSION_KEY
@@ -359,13 +360,14 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
             user=self.invited, provider="orcid", uid="0000-0002-1234-5678"
         )
         for _ in range(5):
-            self.assertIsNone(
-                auth.authenticate(email=self.invited.email, password="wrong")
+            self.client.post(
+                reverse("admin:login"),
+                {"username": self.invited.email, "password": "wrong"},
             )
         self.client.post(self.begin_url)
         self.callback()
         self.assertEqual(auth.get_user(self.client).pk, self.invited.pk)
-        self.assertEqual(LoginAttempt.objects.get().failures, 5)
+        self.assertEqual(AccessAttempt.objects.get().failures_since_start, 5)
 
     def test_registration_completion_and_callback_authenticate_only_invited_user(self):
         self.validate_invitation()

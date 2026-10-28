@@ -14,7 +14,7 @@ import os
 import subprocess
 
 # pylint: disable=line-too-long
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import dj_database_url
@@ -120,6 +120,7 @@ DATA_COOLING_ENABLE = _get_bool_env("DATA_COOLING_ENABLE", default=False)
 # Application definition
 
 CORE_INSTALLED_APPS = [
+    "axes",
     "corsheaders",
     "euphrosyne.apps.AdminConfig",
     "euphrosyne.methods.apps.MethodsConfig",  # Use explicit app config for methods
@@ -174,7 +175,7 @@ if "radiation_protection" in EUPHROSYNE_FEATURES:
         "lab.participations.middleware.ParticipationEmployerCompletionMiddleware"
     )
 
-MIDDLEWARE.append("euphro_auth.login_middleware.LoginLockoutMiddleware")
+MIDDLEWARE.append("axes.middleware.AxesMiddleware")
 
 ROOT_URLCONF = "euphrosyne.urls"
 
@@ -281,12 +282,27 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/topics/auth/customizing/#other-authentication-sources
 
 AUTHENTICATION_BACKENDS = [
+    "euphro_auth.backends.PasswordAxesBackend",
     "orcid_oauth.backends.ORCIDOAuth2",
     "euphro_auth.backends.LowercaseEmailBackend",
 ]
 
-LOGIN_FAILURE_LIMIT: int = int(os.getenv("LOGIN_FAILURE_LIMIT", "5"))
-LOGIN_LOCKOUT_SECONDS: int = int(os.getenv("LOGIN_LOCKOUT_SECONDS", "900"))
+AXES_FAILURE_LIMIT: int = int(os.getenv("LOGIN_FAILURE_LIMIT", "5"))
+AXES_COOLOFF_TIME = timedelta(seconds=int(os.getenv("LOGIN_LOCKOUT_SECONDS", "900")))
+AXES_LOCKOUT_PARAMETERS = ["username"]
+AXES_USERNAME_CALLABLE = "euphro_auth.axes.get_username"
+AXES_CLIENT_IP_CALLABLE = "euphro_auth.axes.get_client_ip"
+AXES_WHITELIST_CALLABLE = "euphro_auth.axes.bypass_non_password_auth"
+AXES_LOCKOUT_CALLABLE = "euphro_auth.axes.lockout_response"
+AXES_RESET_COOL_OFF_ON_FAILURE_DURING_LOCKOUT = False
+# Reset after password verification in the backend, including Basic/JWT checks.
+# OAuth and reuse of an existing session must not clear password failures.
+AXES_RESET_ON_SUCCESS = False
+AXES_DISABLE_ACCESS_LOG = True
+AXES_ENABLE_ACCESS_FAILURE_LOG = False
+AXES_SENSITIVE_PARAMETERS = ["username", "email", "ip_address", "csrfmiddlewaretoken"]
+# Account-only lockouts deliberately aggregate attempts across IPs and user agents.
+SILENCED_SYSTEM_CHECKS = ["axes.W006"]
 
 
 # Internationalization

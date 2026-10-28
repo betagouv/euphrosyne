@@ -103,25 +103,35 @@ For implementation and operational details of project archive/restore flows, see
 
 ### Password login protection
 
-The web login and password-based token APIs share a database counter per email
-address, normalized to lowercase. After five failed password checks, further
-password checks return HTTP `429` for fifteen minutes, including when the client
-changes IP address. Blocked requests do not extend this period. A successful
-password check resets the counter; failures also expire after fifteen minutes
-without a failure. Unknown identifiers and inactive accounts follow the same rules.
+django-axes protects the web login and password-based token APIs with account
+lockouts shared across client IP addresses and user agents. The default policy is
+five failed password checks followed by a fifteen-minute cool-off period. Blocked
+requests do not extend the period. Successful password checks reset the counter,
+including HTTP Basic and JSON token authentication. ORCID and reuse of an existing
+session do not reset password failures. Unknown identifiers and inactive accounts
+follow the same rules. Password checks already in flight can finish before Axes
+records enough failures to lock the account.
 
 The API response contains a generic `detail` message. Both HTML and JSON lockout
 responses include `Retry-After`, the remaining delay in seconds, and are not
 cacheable. Clients should wait for that delay before retrying. ORCID, password
 recovery, invitations, existing sessions and JWT refresh remain available.
 
-Counters store an HMAC of the submitted email, counts and timestamps, without
-storing passwords or client IP addresses. A daily job at `0 3 * * *` runs
-`python manage.py purge_login_attempts` to remove counters inactive for more than
-24 hours, preserving any active lockout.
+Axes stores HMAC identifiers derived from lowercase email addresses. Passwords,
+email form fields and CSRF tokens are masked in attempt metadata, and successful
+login/access-failure history logging is disabled. A constant redacted IP address
+(`0.0.0.0`) is stored instead of client IPs, preserving Axes' database uniqueness
+constraint during concurrent first attempts. Lockout decisions use only the
+account identifier. Axes expires old attempt records during authentication.
 
-Deploy the `euphro_auth` migration with `python manage.py migrate` before serving
-the updated application. No additional service or dependency is required.
+Operators can inspect and clear attempts through the Axes admin screens, or use
+`python manage.py axes_reset_username <stored-HMAC-identifier>` to unlock one
+account. The `LOGIN_FAILURE_LIMIT` and `LOGIN_LOCKOUT_SECONDS` environment variables
+configure `AXES_FAILURE_LIMIT` and `AXES_COOLOFF_TIME`, respectively.
+
+Install the updated requirements and run `python manage.py migrate` to create the
+Axes tables before serving the updated application. No additional service is
+required.
 
 ### Data request Origin protection
 

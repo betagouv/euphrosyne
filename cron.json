@@ -18,10 +18,6 @@
       "size": "S"
     },
     {
-      "command": "0 3 * * * python manage.py purge_login_attempts",
-      "size": "S"
-    },
-    {
       "command": "*/10 * * * * python manage.py every_10_minutes_job",
       "size": "S"
     }
