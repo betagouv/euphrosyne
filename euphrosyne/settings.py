@@ -160,6 +160,7 @@ MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else 
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "euphro_auth.middlewares.SessionIdleTimeoutMiddleware",
     "euphro_auth.middleware.UserLanguageMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "social_django.middleware.SocialAuthExceptionMiddleware",
@@ -389,6 +390,10 @@ FEEDBACK_EMAILS = os.getenv("FEEDBACK_EMAILS", "").split(",")
 
 # Necessary for the correct behavior of password reset flow:
 LOGIN_URL = "/login/"
+
+# Sliding expiration for authenticated web sessions, in seconds.
+SESSION_IDLE_TIMEOUT_ADMIN = 15 * 60
+SESSION_IDLE_TIMEOUT_USER = 60 * 60
 
 # Logging
 
