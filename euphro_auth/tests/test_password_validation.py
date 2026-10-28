@@ -6,7 +6,10 @@ from django.contrib.auth.forms import (
     PasswordChangeForm,
     SetPasswordForm,
 )
-from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.password_validation import (
+    password_validators_help_text_html,
+    validate_password,
+)
 from django.core.exceptions import ValidationError
 from django.db.models.query import QuerySet
 
@@ -28,6 +31,12 @@ def test_administrators_require_sixteen_characters(role):
     validate_password("Q7!vR2#xM9@zL8$p", user)
     with pytest.raises(ValidationError, match="16"):
         validate_password("Q7!vR2#xM9@zL8$", user)
+
+
+def test_password_help_only_displays_the_user_length_requirement():
+    help_html = str(password_validators_help_text_html())
+    assert "12" in help_html
+    assert "16" not in help_html
 
 
 @pytest.mark.parametrize(
@@ -81,6 +90,14 @@ def test_password_forms_enforce_policy(form_class, role):
             },
         )
         assert form.is_valid() == valid, form.errors
+        if role and len(password) == 12:
+            field = (
+                "password2"
+                if form_class == AdminPasswordChangeForm
+                else "new_password2"
+            )
+            assert form.has_error(field, "password_too_short")
+            assert "16" in str(form.errors[field])
 
 
 @pytest.mark.django_db

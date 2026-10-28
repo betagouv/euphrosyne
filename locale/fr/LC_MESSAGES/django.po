@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-27 17:23+0100\n"
+"POT-Creation-Date: 2026-10-28 10:23+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -668,12 +668,6 @@ msgstr "Invitation utilisateur"
 
 msgid "User invitations"
 msgstr "Invitations utilisateur"
-
-msgid ""
-"Your password must contain at least 12 characters (16 for administrators)."
-msgstr ""
-"Votre mot de passe doit contenir au moins 12 caractères (16 pour les "
-"administrateurs)."
 
 #, python-format
 msgid ""

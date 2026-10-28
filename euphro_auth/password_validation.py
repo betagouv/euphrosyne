@@ -5,19 +5,21 @@ from django.utils.translation import gettext as _
 from .models import User
 
 
-class RoleMinimumLengthValidator(MinimumLengthValidator):
+class UserMinimumLengthValidator(MinimumLengthValidator):
     def __init__(self):
         super().__init__(min_length=12)
 
+
+class AdminMinimumLengthValidator(MinimumLengthValidator):
+    def __init__(self):
+        super().__init__(min_length=16)
+
     def validate(self, password: str, user: User | None = None) -> None:
-        min_length = 16 if user and (user.is_superuser or user.is_lab_admin) else 12
-        MinimumLengthValidator(min_length=min_length).validate(password, user)
+        if user and (user.is_superuser or user.is_lab_admin):
+            super().validate(password, user)
 
     def get_help_text(self) -> str:
-        return _(
-            "Your password must contain at least 12 characters "
-            "(16 for administrators)."
-        )
+        return ""
 
 
 class CharacterTypesValidator:

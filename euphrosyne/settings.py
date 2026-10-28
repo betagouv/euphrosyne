@@ -265,7 +265,10 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        "NAME": "euphro_auth.password_validation.RoleMinimumLengthValidator",
+        "NAME": "euphro_auth.password_validation.UserMinimumLengthValidator",
+    },
+    {
+        "NAME": "euphro_auth.password_validation.AdminMinimumLengthValidator",
     },
     {
         "NAME": "euphro_auth.password_validation.CharacterTypesValidator",
