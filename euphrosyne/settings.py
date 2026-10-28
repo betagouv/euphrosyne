@@ -14,7 +14,7 @@ import os
 import subprocess
 
 # pylint: disable=line-too-long
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import dj_database_url
@@ -133,6 +133,7 @@ CORE_INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "axes",
     "social_django",
     "rest_framework",
     "django_filters",
@@ -173,6 +174,8 @@ if "radiation_protection" in EUPHROSYNE_FEATURES:
     MIDDLEWARE.append(
         "lab.participations.middleware.ParticipationEmployerCompletionMiddleware"
     )
+
+MIDDLEWARE.append("axes.middleware.AxesMiddleware")
 
 ROOT_URLCONF = "euphrosyne.urls"
 
@@ -285,9 +288,24 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/topics/auth/customizing/#other-authentication-sources
 
 AUTHENTICATION_BACKENDS = [
+    "euphro_auth.backends.PasswordAxesBackend",
     "orcid_oauth.backends.ORCIDOAuth2",
     "euphro_auth.backends.LowercaseEmailBackend",
 ]
+
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = timedelta(minutes=15)
+AXES_LOCKOUT_PARAMETERS = ["username"]
+AXES_USERNAME_CALLABLE = "euphro_auth.password_lockout.account_username"
+AXES_WHITELIST_CALLABLE = "euphro_auth.password_lockout.is_passwordless_authentication"
+AXES_LOCKOUT_CALLABLE = "euphro_auth.password_lockout.password_lockout_response"
+AXES_HANDLER = "euphro_auth.password_lockout.AccountAxesHandler"
+AXES_RESET_COOL_OFF_ON_FAILURE_DURING_LOCKOUT = False
+AXES_DISABLE_ACCESS_LOG = True
+AXES_SENSITIVE_PARAMETERS = ["username", "email", "ip_address"]
+# Account-only limits are intentional: changing IP or User-Agent cannot bypass
+# them, and unrelated accounts sharing an IP must remain accessible.
+SILENCED_SYSTEM_CHECKS = ["axes.W006"]
 
 
 # Internationalization

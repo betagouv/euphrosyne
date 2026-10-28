@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-28 11:03+0100\n"
+"POT-Creation-Date: 2026-10-28 11:48+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -664,6 +664,16 @@ msgstr "Invitation utilisateur"
 msgid "User invitations"
 msgstr "Invitations utilisateur"
 
+msgid ""
+"Password sign-in is blocked for 15 minutes after too many failed attempts. "
+"You can still log in with ORCID."
+msgstr ""
+"La connexion par mot de passe est bloquée pendant 15 minutes après trop de "
+"tentatives infructueuses. Vous pouvez toujours vous connecter avec ORCID."
+
+msgid "Log in"
+msgstr "Connexion"
+
 #, python-format
 msgid ""
 "Your password must contain at least one lowercase letter, one uppercase "
@@ -827,9 +837,6 @@ msgstr "Sauvegarder et ajouter un autre"
 
 msgid "Close"
 msgstr "Fermer"
-
-msgid "Log in"
-msgstr "Connexion"
 
 #, python-format
 msgid ""

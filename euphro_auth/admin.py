@@ -2,7 +2,6 @@ import logging
 from typing import Any, Dict, Optional
 
 from django.apps import apps
-from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin import ActionLocation, ModelAdmin
 from django.contrib.admin.options import ShowFacets
@@ -378,7 +377,7 @@ class UserAdmin(DjangoUserAdmin):
         impersonator_user_id = request.user.pk
         impersonated_user_id = target_user.pk
         impersonation_started_at = timezone.now().isoformat()
-        backend = settings.AUTHENTICATION_BACKENDS[0]
+        backend = "euphro_auth.backends.LowercaseEmailBackend"
 
         # Keep the actor, target and timestamp in the local administration audit
         # trail rather than in logs forwarded to diagnostic services.
