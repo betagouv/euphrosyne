@@ -1,8 +1,8 @@
-from django.test import SimpleTestCase, override_settings
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 
-class TestAdmin(SimpleTestCase):
+class TestAdmin(TestCase):
     @override_settings(
         STORAGES={
             "default": {

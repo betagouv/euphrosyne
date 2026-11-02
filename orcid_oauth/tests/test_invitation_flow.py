@@ -17,6 +17,8 @@ from euphro_auth.models import User
 from ..backends import ORCIDOAuth2
 from ..invitations import CONTEXT_MAX_AGE, INVITATION_SESSION_KEY
 
+OAUTH_STATES_SESSION_KEY = "orcid_oauth2_transaction_index"
+
 
 @override_settings(
     SOCIAL_AUTH_ORCID_KEY="client-id",
@@ -56,6 +58,9 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
         self.assertIn(INVITATION_SESSION_KEY, self.client.session)
         self.register_url = response.headers["Location"]
 
+    def oauth_state(self) -> str:
+        return next(reversed(self.client.session[OAUTH_STATES_SESSION_KEY]))
+
     def start_registration(self, data: dict | None = None):
         return self.client.post(
             self.register_url, {"provider": "orcid", **(data or {})}
@@ -89,7 +94,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
             return self.client.get(
                 self.callback_url,
                 {
-                    "state": self.client.session["orcid_state"],
+                    "state": self.oauth_state(),
                     "code": "valid-test-code",
                     **(data or {}),
                 },
@@ -143,13 +148,13 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
         self.assertEqual(
             self.client.get(self.register_url, {"provider": "orcid"}).status_code, 200
         )
-        self.assertNotIn("orcid_state", self.client.session)
+        self.assertNotIn(OAUTH_STATES_SESSION_KEY, self.client.session)
 
     def test_orcid_post_without_a_validated_invitation_link_is_rejected(self):
         response = self.start_registration({"user_id": "1"})
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.context["validlink"])
-        self.assertNotIn("orcid_state", self.client.session)
+        self.assertNotIn(OAUTH_STATES_SESSION_KEY, self.client.session)
         self.assert_no_association()
 
     def test_orcid_post_cannot_change_the_invitation_page_uid(self):
@@ -161,7 +166,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
         response = self.client.post(other_page, {"provider": "orcid"})
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(INVITATION_SESSION_KEY, self.client.session)
-        self.assertNotIn("orcid_state", self.client.session)
+        self.assertNotIn(OAUTH_STATES_SESSION_KEY, self.client.session)
         self.assert_no_association()
 
     def test_orcid_post_requires_the_invitation_forms_csrf_token(self):
@@ -170,7 +175,7 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
         client.get(page)
         response = client.post(page, {"provider": "orcid"})
         self.assertEqual(response.status_code, 403)
-        self.assertNotIn("orcid_state", client.session)
+        self.assertNotIn(OAUTH_STATES_SESSION_KEY, client.session)
         self.assertFalse(UserSocialAuth.objects.exists())
 
     def test_unknown_orcid_cannot_associate_authenticated_browser_user(self):
@@ -328,7 +333,10 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
 
     def test_orcid_associated_with_another_account_cannot_use_invitation(self):
         UserSocialAuth.objects.create(
-            user=self.victim, provider="orcid", uid="0000-0002-1234-5678"
+            user=self.victim,
+            provider="orcid",
+            uid="0000-0002-1234-5678",
+            id_key="orcid",
         )
         self.validate_invitation()
         self.start_registration()
@@ -341,7 +349,10 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
         self.invited.invitation_completed_at = timezone.now()
         self.invited.save()
         UserSocialAuth.objects.create(
-            user=self.invited, provider="orcid", uid="0000-0002-1234-5678"
+            user=self.invited,
+            provider="orcid",
+            uid="0000-0002-1234-5678",
+            id_key="orcid",
         )
         session = self.client.session
         session["user_id"] = self.victim.pk
@@ -464,6 +475,16 @@ class TestORCIDInvitationFlow(TestCase):  # pylint: disable=too-many-public-meth
         )
         self.assertEqual(response.url, reverse("admin:login"))
         self.assert_no_association()
+
+    def test_other_oauth_attempt_in_session_cannot_use_the_invitation(self):
+        self.validate_invitation()
+        self.start_registration()
+        # Valid for Social Auth, but not the attempt started from the invitation.
+        self.client.post(self.begin_url)
+        response = self.callback()
+        self.assertEqual(response.url, reverse("admin:login"))
+        self.assert_no_association()
+        self.assertNotIn(INVITATION_SESSION_KEY, self.client.session)
 
     def test_deleted_target_during_oauth_is_rejected(self):
         self.validate_invitation()

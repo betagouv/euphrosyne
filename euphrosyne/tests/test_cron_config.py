@@ -18,6 +18,10 @@ class TestCronJsonConfig(TestCase):
                 "pattern": "0 0 * * *",
                 "command_fragment": "python manage.py run_checks",
             },
+            "clearsocial": {
+                "pattern": "30 0 * * *",
+                "command_fragment": "python manage.py clearsocial",
+            },
             "every_week_job": {
                 "pattern": "0 7 * * 1",
                 "command_fragment": "python manage.py every_week_job",

@@ -1,4 +1,5 @@
 from typing import Any, Dict
+from urllib.parse import parse_qs, urlsplit
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -59,11 +60,10 @@ class UserTokenRegistrationView(PasswordResetConfirmView):
             return reject_invitation(request)
         # Django's invitation dispatch has already validated this page's token.
         # Let Social Auth create the state and bind its attempt to that target.
-        request.session.pop("orcid_state", None)
         response = social_auth(request, backend="orcid")
         request.session[INVITATION_SESSION_KEY] = {
             **request.session[INVITATION_SESSION_KEY],
-            "oauth_state": request.session["orcid_state"],
+            "oauth_state": parse_qs(urlsplit(response.url).query)["state"][0],
         }
         return response
 
