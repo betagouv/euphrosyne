@@ -217,9 +217,10 @@ def test_orcid_still_authenticates_locked_account_without_resetting_password_lim
     for _ in range(5):
         password_request(client, "web", user.email, "wrong-password")
     uid = "0000-0002-1234-5678"
-    UserSocialAuth.objects.create(user=user, provider="orcid", uid=uid)
+    UserSocialAuth.objects.create(user=user, provider="orcid", uid=uid, id_key="orcid")
     begin = reverse("social:begin", args=("orcid",))
     assert client.post(begin).status_code == 302
+    state = next(reversed(client.session["orcid_oauth2_transaction_index"]))
     with (
         patch.object(
             ORCIDOAuth2,
@@ -237,7 +238,7 @@ def test_orcid_still_authenticates_locked_account_without_resetting_password_lim
     ):
         response = client.get(
             reverse("social:complete", args=("orcid",)),
-            {"state": client.session["orcid_state"], "code": "valid-code"},
+            {"state": state, "code": "valid-code"},
         )
     assert response.status_code == 302
     assert auth.get_user(client).pk == user.pk

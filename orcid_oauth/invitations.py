@@ -81,7 +81,11 @@ def store_invitation(request: HttpRequest, user: User, token: str) -> None:
 
 
 def validated_invitation_user(
-    request: HttpRequest, *, for_callback: bool = False, lock: bool = False
+    request: HttpRequest,
+    *,
+    for_callback: bool = False,
+    oauth_state: str | None = None,
+    lock: bool = False,
 ) -> User | None:
     context = request.session.get(INVITATION_SESSION_KEY)
     if isinstance(context, dict):
@@ -94,11 +98,11 @@ def validated_invitation_user(
             and isinstance(context.get("user_id"), int)
             and isinstance(context.get("token"), str)
         )
-        # Social Auth validates the incoming OAuth state. Here we only bind its
-        # server-generated state to the invitation selected at signup start.
+        # Social Auth validates the incoming OAuth state. A session can hold
+        # several attempts, so bind this callback's state to the invitation
+        # selected at signup start.
         started = not for_callback or bool(
-            context.get("oauth_state")
-            and context["oauth_state"] == request.session.get("orcid_state")
+            oauth_state and context.get("oauth_state") == oauth_state
         )
         if current and started:
             context = cast(InvitationContext, context)
