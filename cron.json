@@ -18,10 +18,6 @@
       "size": "S"
     },
     {
-      "command": "30 0 * * * python manage.py clearsocial",
-      "size": "S"
-    },
-    {
       "command": "*/10 * * * * python manage.py every_10_minutes_job",
       "size": "S"
     }

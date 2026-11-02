@@ -30,3 +30,12 @@ class TestRunChecksCommand(TestCase):
         assert mock.call("send_employer_information_reminders") not in (
             mock_call_command.call_args_list
         )
+
+    @mock.patch("lab.management.commands.run_checks.apps.is_installed")
+    @mock.patch("lab.management.commands.run_checks.management.call_command")
+    def test_clears_social_auth_records(self, mock_call_command, mock_is_installed):
+        mock_is_installed.return_value = False
+
+        call_command("run_checks")
+
+        mock_call_command.assert_any_call("clearsocial")

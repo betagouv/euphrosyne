@@ -18,10 +18,6 @@ class TestCronJsonConfig(TestCase):
                 "pattern": "0 0 * * *",
                 "command_fragment": "python manage.py run_checks",
             },
-            "clearsocial": {
-                "pattern": "30 0 * * *",
-                "command_fragment": "python manage.py clearsocial",
-            },
             "every_week_job": {
                 "pattern": "0 7 * * 1",
                 "command_fragment": "python manage.py every_week_job",
@@ -62,6 +58,13 @@ class TestCronJsonConfig(TestCase):
 
         except json.JSONDecodeError:
             self.fail("cron.json is not a valid JSON file")
+
+    def test_job_count_within_scalingo_limit(self):
+        """Test that cron.json stays within Scalingo's limit of 5 cron tasks."""
+        with open(self.cron_json_path, "r", encoding="utf-8") as f:
+            json_data = json.load(f)
+
+        self.assertLessEqual(len(json_data["jobs"]), 5)
 
     def test_required_jobs_present(self):
         """Test that all required jobs are present with the correct schedules."""

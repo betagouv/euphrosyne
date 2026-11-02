@@ -15,3 +15,4 @@ class Command(BaseCommand):
             management.call_command("schedule_project_cooling")
         if apps.is_installed("radiation_protection"):
             management.call_command("send_employer_information_reminders")
+        management.call_command("clearsocial")
