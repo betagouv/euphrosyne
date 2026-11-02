@@ -1,0 +1,3 @@
+# Dependabot scans this directory when one of its files changes and skips it
+# unless it holds a requirements.txt. Keep this file so the graph stays current.
+-r prod.txt
