@@ -21,10 +21,10 @@ Follow these steps to install the dependencies required for Euphrosyne:
 1. Install Python dependencies:
 
 ```
-pip install -r requirements/[dev|prod].txt
+pip install -r requirements-dev.txt
 ```
 
-Replace [dev|prod] with 'dev' for development environments and 'prod' for production environments.
+Use `requirements.txt` instead for production environments.
 
 2. Install JavaScript dependencies:
 

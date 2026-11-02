@@ -45,10 +45,10 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
           cache-dependency-path: |
-            requirements/dev.txt
-            requirements/base.txt
+            requirements-dev.txt
+            requirements.txt
       - name: Install dev requirements
-        run: pip install -r requirements/dev.txt
+        run: pip install -r requirements-dev.txt
       # -- endblock install --
 
       - name: Install GNU gettext
@@ -108,10 +108,10 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
           cache-dependency-path: |
-            requirements/dev.txt
-            requirements/base.txt
+            requirements-dev.txt
+            requirements.txt
       - name: Install dev requirements
-        run: pip install -r requirements/dev.txt
+        run: pip install -r requirements-dev.txt
 
       - uses: actions/setup-node@v4
         with:
