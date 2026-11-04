@@ -8,6 +8,16 @@ updates:
       timezone: "Europe/Paris"
     cooldown:
       default-days: 7
+    groups:
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      fullcalendar:
+        patterns:
+          - "@fullcalendar/*"
   - package-ecosystem: pip
     directory: /
     schedule:
