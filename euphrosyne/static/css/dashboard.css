@@ -25,48 +25,26 @@
   color: var(--text-action-high-blue-france);
 }
 
-/** FULL CALENDAR */
-:root {
-  --fc-event-text-color: unset !important;
-  --fc-button-bg-color: transparent !important;
-  --fc-button-text-color: var(--text-action-high-blue-france) !important;
-  --fc-button-border-color: transparent;
-  --fc-border-color: transparent;
+/** FULL CALENDAR (v7, classic theme palette overrides) */
+.calendar {
+  --fc-classic-border: transparent;
+  --fc-classic-strong-border: transparent;
 
-  --fc-button-active-bg-color: var(
-    --background-action-high-blue-france
-  ) !important;
-  --fc-button-active-border-color: transparent !important;
-  --fc-button-text-color: var(--text-inverted-blue-france) !important;
+  --fc-classic-button: transparent;
+  --fc-classic-button-border: transparent;
+  --fc-classic-button-foreground: var(--text-action-high-blue-france);
+  --fc-classic-button-strong: var(--background-default-grey-hover);
+  --fc-classic-button-strong-border: transparent;
+  --fc-classic-button-outline: var(--border-action-high-blue-france);
 
-  --fc-button-hover-bg-color: var(--hover-tint);
-  --fc-button-hover-border-color: unset;
-  --fc-button-hover-text-color: inherit;
-}
-.fc-event-title {
-  font-size: 0.8rem;
-}
-.fc-daygrid-event,
-.fc-button {
-  border-radius: 0 !important;
-}
-.fc .fc-button-primary:hover {
-  background-color: var(--hover-tint) !important;
-}
-.fc .fc-button-primary[aria-pressed="false"] {
-  --hover: inherit;
-  color: inherit !important;
-}
-.fc .fc-button-primary[aria-pressed="true"] {
-  --hover: var(--background-action-high-blue-france-hover);
-}
+  --fc-classic-event: var(--background-contrast-blue-france);
+  --fc-classic-event-contrast: var(--text-title-grey);
+  --fc-classic-primary: var(--background-contrast-blue-france);
+  --fc-classic-primary-foreground: var(--text-title-grey);
 
-.fc-daygrid-event-dot {
-  display: none;
-}
-
-.calendar .fc .fc-prev-button {
-  margin-right: 1rem;
+  --fc-classic-background: var(--background-default-grey);
+  --fc-classic-foreground: var(--text-default-grey);
+  --fc-classic-muted-foreground: var(--text-mention-grey);
 }
 
 @media (min-width: 1080px) {

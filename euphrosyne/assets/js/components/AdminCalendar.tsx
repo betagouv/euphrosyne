@@ -1,20 +1,21 @@
 import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import frLocale from "@fullcalendar/core/locales/fr";
+import dayGridPlugin from "@fullcalendar/react/daygrid";
+import classicThemePlugin from "@fullcalendar/react/themes/classic";
+import frLocale from "@fullcalendar/react/locales/fr";
 
 export default function AdminCalendar() {
   return (
     <FullCalendar
       events="/api/lab/calendar"
-      plugins={[dayGridPlugin]}
+      plugins={[dayGridPlugin, classicThemePlugin]}
       initialView="dayGridMonth"
       headerToolbar={{
-        left: "",
+        start: "",
         center: "title",
-        right: "prev,next",
+        end: "prev,next",
       }}
       locale={frLocale}
-      eventClassNames={() => `fr-background-contrast--blue-france`}
+      eventDisplay="block"
     />
   );
 }

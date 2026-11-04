@@ -43,6 +43,11 @@ export default {
       "remixicon/fonts/remixicon.css",
     ],
     hdf5: ["@witoldw/h5web-app/styles.css"],
+    fullcalendar: [
+      "@fullcalendar/react/skeleton.css",
+      "@fullcalendar/react/themes/classic/theme.css",
+      "@fullcalendar/react/themes/classic/palette.css",
+    ],
     // js/ts page files
     ...Object.assign(
       {},
