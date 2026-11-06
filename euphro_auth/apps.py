@@ -7,9 +7,11 @@ class EuphroAuthConfig(AppConfig):
     name = "euphro_auth"
 
     def ready(self) -> None:
-        from .sessions import (  # pylint: disable=import-outside-toplevel
-            set_session_idle_timeout,
-        )
+        # pylint: disable=import-outside-toplevel,unused-import
+        import shared.api_schema  # noqa: F401  # registers OpenAPI extensions
+
+        from .jwt import schema  # noqa: F401
+        from .sessions import set_session_idle_timeout
 
         user_logged_in.connect(
             set_session_idle_timeout,

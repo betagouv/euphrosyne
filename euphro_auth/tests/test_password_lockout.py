@@ -181,6 +181,7 @@ def test_lockout_does_not_affect_another_account_on_the_same_ip(client, user):
     assert failures(user.email) == 5
 
 
+@pytest.mark.openapi_invalid_request  # long-token without credentials
 def test_missing_credentials_and_bad_basic_headers_do_not_count(client, user):
     for _ in range(6):
         assert client.post("/api/auth/long-token/", {}).status_code == 400

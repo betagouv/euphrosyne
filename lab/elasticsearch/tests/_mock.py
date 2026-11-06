@@ -19,7 +19,7 @@ BASE_SEARCH_PARAMS = {
     "collection": "collection",
     "inventory": "inventory",
     "is_data_embargoed": False,
-    "_from": 0,
+    "from": 0,
     "size": 10,
     "sort": "asc",
 }

@@ -6,7 +6,7 @@ import frLocale from "@fullcalendar/react/locales/fr";
 export default function AdminCalendar() {
   return (
     <FullCalendar
-      events="/api/lab/calendar"
+      events="/api/lab/calendar/"
       plugins={[dayGridPlugin, classicThemePlugin]}
       initialView="dayGridMonth"
       headerToolbar={{

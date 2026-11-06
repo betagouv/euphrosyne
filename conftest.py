@@ -6,6 +6,7 @@ import pytest
 from django.test import Client
 
 from euphro_auth.tests.factories import LabAdminUserFactory, StaffUserFactory
+from euphrosyne.tests.openapi_request_validation import set_validation_enabled
 from lab.tests.factories import (
     ParticipationFactory,
     ProjectWithLeaderFactory,
@@ -13,6 +14,33 @@ from lab.tests.factories import (
 )
 
 logging.getLogger("faker").setLevel(logging.WARNING)
+
+OPENAPI_INVALID_REQUEST_MARKER = "openapi_invalid_request"
+
+
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers",
+        f"{OPENAPI_INVALID_REQUEST_MARKER}: the test sends /api/ requests that do "
+        "not conform to the OpenAPI schema on purpose (they would be rejected by "
+        "the WAF); skip their validation.",
+    )
+
+
+@pytest.fixture(autouse=True)
+def validate_api_requests_against_openapi_schema(request, settings):
+    """Fail on /api/ requests made with the test client that do not conform to
+    the OpenAPI schema. See euphrosyne/tests/openapi_request_validation.py."""
+    settings.MIDDLEWARE = [
+        *settings.MIDDLEWARE,
+        "euphrosyne.tests.openapi_request_validation."
+        "OpenAPIRequestValidationMiddleware",
+    ]
+    set_validation_enabled(
+        request.node.get_closest_marker(OPENAPI_INVALID_REQUEST_MARKER) is None
+    )
+    yield
+    set_validation_enabled(False)
 
 
 @pytest.fixture(autouse=True)
