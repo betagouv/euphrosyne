@@ -3,6 +3,7 @@ from typing import Literal
 
 from django.db.models import F, Sum
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -59,6 +60,7 @@ class LabStatsUtils:
         return int(aggregation["total_hours"].total_seconds() / 3600)
 
 
+@extend_schema(responses=StatsResponse)
 @api_view(["GET"])
 def stats_view(request):
     stats = {
