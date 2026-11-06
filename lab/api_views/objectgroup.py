@@ -1,7 +1,14 @@
 import logging
 
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    extend_schema,
+    inline_serializer,
+)
 from rest_framework import authentication, generics
+from rest_framework import serializers as drf_serializers
 from rest_framework.decorators import (
     api_view,
     authentication_classes,
@@ -22,7 +29,29 @@ from . import serializers
 
 logger = logging.getLogger(__name__)
 
+_FETCH_OBJECT_REQUEST = inline_serializer(
+    "FetchObjectFromProviderRequest",
+    fields={
+        "query": drf_serializers.CharField(
+            help_text="Object identifier in the provider database."
+        ),
+    },
+)
 
+
+@extend_schema(
+    request=_FETCH_OBJECT_REQUEST,
+    responses={
+        200: inline_serializer(
+            "FetchObjectFromProviderResponse",
+            fields={
+                "external_reference_id": drf_serializers.CharField(),
+                "label": drf_serializers.CharField(),
+            },
+        ),
+        404: OpenApiResponse(description="Object not found in provider."),
+    },
+)
 @api_view(["POST"])
 @authentication_classes([authentication.SessionAuthentication])
 @permission_classes([IsAdminUser])
@@ -47,7 +76,19 @@ def get_object_from_provider(request, provider_name: str):
 
 
 @extend_schema(
-    responses={200: serializers.GetObjectImageFromProviderResponseSerializer},
+    parameters=[
+        OpenApiParameter(
+            "object_id",
+            OpenApiTypes.STR,
+            OpenApiParameter.QUERY,
+            required=True,
+            description="Object identifier in the provider database.",
+        ),
+    ],
+    responses={
+        200: serializers.GetObjectImageFromProviderResponseSerializer,
+        400: OpenApiResponse(description="Missing 'object_id' query parameter."),
+    },
 )
 @api_view(["GET"])
 @authentication_classes([authentication.SessionAuthentication])
@@ -70,6 +111,20 @@ def get_object_images_from_provider(request: Request, provider_name: str):
     return Response({"images": images})
 
 
+@extend_schema(
+    deprecated=True,
+    request=_FETCH_OBJECT_REQUEST,
+    responses={
+        200: inline_serializer(
+            "FetchErosObjectResponse",
+            fields={
+                "c2rmf_id": drf_serializers.CharField(),
+                "label": drf_serializers.CharField(),
+            },
+        ),
+        404: OpenApiResponse(description="Object not found in EROS."),
+    },
+)
 @api_view(["POST"])
 @authentication_classes([authentication.SessionAuthentication])
 @permission_classes([IsAdminUser])

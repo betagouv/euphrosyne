@@ -20,9 +20,10 @@ BASE_BODY_DATA = {
 
 
 def _valid_data_request_payload():
+    # Sent as JSON with ids as strings, like Digilab does.
     return {
         **BASE_BODY_DATA,
-        "runs": [lab_factories.NotEmbargoedRun().id],
+        "runs": [str(lab_factories.NotEmbargoedRun().id)],
     }
 
 
@@ -35,6 +36,7 @@ def test_create_view():
         response = client.post(
             "/api/data-request/",
             data=data,
+            content_type="application/json",
             headers={"Origin": ALLOWED_ORIGIN},
         )
 
@@ -53,6 +55,7 @@ def test_create_view_with_embargoed_run():
         response = client.post(
             "/api/data-request/",
             data=data,
+            content_type="application/json",
             headers={"Origin": ALLOWED_ORIGIN},
         )
 
@@ -65,7 +68,9 @@ def test_create_view_with_embargoed_run():
 def test_create_view_remains_permissive_without_configured_origins():
     with mock.patch("data_request.api_views.send_data_request_created_email"):
         response = Client().post(
-            "/api/data-request/", data=_valid_data_request_payload()
+            "/api/data-request/",
+            data=_valid_data_request_payload(),
+            content_type="application/json",
         )
 
         assert response.status_code == 201
@@ -74,7 +79,11 @@ def test_create_view_remains_permissive_without_configured_origins():
 @pytest.mark.django_db
 @override_settings(DATA_REQUEST_ALLOWED_ORIGINS=[ALLOWED_ORIGIN])
 def test_create_view_without_origin_is_forbidden():
-    response = Client().post("/api/data-request/", data=_valid_data_request_payload())
+    response = Client().post(
+        "/api/data-request/",
+        data=_valid_data_request_payload(),
+        content_type="application/json",
+    )
 
     assert response.status_code == 403
 
@@ -85,6 +94,7 @@ def test_create_view_with_not_allowed_origin_is_forbidden():
     response = Client().post(
         "/api/data-request/",
         data=_valid_data_request_payload(),
+        content_type="application/json",
         headers={"Origin": "https://example.com"},
     )
 
@@ -98,6 +108,7 @@ def test_create_view_allows_configured_origin_with_trailing_slash():
         response = Client().post(
             "/api/data-request/",
             data=_valid_data_request_payload(),
+            content_type="application/json",
             headers={"Origin": ALLOWED_ORIGIN},
         )
 
@@ -114,7 +125,11 @@ def test_create_view_options_is_not_blocked_by_origin_permission():
 @pytest.mark.django_db
 @override_settings(DATA_REQUEST_ALLOWED_ORIGINS=[ALLOWED_ORIGIN])
 def test_create_view_logs_warning_when_origin_is_rejected(caplog):
-    response = Client().post("/api/data-request/", data=_valid_data_request_payload())
+    response = Client().post(
+        "/api/data-request/",
+        data=_valid_data_request_payload(),
+        content_type="application/json",
+    )
 
     assert response.status_code == 403
     assert (
@@ -130,7 +145,8 @@ def test_data_access_event_create():
     data_request = factories.DataRequestFactory()
     token = EuphroToolsAPIToken.for_euphrosyne()
     data = {
-        "data_request": data_request.id,
+        # Tools API sends the id from its token claims, as a string.
+        "data_request": str(data_request.id),
         "path": "path/to/data",
     }
 

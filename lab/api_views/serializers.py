@@ -5,8 +5,8 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from drf_spectacular.utils import extend_schema_field, inline_serializer
 from rest_framework import reverse, serializers, validators
-from rest_framework.fields import empty
 
 from euphro_auth.emails import send_invitation_email
 from euphro_auth.models import User
@@ -37,7 +37,7 @@ class ProjectRunSerializer(serializers.ModelSerializer):
             "methods_url",
         )
 
-    def get_methods_url(self, obj: Run):
+    def get_methods_url(self, obj: Run) -> str:
         return reverse.reverse(
             "api:run-detail-methods", args=[obj.id], request=self.context["request"]
         )
@@ -61,10 +61,10 @@ class UpcomingProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = ("name", "start_date", "change_url", "status", "num_runs")
 
-    def get_change_url(self, obj: Project):
+    def get_change_url(self, obj: Project) -> str:
         return reverse.reverse("admin:lab_project_change", args=[obj.id])
 
-    def get_start_date(self, obj: Project):
+    def get_start_date(self, obj: Project) -> datetime.datetime | None:
         # Get start_date by ordering runs by start_date and filtering the
         # ones that are after now
         ordered_start_dates = [
@@ -81,9 +81,18 @@ class UpcomingProjectSerializer(serializers.ModelSerializer):
             return None
         return ordered_start_dates[0]
 
-    def get_num_runs(self, obj: Project):
+    def get_num_runs(self, obj: Project) -> int:
         return obj.runs.count()
 
+    @extend_schema_field(
+        inline_serializer(
+            "UpcomingProjectStatus",
+            fields={
+                "label": serializers.CharField(),
+                "class_name": serializers.CharField(),
+            },
+        )
+    )
     def get_status(self, obj: Project):
         return {
             "label": obj.status.value[1],
@@ -148,10 +157,10 @@ class _RunObjectGroupObjectGroupSerializer(serializers.ModelSerializer):
             "external_reference",
         )
 
-    def get_dating(self, obj: ObjectGroup):
+    def get_dating(self, obj: ObjectGroup) -> str:
         return obj.dating_era.label if obj.dating_era else ""
 
-    def get_c2rmf_id(self, obj: ObjectGroup):
+    def get_c2rmf_id(self, obj: ObjectGroup) -> str | None:
         if (
             hasattr(obj, "external_reference")
             and obj.external_reference.provider_name == "eros"
@@ -299,9 +308,9 @@ class ParticipationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Participation
-        fields = ("id", "user", "institution", "on_premises")
+        fields: tuple[str, ...] = ("id", "user", "institution", "on_premises")
         # We set on_premises in the views, so make it read-only here
-        read_only_fields = ("id", "on_premises")
+        read_only_fields: tuple[str, ...] = ("id", "on_premises")
 
     def create(self, validated_data):
         institution_data = validated_data.pop("institution")
@@ -368,9 +377,8 @@ class ParticipationTypeSwitchSerializer(serializers.ModelSerializer):
 class OnPremisesParticipationSerializer(ParticipationSerializer):
     employer = _EmployerParticipationSerializer(required=False, allow_null=True)
 
-    def __init__(self, instance=None, data=empty, **kwargs):
-        self.Meta.fields = [*self.Meta.fields, "employer"]
-        super().__init__(instance, data, **kwargs)
+    class Meta(ParticipationSerializer.Meta):
+        fields = (*ParticipationSerializer.Meta.fields, "employer")
 
     def create(self, validated_data):
         employer = None
@@ -429,3 +437,17 @@ class OnPremisesParticipationSerializer(ParticipationSerializer):
         if self.instance and self.instance.institution:
             return self.instance.institution.ror_id
         return None
+
+
+class ParticipationUpdateRequestSerializer(OnPremisesParticipationSerializer):
+    """OpenAPI documentation only: body accepted when updating a member
+    participation. The view validates it with ParticipationTypeSwitchSerializer
+    when ``on_premises`` is sent, otherwise with the serializer matching the
+    participation type (``employer`` is ignored for remote participations)."""
+
+    user = _UserParticipationSerializer(required=False)
+    institution = _InstitutionParticipationSerializer(required=False)
+    on_premises = serializers.BooleanField(required=False)
+
+    class Meta(OnPremisesParticipationSerializer.Meta):
+        read_only_fields = ("id",)

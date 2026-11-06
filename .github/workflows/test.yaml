@@ -65,6 +65,9 @@ jobs:
 
       - name: Check no migration is missing
         run: ./manage.py makemigrations --check --dry-run
+      - name: Check OpenAPI schema is valid and complete
+        # The schema is given to the WAF to reject non-conforming /api requests.
+        run: ./manage.py spectacular --validate --fail-on-warn --file /dev/null
       - name: Check no makemessages translation is missing
         run: |
           ./manage.py makemessages --all --verbosity 0 --no-location --no-obsolete

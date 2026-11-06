@@ -1,5 +1,7 @@
 from django.db.models import QuerySet
 from django.urls import reverse
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import serializers
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.generics import ListAPIView
@@ -27,13 +29,31 @@ class CalendarSerializer(serializers.ModelSerializer):
             "url",
         )
 
-    def get_title(self, obj: Run):
+    def get_title(self, obj: Run) -> str:
         return f"{obj.label} [{obj.project.name}]"
 
-    def get_url(self, obj: Run):
+    def get_url(self, obj: Run) -> str:
         return reverse("admin:lab_run_change", args=[obj.id])
 
 
+@extend_schema_view(
+    get=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "start",
+                OpenApiTypes.STR,
+                OpenApiParameter.QUERY,
+                description="Only runs starting at or after this ISO 8601 date.",
+            ),
+            OpenApiParameter(
+                "end",
+                OpenApiTypes.STR,
+                OpenApiParameter.QUERY,
+                description="Only runs starting at or before this ISO 8601 date.",
+            ),
+        ]
+    )
+)
 class CalendarView(ListAPIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAdminUser]

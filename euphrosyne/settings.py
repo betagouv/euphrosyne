@@ -472,6 +472,15 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
+SPECTACULAR_SETTINGS = {
+    # Name choice sets shared by several components (values only, so that the
+    # setting does not import optional apps).
+    "ENUM_NAME_OVERRIDES": {
+        "LifecycleOperationTypeEnum": ["COOL", "RESTORE"],
+        "LifecycleCallbackOutcomeEnum": ["SUCCEEDED", "FAILED"],
+    },
+}
+
 
 ELASTICSEARCH_HOST = os.getenv("ELASTICSEARCH_HOST")
 ELASTICSEARCH_USERNAME = os.getenv("ELASTICSEARCH_USERNAME")

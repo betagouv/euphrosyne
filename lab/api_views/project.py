@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django_filters import rest_framework as filters
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics, serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import SAFE_METHODS, IsAdminUser
@@ -17,6 +18,7 @@ from .participation import (
 from .permissions import IsLabAdminUser, IsLeaderOrReadOnlyMixin
 from .serializers import (
     OnPremisesParticipationSerializer,
+    ParticipationUpdateRequestSerializer,
     ProjectSerializer,
     UpcomingProjectSerializer,
 )
@@ -127,6 +129,20 @@ class ProjectRemoteParticipationListCreateGroupView(
         serializer.save(on_premises=False, project=self.get_related_project())
 
 
+# The serializer depends on the participation fetched and on the request body,
+# so it cannot be inferred without a request.
+@extend_schema_view(
+    get=extend_schema(responses=OnPremisesParticipationSerializer),
+    put=extend_schema(
+        request=ParticipationUpdateRequestSerializer,
+        responses=OnPremisesParticipationSerializer,
+    ),
+    patch=extend_schema(
+        request=ParticipationUpdateRequestSerializer,
+        responses=OnPremisesParticipationSerializer,
+    ),
+    delete=extend_schema(responses={204: None}),
+)
 class ProjectParticipationRetrieveUpdateDestroyGroupView(
     IsLeaderOrReadOnlyMixin[Participation],
     MemberParticipationRetrieveUpdateDestroyGroupView,
@@ -203,6 +219,9 @@ class ProjectLeaderParticipationRetrieveCreateUpdateGroupView(
         return obj
 
     def get_serializer_context(self):
+        if getattr(self, "swagger_fake_view", False):
+            # OpenAPI schema generation: no request, no database access.
+            return super().get_serializer_context()
         return {
             **super().get_serializer_context(),
             "project": self.get_related_project(),
