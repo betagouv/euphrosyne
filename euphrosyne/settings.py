@@ -477,11 +477,6 @@ SPECTACULAR_SETTINGS = {
     # component they stay listed as required, which a request validator such as
     # the WAF may not ignore.
     "COMPONENT_SPLIT_REQUEST": True,
-    # Name the callback status choice set, shared by two fields (values only,
-    # so that the setting does not import optional apps).
-    "ENUM_NAME_OVERRIDES": {
-        "LifecycleCallbackOutcomeEnum": ["SUCCEEDED", "FAILED"],
-    },
 }
 
 

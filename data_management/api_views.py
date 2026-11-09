@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_field
 from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -61,6 +61,28 @@ FROM_DATA_DELETION_STATUS_CHOICES = (
     FromDataDeletionStatus.FAILED,
 )
 
+
+def _named_choice_field(component_name: str, choices: tuple[Any, ...]):
+    """ChoiceField whose values get their own schema component, since the two
+    callback status fields would otherwise collide with other "status" enums."""
+
+    @extend_schema_field(
+        {"type": "string", "enum": [str(choice) for choice in choices]},
+        component_name=component_name,
+    )
+    class NamedChoiceField(serializers.ChoiceField):
+        def __init__(self, **kwargs: Any):
+            super().__init__(choices=choices, **kwargs)
+
+    return NamedChoiceField
+
+
+CallbackStatusField = _named_choice_field(
+    "LifecycleCallbackStatusEnum", CALLBACK_STATUS_CHOICES
+)
+FromDataDeletionStatusField = _named_choice_field(
+    "FromDataDeletionStatusEnum", FROM_DATA_DELETION_STATUS_CHOICES
+)
 
 # The WAF only validates requests: responses are documented minimally.
 _lifecycle_trigger_schema = extend_schema(
@@ -166,7 +188,7 @@ class LifecycleOperationCallbackSerializer(serializers.Serializer):
         choices=CALLBACK_PHASE_CHOICES,
         required=False,
     )
-    status = serializers.ChoiceField(choices=CALLBACK_STATUS_CHOICES, required=False)
+    status = CallbackStatusField(required=False)
     bytes_copied = serializers.IntegerField(
         required=False, allow_null=True, min_value=0
     )
@@ -179,10 +201,7 @@ class LifecycleOperationCallbackSerializer(serializers.Serializer):
         required=False, allow_blank=True, allow_null=True
     )
     error_details = serializers.JSONField(required=False, allow_null=True)
-    from_data_deletion_status = serializers.ChoiceField(
-        choices=FROM_DATA_DELETION_STATUS_CHOICES,
-        required=False,
-    )
+    from_data_deletion_status = FromDataDeletionStatusField(required=False)
     error = serializers.JSONField(required=False, allow_null=True)
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
