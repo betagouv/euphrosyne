@@ -131,7 +131,7 @@ describe("project-lifecycle-service", () => {
       }, 202),
     );
 
-    const details = await triggerProjectCool("123");
+    const details = await triggerProjectCool(123);
 
     expect(details).toEqual({
       operationId: "op-2",
@@ -161,7 +161,7 @@ describe("project-lifecycle-service", () => {
   it("throws when the restore trigger endpoint rejects the request", async () => {
     fetchMock.mockResolvedValueOnce(createJSONResponse({}, 502));
 
-    await expect(triggerProjectRestore("123")).rejects.toThrow(
+    await expect(triggerProjectRestore(123)).rejects.toThrow(
       "Lifecycle action failed with status 502.",
     );
   });

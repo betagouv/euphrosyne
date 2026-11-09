@@ -7,10 +7,10 @@ export interface WorkplaceRunTabProps {
   project: {
     name: string;
     slug: string;
-    id: string;
+    id: number;
   };
   run: {
-    id: string;
+    id: number;
     label: string;
     rawDataTable: {
       canDelete: boolean;

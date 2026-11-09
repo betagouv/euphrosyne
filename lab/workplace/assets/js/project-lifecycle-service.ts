@@ -156,10 +156,10 @@ export async function fetchLifecycleOperation(
 }
 
 export async function triggerProjectCool(
-  projectId: string,
+  projectId: number,
 ): Promise<LifecycleOperationDetails | null> {
   const response = await fetch(
-    `/api/data-management/projects/${encodeURIComponent(projectId)}/cool`,
+    `/api/data-management/projects/${projectId}/cool`,
     {
       method: "POST",
       headers: {
@@ -181,10 +181,10 @@ export async function triggerProjectCool(
 }
 
 export async function triggerProjectRestore(
-  projectId: string,
+  projectId: number,
 ): Promise<LifecycleOperationDetails | null> {
   const response = await fetch(
-    `/api/data-management/projects/${encodeURIComponent(projectId)}/restore`,
+    `/api/data-management/projects/${projectId}/restore`,
     {
       method: "POST",
       headers: {

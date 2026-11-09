@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderComponent(
       "project-lifecycle-root",
       createElement(ProjectLifecycleRoot, {
-        projectId: String(project.id),
+        projectId: project.id,
         projectSlug: project.slug,
         title: labels.dataManagementTitle,
         loadingLabel: labels.loading,

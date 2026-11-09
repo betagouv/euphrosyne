@@ -17,7 +17,7 @@ import { useClientContext } from "../../../../../shared/js/EuphrosyneToolsClient
 
 interface DocumentManagerProps {
   project: {
-    id: string;
+    id: number;
     name: string;
     slug: string;
   };

@@ -3,7 +3,7 @@ import { useContext } from "react";
 
 interface IWorkplaceContext {
   project: {
-    id: string;
+    id: number;
   };
 }
 

@@ -13,7 +13,7 @@ interface HarnessProps {
   initialLifecycleState: LifecycleState | null;
   initialOperationId: string | null;
   initialOperationType: LifecycleOperationType | null;
-  projectId?: string;
+  projectId?: number;
   projectSlug?: string;
   actionErrorMessage?: string;
 }
@@ -58,7 +58,7 @@ function HookHarness({
   initialLifecycleState,
   initialOperationId,
   initialOperationType,
-  projectId = "42",
+  projectId = 42,
   projectSlug = "project-slug",
   actionErrorMessage = "Could not update lifecycle state.",
 }: HarnessProps) {

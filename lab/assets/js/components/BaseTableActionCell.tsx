@@ -5,7 +5,7 @@ import BaseFileActionCell from "./BaseFileActionCell";
 import BaseDirectoryActionCell from "./BaseDirectoryActionCell";
 
 interface BaseTableActionCellProps {
-  projectId: string;
+  projectId: number;
   fileService: FileService;
   canDelete: boolean;
   onDeleteSuccess?: (fileName: string) => void;

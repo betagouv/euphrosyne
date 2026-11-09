@@ -8,7 +8,7 @@ import ProjectLifecycleErrorAlert from "./ProjectLifecycleErrorAlert";
 import ProjectLifecycleStatus from "./ProjectLifecycleStatus";
 
 interface ProjectLifecyclePanelProps {
-  projectId: string;
+  projectId: number;
   projectSlug: string;
   lifecycleState: LifecycleState | null;
   lastLifecycleOperationId: string | null;
