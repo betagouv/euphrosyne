@@ -3,7 +3,6 @@ from django.urls import include, path
 from .api_views.calendar import CalendarView
 from .api_views.objectgroup import (
     ObjectGroupCreateView,
-    get_eros_object,
     get_object_from_provider,
     get_object_images_from_provider,
 )
@@ -121,10 +120,5 @@ urlpatterns = [
         "measuring-points/<int:measuring_point_id>/image",
         measuring_points_views.MeasuringPointImageCreateView.as_view(),
         name="run_measuring_point",
-    ),
-    path(  # deprecated. Use /objectgroup/provider/eros/fetch instead
-        "objectgroup/c2rmf-fetch",
-        get_eros_object,
-        name="objectgroup-c2rmf-fetch",
     ),
 ]

@@ -91,37 +91,6 @@ def get_object_images_from_provider(request: Request, provider_name: str):
     return Response({"images": images})
 
 
-@extend_schema(
-    deprecated=True, request=_FETCH_OBJECT_REQUEST, responses=OpenApiTypes.OBJECT
-)
-@api_view(["POST"])
-@authentication_classes([authentication.SessionAuthentication])
-@permission_classes([IsAdminUser])
-def get_eros_object(request):
-    """DEPRECATED. Use get_object_from_provider with provider_name='eros' instead.
-    Fetch object from Eros."""
-    import sentry_sdk  # pylint: disable=import-outside-toplevel
-
-    sentry_sdk.capture_message(
-        "Deprecated API endpoint called: lab/api_views/objectgroup.py/get_eros_object",
-        level="warning",
-    )
-
-    c2rmf_id = request.data["query"]
-    try:
-        obj = fetch_partial_objectgroup("eros", c2rmf_id)
-    except ObjectProviderError as error:
-        logger.error(
-            "An error occurred when importing data from Eros.\nID: %s\nError: %s",
-            c2rmf_id,
-            error,
-        )
-        obj = None
-    if not obj:
-        raise NotFound("Object with this EROS ID was not found.")
-    return Response({"c2rmf_id": c2rmf_id, "label": obj["label"]})
-
-
 class ObjectGroupCreateView(generics.CreateAPIView):
     permission_classes = [IsAdminUser]
     serializer_class = serializers.ObjectGroupCreateSerializer
