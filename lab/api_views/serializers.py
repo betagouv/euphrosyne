@@ -6,7 +6,6 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import reverse, serializers, validators
-from rest_framework.fields import empty
 
 from euphro_auth.emails import send_invitation_email
 from euphro_auth.models import User
@@ -299,9 +298,9 @@ class ParticipationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Participation
-        fields = ("id", "user", "institution", "on_premises")
+        fields: tuple[str, ...] = ("id", "user", "institution", "on_premises")
         # We set on_premises in the views, so make it read-only here
-        read_only_fields = ("id", "on_premises")
+        read_only_fields: tuple[str, ...] = ("id", "on_premises")
 
     def create(self, validated_data):
         institution_data = validated_data.pop("institution")
@@ -368,9 +367,8 @@ class ParticipationTypeSwitchSerializer(serializers.ModelSerializer):
 class OnPremisesParticipationSerializer(ParticipationSerializer):
     employer = _EmployerParticipationSerializer(required=False, allow_null=True)
 
-    def __init__(self, instance=None, data=empty, **kwargs):
-        self.Meta.fields = [*self.Meta.fields, "employer"]
-        super().__init__(instance, data, **kwargs)
+    class Meta(ParticipationSerializer.Meta):
+        fields = (*ParticipationSerializer.Meta.fields, "employer")
 
     def create(self, validated_data):
         employer = None

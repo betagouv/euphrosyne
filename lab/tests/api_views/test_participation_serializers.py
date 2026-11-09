@@ -266,6 +266,17 @@ class TestOnPremisesParticipationSerializer(TestCase):
         serializer = OnPremisesParticipationSerializer()
         assert "employer" in serializer.fields
 
+    def test_instantiation_does_not_mutate_parent_meta(self):
+        parent_fields = ParticipationSerializer.Meta.fields
+
+        for _ in range(3):
+            OnPremisesParticipationSerializer()
+
+        assert ParticipationSerializer.Meta.fields == parent_fields
+        assert "employer" not in ParticipationSerializer().fields
+        assert OnPremisesParticipationSerializer.Meta.fields.count("employer") == 1
+        assert list(OnPremisesParticipationSerializer().fields).count("employer") == 1
+
 
 class TestEmployerFormExemption(TestCase):
     def _build_data(self, ror_id: str):
