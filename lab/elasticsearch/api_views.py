@@ -1,60 +1,18 @@
+from drf_spectacular.plumbing import resolve_type_hint
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import (
     OpenApiParameter,
     extend_schema,
-    inline_serializer,
 )
-from rest_framework import serializers
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .client import CatalogClient
+from .queries import QueryParams
 
-_GeoPointSerializer = inline_serializer(
-    "CatalogSearchGeoPoint",
-    fields={"lat": serializers.FloatField(), "lon": serializers.FloatField()},
-).__class__
-
-# Mirrors lab.elasticsearch.queries.QueryParams (pagination key is "from").
-CATALOG_SEARCH_REQUEST = inline_serializer(
-    "CatalogSearchRequest",
-    fields={
-        "q": serializers.CharField(required=False, allow_blank=True),
-        "status": serializers.CharField(required=False),
-        "materials": serializers.ListField(
-            child=serializers.CharField(), required=False
-        ),
-        "dating_period_ids": serializers.ListField(
-            child=serializers.CharField(), required=False
-        ),
-        "dating_era_ids": serializers.ListField(
-            child=serializers.CharField(), required=False
-        ),
-        "category": serializers.ChoiceField(
-            choices=["project", "object"], required=False
-        ),
-        "c2rmf_id": serializers.CharField(required=False),
-        # Passed as is to an OpenSearch range query: date or date-time.
-        "created_from": serializers.CharField(required=False),
-        "created_to": serializers.CharField(required=False),
-        "location": inline_serializer(
-            "CatalogSearchLocation",
-            fields={
-                "top_left": _GeoPointSerializer(required=False),
-                "bottom_right": _GeoPointSerializer(required=False),
-                "top_right": _GeoPointSerializer(required=False),
-                "bottom_left": _GeoPointSerializer(required=False),
-            },
-            required=False,
-        ),
-        "collection": serializers.CharField(required=False),
-        "inventory": serializers.CharField(required=False),
-        "is_data_embargoed": serializers.BooleanField(required=False),
-        "from": serializers.IntegerField(required=False, min_value=0),
-        "size": serializers.IntegerField(required=False, min_value=0),
-        "sort": serializers.ChoiceField(choices=["asc", "desc"], required=False),
-    },
-)
+# Generated from the TypedDict the search code is typed with, so that the
+# schema given to the WAF cannot drift from it.
+CATALOG_SEARCH_REQUEST = {"application/json": resolve_type_hint(QueryParams)}
 
 
 @extend_schema(responses=OpenApiTypes.OBJECT)
