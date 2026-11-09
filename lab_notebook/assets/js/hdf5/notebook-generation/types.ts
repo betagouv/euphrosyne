@@ -46,36 +46,36 @@ export interface DiscoverHDF5NotebookGenerationCandidatesOptions {
 
 export interface HDF5NotebookGenerationServices {
   createMeasuringPoint: (
-    runId: string,
-    body: { name: string; comments?: string; object_group?: string },
+    runId: number,
+    body: { name: string; comments?: string; object_group?: number | null },
   ) => Promise<IMeasuringPoint>;
   updateMeasuringPointComments: (
-    runId: string,
-    pointId: string,
+    runId: number,
+    pointId: number,
     comments: string,
   ) => Promise<void>;
   updateMeasuringPointObjectId: (
-    runId: string,
-    pointId: string,
-    objectGroupId: string,
+    runId: number,
+    pointId: number,
+    objectGroupId: number | null,
   ) => Promise<void>;
   createObjectGroup: (body: { label: string }) => Promise<{
     id: number;
     label: string;
   }>;
   addObjectGroupToRun: (
-    runId: string,
-    objectGroupId: string,
+    runId: number,
+    objectGroupId: number,
   ) => Promise<unknown>;
   addOrUpdateStandardToMeasuringPoint: (
     standard: string,
-    pointId: string,
+    pointId: number,
     create?: boolean,
   ) => Promise<IMeasuringPointStandard>;
 }
 
 export interface GenerateNotebookFromHDF5Options {
-  runId: string;
+  runId: number;
   candidates: HDF5NotebookGenerationCandidate[];
   measuringPoints: IMeasuringPoint[];
   runObjectGroups: RunObjectGroup[];

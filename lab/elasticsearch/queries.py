@@ -2,8 +2,6 @@ import dataclasses
 import datetime
 from typing import Literal, NotRequired, TypedDict, cast
 
-from lab.projects.models import Project
-
 
 class GeoPoint(TypedDict):
     lat: float
@@ -17,23 +15,32 @@ class Location(TypedDict):
     bottom_left: NotRequired[GeoPoint]
 
 
-class QueryParams(TypedDict, total=False):
-    q: str
-    status: Project.Status
-    materials: list[str]
-    dating_period_ids: list[str]
-    dating_era_ids: list[str]
-    category: Literal["project", "object"]
-    c2rmf_id: str
-    created_from: datetime.datetime
-    created_to: datetime.datetime
-    location: Location
-    collection: str
-    inventory: str
-    is_data_embargoed: bool
-    _from: int
-    size: int
-    sort: Literal["asc", "desc"]
+# Wire format of the catalog search body, also used to generate its OpenAPI
+# schema. Functional syntax because "from" is a Python keyword.
+QueryParams = TypedDict(
+    "QueryParams",
+    {
+        "q": str,
+        # str() of a Project.Status member, as indexed, e.g. "Status.ONGOING".
+        "status": str,
+        "materials": list[str],
+        "dating_period_ids": list[str],
+        "dating_era_ids": list[str],
+        "category": Literal["project", "object"],
+        "c2rmf_id": str,
+        # Date or date-time, passed as is to an OpenSearch range query.
+        "created_from": str,
+        "created_to": str,
+        "location": Location,
+        "collection": str,
+        "inventory": str,
+        "is_data_embargoed": bool,
+        "from": int,
+        "size": int,
+        "sort": Literal["asc", "desc"],
+    },
+    total=False,
+)
 
 
 @dataclasses.dataclass
@@ -137,7 +144,7 @@ def filter_query(
     params: QueryParams,
 ):
     size = params.pop("size", None)
-    _from = params.pop("from", None)  # type: ignore
+    _from = params.pop("from", None)
     sort = params.pop("sort", None)
     return Query().build_query(
         params,
@@ -211,8 +218,8 @@ def _multi_match_query(q: str, fields: list[str]):
     }
 
 
-def _status_query(status: Project.Status):
-    return _term_query("status", status)  # type: ignore
+def _status_query(status: str):
+    return _term_query("status", status)
 
 
 def _materials_query(materials: list[str]):
@@ -236,8 +243,8 @@ def _c2rmf_id_query(c2rmf_id: str):
 
 
 def _created_query(
-    created_from: datetime.datetime | None = None,
-    created_to: datetime.datetime | None = None,
+    created_from: str | None = None,
+    created_to: str | None = None,
 ):
     return {
         "range": {

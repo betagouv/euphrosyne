@@ -36,12 +36,12 @@ export class StorageImageServices {
 
 export class ObjectGroupImageServices extends UploadSasUrlMixin {
   protected projectSlug: string;
-  protected objectGroupId: string;
+  protected objectGroupId: number;
   protected uploadSasUrl: string;
 
   constructor(
     projectSlug: string,
-    objectGroupId: string,
+    objectGroupId: number,
     fetchFn?: typeof fetch,
   ) {
     super(fetchFn);
@@ -60,9 +60,9 @@ export class ObjectGroupImageServices extends UploadSasUrlMixin {
 }
 
 export class RunObjectGroupImageServices {
-  protected runObjectGroupId: string;
+  protected runObjectGroupId: number;
 
-  constructor(runObjectGroupId: string) {
+  constructor(runObjectGroupId: number) {
     this.runObjectGroupId = runObjectGroupId;
   }
 
@@ -111,6 +111,6 @@ export class RunObjectGroupImageServices {
     }
 
     const { id } = (await response.json()) as { id: number };
-    return { ...image, id: id.toString() };
+    return { ...image, id };
   }
 }

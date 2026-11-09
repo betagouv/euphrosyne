@@ -4,7 +4,7 @@ interface RunObjectGroupProjectImportModalProps {
   id: string;
   availableObjectGroups: ObjectGroup[];
   error?: string | null;
-  onAdd: (objectGroupId: string) => void;
+  onAdd: (objectGroupId: number) => void;
 }
 
 const objectGroupToOptionLabel = (objectGroup: ObjectGroup) => {
@@ -117,7 +117,9 @@ export default function RunObjectGroupProjectImportModal({
                   <button
                     className="fr-btn fr-icon-add-circle-line fr-btn--icon-left"
                     type="button"
-                    onClick={() => onAdd(selectedValue)}
+                    onClick={() => {
+                      if (selectedValue) onAdd(Number(selectedValue));
+                    }}
                   >
                     {t["Add object to run"]}
                   </button>

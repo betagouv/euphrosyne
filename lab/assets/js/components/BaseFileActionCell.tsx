@@ -6,7 +6,7 @@ import { FileContext } from "./FileContext";
 import { fileTableRowActionCellBtnStyle } from "./style";
 
 interface BaseFileActionCellProps {
-  projectId: string;
+  projectId: number;
   fileService: FileService;
   canDelete: boolean;
   onDeleteSuccess?: (fileName: string) => void;

@@ -13,6 +13,8 @@ import {
   findAvailableObjectGroupByLabel,
   findPointByCandidate,
   findRunObjectGroupById,
+  previewId,
+  UNKNOWN_RUN_OBJECT_GROUP_ID,
   findRunObjectGroupByLabel,
   findStandardByReferenceLabel,
   standardLabelsMatch,
@@ -337,7 +339,7 @@ function previewStandardCandidate({
         runStandards: {
           ...state.snapshot.runStandards,
           [point.id]: {
-            id: `__preview_standard_${point.id}`,
+            id: previewId(point.id),
             standard: matchingStandard,
           },
         },
@@ -368,7 +370,7 @@ function addPreviewRunObjectGroup(
       ...state.snapshot,
       runObjectGroups: [
         ...state.snapshot.runObjectGroups,
-        { id: "", objectGroup },
+        { id: UNKNOWN_RUN_OBJECT_GROUP_ID, objectGroup },
       ],
     },
   };

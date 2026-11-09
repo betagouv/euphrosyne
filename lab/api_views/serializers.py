@@ -1,4 +1,5 @@
 import datetime
+from typing import Any
 
 from django.apps import apps
 from django.conf import settings
@@ -36,7 +37,7 @@ class ProjectRunSerializer(serializers.ModelSerializer):
             "methods_url",
         )
 
-    def get_methods_url(self, obj: Run):
+    def get_methods_url(self, obj: Run) -> str:
         return reverse.reverse(
             "api:run-detail-methods", args=[obj.id], request=self.context["request"]
         )
@@ -60,10 +61,10 @@ class UpcomingProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = ("name", "start_date", "change_url", "status", "num_runs")
 
-    def get_change_url(self, obj: Project):
+    def get_change_url(self, obj: Project) -> str:
         return reverse.reverse("admin:lab_project_change", args=[obj.id])
 
-    def get_start_date(self, obj: Project):
+    def get_start_date(self, obj: Project) -> datetime.datetime | None:
         # Get start_date by ordering runs by start_date and filtering the
         # ones that are after now
         ordered_start_dates = [
@@ -80,10 +81,10 @@ class UpcomingProjectSerializer(serializers.ModelSerializer):
             return None
         return ordered_start_dates[0]
 
-    def get_num_runs(self, obj: Project):
+    def get_num_runs(self, obj: Project) -> int:
         return obj.runs.count()
 
-    def get_status(self, obj: Project):
+    def get_status(self, obj: Project) -> dict[str, Any]:
         return {
             "label": obj.status.value[1],
             "class_name": obj.status.name.lower(),
@@ -147,10 +148,10 @@ class _RunObjectGroupObjectGroupSerializer(serializers.ModelSerializer):
             "external_reference",
         )
 
-    def get_dating(self, obj: ObjectGroup):
+    def get_dating(self, obj: ObjectGroup) -> str:
         return obj.dating_era.label if obj.dating_era else ""
 
-    def get_c2rmf_id(self, obj: ObjectGroup):
+    def get_c2rmf_id(self, obj: ObjectGroup) -> str | None:
         if (
             hasattr(obj, "external_reference")
             and obj.external_reference.provider_name == "eros"
@@ -427,3 +428,17 @@ class OnPremisesParticipationSerializer(ParticipationSerializer):
         if self.instance and self.instance.institution:
             return self.instance.institution.ror_id
         return None
+
+
+class ParticipationUpdateRequestSerializer(  # pylint: disable=abstract-method
+    serializers.Serializer
+):
+    """OpenAPI documentation only: body accepted when updating a member
+    participation. The view validates it with ParticipationTypeSwitchSerializer
+    when ``on_premises`` is sent, otherwise with the serializer matching the
+    participation type (``employer`` is ignored for remote participations)."""
+
+    user = _UserParticipationSerializer(required=False)
+    institution = _InstitutionParticipationSerializer(required=False)
+    employer = _EmployerParticipationSerializer(required=False, allow_null=True)
+    on_premises = serializers.BooleanField(required=False)

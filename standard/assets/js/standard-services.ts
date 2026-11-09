@@ -1,5 +1,9 @@
 import { getCSRFToken } from "../../../lab/assets/js/utils";
-import { IMeasuringPointStandard, IStandard } from "./IStandard";
+import {
+  IMeasuringPointStandard,
+  IStandard,
+  RunMeasuringPointStandards,
+} from "./IStandard";
 
 interface IMeasuringPointStandardResponse {
   id: number;
@@ -24,7 +28,7 @@ export async function listStandards(): Promise<IStandard[]> {
 
 export async function addOrUpdateStandardToMeasuringPoint(
   standard: string,
-  pointId: string,
+  pointId: number,
   create: boolean = true,
 ): Promise<IMeasuringPointStandard> {
   const headers: HeadersInit = new Headers();
@@ -49,30 +53,27 @@ export async function addOrUpdateStandardToMeasuringPoint(
 }
 
 export async function listRunMeasuringPointsStandard(
-  runId: string,
-): Promise<{ [id: string]: IMeasuringPointStandard }> {
+  runId: number,
+): Promise<RunMeasuringPointStandards> {
   const response = await fetch(`/api/standard/runs/${runId}`, {
     method: "GET",
   });
   if (response.ok) {
     const data =
       (await response.json()) as IRunMeasuringPointStandardResponse[];
-    return data.reduce(
-      (acc, item) => {
-        acc[item.measuring_point.toString()] = {
-          standard: item.standard,
-          id: item.id.toString(),
-        };
-        return acc;
-      },
-      {} as { [id: string]: IMeasuringPointStandard },
-    );
+    return data.reduce((acc, item) => {
+      acc[item.measuring_point] = {
+        standard: item.standard,
+        id: item.id,
+      };
+      return acc;
+    }, {} as RunMeasuringPointStandards);
   }
   throw new Error("Failed to fetch measuring points");
 }
 
 export async function retrieveMeasuringPointStandard(
-  pointId: string,
+  pointId: number,
 ): Promise<IMeasuringPointStandard | null> {
   const response = await fetch(
     `/api/standard/measuring-points/${pointId}/standard`,
@@ -91,7 +92,7 @@ export async function retrieveMeasuringPointStandard(
 }
 
 export async function deleteMeasuringPointStandard(
-  pointId: string,
+  pointId: number,
 ): Promise<void> {
   const headers: HeadersInit = new Headers();
   headers.set("X-CSRFToken", getCSRFToken() || "");
@@ -112,7 +113,7 @@ function parseMeasuringPointStandardData(
   data: IMeasuringPointStandardResponse,
 ) {
   return {
-    id: data.id.toString(),
+    id: data.id,
     standard: data.standard,
   };
 }

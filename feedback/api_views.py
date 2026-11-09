@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.core.mail import EmailMessage
-from rest_framework import status
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import serializers, status
 from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny
@@ -9,6 +11,22 @@ from rest_framework.response import Response
 from .serializers import FeedbackFormSerializer
 
 
+@extend_schema(
+    request={
+        "multipart/form-data": inline_serializer(
+            "FeedbackFormRequest",
+            fields={
+                **FeedbackFormSerializer().get_fields(),
+                "attachments": serializers.ListField(
+                    child=serializers.FileField(),
+                    required=False,
+                    help_text="Files attached to the feedback email.",
+                ),
+            },
+        )
+    },
+    responses=OpenApiTypes.OBJECT,
+)
 @api_view(["POST"])
 @permission_classes([AllowAny])
 @parser_classes([MultiPartParser])

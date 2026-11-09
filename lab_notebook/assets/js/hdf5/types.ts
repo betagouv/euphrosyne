@@ -49,13 +49,13 @@ export interface HDF5FileSummary {
 }
 
 export interface MeasuringPointLike {
-  id: string;
+  id: number;
   name: string;
 }
 
 export interface HDF5GroupMatch {
   file: EuphrosyneFile;
-  pointId: string;
+  pointId: number;
   pointKey: string;
   group: HDF5Group;
   groupPath: string;
@@ -95,7 +95,8 @@ export type HDF5DatasetEntryKind = "spectrum" | "map";
 
 export interface HDF5DatasetEntry {
   id: string;
-  pointId: string;
+  /** Measuring point id, null when no measuring point matches the entry. */
+  pointId: number | null;
   pointKey: string;
   fileName: string;
   filePath: string;

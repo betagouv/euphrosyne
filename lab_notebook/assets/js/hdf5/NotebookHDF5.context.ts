@@ -2,10 +2,10 @@ import { createContext, useContext } from "react";
 import { HDF5DatasetEntry } from "./types";
 
 export interface NotebookHDF5ContextValue {
-  entriesByPointId: Record<string, HDF5DatasetEntry[]>;
-  hasViewableHDF5DataByPointId: Record<string, boolean>;
-  loadingEntriesByPointId: Record<string, boolean>;
-  loadEntriesForPoint: (pointId: string) => Promise<void>;
+  entriesByPointId: Record<number, HDF5DatasetEntry[]>;
+  hasViewableHDF5DataByPointId: Record<number, boolean>;
+  loadingEntriesByPointId: Record<number, boolean>;
+  loadEntriesForPoint: (pointId: number) => Promise<void>;
 }
 
 export const NotebookHDF5Context = createContext<NotebookHDF5ContextValue>({

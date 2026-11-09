@@ -1,9 +1,9 @@
 import { getCSRFToken } from "../../../lab/assets/js/utils.js";
 
 export class NotebookServices {
-  protected runId: string;
+  protected runId: number;
 
-  constructor(runId: string) {
+  constructor(runId: number) {
     this.runId = runId;
   }
 

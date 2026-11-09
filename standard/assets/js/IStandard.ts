@@ -3,10 +3,10 @@ export interface IStandard {
 }
 
 export interface IMeasuringPointStandard {
-  id: string;
+  id: number;
   standard: IStandard;
 }
 
 export type RunMeasuringPointStandards = {
-  [measuringPointId: string]: IMeasuringPointStandard;
+  [measuringPointId: number]: IMeasuringPointStandard;
 };

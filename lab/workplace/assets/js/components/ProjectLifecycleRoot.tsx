@@ -8,7 +8,7 @@ import { ProjectLifecycleSnapshot } from "../project-lifecycle-service";
 import ProjectLifecyclePanel from "./ProjectLifecyclePanel";
 
 interface ProjectLifecycleRootProps {
-  projectId: string;
+  projectId: number;
   projectSlug: string;
   title: string;
   loadingLabel: string;

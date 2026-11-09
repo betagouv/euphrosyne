@@ -15,9 +15,9 @@ import { NotebookHDF5Context } from "../hdf5";
 import HDF5NotebookGenerationModal from "./HDF5NotebookGenerationModal";
 
 interface NotebookProps {
-  runId: string;
+  runId: number;
   projectSlug: string;
-  projectId: string;
+  projectId: number;
   runName: string;
   isLabAdmin: boolean;
   canWriteNotebook: boolean;

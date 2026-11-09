@@ -8,12 +8,26 @@ import { normalizeMeasuringPointName } from "../notebook-hdf5";
 import type { HDF5NotebookGenerationCandidate } from "../types";
 import type { HDF5NotebookGenerationProgress } from "./types";
 
+/**
+ * Preview entities do not exist in the database yet: they get negative ids so
+ * they can never collide with a real primary key.
+ */
+export function previewId(id: number) {
+  return -id;
+}
+
+/**
+ * Placeholder for a run object group created during generation: its primary
+ * key is not returned by the API and is not needed afterwards.
+ */
+export const UNKNOWN_RUN_OBJECT_GROUP_ID = 0;
+
 export function createPreviewPoint(
   candidate: HDF5NotebookGenerationCandidate,
   id: number,
 ): IMeasuringPoint {
   return {
-    id: `__preview_point_${id}`,
+    id: previewId(id),
     name: candidate.pointName,
     objectGroupId: null,
     comments: null,
@@ -25,7 +39,7 @@ export function createPreviewObjectGroup(
   id: number,
 ): ObjectGroup {
   return {
-    id: `__preview_object_${id}`,
+    id: previewId(id),
     label,
     objectCount: 1,
     dating: "",
@@ -45,7 +59,7 @@ export function findPointByCandidate(
 
 export function findRunObjectGroupById(
   runObjectGroups: RunObjectGroup[],
-  objectGroupId: string,
+  objectGroupId: number,
 ) {
   return runObjectGroups.find(
     ({ objectGroup }) => objectGroup.id === objectGroupId,

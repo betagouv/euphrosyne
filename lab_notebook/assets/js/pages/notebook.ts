@@ -5,9 +5,9 @@ import Notebook from "../components/Notebook";
 import { getTemplateJSONData } from "../../../../shared/js/utils";
 
 interface NotebookPageData {
-  runId: string;
+  runId: number;
   projectSlug: string;
-  projectId: string;
+  projectId: number;
   runName: string;
   isLabAdmin: boolean;
   canWriteNotebook: boolean;

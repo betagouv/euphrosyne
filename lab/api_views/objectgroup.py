@@ -1,7 +1,9 @@
 import logging
 
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema, inline_serializer
 from rest_framework import authentication, generics
+from rest_framework import serializers as drf_serializers
 from rest_framework.decorators import (
     api_view,
     authentication_classes,
@@ -22,7 +24,17 @@ from . import serializers
 
 logger = logging.getLogger(__name__)
 
+_FETCH_OBJECT_REQUEST = inline_serializer(
+    "FetchObjectFromProviderRequest",
+    fields={
+        "query": drf_serializers.CharField(
+            help_text="Object identifier in the provider database."
+        ),
+    },
+)
 
+
+@extend_schema(request=_FETCH_OBJECT_REQUEST, responses=OpenApiTypes.OBJECT)
 @api_view(["POST"])
 @authentication_classes([authentication.SessionAuthentication])
 @permission_classes([IsAdminUser])
@@ -47,7 +59,16 @@ def get_object_from_provider(request, provider_name: str):
 
 
 @extend_schema(
-    responses={200: serializers.GetObjectImageFromProviderResponseSerializer},
+    parameters=[
+        OpenApiParameter(
+            "object_id",
+            OpenApiTypes.STR,
+            OpenApiParameter.QUERY,
+            required=True,
+            description="Object identifier in the provider database.",
+        ),
+    ],
+    responses=serializers.GetObjectImageFromProviderResponseSerializer,
 )
 @api_view(["GET"])
 @authentication_classes([authentication.SessionAuthentication])
@@ -68,34 +89,6 @@ def get_object_images_from_provider(request: Request, provider_name: str):
         )
         images = []
     return Response({"images": images})
-
-
-@api_view(["POST"])
-@authentication_classes([authentication.SessionAuthentication])
-@permission_classes([IsAdminUser])
-def get_eros_object(request):
-    """DEPRECATED. Use get_object_from_provider with provider_name='eros' instead.
-    Fetch object from Eros."""
-    import sentry_sdk  # pylint: disable=import-outside-toplevel
-
-    sentry_sdk.capture_message(
-        "Deprecated API endpoint called: lab/api_views/objectgroup.py/get_eros_object",
-        level="warning",
-    )
-
-    c2rmf_id = request.data["query"]
-    try:
-        obj = fetch_partial_objectgroup("eros", c2rmf_id)
-    except ObjectProviderError as error:
-        logger.error(
-            "An error occurred when importing data from Eros.\nID: %s\nError: %s",
-            c2rmf_id,
-            error,
-        )
-        obj = None
-    if not obj:
-        raise NotFound("Object with this EROS ID was not found.")
-    return Response({"c2rmf_id": c2rmf_id, "label": obj["label"]})
 
 
 class ObjectGroupCreateView(generics.CreateAPIView):

@@ -26,7 +26,7 @@ export default function MeasuringPoints() {
 
   // Selected measuring point for object group modal
   const [addObjectModalPointId, setAddObjectModalPointId] = useState<
-    string | null
+    number | null
   >(null);
 
   // Selected measuring point for image localization modal

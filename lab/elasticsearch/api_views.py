@@ -1,9 +1,21 @@
+from drf_spectacular.plumbing import resolve_type_hint
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    extend_schema,
+)
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .client import CatalogClient
+from .queries import QueryParams
+
+# Generated from the TypedDict the search code is typed with, so that the
+# schema given to the WAF cannot drift from it.
+CATALOG_SEARCH_REQUEST = {"application/json": resolve_type_hint(QueryParams)}
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 @api_view(["GET"])
 def list_all_items(request):
     """Catalog items listing endpoint"""
@@ -11,6 +23,10 @@ def list_all_items(request):
     return Response(results)
 
 
+@extend_schema(
+    request=CATALOG_SEARCH_REQUEST,
+    responses=OpenApiTypes.OBJECT,
+)
 @api_view(["POST"])
 def search(request):
     """Catalog search endpoint"""
@@ -18,6 +34,30 @@ def search(request):
     return Response(results)
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            "field",
+            OpenApiTypes.STR,
+            OpenApiParameter.QUERY,
+            required=True,
+            description="Catalog field to aggregate, e.g. materials.",
+        ),
+        OpenApiParameter(
+            "query",
+            OpenApiTypes.STR,
+            OpenApiParameter.QUERY,
+            description="Only keep terms containing this value.",
+        ),
+        OpenApiParameter(
+            "exclude",
+            OpenApiTypes.STR,
+            OpenApiParameter.QUERY,
+            description="Comma-separated terms to exclude.",
+        ),
+    ],
+    responses=OpenApiTypes.OBJECT,
+)
 @api_view(["GET"])
 def aggregate_field(request):
     """Catalog aggregation endpoint"""
@@ -34,6 +74,7 @@ def aggregate_field(request):
     return Response(results)
 
 
+@extend_schema(responses=OpenApiTypes.OBJECT)
 @api_view(["GET"])
 def aggregate_created(request):
     """Catalog aggregation endpoint"""

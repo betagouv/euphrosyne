@@ -472,6 +472,13 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
+SPECTACULAR_SETTINGS = {
+    # Separate request components without read-only fields: in a shared
+    # component they stay listed as required, which a request validator such as
+    # the WAF may not ignore.
+    "COMPONENT_SPLIT_REQUEST": True,
+}
+
 
 ELASTICSEARCH_HOST = os.getenv("ELASTICSEARCH_HOST")
 ELASTICSEARCH_USERNAME = os.getenv("ELASTICSEARCH_USERNAME")

@@ -228,7 +228,7 @@ class RunAdmin(LabPermissionMixin, ModelAdmin):
         run = schedule_form.instance
         extra_context["json_data"] = {
             "run": {
-                "id": str(run.id) if run.id else "",
+                "id": run.id,
                 "label": run.label,
             }
         }
