@@ -14,7 +14,7 @@ export class NotebookRunComments extends HTMLTextAreaElement {
 
     if (!runId) throw new Error("runId must be defined as element attribute");
 
-    this.services = new NotebookServices(runId);
+    this.services = new NotebookServices(Number(runId));
 
     this.addEventListener("change", (e) =>
       this.services?.updateRunComments((e.target as HTMLTextAreaElement).value),

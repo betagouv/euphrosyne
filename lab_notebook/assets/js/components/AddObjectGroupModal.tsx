@@ -11,8 +11,8 @@ export default function AddObjectGroupModal({
   runObjectGroupLabels,
   onAddSuccess,
 }: {
-  runId: string;
-  measuringPointId: string | null;
+  runId: number;
+  measuringPointId: number | null;
   runObjectGroupLabels: string[];
   onAddSuccess?: () => void;
 }) {
@@ -57,7 +57,7 @@ export default function AddObjectGroupModal({
       return;
     }
     try {
-      await addObjectGroupToRun(runId, objectGroup.id.toString());
+      await addObjectGroupToRun(runId, objectGroup.id);
     } catch {
       setError(t.addObjectErrorToRun);
       return;
@@ -66,7 +66,7 @@ export default function AddObjectGroupModal({
       await updateMeasuringPointObjectId(
         runId,
         measuringPointId,
-        objectGroup.id.toString(),
+        objectGroup.id,
       );
     } catch {
       setError(t.addObjectErrorToPoint);

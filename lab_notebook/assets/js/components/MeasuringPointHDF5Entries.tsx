@@ -14,7 +14,7 @@ const HDF5InlineVisualization = lazy(loadHDF5Visualization);
 export default function MeasuringPointHDF5Entries({
   pointId,
 }: {
-  pointId: string;
+  pointId: number;
 }) {
   const {
     entriesByPointId,

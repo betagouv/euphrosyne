@@ -50,18 +50,18 @@ export default function useNotebookHDF5Data({
   >([]);
   const [roots, setRoots] = useState<HDF5FileRoot[]>([]);
   const [entriesByPointId, setEntriesByPointId] = useState<
-    Record<string, HDF5DatasetEntry[]>
+    Record<number, HDF5DatasetEntry[]>
   >({});
   const [isLoading, setIsLoading] = useState(false);
   const [loadingEntriesByPointId, setLoadingEntriesByPointId] = useState<
-    Record<string, boolean>
+    Record<number, boolean>
   >({});
   const [error, setError] = useState<string | null>(null);
   const groupMetadataCache = useRef<Map<string, Promise<HDF5Entity>>>(
     new Map(),
   );
-  const loadedPointIds = useRef<Set<string>>(new Set());
-  const loadingPointPromises = useRef<Map<string, Promise<void>>>(new Map());
+  const loadedPointIds = useRef<Set<number>>(new Set());
+  const loadingPointPromises = useRef<Map<number, Promise<void>>>(new Map());
 
   useEffect(() => {
     let isCurrent = true;
@@ -211,7 +211,7 @@ export default function useNotebookHDF5Data({
   const matchesByPointId = useMemo(
     () =>
       findHDF5GroupMatches(roots, measuringPoints).reduce<
-        Record<string, HDF5GroupMatch[]>
+        Record<number, HDF5GroupMatch[]>
       >((accumulator, match) => {
         accumulator[match.pointId] = accumulator[match.pointId] || [];
         accumulator[match.pointId].push(match);
@@ -228,13 +228,15 @@ export default function useNotebookHDF5Data({
           ...Object.keys(mapFilesByPointId),
           ...Object.keys(mapEntriesByPointId),
         ]),
-      ).reduce<Record<string, boolean>>((accumulator, pointId) => {
-        accumulator[pointId] =
-          (matchesByPointId[pointId] || []).length > 0 ||
-          (mapFilesByPointId[pointId] || []).length > 0 ||
-          (mapEntriesByPointId[pointId] || []).length > 0;
-        return accumulator;
-      }, {}),
+      )
+        .map(Number)
+        .reduce<Record<number, boolean>>((accumulator, pointId) => {
+          accumulator[pointId] =
+            (matchesByPointId[pointId] || []).length > 0 ||
+            (mapFilesByPointId[pointId] || []).length > 0 ||
+            (mapEntriesByPointId[pointId] || []).length > 0;
+          return accumulator;
+        }, {}),
     [mapEntriesByPointId, mapFilesByPointId, matchesByPointId],
   );
 
@@ -253,7 +255,7 @@ export default function useNotebookHDF5Data({
   );
 
   const loadEntriesForPoint = useCallback(
-    async (pointId: string) => {
+    async (pointId: number) => {
       if (loadedPointIds.current.has(pointId)) {
         return;
       }
@@ -421,11 +423,11 @@ function createPointIdByPointKey(points: IMeasuringPoint[]) {
 
 function createMapEntriesWithPointIds(
   entries: HDF5DatasetEntry[],
-  pointIdByPointKey: Map<string, string>,
+  pointIdByPointKey: Map<string, number>,
 ): HDF5DatasetEntry[] {
   return entries.map((entry) => {
     const pointKey = getPointKeyFromHDF5FileName(entry.fileName);
-    const pointId = pointKey ? pointIdByPointKey.get(pointKey) || "" : "";
+    const pointId = pointKey ? (pointIdByPointKey.get(pointKey) ?? null) : null;
     return {
       ...entry,
       pointId,
@@ -436,13 +438,13 @@ function createMapEntriesWithPointIds(
 
 function groupMapFilesByPointId(
   mapFiles: EuphrosyneFile[],
-  pointIdByPointKey: Map<string, string>,
-): Record<string, EuphrosyneFile[]> {
-  return mapFiles.reduce<Record<string, EuphrosyneFile[]>>(
+  pointIdByPointKey: Map<string, number>,
+): Record<number, EuphrosyneFile[]> {
+  return mapFiles.reduce<Record<number, EuphrosyneFile[]>>(
     (accumulator, file) => {
       const pointKey = getPointKeyFromHDF5FileName(file.name);
-      const pointId = pointKey ? pointIdByPointKey.get(pointKey) || "" : "";
-      if (!pointId) {
+      const pointId = pointKey ? pointIdByPointKey.get(pointKey) : undefined;
+      if (pointId === undefined) {
         return accumulator;
       }
       accumulator[pointId] = accumulator[pointId] || [];
@@ -455,14 +457,15 @@ function groupMapFilesByPointId(
 
 function groupEntriesByPointId(
   entries: HDF5DatasetEntry[],
-): Record<string, HDF5DatasetEntry[]> {
-  return entries.reduce<Record<string, HDF5DatasetEntry[]>>(
+): Record<number, HDF5DatasetEntry[]> {
+  return entries.reduce<Record<number, HDF5DatasetEntry[]>>(
     (accumulator, entry) => {
-      if (!entry.pointId) {
+      const { pointId } = entry;
+      if (pointId === null) {
         return accumulator;
       }
-      accumulator[entry.pointId] = accumulator[entry.pointId] || [];
-      accumulator[entry.pointId].push(entry);
+      accumulator[pointId] = accumulator[pointId] || [];
+      accumulator[pointId].push(entry);
       return accumulator;
     },
     {},
@@ -470,15 +473,15 @@ function groupEntriesByPointId(
 }
 
 function combineEntriesByPointId(
-  entriesByPointId: Record<string, HDF5DatasetEntry[]>,
-  mapEntriesByPointId: Record<string, HDF5DatasetEntry[]>,
-): Record<string, HDF5DatasetEntry[]> {
+  entriesByPointId: Record<number, HDF5DatasetEntry[]>,
+  mapEntriesByPointId: Record<number, HDF5DatasetEntry[]>,
+): Record<number, HDF5DatasetEntry[]> {
   return {
     ...entriesByPointId,
     ...Object.fromEntries(
       Object.entries(mapEntriesByPointId).map(([pointId, entries]) => [
         pointId,
-        [...(entriesByPointId[pointId] || []), ...entries],
+        [...(entriesByPointId[Number(pointId)] || []), ...entries],
       ]),
     ),
   };

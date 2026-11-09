@@ -258,7 +258,7 @@ function createMapDatasetEntry(
   const detectorName = dataset.detectorName || dataset.name;
   return {
     id: `${file.path}:${dataset.path}`,
-    pointId: "",
+    pointId: null,
     pointKey: "",
     fileName: file.name,
     filePath: file.path,

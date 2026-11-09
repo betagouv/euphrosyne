@@ -49,7 +49,7 @@ interface HDF5NotebookGenerationPreflightData {
 }
 
 interface UseHDF5NotebookGenerationWorkflowOptions {
-  runId: string;
+  runId: number;
   projectSlug: string;
   runName: string;
   fetchFn: ToolsFetch;
@@ -235,7 +235,7 @@ export function useHDF5NotebookGenerationWorkflow({
 }
 
 async function fetchGenerationPreflightData(
-  runId: string,
+  runId: number,
 ): Promise<HDF5NotebookGenerationPreflightData> {
   const [
     measuringPoints,

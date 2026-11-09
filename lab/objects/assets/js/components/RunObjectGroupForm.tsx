@@ -43,7 +43,7 @@ export default function RunObjectGroupForm({
 
   const importFromProjectModalId = "run-object-group-project-import";
 
-  const onRunObjectGroupDelete = async (runObjectGroupId: string) => {
+  const onRunObjectGroupDelete = async (runObjectGroupId: number) => {
     const response = await deleteRunObjectGroup(runObjectGroupId);
     if (response && response.ok) {
       setRunObjectGroups(
@@ -53,7 +53,7 @@ export default function RunObjectGroupForm({
     }
   };
 
-  const onAddObjectGroupToRun = (objectGroupId: string) => {
+  const onAddObjectGroupToRun = (objectGroupId: number) => {
     addObjectGroupToRun(run.id, objectGroupId).then(async (response) => {
       if (response?.ok) {
         // Remove error message if any

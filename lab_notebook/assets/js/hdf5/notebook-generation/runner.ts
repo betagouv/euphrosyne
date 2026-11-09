@@ -12,6 +12,7 @@ import {
   findAvailableObjectGroupByLabel,
   findPointByCandidate,
   findRunObjectGroupById,
+  UNKNOWN_RUN_OBJECT_GROUP_ID,
   findRunObjectGroupByLabel,
   findStandardByReferenceLabel,
   standardLabelsMatch,
@@ -148,7 +149,7 @@ async function getOrCreateMeasuringPoint({
   services,
   progress,
 }: {
-  runId: string;
+  runId: number;
   candidate: HDF5NotebookGenerationCandidate;
   points: IMeasuringPoint[];
   services: HDF5NotebookGenerationServices;
@@ -176,7 +177,7 @@ async function completeObjectAnalysis({
   services,
   progress,
 }: {
-  runId: string;
+  runId: number;
   candidate: HDF5NotebookGenerationCandidate;
   point: IMeasuringPoint;
   runObjectGroups: RunObjectGroup[];
@@ -253,7 +254,7 @@ async function resolveObjectGroup({
   services,
   progress,
 }: {
-  runId: string;
+  runId: number;
   referenceLabel: string;
   runObjectGroups: RunObjectGroup[];
   availableObjectGroups: ObjectGroup[];
@@ -280,7 +281,7 @@ async function resolveObjectGroup({
       objectGroup: availableObjectGroup,
       runObjectGroups: [
         ...runObjectGroups,
-        { id: "", objectGroup: availableObjectGroup },
+        { id: UNKNOWN_RUN_OBJECT_GROUP_ID, objectGroup: availableObjectGroup },
       ],
     };
   }
@@ -288,10 +289,10 @@ async function resolveObjectGroup({
   const createdObjectGroup = await services.createObjectGroup({
     label: referenceLabel,
   });
-  await services.addObjectGroupToRun(runId, createdObjectGroup.id.toString());
+  await services.addObjectGroupToRun(runId, createdObjectGroup.id);
   progress.objectsCreated += 1;
   const objectGroup: ObjectGroup = {
-    id: createdObjectGroup.id.toString(),
+    id: createdObjectGroup.id,
     label: createdObjectGroup.label,
     objectCount: 1,
     dating: "",
@@ -300,7 +301,10 @@ async function resolveObjectGroup({
   };
   return {
     objectGroup,
-    runObjectGroups: [...runObjectGroups, { id: "", objectGroup }],
+    runObjectGroups: [
+      ...runObjectGroups,
+      { id: UNKNOWN_RUN_OBJECT_GROUP_ID, objectGroup },
+    ],
   };
 }
 

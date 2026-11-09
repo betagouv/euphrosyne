@@ -56,7 +56,7 @@ export async function createObjectGroup(
 }
 
 export async function fetchRunObjectGroups(
-  runId: string,
+  runId: number,
 ): Promise<RunObjectGroup[]> {
   const response = await fetch(`/api/lab/runs/${runId}/objectgroups`);
   if (!response.ok) {
@@ -65,16 +65,16 @@ export async function fetchRunObjectGroups(
   const runObjectGroups =
     (await response.json()) as RunObjectGroupsResponseElement[];
   return runObjectGroups.map((ro) => ({
-    id: ro.id.toString(),
+    id: ro.id,
     objectGroup: {
-      id: ro.objectgroup.id.toString(),
+      id: ro.objectgroup.id,
       label: ro.objectgroup.label,
       objectCount: ro.objectgroup.object_count,
       dating: ro.objectgroup.dating,
       materials: ro.objectgroup.materials,
       externalReference: ro.objectgroup.external_reference
         ? {
-            id: ro.objectgroup.external_reference.id.toString(),
+            id: ro.objectgroup.external_reference.id,
             providerName: ro.objectgroup.external_reference.provider_name,
             providerObjectId:
               ro.objectgroup.external_reference.provider_object_id,
@@ -88,7 +88,7 @@ export async function fetchRunObjectGroups(
  * Fetches the object groups available to import for a run.
  */
 export async function fetchAvailableObjectGroups(
-  runId: string,
+  runId: number,
 ): Promise<ObjectGroup[]> {
   const response = await fetch(`/api/lab/runs/${runId}/available-objectgroups`);
   if (!response.ok) {
@@ -97,14 +97,14 @@ export async function fetchAvailableObjectGroups(
   const availableObjectGroups =
     (await response.json()) as ObjectGroupResponseElement[];
   return availableObjectGroups.map((objectgroup) => ({
-    id: objectgroup.id.toString(),
+    id: objectgroup.id,
     label: objectgroup.label,
     objectCount: objectgroup.object_count,
     dating: objectgroup.dating,
     materials: objectgroup.materials,
     externalReference: objectgroup.external_reference
       ? {
-          id: objectgroup.external_reference.id.toString(),
+          id: objectgroup.external_reference.id,
           providerName: objectgroup.external_reference.provider_name,
           providerObjectId: objectgroup.external_reference.provider_object_id,
         }
@@ -113,12 +113,12 @@ export async function fetchAvailableObjectGroups(
 }
 
 export async function addObjectGroupToRun(
-  runId: string,
-  objectGroupId: string,
+  runId: number,
+  objectGroupId: number,
 ) {
   const response = await fetch(`/api/lab/runs/${runId}/objectgroups`, {
     ...getBasePOSTParams(),
-    body: JSON.stringify({ objectgroup: Number(objectGroupId) }),
+    body: JSON.stringify({ objectgroup: objectGroupId }),
   });
   if (!response || !response.ok) {
     throw new Error(
@@ -128,7 +128,7 @@ export async function addObjectGroupToRun(
   return response;
 }
 
-export async function deleteRunObjectGroup(runObjectGroupId: string) {
+export async function deleteRunObjectGroup(runObjectGroupId: number) {
   let response;
   try {
     response = await fetch(`/api/lab/run_objectgroups/${runObjectGroupId}`, {

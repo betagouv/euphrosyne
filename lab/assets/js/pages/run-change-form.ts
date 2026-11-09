@@ -9,7 +9,7 @@ import { initRunScheduleForm } from "../run/schedule-form";
 
 interface RunChangeFormData {
   run: {
-    id: string;
+    id: number;
     label: string;
   };
 }

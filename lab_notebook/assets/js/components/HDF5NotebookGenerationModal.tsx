@@ -4,7 +4,7 @@ import HDF5NotebookGenerationPreparationPanel from "./HDF5NotebookGenerationPrep
 import HDF5NotebookGenerationProgressPanel from "./HDF5NotebookGenerationProgressPanel";
 
 interface HDF5NotebookGenerationModalProps {
-  runId: string;
+  runId: number;
   projectSlug: string;
   runName: string;
   fetchFn: ToolsFetch;

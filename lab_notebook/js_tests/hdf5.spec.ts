@@ -218,12 +218,12 @@ describe("notebook HDF5 data helpers", () => {
           ]),
         },
       ],
-      [{ id: "point-8", name: "8" }],
+      [{ id: 8, name: "8" }],
     );
 
     expect(matches).toHaveLength(1);
     expect(matches[0]).toMatchObject({
-      pointId: "point-8",
+      pointId: 8,
       pointKey: "0008",
       groupPath: "/20260224_0008_CRRMF48563",
     });
@@ -483,7 +483,7 @@ describe("notebook HDF5 data helpers", () => {
     const hdf5File = file("batch.hdf5");
     const match: HDF5GroupMatch = {
       file: hdf5File,
-      pointId: "point-8",
+      pointId: 8,
       pointKey: "0008",
       group: group("20260224_0008_CRRMF48563"),
       groupPath: "/20260224_0008_CRRMF48563",
@@ -520,7 +520,7 @@ describe("notebook HDF5 data helpers", () => {
     const hdf5File = file("batch.hdf5");
     const match: HDF5GroupMatch = {
       file: hdf5File,
-      pointId: "point-5",
+      pointId: 5,
       pointKey: "0005",
       group: group("20260224_0005_CRRMF48563"),
       groupPath: "/20260224_0005_CRRMF48563",
@@ -557,7 +557,7 @@ describe("notebook HDF5 data helpers", () => {
     const hdf5File = file("batch.hdf5");
     const match: HDF5GroupMatch = {
       file: hdf5File,
-      pointId: "point-8",
+      pointId: 8,
       pointKey: "0008",
       group: group("20260224_0008_CRRMF48563"),
       groupPath: "/20260224_0008_CRRMF48563",
@@ -584,7 +584,7 @@ describe("notebook HDF5 data helpers", () => {
 
     expect(entries).toHaveLength(1);
     expect(entries[0]).toMatchObject({
-      pointId: "point-8",
+      pointId: 8,
       dataKind: "spectrum",
       dataKindLabel: "Spectrum",
       datasetName: "X0",
@@ -597,7 +597,7 @@ describe("notebook HDF5 data helpers", () => {
     const hdf5File = file("20260224_2026BOUDDHA_batch_IBA.hdf5");
     const match: HDF5GroupMatch = {
       file: hdf5File,
-      pointId: "point-5",
+      pointId: 5,
       pointKey: "0005",
       group: group("20260224_0005_CRRMF48563"),
       groupPath: "/20260224_0005_CRRMF48563",
@@ -677,7 +677,7 @@ describe("notebook HDF5 data helpers", () => {
 
     expect(entries).toHaveLength(1);
     expect(entries[0]).toMatchObject({
-      pointId: "",
+      pointId: null,
       dataKind: "map",
       dataKindLabel: "Map",
       fileName: "cartography.hdf5",
@@ -795,7 +795,7 @@ describe("notebook HDF5 data helpers", () => {
     const hdf5File = file("batch.hdf5");
     const match: HDF5GroupMatch = {
       file: hdf5File,
-      pointId: "point-8",
+      pointId: 8,
       pointKey: "0008",
       group: group("20260224_0008_CRRMF48563"),
       groupPath: "/20260224_0008_CRRMF48563",

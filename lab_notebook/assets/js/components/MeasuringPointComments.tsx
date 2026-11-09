@@ -11,7 +11,7 @@ export default function MeasuringPointComments({
   pointId,
   value,
 }: {
-  pointId: string;
+  pointId: number;
   value: string | null;
 }) {
   const t = {
