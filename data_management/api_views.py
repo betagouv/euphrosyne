@@ -9,7 +9,8 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema
 from rest_framework import serializers, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -61,34 +62,9 @@ FROM_DATA_DELETION_STATUS_CHOICES = (
 )
 
 
-_LIFECYCLE_STATE_FIELD = serializers.ChoiceField(choices=LifecycleState.choices)
-
+# The WAF only validates requests: responses are documented minimally.
 _lifecycle_trigger_schema = extend_schema(
-    request=None,
-    responses={
-        202: inline_serializer(
-            "LifecycleOperationTriggered",
-            fields={
-                "operation_id": serializers.UUIDField(),
-                "lifecycle_state": _LIFECYCLE_STATE_FIELD,
-            },
-        ),
-        400: inline_serializer(
-            "LifecycleOperationNotAllowed",
-            fields={
-                "detail": serializers.CharField(),
-                "lifecycle_state": _LIFECYCLE_STATE_FIELD,
-            },
-        ),
-        404: OpenApiResponse(description="Project data not found."),
-        502: inline_serializer(
-            "LifecycleOperationStartFailed",
-            fields={
-                "detail": serializers.CharField(),
-                "operation_id": serializers.UUIDField(),
-            },
-        ),
-    },
+    request=None, responses={202: OpenApiTypes.OBJECT}
 )
 
 
@@ -171,12 +147,7 @@ class ProjectRestoreTriggerAPIView(APIView):
 class LifecycleOperationDetailAPIView(APIView):
     permission_classes = [IsLabAdminUser]
 
-    @extend_schema(
-        responses={
-            200: LifecycleOperationDetailSerializer,
-            404: OpenApiResponse(description="Operation not found."),
-        }
-    )
+    @extend_schema(responses=LifecycleOperationDetailSerializer)
     def get(self, request: Request, operation_id: uuid.UUID) -> Response:
         operation = (
             LifecycleOperation.objects.select_related("project_data")
@@ -257,10 +228,7 @@ class LifecycleOperationCallbackAPIView(APIView):
 
     @extend_schema(
         request=LifecycleOperationCallbackRequestSerializer,
-        responses={
-            200: OpenApiResponse(description="Callback processed."),
-            404: OpenApiResponse(description="Operation not found."),
-        },
+        responses={200: None},
     )
     def post(self, request: Request) -> Response:
         callback_data = self._validated_callback_data(request)
@@ -309,20 +277,7 @@ class ProjectLifecycleAPIView(APIView):
         *rf_api_settings.DEFAULT_AUTHENTICATION_CLASSES,
     ]
 
-    @extend_schema(
-        responses={
-            200: inline_serializer(
-                "ProjectLifecycle",
-                fields={
-                    "lifecycle_state": _LIFECYCLE_STATE_FIELD,
-                    "last_operation_id": serializers.UUIDField(allow_null=True),
-                    "last_operation_type": serializers.ChoiceField(
-                        choices=LifecycleOperationType.values, allow_null=True
-                    ),
-                },
-            ),
-        }
-    )
+    @extend_schema(responses=OpenApiTypes.OBJECT)
     def get(self, request: Request, project_slug: str) -> Response:
 
         project = get_object_or_404(Project, slug=project_slug)

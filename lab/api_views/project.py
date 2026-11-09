@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django_filters import rest_framework as filters
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import generics, serializers
 from rest_framework.exceptions import PermissionDenied
@@ -132,14 +133,14 @@ class ProjectRemoteParticipationListCreateGroupView(
 # The serializer depends on the participation fetched and on the request body,
 # so it cannot be inferred without a request.
 @extend_schema_view(
-    get=extend_schema(responses=OnPremisesParticipationSerializer),
+    get=extend_schema(responses=OpenApiTypes.OBJECT),
     put=extend_schema(
         request=ParticipationUpdateRequestSerializer,
-        responses=OnPremisesParticipationSerializer,
+        responses=OpenApiTypes.OBJECT,
     ),
     patch=extend_schema(
         request=ParticipationUpdateRequestSerializer,
-        responses=OnPremisesParticipationSerializer,
+        responses=OpenApiTypes.OBJECT,
     ),
     delete=extend_schema(responses={204: None}),
 )

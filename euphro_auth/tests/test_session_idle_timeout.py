@@ -86,8 +86,6 @@ def test_password_login_sets_expiry_on_first_response(client, clock, session_use
     )
 
 
-# /api/session-probe/ is a test-only route, absent from the OpenAPI schema.
-@pytest.mark.openapi_invalid_request
 @pytest.mark.parametrize("url", ["/session-probe/", "/api/session-probe/"])
 def test_read_only_requests_keep_active_session_alive(client, clock, session_user, url):
     user, timeout = session_user
@@ -126,8 +124,6 @@ def test_expired_session_rejects_replayed_cookie(client, clock, session_user, ov
     assert Session.objects.get(session_key=cookie).expire_date <= clock.return_value
 
 
-# /api/session-probe/ is a test-only route, absent from the OpenAPI schema.
-@pytest.mark.openapi_invalid_request
 def test_expired_session_cannot_access_api(client, clock, session_user):
     user, timeout = session_user
     client.force_login(user)
@@ -191,8 +187,6 @@ def test_anonymous_request_does_not_set_session_expiry(client):
     assert not Session.objects.exists()
 
 
-# /api/session-probe/ is a test-only route, absent from the OpenAPI schema.
-@pytest.mark.openapi_invalid_request
 def test_jwt_only_request_does_not_create_session(client, session_user):
     user, _timeout = session_user
     access = EuphroRefreshToken.for_user(user).access_token
@@ -204,8 +198,6 @@ def test_jwt_only_request_does_not_create_session(client, session_user):
     assert not Session.objects.exists()
 
 
-# /api/session-probe/ is a test-only route, absent from the OpenAPI schema.
-@pytest.mark.openapi_invalid_request
 def test_jwt_user_cannot_change_another_sessions_timeout(client, session_user):
     user, timeout = session_user
     client.force_login(user)

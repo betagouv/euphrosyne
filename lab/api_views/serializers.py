@@ -1,11 +1,11 @@
 import datetime
+from typing import Any
 
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from drf_spectacular.utils import extend_schema_field, inline_serializer
 from rest_framework import reverse, serializers, validators
 
 from euphro_auth.emails import send_invitation_email
@@ -84,16 +84,7 @@ class UpcomingProjectSerializer(serializers.ModelSerializer):
     def get_num_runs(self, obj: Project) -> int:
         return obj.runs.count()
 
-    @extend_schema_field(
-        inline_serializer(
-            "UpcomingProjectStatus",
-            fields={
-                "label": serializers.CharField(),
-                "class_name": serializers.CharField(),
-            },
-        )
-    )
-    def get_status(self, obj: Project):
+    def get_status(self, obj: Project) -> dict[str, Any]:
         return {
             "label": obj.status.value[1],
             "class_name": obj.status.name.lower(),
@@ -439,7 +430,9 @@ class OnPremisesParticipationSerializer(ParticipationSerializer):
         return None
 
 
-class ParticipationUpdateRequestSerializer(OnPremisesParticipationSerializer):
+class ParticipationUpdateRequestSerializer(  # pylint: disable=abstract-method
+    serializers.Serializer
+):
     """OpenAPI documentation only: body accepted when updating a member
     participation. The view validates it with ParticipationTypeSwitchSerializer
     when ``on_premises`` is sent, otherwise with the serializer matching the
@@ -447,7 +440,5 @@ class ParticipationUpdateRequestSerializer(OnPremisesParticipationSerializer):
 
     user = _UserParticipationSerializer(required=False)
     institution = _InstitutionParticipationSerializer(required=False)
+    employer = _EmployerParticipationSerializer(required=False, allow_null=True)
     on_premises = serializers.BooleanField(required=False)
-
-    class Meta(OnPremisesParticipationSerializer.Meta):
-        read_only_fields = ("id",)
