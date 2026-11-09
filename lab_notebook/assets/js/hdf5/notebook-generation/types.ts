@@ -47,7 +47,7 @@ export interface DiscoverHDF5NotebookGenerationCandidatesOptions {
 export interface HDF5NotebookGenerationServices {
   createMeasuringPoint: (
     runId: string,
-    body: { name: string; comments?: string; object_group?: string },
+    body: { name: string; comments?: string; object_group?: number | null },
   ) => Promise<IMeasuringPoint>;
   updateMeasuringPointComments: (
     runId: string,
