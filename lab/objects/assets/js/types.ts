@@ -2,17 +2,17 @@ export type ExternalObjectProvider = "eros" | "pop";
 
 export interface Run {
   label: string;
-  id: string;
+  id: number;
 }
 
 interface ExternalObjectReference {
-  id: string;
+  id: number;
   providerName: ExternalObjectProvider;
   providerObjectId: string;
 }
 
 export interface ObjectGroup {
-  id: string;
+  id: number;
   label: string;
   objectCount: number;
   dating: string;
@@ -21,6 +21,6 @@ export interface ObjectGroup {
 }
 
 export interface RunObjectGroup {
-  id: string;
+  id: number;
   objectGroup: ObjectGroup;
 }

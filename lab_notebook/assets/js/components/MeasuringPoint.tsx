@@ -44,7 +44,7 @@ export default function MeasuringPoint({
 }: {
   point: IMeasuringPoint;
   runObjectGroups: RunObjectGroup[];
-  runId: string;
+  runId: number;
   measuringPointStandard?: IMeasuringPointStandard;
   onAddObjectClicked: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onLocalizeImageClicked: (event: React.MouseEvent<HTMLButtonElement>) => void;

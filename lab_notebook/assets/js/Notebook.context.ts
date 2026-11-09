@@ -25,16 +25,16 @@ import { ImageStorage } from "./hooks/useImageStorage";
 
 export interface INotebookContext {
   projectSlug: string;
-  runId: string;
+  runId: number;
   imageStorage: ImageStorage | null;
   measuringPoints: IMeasuringPoint[];
   setMeasuringPoints: Dispatch<SetStateAction<IMeasuringPoint[]>>;
   addObjectToMeasuringPoint: (
-    measuringPointId: string,
-    objectGroupId: string,
+    measuringPointId: number,
+    objectGroupId: number | null,
   ) => void;
   updateMeasuringPointImage: (
-    measuringPointId: string,
+    measuringPointId: number,
     image?: IMeasuringPointImage,
   ) => void;
   standards: IStandard[];
@@ -47,14 +47,14 @@ export interface INotebookContext {
   >;
   refreshNotebookState: () => Promise<void>;
   updatedMeasuringPointStandard: (
-    measuringPointId: string,
+    measuringPointId: number,
     standard?: IMeasuringPointStandard,
   ) => void;
 }
 
 export const NotebookContext = createContext<INotebookContext>({
   projectSlug: "",
-  runId: "",
+  runId: 0,
   measuringPoints: [],
   standards: [],
   runObjectGroups: [],
@@ -72,7 +72,7 @@ export const NotebookContext = createContext<INotebookContext>({
 
 export function useNotebookContext(
   projectSlug: string,
-  runId: string,
+  runId: number,
   imageStorage: ImageStorage | null,
 ): INotebookContext {
   const [measuringPoints, setMeasuringPoints] = useState<IMeasuringPoint[]>([]);
@@ -100,8 +100,8 @@ export function useNotebookContext(
   }, [runId]);
 
   const addObjectToMeasuringPoint = (
-    measuringPointId: string,
-    objectGroupId: string,
+    measuringPointId: number,
+    objectGroupId: number | null,
   ) => {
     setMeasuringPoints((currentPoints) =>
       currentPoints.map((p) =>
@@ -111,7 +111,7 @@ export function useNotebookContext(
   };
 
   const updateMeasuringPointImage = (
-    measuringPointId: string,
+    measuringPointId: number,
     image?: IMeasuringPointImage,
   ) => {
     setMeasuringPoints((currentPoints) =>
@@ -122,7 +122,7 @@ export function useNotebookContext(
   };
 
   const updatedMeasuringPointStandard = (
-    measuringPointId: string,
+    measuringPointId: number,
     standard?: IMeasuringPointStandard,
   ) => {
     setRunMeasuringPointStandards((currentStandards) => {

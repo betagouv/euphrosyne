@@ -14,7 +14,7 @@ export default function HDF5RunDataSection({
   isLoading,
   error,
 }: {
-  projectId: string;
+  projectId: number;
   fileSummaries: HDF5FileSummary[];
   isLoading: boolean;
   error: string | null;

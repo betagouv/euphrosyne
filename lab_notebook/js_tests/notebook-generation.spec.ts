@@ -39,7 +39,7 @@ function candidate(
 
 function point(overrides: Partial<IMeasuringPoint> = {}): IMeasuringPoint {
   return {
-    id: "point-6",
+    id: 6,
     name: "006",
     objectGroupId: null,
     comments: null,
@@ -47,9 +47,9 @@ function point(overrides: Partial<IMeasuringPoint> = {}): IMeasuringPoint {
   };
 }
 
-function runObjectGroup(label: string, id = "object-1"): RunObjectGroup {
+function runObjectGroup(label: string, id = 1): RunObjectGroup {
   return {
-    id: `run-${id}`,
+    id: 1000 + id,
     objectGroup: {
       id,
       label,
@@ -72,7 +72,7 @@ function services() {
     })),
     addObjectGroupToRun: vi.fn(async () => undefined),
     addOrUpdateStandardToMeasuringPoint: vi.fn(async (standard: string) => ({
-      id: "standard-link-1",
+      id: 31,
       standard: { label: standard },
     })),
   };
@@ -207,7 +207,7 @@ describe("HDF5 notebook generation workflow", () => {
     const mockedServices = services();
 
     const result = await generateNotebookFromHDF5({
-      runId: "run-1",
+      runId: 1,
       candidates: [candidate()],
       measuringPoints: [],
       runObjectGroups: [],
@@ -217,25 +217,22 @@ describe("HDF5 notebook generation workflow", () => {
       services: mockedServices,
     });
 
-    expect(mockedServices.createMeasuringPoint).toHaveBeenCalledWith("run-1", {
+    expect(mockedServices.createMeasuringPoint).toHaveBeenCalledWith(1, {
       name: "006",
     });
     expect(mockedServices.updateMeasuringPointComments).toHaveBeenCalledWith(
-      "run-1",
-      "point-6",
+      1,
+      6,
       "Face avant base zone rouge",
     );
     expect(mockedServices.createObjectGroup).toHaveBeenCalledWith({
       label: "CRRMF48563",
     });
-    expect(mockedServices.addObjectGroupToRun).toHaveBeenCalledWith(
-      "run-1",
-      "10",
-    );
+    expect(mockedServices.addObjectGroupToRun).toHaveBeenCalledWith(1, 10);
     expect(mockedServices.updateMeasuringPointObjectId).toHaveBeenCalledWith(
-      "run-1",
-      "point-6",
-      "10",
+      1,
+      6,
+      10,
     );
     expect(result.progress.pointsCreated).toBe(1);
     expect(result.progress.objectsCreated).toBe(1);
@@ -270,10 +267,10 @@ describe("HDF5 notebook generation workflow", () => {
       measuringPoints: [
         point({
           comments: "Manual comment",
-          objectGroupId: "object-1",
+          objectGroupId: 1,
         }),
       ],
-      runObjectGroups: [runObjectGroup("CRRMF48563", "object-1")],
+      runObjectGroups: [runObjectGroup("CRRMF48563", 1)],
       availableObjectGroups: [],
       standards: [],
       runMeasuringPointStandards: {},
@@ -295,7 +292,7 @@ describe("HDF5 notebook generation workflow", () => {
       runObjectGroups: [],
       availableObjectGroups: [
         {
-          id: "available-1",
+          id: 21,
           label: "CRRMF48563",
           objectCount: 1,
           dating: "",
@@ -358,10 +355,10 @@ describe("HDF5 notebook generation workflow", () => {
       candidates: [candidate()],
       measuringPoints: [
         point({
-          objectGroupId: "object-2",
+          objectGroupId: 2,
         }),
       ],
-      runObjectGroups: [runObjectGroup("OTHER", "object-2")],
+      runObjectGroups: [runObjectGroup("OTHER", 2)],
       availableObjectGroups: [],
       standards: [],
       runMeasuringPointStandards: {},
@@ -385,8 +382,8 @@ describe("HDF5 notebook generation workflow", () => {
       availableObjectGroups: [],
       standards: [{ label: "STD-A" }],
       runMeasuringPointStandards: {
-        "point-6": {
-          id: "standard-link-1",
+        6: {
+          id: 31,
           standard: { label: "STD-B" },
         },
       },
@@ -401,14 +398,14 @@ describe("HDF5 notebook generation workflow", () => {
 
   it("reuses existing run objects and does not overwrite conflicting comments", async () => {
     const mockedServices = services();
-    const existingObject = runObjectGroup("CRRMF48563", "object-1");
+    const existingObject = runObjectGroup("CRRMF48563", 1);
 
     const result = await generateNotebookFromHDF5({
-      runId: "run-1",
+      runId: 1,
       candidates: [candidate()],
       measuringPoints: [
         point({
-          objectGroupId: "object-1",
+          objectGroupId: 1,
           comments: "Manual comment",
         }),
       ],
@@ -430,13 +427,13 @@ describe("HDF5 notebook generation workflow", () => {
     const mockedServices = services();
 
     await generateNotebookFromHDF5({
-      runId: "run-1",
+      runId: 1,
       candidates: [candidate()],
       measuringPoints: [point()],
       runObjectGroups: [],
       availableObjectGroups: [
         {
-          id: "available-1",
+          id: 21,
           label: "CRRMF48563",
           objectCount: 1,
           dating: "",
@@ -450,14 +447,11 @@ describe("HDF5 notebook generation workflow", () => {
     });
 
     expect(mockedServices.createObjectGroup).not.toHaveBeenCalled();
-    expect(mockedServices.addObjectGroupToRun).toHaveBeenCalledWith(
-      "run-1",
-      "available-1",
-    );
+    expect(mockedServices.addObjectGroupToRun).toHaveBeenCalledWith(1, 21);
     expect(mockedServices.updateMeasuringPointObjectId).toHaveBeenCalledWith(
-      "run-1",
-      "point-6",
-      "available-1",
+      1,
+      6,
+      21,
     );
   });
 
@@ -465,7 +459,7 @@ describe("HDF5 notebook generation workflow", () => {
     const mockedServices = services();
 
     const result = await generateNotebookFromHDF5({
-      runId: "run-1",
+      runId: 1,
       candidates: [
         candidate({
           analysisType: "standard",
@@ -482,7 +476,7 @@ describe("HDF5 notebook generation workflow", () => {
 
     expect(
       mockedServices.addOrUpdateStandardToMeasuringPoint,
-    ).toHaveBeenCalledWith("STD-ASOBELLS", "point-6", true);
+    ).toHaveBeenCalledWith("STD-ASOBELLS", 6, true);
     expect(result.progress.standardsReused).toBe(1);
     expect(result.progress.errors).toHaveLength(0);
   });
@@ -491,7 +485,7 @@ describe("HDF5 notebook generation workflow", () => {
     const mockedServices = services();
 
     const result = await generateNotebookFromHDF5({
-      runId: "run-1",
+      runId: 1,
       candidates: [
         candidate({
           analysisType: "standard",
@@ -518,15 +512,15 @@ describe("HDF5 notebook generation workflow", () => {
     const mockedServices = services();
 
     const result = await generateNotebookFromHDF5({
-      runId: "run-1",
+      runId: 1,
       candidates: [candidate()],
       measuringPoints: [
         point({
-          objectGroupId: "object-1",
+          objectGroupId: 1,
           comments: "Face avant base zone rouge",
         }),
       ],
-      runObjectGroups: [runObjectGroup("CRRMF48563", "object-1")],
+      runObjectGroups: [runObjectGroup("CRRMF48563", 1)],
       availableObjectGroups: [],
       standards: [],
       runMeasuringPointStandards: {},

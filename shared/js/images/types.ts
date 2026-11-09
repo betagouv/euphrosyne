@@ -19,14 +19,13 @@ export interface IImagewithUrl {
 }
 
 export interface IRunObjectImage {
-  id?: string;
+  id?: number;
   path: string;
   transform?: IImageTransform | null;
 }
 
 export interface IRunObjectImageWithUrl
-  extends IImagewithUrl,
-    IRunObjectImage {}
+  extends IImagewithUrl, IRunObjectImage {}
 
 export interface IPointLocation {
   x: number;
@@ -36,15 +35,15 @@ export interface IPointLocation {
 }
 
 export interface IMeasuringPoint {
-  id: string;
+  id: number;
   name: string;
-  objectGroupId: string | null;
+  objectGroupId: number | null;
   comments: string | null;
   image?: IMeasuringPointImage;
 }
 
 export interface IMeasuringPointImage {
-  id: string;
+  id: number;
   runObjectGroupImage: IRunObjectImage;
   pointLocation: IPointLocation;
 }

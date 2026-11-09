@@ -21,7 +21,10 @@ export default function ObjectSelect({
   const selectId = useId();
 
   const changeObjectGroup = async (event: ChangeEvent<HTMLSelectElement>) => {
-    const objectGroupId = event.target.value;
+    // An empty value is the "No object group" option.
+    const objectGroupId = event.target.value
+      ? Number(event.target.value)
+      : null;
     await updateMeasuringPointObjectId(runId, measuringPoint.id, objectGroupId);
     addObjectToMeasuringPoint(measuringPoint.id, objectGroupId);
   };
@@ -36,7 +39,7 @@ export default function ObjectSelect({
         id={selectId}
         name="select"
         onChange={changeObjectGroup}
-        value={measuringPoint.objectGroupId || undefined}
+        value={measuringPoint.objectGroupId ?? ""}
       >
         <option value="">{t.emptyObject}</option>
         {runObjectGroups.map((og) => (

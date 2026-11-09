@@ -9,11 +9,11 @@ export interface WorkplaceRunTabsProps {
   project: {
     name: string;
     slug: string;
-    id: string;
+    id: number;
   };
   isDataManagementEnabled: boolean;
   runs: {
-    id: string;
+    id: number;
     label: string;
     rawDataTable: {
       canDelete: boolean;

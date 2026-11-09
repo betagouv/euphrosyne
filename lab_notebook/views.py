@@ -33,9 +33,9 @@ class NotebookView(ProjectMembershipRequiredMixin, TemplateView):
             "project": self.run.project,
             "notebook": self.run.run_notebook,
             "json_data": {
-                "runId": str(self.run.id),
+                "runId": self.run.id,
                 "projectSlug": self.run.project.slug,
-                "projectId": str(self.run.project.id),
+                "projectId": self.run.project.id,
                 "runName": self.run.label,
                 "isLabAdmin": user_is_lab_admin,
                 "canWriteNotebook": can_write_notebook,

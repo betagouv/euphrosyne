@@ -25,7 +25,7 @@ interface RetryTarget {
 }
 
 interface UseProjectLifecycleOptions {
-  projectId: string;
+  projectId: number;
   projectSlug: string;
   lifecycleState: LifecycleState | null;
   lastLifecycleOperationId: string | null;

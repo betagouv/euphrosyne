@@ -6,9 +6,9 @@ import { RunObjectGroup } from "../types";
 import ObjectGroupMaterialsCell from "./ObjectGroupMaterialsCell";
 
 interface ObjectGroupTableProps {
-  runId: string;
+  runId: number;
   runObjectGroups: RunObjectGroup[];
-  onRowDelete?: (runObjectGroupId: string) => void;
+  onRowDelete?: (runObjectGroupId: number) => void;
 }
 
 export default function ObjectGroupTable({
@@ -30,7 +30,7 @@ export default function ObjectGroupTable({
     width: "4.5rem",
   });
 
-  const onDeleteClick = async (runObjectGroupId: string) => {
+  const onDeleteClick = async (runObjectGroupId: number) => {
     setDeleting(true);
     try {
       onRowDelete?.(runObjectGroupId);

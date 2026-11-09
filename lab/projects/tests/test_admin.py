@@ -105,6 +105,10 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         response = self.client.get(self.add_view_url)
         assert '<input type="checkbox" name="confidential"' in response.content.decode()
 
+    def test_add_project_json_data_has_no_project_id(self):
+        response = self.client.get(self.add_view_url)
+        assert response.context["json_data"]["projectId"] is None
+
     def test_change_project_form_has_confidential_checkbox(self):
         fieldsets = self.project_admin.get_fieldsets(
             self.change_request, self.change_project

@@ -9,7 +9,7 @@ import { workplaceTableCols } from "../../../../assets/js/components/FileTableCo
 import { useWorkplaceContext } from "./WorkplaceContext";
 
 interface WorkplaceDataTypeDisplayProps {
-  projectId: string;
+  projectId: number;
   dataLabel: string;
   fileService: FileService;
   isSearchable?: boolean;

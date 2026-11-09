@@ -14,7 +14,7 @@ interface IMeasuringPointCreate extends IMeasuringPointUpdate {
 }
 
 interface IMeasurePointResponse {
-  id: string;
+  id: number;
   name: string;
   comments: string | null;
   object_group: number | null;
@@ -43,7 +43,7 @@ interface IMeasurePointResponse {
 }
 
 export async function listMeasuringPoints(
-  runId: string,
+  runId: number,
 ): Promise<IMeasuringPoint[]> {
   const response = await fetch(`/api/lab/runs/${runId}/measuring-points`, {
     method: "GET",
@@ -56,7 +56,7 @@ export async function listMeasuringPoints(
 }
 
 export async function createMeasuringPoint(
-  runId: string,
+  runId: number,
   body: IMeasuringPointCreate,
 ): Promise<IMeasuringPoint> {
   const headers: HeadersInit = new Headers();
@@ -77,19 +77,18 @@ export async function createMeasuringPoint(
 }
 
 export function updateMeasuringPointObjectId(
-  runId: string,
-  pointId: string,
-  objectGroupId: string,
+  runId: number,
+  pointId: number,
+  objectGroupId: number | null,
 ) {
   return updateMeasuringPoint(runId, pointId, {
-    // The API expects an integer id, or null to unlink the object group.
-    object_group: objectGroupId ? Number(objectGroupId) : null,
+    object_group: objectGroupId,
   });
 }
 
 export function updateMeasuringPointComments(
-  runId: string,
-  pointId: string,
+  runId: number,
+  pointId: number,
   comments: string,
 ) {
   return updateMeasuringPoint(runId, pointId, {
@@ -98,8 +97,8 @@ export function updateMeasuringPointComments(
 }
 
 async function updateMeasuringPoint(
-  runId: string,
-  pointId: string,
+  runId: number,
+  pointId: number,
   body: IMeasuringPointUpdate,
 ) {
   const headers: HeadersInit = new Headers();
@@ -129,15 +128,12 @@ function parseMeasuringPointResponse({
   return {
     id,
     name,
-    objectGroupId: object_group?.toString() || null,
+    objectGroupId: object_group,
     comments,
     image: image && {
-      id: image.id.toString(),
+      id: image.id,
       pointLocation: image.point_location,
-      runObjectGroupImage: {
-        ...image.run_object_group_image,
-        id: image.run_object_group_image.id.toString(),
-      },
+      runObjectGroupImage: image.run_object_group_image,
     },
   };
 }
@@ -154,14 +150,14 @@ interface IAddMeasuringPointImageResponse {
 }
 
 export async function addMeasuringPointImage(
-  pointId: string,
-  runObjectImageId: string,
+  pointId: number,
+  runObjectImageId: number,
   location: IPointLocation,
   create: boolean = true, // whether object should be a creation (POST) or a modification (PATCH)
 ) {
   const body = {
     point_location: location,
-    run_object_group_image: Number(runObjectImageId),
+    run_object_group_image: runObjectImageId,
   };
   const headers: HeadersInit = new Headers();
   headers.set("X-CSRFToken", getCSRFToken() || "");
@@ -182,13 +178,13 @@ export async function addMeasuringPointImage(
 
   const image = (await response.json()) as IAddMeasuringPointImageResponse;
   return {
-    id: image.id.toString(),
+    id: image.id,
     pointLocation: image.point_location,
-    runObjectImageId: image.run_object_group_image.toString(),
+    runObjectImageId: image.run_object_group_image,
   };
 }
 
-export async function deleteMeasuringPointImage(pointId: string) {
+export async function deleteMeasuringPointImage(pointId: number) {
   const headers: HeadersInit = new Headers();
   headers.set("X-CSRFToken", getCSRFToken() || "");
 

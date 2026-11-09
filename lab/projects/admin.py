@@ -320,7 +320,9 @@ class ProjectAdmin(LabPermissionMixin, ProjectDisplayMixin, ModelAdmin):
                 "show_save_as_new": False,
                 "show_save_and_add_another": False,
                 "json_data": {
-                    "projectId": object_id,
+                    "projectId": (
+                        int(object_id) if object_id and object_id.isdigit() else None
+                    ),
                     "participationEmployerFormExemptRorIds": (
                         settings.PARTICIPATION_EMPLOYER_FORM_EXEMPT_ROR_IDS
                     ),
