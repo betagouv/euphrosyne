@@ -118,7 +118,7 @@ export async function addObjectGroupToRun(
 ) {
   const response = await fetch(`/api/lab/runs/${runId}/objectgroups`, {
     ...getBasePOSTParams(),
-    body: JSON.stringify({ objectgroup: objectGroupId }),
+    body: JSON.stringify({ objectgroup: Number(objectGroupId) }),
   });
   if (!response || !response.ok) {
     throw new Error(

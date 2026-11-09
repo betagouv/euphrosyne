@@ -6,7 +6,7 @@ import { getCSRFToken } from "./utils";
 
 interface IMeasuringPointUpdate {
   comments?: string;
-  object_group?: string;
+  object_group?: number | null;
 }
 
 interface IMeasuringPointCreate extends IMeasuringPointUpdate {
@@ -82,7 +82,8 @@ export function updateMeasuringPointObjectId(
   objectGroupId: string,
 ) {
   return updateMeasuringPoint(runId, pointId, {
-    object_group: objectGroupId,
+    // The API expects an integer id, or null to unlink the object group.
+    object_group: objectGroupId ? Number(objectGroupId) : null,
   });
 }
 
@@ -160,7 +161,7 @@ export async function addMeasuringPointImage(
 ) {
   const body = {
     point_location: location,
-    run_object_group_image: runObjectImageId,
+    run_object_group_image: Number(runObjectImageId),
   };
   const headers: HeadersInit = new Headers();
   headers.set("X-CSRFToken", getCSRFToken() || "");
