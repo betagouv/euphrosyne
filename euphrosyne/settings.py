@@ -473,10 +473,13 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    # Name choice sets shared by several components (values only, so that the
-    # setting does not import optional apps).
+    # Separate request components without read-only fields: in a shared
+    # component they stay listed as required, which a request validator such as
+    # the WAF may not ignore.
+    "COMPONENT_SPLIT_REQUEST": True,
+    # Name the callback status choice set, shared by two fields (values only,
+    # so that the setting does not import optional apps).
     "ENUM_NAME_OVERRIDES": {
-        "LifecycleOperationTypeEnum": ["COOL", "RESTORE"],
         "LifecycleCallbackOutcomeEnum": ["SUCCEEDED", "FAILED"],
     },
 }

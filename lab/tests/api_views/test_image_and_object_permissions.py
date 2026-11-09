@@ -59,11 +59,7 @@ def test_object_group_create_permissions(project_api_context):
         ("patch", "/api/lab/measuring-points/99999999/image"),
         ("get", "/api/lab/run_objectgroups/99999999/images"),
         ("get", "/api/standard/runs/99999999"),
-        pytest.param(
-            "post",
-            "/api/standard/measuring-points/99999999/standard",
-            marks=pytest.mark.openapi_invalid_request,  # empty body
-        ),
+        ("post", "/api/standard/measuring-points/99999999/standard"),
         ("patch", "/api/notebook/run-notebook/99999999"),
     ],
 )

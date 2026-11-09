@@ -1,7 +1,6 @@
 import json
 from unittest import mock
 
-import pytest
 from django.test import Client, SimpleTestCase
 
 from ._mock import BASE_SEARCH_PARAMS
@@ -58,7 +57,6 @@ class TestProjectListView(SimpleTestCase):
 
         assert response.status_code == 200
 
-    @pytest.mark.openapi_invalid_request
     def test_aggregate_field_view_when_field_is_missing(self):
         response = self.client.get(f"{BASE_API_URL}/aggregate")
         assert response.status_code == 400

@@ -1,7 +1,6 @@
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import (
     OpenApiParameter,
-    OpenApiResponse,
     extend_schema,
     inline_serializer,
 )
@@ -10,12 +9,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .client import CatalogClient
-
-# Raw OpenSearch responses are returned as is.
-_OPENSEARCH_RESPONSE = OpenApiResponse(
-    OpenApiTypes.OBJECT, description="OpenSearch response."
-)
-
 
 _GeoPointSerializer = inline_serializer(
     "CatalogSearchGeoPoint",
@@ -64,7 +57,7 @@ CATALOG_SEARCH_REQUEST = inline_serializer(
 )
 
 
-@extend_schema(responses={200: _OPENSEARCH_RESPONSE})
+@extend_schema(responses=OpenApiTypes.OBJECT)
 @api_view(["GET"])
 def list_all_items(request):
     """Catalog items listing endpoint"""
@@ -74,7 +67,7 @@ def list_all_items(request):
 
 @extend_schema(
     request=CATALOG_SEARCH_REQUEST,
-    responses={200: _OPENSEARCH_RESPONSE},
+    responses=OpenApiTypes.OBJECT,
 )
 @api_view(["POST"])
 def search(request):
@@ -105,10 +98,7 @@ def search(request):
             description="Comma-separated terms to exclude.",
         ),
     ],
-    responses={
-        200: _OPENSEARCH_RESPONSE,
-        400: OpenApiResponse(description="Missing 'field' query parameter."),
-    },
+    responses=OpenApiTypes.OBJECT,
 )
 @api_view(["GET"])
 def aggregate_field(request):
@@ -126,7 +116,7 @@ def aggregate_field(request):
     return Response(results)
 
 
-@extend_schema(responses={200: _OPENSEARCH_RESPONSE})
+@extend_schema(responses=OpenApiTypes.OBJECT)
 @api_view(["GET"])
 def aggregate_created(request):
     """Catalog aggregation endpoint"""

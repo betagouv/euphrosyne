@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.mail import EmailMessage
-from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers, status
 from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.parsers import MultiPartParser
@@ -24,12 +25,7 @@ from .serializers import FeedbackFormSerializer
             },
         )
     },
-    responses={
-        200: inline_serializer(
-            "FeedbackSent", fields={"detail": serializers.CharField()}
-        ),
-        400: OpenApiResponse(description="Invalid feedback form."),
-    },
+    responses=OpenApiTypes.OBJECT,
 )
 @api_view(["POST"])
 @permission_classes([AllowAny])
