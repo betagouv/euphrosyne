@@ -127,7 +127,7 @@ def test_project_views_escape_script_data(client, view_name):
         assert scripts.data("notebook-data")["runName"] == run.label
     elif view_name == "admin:lab_run_change":
         assert scripts.data("run-change-form-data")["run"] == {
-            "id": str(run.id),
+            "id": run.id,
             "label": run.label,
         }
 
