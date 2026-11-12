@@ -50,7 +50,7 @@
     "@types/react-dom": "^19.3.0",
     "@witoldw/h5web-app": "^0.0.7",
     "@witoldw/h5web-lib": "^0.0.4",
-    "axios": "^1.20.0",
+    "axios": "^1.21.0",
     "cropperjs": "^2.3.1",
     "css-loader": "^7.1.4",
     "css-minimizer-webpack-plugin": "^8.0.0",
