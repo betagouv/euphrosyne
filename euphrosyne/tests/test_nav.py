@@ -86,6 +86,14 @@ def test_get_nav_items_for_admin():
                         "extraPath": [],
                     },
                 },
+                {
+                    "title": "Sécurité du compte",
+                    "item": {
+                        "href": "/accounts/2fa/",
+                        "exactPath": False,
+                        "extraPath": [],
+                    },
+                },
             ],
         },
     ]
@@ -151,6 +159,14 @@ def test_get_nav_items_for_admin_without_optional_features(mock_is_installed):
                     "title": "Journaux des emails",
                     "item": {
                         "href": "/log_email/emaillog/",
+                        "exactPath": False,
+                        "extraPath": [],
+                    },
+                },
+                {
+                    "title": "Sécurité du compte",
+                    "item": {
+                        "href": "/accounts/2fa/",
                         "exactPath": False,
                         "extraPath": [],
                     },

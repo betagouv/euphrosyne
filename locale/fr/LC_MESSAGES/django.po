@@ -589,6 +589,22 @@ msgstr "Se connecter en tant que superadmin n'est pas autorisé."
 msgid "You are now impersonating {}."
 msgstr "Vous êtes connecté en tant que {}."
 
+msgid "Reset two-factor authentication"
+msgstr "Réinitialiser l’authentification à deux facteurs"
+
+msgid "You do not have permission to reset two-factor authentication."
+msgstr ""
+"Vous n’avez pas la permission de réinitialiser l’authentification à deux "
+"facteurs."
+
+msgid "Two-factor authentication reset for: {}."
+msgstr "Authentification à deux facteurs réinitialisée pour : {}."
+
+msgid "None of the selected users had two-factor authentication set up."
+msgstr ""
+"Aucun des utilisateurs sélectionnés n’avait configuré l’authentification à "
+"deux facteurs."
+
 msgid "Name"
 msgstr "Nom"
 
@@ -616,6 +632,9 @@ msgstr "Radioprotection"
 msgid "Invite new user"
 msgstr "Inviter un utilisateur"
 
+msgid "[Euphrosyne] Two-factor authentication enabled"
+msgstr "[Euphrosyne] Authentification à deux facteurs activée"
+
 msgid "[Euphrosyne] Invitation to register"
 msgstr "[Euphrosyne] Invitation à s'inscrire"
 
@@ -636,6 +655,16 @@ msgstr "Le superutilisateur doit avoir is_staff=True"
 
 msgid "Superuser must have is_superuser=True."
 msgstr "Le superutilisateur doit avoir is_superuser=True"
+
+msgid "Multi-factor authentication is required."
+msgstr "L’authentification à deux facteurs est requise."
+
+msgid "You must accept the Terms and Conditions to continue."
+msgstr ""
+"Vous devez accepter les Conditions Générales d'Utilisation pour continuer."
+
+msgid "Employer information is required for this project."
+msgstr "Les informations sur l’employeur sont requises pour ce projet."
 
 msgid "email address"
 msgstr "adresse email"
@@ -717,6 +746,28 @@ msgstr "Lire les CGU."
 msgid "Accept"
 msgstr "Accepter"
 
+msgid "Hello"
+msgstr "Bonjour"
+
+#, python-format
+msgid ""
+"Two-factor authentication has just been enabled on your Euphrosyne account "
+"(%(email)s). An authenticator application will now be required to log in."
+msgstr ""
+"L’authentification à deux facteurs vient d’être activée sur votre compte "
+"Euphrosyne (%(email)s). Une application d’authentification sera désormais "
+"nécessaire pour vous connecter."
+
+msgid ""
+"If you did not do this, contact the Euphrosyne team immediately and change "
+"your password."
+msgstr ""
+"Si vous n’êtes pas à l’origine de cette action, contactez immédiatement "
+"l’équipe Euphrosyne et changez votre mot de passe."
+
+msgid "The Euphrosyne team"
+msgstr "L'équipe Euphrosyne"
+
 msgid "Create your account"
 msgstr "Créer votre compte"
 
@@ -737,9 +788,6 @@ msgid ""
 msgstr ""
 "Le lien d'inscription est invalide, peut-être parce qu'il a déjà été utilisé."
 
-msgid "Hello"
-msgstr "Bonjour"
-
 msgid "You've been invited to register at Euphrosyne."
 msgstr "Vous avez été invité à vous inscrire sur Euphrosyne."
 
@@ -749,15 +797,8 @@ msgstr "Cliquez sur ce lien pour créer votre compte :"
 msgid "Create account"
 msgstr "Créer mon compte"
 
-msgid "The Euphrosyne team"
-msgstr "L'équipe Euphrosyne"
-
 msgid "Enter your information"
 msgstr "Entrez vos informations"
-
-msgid "You must accept the Terms and Conditions to continue."
-msgstr ""
-"Vous devez accepter les Conditions Générales d'Utilisation pour continuer."
 
 msgid "Terms and Conditions Agreement"
 msgstr "Conditions Générales d'Utilisation"
@@ -770,6 +811,9 @@ msgstr "Tableau de bord"
 
 msgid "Admin"
 msgstr "Administration"
+
+msgid "Account security"
+msgstr "Sécurité du compte"
 
 msgid "Proton"
 msgstr "Proton"

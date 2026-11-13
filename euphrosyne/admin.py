@@ -77,3 +77,18 @@ class AdminSite(admin.AdminSite):
         if not request.user.is_lab_admin and request.path == "/":
             return redirect(reverse("admin:lab_project_changelist"))
         return super().index(request, extra_context=extra_context)
+
+
+def allauth_models_without_admin() -> list:
+    """allauth admin pages the platform does not offer:
+
+    - authenticators hold TOTP secrets: superusers reset them from the users;
+    - email addresses would sign in: User.email is the only address;
+    - the ORCID app is configured in settings, a second one breaks sign-in;
+    - OAuth tokens are not stored."""
+    # pylint: disable=import-outside-toplevel
+    from allauth.account.models import EmailAddress
+    from allauth.mfa.models import Authenticator
+    from allauth.socialaccount.models import SocialApp, SocialToken
+
+    return [Authenticator, EmailAddress, SocialApp, SocialToken]

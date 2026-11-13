@@ -46,6 +46,17 @@ def get_nav_items(request: HttpRequest) -> list[NavElementJson]:
 
     admin_nav_items["items"] += log_email_get_nav_items(request)
 
+    admin_nav_items["items"].append(
+        {
+            "title": str(_("Account security")),
+            "item": {
+                "href": reverse("mfa_index"),
+                "exactPath": False,
+                "extraPath": [],
+            },
+        }
+    )
+
     if is_lab_admin(request.user):
         nav_items.append(admin_nav_items)
 

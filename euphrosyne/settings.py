@@ -26,6 +26,7 @@ from django.utils.csp import CSP
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
+from euphro_auth.mfa.conf import parse_mfa_admin_required
 from euphrosyne.features import add_feature_apps, enabled_features
 
 # pylint: disable=abstract-class-instantiated
@@ -141,6 +142,7 @@ CORE_INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "allauth",
     "allauth.account",
+    "allauth.mfa",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.orcid",
     "rest_framework",
@@ -175,13 +177,9 @@ MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else 
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.csp.ContentSecurityPolicyMiddleware",
-    "euphro_auth.middlewares.CGUAcceptanceMiddleware",
+    # Gates of signed-in sessions: MFA, then CGU, then employer information.
+    "euphro_auth.middlewares.AccountGatesMiddleware",
 ]
-
-if "radiation_protection" in EUPHROSYNE_FEATURES:
-    MIDDLEWARE.append(
-        "lab.participations.middleware.ParticipationEmployerCompletionMiddleware"
-    )
 
 ROOT_URLCONF = "euphrosyne.urls"
 
@@ -410,6 +408,26 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Custom user model
 
 AUTH_USER_MODEL = "euphro_auth.User"
+
+# Multi-factor authentication (allauth.mfa): TOTP, mandatory for lab
+# administrators. Only an explicit MFA_ADMIN_REQUIRED=0/false/no/off disables
+# it, for a rollback; any other value, including an empty one, keeps it on.
+MFA_ADMIN_REQUIRED = parse_mfa_admin_required(os.getenv("MFA_ADMIN_REQUIRED"))
+# No recovery codes: a superuser resets a lost factor. WebAuthn comes later.
+MFA_SUPPORTED_TYPES = ["totp"]
+MFA_TOTP_ISSUER = "Euphrosyne"
+# Accept the previous and next 30-second codes, for clock drift.
+MFA_TOTP_TOLERANCE = 1
+MFA_FORMS = {
+    "authenticate": "euphro_auth.mfa.forms.AuthenticateForm",
+    "reauthenticate": "euphro_auth.mfa.forms.ReauthenticateForm",
+    "activate_totp": "euphro_auth.mfa.forms.ActivateTOTPForm",
+}
+# Factor changes need a verified session (AccountGatesMiddleware), not a
+# second password prompt right after sign-in.
+MFA_REAUTHENTICATION_REQUIRED = False
+# Emails are set by administrators and invitations, not verified by allauth.
+MFA_ALLOW_UNVERIFIED_EMAIL = True
 
 # ORCID sign-in (allauth.socialaccount)
 # https://docs.allauth.org/en/latest/socialaccount/providers/orcid.html

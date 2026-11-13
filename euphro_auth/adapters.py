@@ -18,6 +18,17 @@ class AccountAdapter(DefaultAccountAdapter):  # pylint: disable=abstract-method
         "too_many_login_attempts": password_lockout.LOCKOUT_MESSAGE,
     }
 
+    def get_login_stages(self) -> list[str]:
+        # Ask for the second factor only where MFA is enforced.
+        return [
+            (
+                "euphro_auth.mfa.stages.AdminAuthenticateStage"
+                if stage == "allauth.mfa.stages.AuthenticateStage"
+                else stage
+            )
+            for stage in super().get_login_stages()
+        ]
+
     def is_open_for_signup(self, request: HttpRequest) -> bool:
         # Accounts are created by administrators, or by invitation.
         return False
