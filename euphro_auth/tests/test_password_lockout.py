@@ -5,16 +5,16 @@ import time
 from unittest.mock import patch
 
 import pytest
+from allauth.socialaccount.models import SocialAccount
 from django.contrib import auth
 from django.test import Client
 from django.urls import reverse
 from django.utils import timezone
-from social_django.models import UserSocialAuth
 
 from euphro_auth.jwt.tokens import EuphroRefreshToken
 from euphro_auth.models import User
 from euphro_auth.password_lockout import LOCKOUT_MESSAGE
-from orcid_oauth.backends import ORCIDOAuth2
+from orcid_oauth.tests.helpers import orcid_callback, start_orcid_login
 
 pytestmark = pytest.mark.django_db
 PASSWORD = "T8!vQ2#rM6@zL9$p"
@@ -120,7 +120,7 @@ def test_fifth_password_failure_locks_every_channel(client, user, channel):
     response = password_request(client, channel, user.email, "wrong-password")
     assert is_locked_out_response(channel, response)
     if channel == "web":
-        assert reverse("social:begin", args=("orcid",)) in response.content.decode()
+        assert reverse("orcid_login") in response.content.decode()
     for target in CHANNELS:
         with patch.object(
             User, "check_password", side_effect=AssertionError("blocked")
@@ -238,36 +238,14 @@ def test_existing_session_and_refresh_remain_usable_during_lockout(client, user)
 
 
 def test_orcid_still_authenticates_locked_account_without_resetting_password_limit(
-    client, user, settings
+    client, user
 ):
-    settings.SOCIAL_AUTH_ORCID_KEY = "client-id"
-    settings.SOCIAL_AUTH_ORCID_SECRET = "client-secret"
     for _ in range(5):
         password_request(client, "web", user.email, "wrong-password")
     uid = "0000-0002-1234-5678"
-    UserSocialAuth.objects.create(user=user, provider="orcid", uid=uid, id_key="orcid")
-    begin = reverse("social:begin", args=("orcid",))
-    assert client.post(begin).status_code == 302
-    state = next(reversed(client.session["orcid_oauth2_transaction_index"]))
-    with (
-        patch.object(
-            ORCIDOAuth2,
-            "request_access_token",
-            return_value={"orcid": uid, "access_token": "token"},
-        ),
-        patch.object(
-            ORCIDOAuth2,
-            "user_data",
-            return_value={
-                "orcid-identifier": {"path": uid},
-                "person": {"name": {}, "emails": {"email": []}},
-            },
-        ),
-    ):
-        response = client.get(
-            reverse("social:complete", args=("orcid",)),
-            {"state": state, "code": "valid-code"},
-        )
+    SocialAccount.objects.create(user=user, provider="orcid", uid=uid)
+    assert start_orcid_login(client).status_code == 302
+    response = orcid_callback(client, uid)
     assert response.status_code == 302
     assert auth.get_user(client).pk == user.pk
     assert is_locked_out_response(

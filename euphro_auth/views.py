@@ -1,6 +1,8 @@
 from typing import Any, Dict
 from urllib.parse import parse_qs, urlsplit
 
+from allauth.socialaccount.adapter import get_adapter as get_socialaccount_adapter
+from allauth.socialaccount.providers.base import AuthProcess
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import SetPasswordForm
@@ -9,12 +11,11 @@ from django.contrib.auth.views import (
     PasswordResetConfirmView,
 )
 from django.http import HttpRequest
-from django.http.response import HttpResponse, HttpResponseBase
+from django.http.response import HttpResponse, HttpResponseBase, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from social_django.views import auth as social_auth
 
 from orcid_oauth.invitations import (
     INVITATION_SESSION_KEY,
@@ -59,8 +60,11 @@ class UserTokenRegistrationView(PasswordResetConfirmView):
         if target is None or self.user is None or target.pk != self.user.pk:
             return reject_invitation(request)
         # Django's invitation dispatch has already validated this page's token.
-        # Let Social Auth create the state and bind its attempt to that target.
-        response = social_auth(request, backend="orcid")
+        # Let allauth create the OAuth state and bind its attempt to that target.
+        provider = get_socialaccount_adapter(request).get_provider(request, "orcid")
+        response = provider.redirect(request, AuthProcess.LOGIN)
+        if not isinstance(response, HttpResponseRedirect):
+            return response
         request.session[INVITATION_SESSION_KEY] = {
             **request.session[INVITATION_SESSION_KEY],
             "oauth_state": parse_qs(urlsplit(response.url).query)["state"][0],

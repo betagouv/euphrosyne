@@ -22,21 +22,15 @@ from django.views.i18n import JavaScriptCatalog
 
 from euphro_auth.views import UserTokenRegistrationView, cgu_acceptance_view
 from lab.participations.views import complete_employer_information
-from orcid_oauth.views import UserCompleteAccountView
 
 urlpatterns = [
-    path("", include("social_django.urls")),
+    path("", include("orcid_oauth.urls")),
     path("doc/", include("django.contrib.admindocs.urls")),
     path("accounts/", include("euphro_auth.urls")),
     path(
         "registration/<uidb64>/<token>/",
         UserTokenRegistrationView.as_view(),
         name="registration_token",
-    ),
-    path(
-        "registration/orcid/verify/<token>",
-        UserCompleteAccountView.as_view(),
-        name="complete_registration_orcid",
     ),
     path(
         "cgu-acceptance/",
