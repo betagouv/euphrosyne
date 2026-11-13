@@ -9,8 +9,12 @@ class EuphroAuthConfig(AppConfig):
 
     def ready(self) -> None:
         # pylint: disable=import-outside-toplevel,unused-import
+        from allauth.mfa.signals import authenticator_used
+
         from .email_addresses import remove_stale_email_addresses
         from .jwt import schema  # noqa: F401  # registers the OpenAPI extension
+        from .mfa.conf import warn_if_mfa_disabled
+        from .mfa.signals import on_authenticator_used
         from .models import User
         from .sessions import set_session_idle_timeout
 
@@ -23,3 +27,8 @@ class EuphroAuthConfig(AppConfig):
             sender=User,
             dispatch_uid="euphro_auth.remove_stale_email_addresses",
         )
+        authenticator_used.connect(
+            on_authenticator_used,
+            dispatch_uid="euphro_auth.mfa.on_authenticator_used",
+        )
+        warn_if_mfa_disabled()

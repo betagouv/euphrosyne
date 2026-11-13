@@ -24,6 +24,7 @@ from lab.runs.models import Run
 
 from .emails import send_invitation_email
 from .forms import UserChangeForm, UserCreationForm
+from .mfa import services as mfa_services
 from .models import User, UserInvitation
 
 logger = logging.getLogger(__name__)
@@ -163,7 +164,11 @@ class UserAdmin(DjangoUserAdmin):
     )
     list_per_page = 30
     show_facets = ShowFacets.NEVER
-    actions = ("send_invitation_mail_action", "impersonate_selected_user")
+    actions = (
+        "send_invitation_mail_action",
+        "impersonate_selected_user",
+        "reset_mfa_devices",
+    )
 
     add_fieldsets = (
         (
@@ -189,6 +194,7 @@ class UserAdmin(DjangoUserAdmin):
         actions = super().get_actions(request, action_location)
         if request.user.is_superuser is not True:
             actions.pop("impersonate_selected_user", None)
+            actions.pop("reset_mfa_devices", None)
         return actions
 
     def get_list_display(self, request):
@@ -376,6 +382,8 @@ class UserAdmin(DjangoUserAdmin):
 
         impersonator_user_id = request.user.pk
         impersonated_user_id = target_user.pk
+        # An impersonation started from a verified session is verified.
+        verified = mfa_services.is_session_verified(request, request.user)
         impersonation_started_at = timezone.now().isoformat()
         backend = "allauth.account.auth_backends.AuthenticationBackend"
 
@@ -390,6 +398,10 @@ class UserAdmin(DjangoUserAdmin):
         request.session["impersonator_user_id"] = impersonator_user_id
         request.session["impersonated_user_id"] = impersonated_user_id
         request.session["impersonation_started_at"] = impersonation_started_at
+        if verified:
+            mfa_services.mark_impersonation_verified(
+                request, target_user, impersonator_user_id
+            )
 
         self.message_user(
             request,
@@ -398,6 +410,46 @@ class UserAdmin(DjangoUserAdmin):
         )
 
         return HttpResponseRedirect("/")
+
+    @admin.action(description=_("Reset two-factor authentication"))
+    def reset_mfa_devices(self, request: HttpRequest, queryset: QuerySet[User]):
+        if request.user.is_superuser is not True:
+            self.message_user(
+                request,
+                _("You do not have permission to reset two-factor authentication."),
+                level=messages.ERROR,
+            )
+            return None
+
+        reset_users = []
+        for target_user in queryset:
+            if mfa_services.remove_factors(target_user):
+                reset_users.append(target_user)
+                # Actor and target are kept in the local administration audit trail.
+                self.log_change(
+                    request, target_user, "Reset two-factor authentication devices"
+                )
+                logger.warning(
+                    "MFA devices of user %s removed by superuser %s",
+                    target_user.pk,
+                    request.user.pk,
+                )
+
+        if reset_users:
+            self.message_user(
+                request,
+                _("Two-factor authentication reset for: {}.").format(
+                    ", ".join(user.email for user in reset_users)
+                ),
+                messages.SUCCESS,
+            )
+        else:
+            self.message_user(
+                request,
+                _("None of the selected users had two-factor authentication set up."),
+                messages.WARNING,
+            )
+        return None
 
     @admin.display(description=_("Name"))
     def full_name_display(self, obj: User) -> str:

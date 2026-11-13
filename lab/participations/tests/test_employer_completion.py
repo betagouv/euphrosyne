@@ -96,7 +96,7 @@ class TestEmployerCompletionWorkflow(TestCase):
         assert 'value="Manager"' in content
         assert 'value="Director"' in content
 
-    def test_incomplete_participation_blocks_project_api_with_completion_url(self):
+    def test_incomplete_participation_blocks_project_api_with_redirect_url(self):
         response = self.client.get(
             reverse(
                 "api:project-on-premises-participation-list-create",
@@ -105,7 +105,8 @@ class TestEmployerCompletionWorkflow(TestCase):
         )
 
         assert response.status_code == 403
-        assert response.json()["completion_url"] == reverse(
+        assert response.json()["code"] == "employer_information_required"
+        assert response.json()["redirect_url"] == reverse(
             "participation_employer_completion",
             kwargs={"project_id": self.project.id},
         )

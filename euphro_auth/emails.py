@@ -15,6 +15,24 @@ if typing.TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+def send_mfa_enrolled_email(user: "User") -> bool:
+    """Inform the account owner that a second factor was set up on their
+    account, in their preferred language."""
+    context = {"email": user.email, "site_url": settings.SITE_URL}
+    with use_user_language(user=user):
+        subject = _("[Euphrosyne] Two-factor authentication enabled")
+    sent = send_email_with_language(
+        subject=subject,
+        template_name="euphro_auth/mfa_enrolled_email",
+        context=context,
+        to_emails=[user.email],
+        user=user,
+    )
+    if not sent:
+        logger.warning("MFA enrollment email could not be sent to user %s", user.pk)
+    return sent
+
+
 def send_invitation_email(user: "User"):
     """
     Send an email with an invitation link based on a user ID and a token used for
