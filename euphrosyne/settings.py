@@ -141,7 +141,8 @@ CORE_INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "allauth",
     "allauth.account",
-    "social_django",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.orcid",
     "rest_framework",
     "django_filters",
     "lab",
@@ -172,7 +173,6 @@ MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else 
     "euphro_auth.middlewares.SessionIdleTimeoutMiddleware",
     "euphro_auth.middleware.UserLanguageMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "social_django.middleware.SocialAuthExceptionMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.csp.ContentSecurityPolicyMiddleware",
     "euphro_auth.middlewares.CGUAcceptanceMiddleware",
@@ -294,7 +294,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/topics/auth/customizing/#other-authentication-sources
 
 AUTHENTICATION_BACKENDS = [
-    "orcid_oauth.backends.ORCIDOAuth2",
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
@@ -411,28 +410,29 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "euphro_auth.User"
 
-# For Python Social Auth; used for ORCID OAuth 2.0 flow
+# ORCID sign-in (allauth.socialaccount)
+# https://docs.allauth.org/en/latest/socialaccount/providers/orcid.html
 
 ORCID_USE_SANDBOX = os.getenv("ORCID_USE_SANDBOX", "false") == "true"
 
-SOCIAL_AUTH_FIELDS_STORED_IN_SESSION: list[str] = []
-SOCIAL_AUTH_JSONFIELD_ENABLED = True
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/"
-SOCIAL_AUTH_ORCID_LOGIN_ERROR_URL = "/login/"
-SOCIAL_AUTH_ORCID_KEY = os.getenv("SOCIAL_AUTH_ORCID_KEY")
-SOCIAL_AUTH_ORCID_SECRET = os.getenv("SOCIAL_AUTH_ORCID_SECRET")
-SOCIAL_AUTH_PIPELINE = (
-    "social_core.pipeline.social_auth.social_details",
-    "social_core.pipeline.social_auth.social_uid",
-    "social_core.pipeline.social_auth.auth_allowed",
-    "orcid_oauth.pipeline.social_user",
-    "social_core.pipeline.social_auth.associate_user",
-    "social_core.pipeline.social_auth.load_extra_data",
-    "social_core.pipeline.user.user_details",
-    "orcid_oauth.pipeline.complete_information",
-)
-SOCIAL_AUTH_URL_NAMESPACE = "social"
-SOCIAL_AUTH_USER_MODEL = "euphro_auth.User"
+SOCIALACCOUNT_ADAPTER = "orcid_oauth.adapters.SocialAccountAdapter"
+SOCIALACCOUNT_PROVIDERS = {
+    "orcid": {
+        "BASE_DOMAIN": "sandbox.orcid.org" if ORCID_USE_SANDBOX else "orcid.org",
+        "MEMBER_API": False,
+        "APPS": [
+            {
+                "client_id": os.getenv("SOCIAL_AUTH_ORCID_KEY", ""),
+                "secret": os.getenv("SOCIAL_AUTH_ORCID_SECRET", ""),
+            }
+        ],
+    }
+}
+# ORCID never creates an account and is never linked through an email address:
+# an ORCID iD is linked to an account only by a validated invitation.
+SOCIALACCOUNT_AUTO_SIGNUP = False
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = False
+SOCIALACCOUNT_STORE_TOKENS = False
 
 
 # For Django Debug Toolbar

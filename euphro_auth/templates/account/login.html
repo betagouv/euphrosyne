@@ -1,5 +1,5 @@
 {% extends "account/base_entrance.html" %}
-{% load i18n %}
+{% load i18n socialaccount %}
 
 {% block head_title %}{% translate "Log in" %}{% endblock head_title %}
 
@@ -8,8 +8,10 @@
     <h3>{% translate "Log in" %}</h3>
 
     <div class="orcid-row fr-mt-6w fr-mb-4w">
-      <form action="{% url "social:begin" "orcid" %}" method="post">
+      <form action="{% provider_login_url "orcid" %}" method="post">
         {% csrf_token %}
+        <input type="hidden" name="process" value="login">
+        {{ redirect_field }}
         <button class="button" type="submit">
           <img alt="ORCID logo" src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_24x24.png" width="24" height="24" />
           {% translate 'Log in with ORCID' %}
