@@ -1,0 +1,16 @@
+{% load i18n %}
+<form method="post" novalidate>
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
+  <div class="fr-input-group{% if form.code.errors %} fr-input-group--error{% endif %}">
+    <label class="fr-label" for="{{ form.code.id_for_label }}">
+      {{ form.code.label }}
+      {% if hint %}<span class="fr-hint-text">{{ hint }}</span>{% endif %}
+    </label>
+    {{ form.code }}
+    {% for error in form.code.errors %}
+      <p class="fr-message fr-message--error">{{ error }}</p>
+    {% endfor %}
+  </div>
+  <button type="submit" class="fr-btn fr-mt-3w">{{ submit_label }}</button>
+</form>

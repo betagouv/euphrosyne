@@ -86,6 +86,22 @@ def test_get_nav_items_for_admin():
                         "extraPath": [],
                     },
                 },
+                {
+                    "title": "Sécurité du compte",
+                    "item": {
+                        "href": "/security/",
+                        "exactPath": True,
+                        "extraPath": [],
+                    },
+                },
+                {
+                    "title": "Jeton Herma",
+                    "item": {
+                        "href": "/herma-token/",
+                        "exactPath": True,
+                        "extraPath": [],
+                    },
+                },
             ],
         },
     ]
@@ -152,6 +168,22 @@ def test_get_nav_items_for_admin_without_optional_features(mock_is_installed):
                     "item": {
                         "href": "/log_email/emaillog/",
                         "exactPath": False,
+                        "extraPath": [],
+                    },
+                },
+                {
+                    "title": "Sécurité du compte",
+                    "item": {
+                        "href": "/security/",
+                        "exactPath": True,
+                        "extraPath": [],
+                    },
+                },
+                {
+                    "title": "Jeton Herma",
+                    "item": {
+                        "href": "/herma-token/",
+                        "exactPath": True,
                         "extraPath": [],
                     },
                 },

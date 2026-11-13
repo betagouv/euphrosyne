@@ -17,6 +17,7 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
+from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from lab.participations.models import Participation
 from lab.permissions import is_lab_admin
@@ -24,6 +25,7 @@ from lab.runs.models import Run
 
 from .emails import send_invitation_email
 from .forms import UserChangeForm, UserCreationForm
+from .mfa.services import remove_devices
 from .models import User, UserInvitation
 
 logger = logging.getLogger(__name__)
@@ -163,7 +165,11 @@ class UserAdmin(DjangoUserAdmin):
     )
     list_per_page = 30
     show_facets = ShowFacets.NEVER
-    actions = ("send_invitation_mail_action", "impersonate_selected_user")
+    actions = (
+        "send_invitation_mail_action",
+        "impersonate_selected_user",
+        "reset_mfa_devices",
+    )
 
     add_fieldsets = (
         (
@@ -189,6 +195,7 @@ class UserAdmin(DjangoUserAdmin):
         actions = super().get_actions(request, action_location)
         if request.user.is_superuser is not True:
             actions.pop("impersonate_selected_user", None)
+            actions.pop("reset_mfa_devices", None)
         return actions
 
     def get_list_display(self, request):
@@ -399,6 +406,46 @@ class UserAdmin(DjangoUserAdmin):
 
         return HttpResponseRedirect("/")
 
+    @admin.action(description=_("Reset two-factor authentication"))
+    def reset_mfa_devices(self, request: HttpRequest, queryset: QuerySet[User]):
+        if request.user.is_superuser is not True:
+            self.message_user(
+                request,
+                _("You do not have permission to reset two-factor authentication."),
+                level=messages.ERROR,
+            )
+            return None
+
+        reset_users = []
+        for target_user in queryset:
+            if remove_devices(target_user):
+                reset_users.append(target_user)
+                # Actor and target are kept in the local administration audit trail.
+                self.log_change(
+                    request, target_user, "Reset two-factor authentication devices"
+                )
+                logger.warning(
+                    "MFA devices of user %s removed by superuser %s",
+                    target_user.pk,
+                    request.user.pk,
+                )
+
+        if reset_users:
+            self.message_user(
+                request,
+                _("Two-factor authentication reset for: {}.").format(
+                    ", ".join(user.email for user in reset_users)
+                ),
+                messages.SUCCESS,
+            )
+        else:
+            self.message_user(
+                request,
+                _("None of the selected users had two-factor authentication set up."),
+                messages.WARNING,
+            )
+        return None
+
     @admin.display(description=_("Name"))
     def full_name_display(self, obj: User) -> str:
         return obj.get_full_name()
@@ -499,3 +546,9 @@ class UserInvitationAdmin(ModelAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.register(UserInvitation, UserInvitationAdmin)
+
+
+# django-otp registers an admin for its device model. Device management goes
+# through the account security page and the superuser-only reset action above.
+if admin.site.is_registered(TOTPDevice):
+    admin.site.unregister(TOTPDevice)

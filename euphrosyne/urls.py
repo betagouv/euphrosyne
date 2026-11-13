@@ -21,6 +21,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
 
+from euphro_auth.mfa.views import mfa_setup_view, mfa_verify_view
 from euphro_auth.views import UserTokenRegistrationView, cgu_acceptance_view
 from lab.participations.views import complete_employer_information
 from orcid_oauth.views import UserCompleteAccountView
@@ -63,6 +64,8 @@ urlpatterns = [
         cgu_acceptance_view,
         name="cgu_acceptance",
     ),
+    path("mfa/verify/", mfa_verify_view, name="mfa_verify"),
+    path("mfa/setup/", mfa_setup_view, name="mfa_setup"),
     path(
         "projects/<int:project_id>/employer/",
         complete_employer_information,

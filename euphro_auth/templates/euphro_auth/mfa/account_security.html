@@ -1,0 +1,44 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+<div class="fr-container fr-my-6w">
+  <div class="fr-grid-row">
+    <div class="fr-col-12 fr-col-lg-8">
+      <h1>{% translate "Account security" %}</h1>
+
+      <h2 class="fr-h4">{% translate "Two-factor authentication" %}</h2>
+      {% if device %}
+        <p>
+          {% blocktranslate trimmed with created_at=device.created_at|date:"SHORT_DATETIME_FORMAT" %}
+          An authenticator application is configured since {{ created_at }}.
+          {% endblocktranslate %}
+          {% if device.last_used_at %}
+            {% blocktranslate trimmed with last_used_at=device.last_used_at|date:"SHORT_DATETIME_FORMAT" %}
+            Last used on {{ last_used_at }}.
+            {% endblocktranslate %}
+          {% endif %}
+        </p>
+
+        <h2 class="fr-h4 fr-mt-4w">{% translate "Change authenticator application" %}</h2>
+        <p>
+          {% blocktranslate trimmed %}
+          Administrators who remove their authenticator application must
+          immediately set up a new one.
+          {% endblocktranslate %}
+        </p>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="remove_devices">
+          <button type="submit" class="fr-btn fr-btn--tertiary">{% translate "Remove and set up again" %}</button>
+        </form>
+      {% else %}
+        <p>{% translate "Two-factor authentication is not configured on your account." %}</p>
+        <a class="fr-btn" href="{% url 'mfa_setup' %}">{% translate "Set up two-factor authentication" %}</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

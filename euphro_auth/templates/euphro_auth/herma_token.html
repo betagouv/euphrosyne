@@ -1,0 +1,49 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+<div class="fr-container fr-my-6w">
+  <div class="fr-grid-row">
+    <div class="fr-col-12 fr-col-lg-8">
+      <h1>{% translate "Herma token" %}</h1>
+
+      <p>
+        {% translate "Generate a token here and paste it into Herma when it asks for one." %}
+      </p>
+
+      {% if refresh_token %}
+        <div class="fr-alert fr-alert--warning fr-mb-3w">
+          <p>
+            {% blocktranslate trimmed %}
+            Copy this token now: it will not be displayed again. Do not share it, it gives access to your account.
+            {% endblocktranslate %}
+          </p>
+        </div>
+        <div class="fr-input-group">
+          <label class="fr-label" for="herma-token">
+            {% translate "Herma token" %}
+            <span class="fr-hint-text">
+              {% blocktranslate trimmed with expires_at=expires_at|date:"SHORT_DATETIME_FORMAT" %}
+              Expires on {{ expires_at }}.
+              {% endblocktranslate %}
+            </span>
+          </label>
+          <textarea class="fr-input" id="herma-token" rows="6" readonly onclick="this.select()">{{ refresh_token }}</textarea>
+        </div>
+        <p class="fr-text--sm">
+          {% translate "Select the whole token (click in the field), copy it and paste it into Herma." %}
+        </p>
+      {% endif %}
+
+      <form method="post" class="fr-mt-4w">
+        {% csrf_token %}
+        <button type="submit" class="fr-btn">
+          {% if refresh_token %}{% translate "Generate another token" %}{% else %}{% translate "Generate a token" %}{% endif %}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
