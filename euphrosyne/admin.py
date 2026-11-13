@@ -5,6 +5,7 @@ from django.urls import include, path, reverse
 from django.urls.resolvers import URLPattern, URLResolver
 from django.utils.translation import gettext_lazy as _
 
+from euphro_auth.mfa.views import account_security_view
 from lab.documents.views import ProjectDocumentsView
 from lab.hdf5.views import HDF5View
 from lab.objects.views import ObjectImportErosView, ObjectImportPOPView
@@ -21,6 +22,11 @@ class AdminSite(admin.AdminSite):
 
     def get_urls(self) -> list[URLPattern | URLResolver]:  # type: ignore[override]
         urls: list[URLPattern | URLResolver] = [
+            path(
+                "security/",
+                self.admin_view(account_security_view),
+                name="account_security",
+            ),
             path(
                 "lab/project/<project_id>/documents",
                 self.admin_view(ProjectDocumentsView.as_view()),  # type: ignore[type-var] # pylint: disable=line-too-long

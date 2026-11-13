@@ -1,0 +1,15 @@
+{% load i18n %}
+<p>
+    {% trans "Hello" %},
+</p>
+<p>
+    {% blocktrans trimmed %}Two-factor authentication has just been enabled on your Euphrosyne account ({{ email }}). An authenticator application will now be required to log in.{% endblocktrans %}
+</p>
+<p>
+    {% blocktrans trimmed %}If you did not do this, contact the Euphrosyne team immediately and change your password.{% endblocktrans %}
+</p>
+<p>
+    <a href="{{ site_url }}" rel="notrack">Euphrosyne</a>
+</p>
+
+{% trans "The Euphrosyne team" %}

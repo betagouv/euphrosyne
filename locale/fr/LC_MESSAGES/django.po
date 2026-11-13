@@ -1,8 +1,9 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-28 11:48+0100\n"
+"POT-Creation-Date: 2026-11-09 12:39+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -563,9 +564,11 @@ msgstr "Utilisateurs"
 msgid "Send invitation e-mail again"
 msgstr "Ré-envoyer les invitations"
 
+#, python-brace-format
 msgid "Invitations sent to : {}."
 msgstr "Invitations envoyées à : {}."
 
+#, python-brace-format
 msgid ""
 "Invitations were not sent to the following accounts, the registrations have "
 "already been completed : {}"
@@ -586,8 +589,26 @@ msgstr "Sélectionnez seulement un utilisateur à la fois."
 msgid "Impersonating superusers is not allowed."
 msgstr "Se connecter en tant que superadmin n'est pas autorisé."
 
+#, python-brace-format
 msgid "You are now impersonating {}."
 msgstr "Vous êtes connecté en tant que {}."
+
+msgid "Reset two-factor authentication"
+msgstr "Réinitialiser l’authentification à deux facteurs"
+
+msgid "You do not have permission to reset two-factor authentication."
+msgstr ""
+"Vous n’avez pas la permission de réinitialiser l’authentification à deux "
+"facteurs."
+
+#, python-brace-format
+msgid "Two-factor authentication reset for: {}."
+msgstr "Authentification à deux facteurs réinitialisée pour : {}."
+
+msgid "None of the selected users had two-factor authentication set up."
+msgstr ""
+"Aucun des utilisateurs sélectionnés n’avait configuré l’authentification à "
+"deux facteurs."
 
 msgid "Name"
 msgstr "Nom"
@@ -604,9 +625,11 @@ msgstr "Mot de passe"
 msgid "this form"
 msgstr "ce formulaire"
 
+#, python-brace-format
 msgid "Change password using {}."
 msgstr "Modifier le mot de passe en utilisant {}."
 
+#, python-brace-format
 msgid "No password. You can set one using {}."
 msgstr "Aucun mot de passe. Vous pouvez en définir un en utilisant {}."
 
@@ -618,6 +641,9 @@ msgstr "Inviter un utilisateur"
 
 msgid "[Euphrosyne] Invitation to register"
 msgstr "[Euphrosyne] Invitation à s'inscrire"
+
+msgid "[Euphrosyne] Two-factor authentication enabled"
+msgstr "[Euphrosyne] Authentification à deux facteurs activée"
 
 msgid "Email"
 msgstr "Email"
@@ -636,6 +662,27 @@ msgstr "Le superutilisateur doit avoir is_staff=True"
 
 msgid "Superuser must have is_superuser=True."
 msgstr "Le superutilisateur doit avoir is_superuser=True"
+
+msgid "Authentication code"
+msgstr "Code d’authentification"
+
+msgid "Multi-factor authentication is required."
+msgstr "L’authentification à deux facteurs est requise."
+
+msgid "Invalid code. Please try again."
+msgstr "Code invalide. Veuillez réessayer."
+
+msgid "Two-factor authentication"
+msgstr "Authentification à deux facteurs"
+
+msgid "Set up two-factor authentication"
+msgstr "Configurer l’authentification à deux facteurs"
+
+msgid "Your two-factor authentication device has been removed."
+msgstr "Votre application d’authentification a été supprimée."
+
+msgid "Account security"
+msgstr "Sécurité du compte"
 
 msgid "email address"
 msgstr "adresse email"
@@ -711,6 +758,99 @@ msgstr "Lire les CGU."
 msgid "Accept"
 msgstr "Accepter"
 
+msgid "Log out"
+msgstr "Se déconnecter"
+
+#, python-format
+msgid "An authenticator application is configured since %(created_at)s."
+msgstr ""
+"Une application d’authentification est configurée depuis le %(created_at)s."
+
+#, python-format
+msgid "Last used on %(last_used_at)s."
+msgstr "Dernière utilisation le %(last_used_at)s."
+
+msgid "Change authenticator application"
+msgstr "Changer d’application d’authentification"
+
+msgid ""
+"Administrators who remove their authenticator application must immediately "
+"set up a new one."
+msgstr ""
+"Les administrateurs qui suppriment leur application d’authentification "
+"doivent immédiatement en configurer une nouvelle."
+
+msgid "Remove and set up again"
+msgstr "Supprimer et reconfigurer"
+
+msgid "Two-factor authentication is not configured on your account."
+msgstr ""
+"L’authentification à deux facteurs n’est pas configurée sur votre compte."
+
+msgid "Two-factor authentication is now enabled on your account."
+msgstr ""
+"L’authentification à deux facteurs est maintenant activée sur votre compte."
+
+msgid ""
+"Two-factor authentication is mandatory for administrator accounts. Scan this "
+"QR code with an authenticator application (for example FreeOTP, Aegis, "
+"Google Authenticator or Microsoft Authenticator)."
+msgstr ""
+"L’authentification à deux facteurs est obligatoire pour les comptes "
+"administrateurs. Scannez ce QR code avec une application d’authentification "
+"(par exemple FreeOTP, Aegis, Google Authenticator ou Microsoft "
+"Authenticator)."
+
+msgid ""
+"If you cannot scan the QR code, enter this key manually in your application:"
+msgstr ""
+"Si vous ne pouvez pas scanner le QR code, saisissez cette clé manuellement "
+"dans votre application :"
+
+msgid "Enter the 6-digit code displayed by your application to confirm."
+msgstr ""
+"Saisissez le code à 6 chiffres affiché par votre application pour confirmer."
+
+msgid "Confirm"
+msgstr "Confirmer"
+
+msgid "Enter the 6-digit code displayed by your authenticator application."
+msgstr ""
+"Saisissez le code à 6 chiffres affiché par votre application "
+"d’authentification."
+
+msgid ""
+"If you no longer have access to your application, ask a superuser to reset "
+"your two-factor authentication."
+msgstr ""
+"Si vous n’avez plus accès à votre application, demandez à un superutilisateur "
+"de réinitialiser votre authentification à deux facteurs."
+
+msgid "Verify"
+msgstr "Vérifier"
+
+msgid "Hello"
+msgstr "Bonjour"
+
+#, python-format
+msgid ""
+"Two-factor authentication has just been enabled on your Euphrosyne account "
+"(%(email)s). An authenticator application will now be required to log in."
+msgstr ""
+"L’authentification à deux facteurs vient d’être activée sur votre compte "
+"Euphrosyne (%(email)s). Une application d’authentification sera désormais "
+"nécessaire pour vous connecter."
+
+msgid ""
+"If you did not do this, contact the Euphrosyne team immediately and change "
+"your password."
+msgstr ""
+"Si vous n’êtes pas à l’origine de cette action, contactez immédiatement "
+"l’équipe Euphrosyne et changez votre mot de passe."
+
+msgid "The Euphrosyne team"
+msgstr "L'équipe Euphrosyne"
+
 msgid "Create your account"
 msgstr "Créer votre compte"
 
@@ -731,9 +871,6 @@ msgid ""
 msgstr ""
 "Le lien d'inscription est invalide, peut-être parce qu'il a déjà été utilisé."
 
-msgid "Hello"
-msgstr "Bonjour"
-
 msgid "You've been invited to register at Euphrosyne."
 msgstr "Vous avez été invité à vous inscrire sur Euphrosyne."
 
@@ -742,9 +879,6 @@ msgstr "Cliquez sur ce lien pour créer votre compte :"
 
 msgid "Create account"
 msgstr "Créer mon compte"
-
-msgid "The Euphrosyne team"
-msgstr "L'équipe Euphrosyne"
 
 msgid "Enter your information"
 msgstr "Entrez vos informations"
@@ -971,18 +1105,22 @@ msgstr "Commentaires"
 msgid "Point location of image"
 msgstr "Localisation du point sur l'image"
 
+#, python-brace-format
 msgid "{} analysis technique"
 msgstr "technique d'analyse {}"
 
 msgid "other detector"
 msgstr "autre détecteur"
 
+#, python-brace-format
 msgid "{} / {} detector"
 msgstr "détecteur {} / {}"
 
+#, python-brace-format
 msgid "{} filters"
 msgstr "filtres {}"
 
+#, python-brace-format
 msgid "{} / {} filters choice"
 msgstr "choix de filtres {} / {}"
 
@@ -1341,6 +1479,7 @@ msgstr "Seuls les utilisateurs Admin peuvents valider et éxécuter les runs."
 msgid "Change state"
 msgstr "Modification du chef de projet"
 
+#, python-brace-format
 msgid "Run {} successfully moved to status: {}."
 msgstr "Le Run {} a maintenant le statut: {}."
 

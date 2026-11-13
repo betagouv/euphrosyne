@@ -26,6 +26,7 @@ from django.utils.csp import CSP
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
+from euphro_auth.mfa.conf import parse_mfa_admin_required
 from euphrosyne.features import add_feature_apps, enabled_features
 
 # pylint: disable=abstract-class-instantiated
@@ -130,6 +131,9 @@ CORE_INSTALLED_APPS = [
     "euphrosyne.apps.AdminConfig",
     "euphrosyne.methods.apps.MethodsConfig",  # Use explicit app config for methods
     "objectstorage",
+    # Before euphro_auth, whose admin module unregisters django-otp's admins.
+    "django_otp",
+    "django_otp.plugins.otp_totp",
     "euphro_auth",
     "django.forms",
     "django.contrib.admindocs",
@@ -167,12 +171,14 @@ MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else 
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_otp.middleware.OTPMiddleware",
     "euphro_auth.middlewares.SessionIdleTimeoutMiddleware",
     "euphro_auth.middleware.UserLanguageMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "social_django.middleware.SocialAuthExceptionMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.csp.ContentSecurityPolicyMiddleware",
+    "euphro_auth.mfa.middleware.AdminMFARequiredMiddleware",
     "euphro_auth.middlewares.CGUAcceptanceMiddleware",
 ]
 
@@ -420,6 +426,18 @@ FEEDBACK_EMAILS = os.getenv("FEEDBACK_EMAILS", "").split(",")
 
 # Necessary for the correct behavior of password reset flow:
 LOGIN_URL = "/login/"
+
+# Password reset links are valid for one hour.
+PASSWORD_RESET_TIMEOUT = 60 * 60
+
+# Multi-factor authentication (TOTP) for lab administrators.
+# Set MFA_ADMIN_REQUIRED=false (or 0/no/off) to temporarily stop enforcing it
+# (rollback only). Any other value, including an empty one, keeps it on.
+MFA_ADMIN_REQUIRED = parse_mfa_admin_required(os.getenv("MFA_ADMIN_REQUIRED"))
+OTP_TOTP_ISSUER = "Euphrosyne"
+# Exponential back-off after failed attempts: factor * 2 ** (failures - 1) seconds.
+OTP_TOTP_THROTTLE_FACTOR = 1
+OTP_ADMIN_HIDE_SENSITIVE_DATA = True
 
 # Sliding expiration for authenticated web sessions, in seconds.
 SESSION_IDLE_TIMEOUT_ADMIN = 15 * 60
