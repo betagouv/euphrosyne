@@ -123,7 +123,7 @@ class TestImpersonateSelectedUserAction(TestCase):
         assert response.headers["Location"] == "/"
         assert int(request.session["_auth_user_id"]) == target_user.pk
         assert request.session["_auth_user_backend"] == (
-            "euphro_auth.backends.LowercaseEmailBackend"
+            "allauth.account.auth_backends.AuthenticationBackend"
         )
         assert request.session["impersonator_user_id"] == admin_user.pk
         assert request.session["impersonated_user_id"] == target_user.pk

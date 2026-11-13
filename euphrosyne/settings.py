@@ -14,7 +14,7 @@ import os
 import subprocess
 
 # pylint: disable=line-too-long
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 import dj_database_url
@@ -139,7 +139,8 @@ CORE_INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "axes",
+    "allauth",
+    "allauth.account",
     "social_django",
     "rest_framework",
     "django_filters",
@@ -167,6 +168,7 @@ MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else 
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     "euphro_auth.middlewares.SessionIdleTimeoutMiddleware",
     "euphro_auth.middleware.UserLanguageMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -180,8 +182,6 @@ if "radiation_protection" in EUPHROSYNE_FEATURES:
     MIDDLEWARE.append(
         "lab.participations.middleware.ParticipationEmployerCompletionMiddleware"
     )
-
-MIDDLEWARE.append("axes.middleware.AxesMiddleware")
 
 ROOT_URLCONF = "euphrosyne.urls"
 
@@ -294,24 +294,63 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/topics/auth/customizing/#other-authentication-sources
 
 AUTHENTICATION_BACKENDS = [
-    "euphro_auth.backends.PasswordAxesBackend",
     "orcid_oauth.backends.ORCIDOAuth2",
-    "euphro_auth.backends.LowercaseEmailBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-AXES_FAILURE_LIMIT = 5
-AXES_COOLOFF_TIME = timedelta(minutes=15)
-AXES_LOCKOUT_PARAMETERS = ["username"]
-AXES_USERNAME_CALLABLE = "euphro_auth.password_lockout.account_username"
-AXES_WHITELIST_CALLABLE = "euphro_auth.password_lockout.is_passwordless_authentication"
-AXES_LOCKOUT_CALLABLE = "euphro_auth.password_lockout.password_lockout_response"
-AXES_HANDLER = "euphro_auth.password_lockout.AccountAxesHandler"
-AXES_RESET_COOL_OFF_ON_FAILURE_DURING_LOCKOUT = False
-AXES_DISABLE_ACCESS_LOG = True
-AXES_SENSITIVE_PARAMETERS = ["username", "email", "ip_address"]
-# Account-only limits are intentional: changing IP or User-Agent cannot bypass
-# them, and unrelated accounts sharing an IP must remain accessible.
-SILENCED_SYSTEM_CHECKS = ["axes.W006"]
+# Accounts (django-allauth)
+# https://docs.allauth.org/en/latest/account/configuration.html
+
+ACCOUNT_ADAPTER = "euphro_auth.adapters.AccountAdapter"
+ACCOUNT_FORMS = {
+    "login": "euphro_auth.forms.LoginForm",
+    "reset_password": "euphro_auth.forms.ResetPasswordForm",
+}
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_UNIQUE_EMAIL = True
+# Accounts are created by administrators or by invitation: no self-service
+# signup and no email verification step.
+ACCOUNT_EMAIL_VERIFICATION = "none"
+# Like Django's password reset, send nothing to an address without an account.
+ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS = False
+# No "remember me" choice: the session idle timeouts below always apply.
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_LOGOUT_REDIRECT_URL = "/login/"
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Euphrosyne] "
+ACCOUNT_PASSWORD_RESET_TOKEN_GENERATOR = (
+    "euphro_auth.tokens.PasswordResetTokenGenerator"
+)
+# Password reset links expire after one hour. Invitation links keep Django's
+# PASSWORD_RESET_TIMEOUT (3 days).
+PASSWORD_RESET_LINK_TIMEOUT = 60 * 60
+
+# Password lockout: on the 5th failure within 15 minutes for an email
+# (lowercased, whatever the IP address or user agent), password sign-in is
+# blocked for 15 minutes. See euphro_auth.password_lockout.
+# Per-IP limits are disabled: allauth does not trust X-Forwarded-For by default,
+# so behind the hosting router every client would share one address.
+ACCOUNT_RATE_LIMITS = {
+    "login": None,
+    "login_failed": "5/15m/key",
+    "login_lockout": "1/15m/key",
+    "reset_password": "5/m/key",
+    "reset_password_from_key": None,
+    "signup": None,
+    "request_login_code": "3/m/key",
+    "verify_phone": "1/30s/key",
+}
+
+# Rate limits and allauth's one-time code replay protection are kept in the cache,
+# which must be shared by every process (gunicorn workers restart regularly).
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "euphrosyne_cache",
+        "OPTIONS": {"MAX_ENTRIES": 1_000_000},
+    }
+}
 
 
 # Internationalization
@@ -418,8 +457,8 @@ DEFAULT_FROM_EMAIL = os.environ["DEFAULT_FROM_EMAIL"]
 
 FEEDBACK_EMAILS = os.getenv("FEEDBACK_EMAILS", "").split(",")
 
-# Necessary for the correct behavior of password reset flow:
 LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/"
 
 # Sliding expiration for authenticated web sessions, in seconds.
 SESSION_IDLE_TIMEOUT_ADMIN = 15 * 60

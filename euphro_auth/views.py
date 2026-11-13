@@ -34,7 +34,7 @@ class UserTokenRegistrationView(PasswordResetConfirmView):
     success_url = reverse_lazy("admin:index")
     post_reset_login = True
     reset_url_token = "registration"
-    post_reset_login_backend = "euphro_auth.backends.LowercaseEmailBackend"
+    post_reset_login_backend = "allauth.account.auth_backends.AuthenticationBackend"
 
     def dispatch(self, *args: Any, **kwargs: Any) -> HttpResponseBase:
         request = self.request

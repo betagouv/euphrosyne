@@ -1,0 +1,7 @@
+{% comment %}Non-field errors are shown by the page layout.{% endcomment %}
+{% for field in attrs.form.hidden_fields %}{{ field }}{% endfor %}
+{% for field in attrs.form.visible_fields %}
+<div class="fr-input-group{% if field.errors %} fr-input-group--error{% endif %}">
+    {{ field.as_field_group }}
+</div>
+{% endfor %}
