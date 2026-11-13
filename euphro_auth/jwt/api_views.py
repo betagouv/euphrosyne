@@ -2,6 +2,7 @@ from rest_framework import authentication
 from rest_framework.permissions import IsAdminUser
 from rest_framework_simplejwt.views import TokenViewBase
 
+from .authentication import PasswordBasicAuthentication
 from .serializers import LongTokenObtainSerializer, SessionTokenObtainSerializer
 
 
@@ -12,7 +13,7 @@ class SessionTokenObtainPairView(TokenViewBase):
     """
 
     authentication_classes = (  # type: ignore[assignment]
-        authentication.BasicAuthentication,
+        PasswordBasicAuthentication,
         authentication.SessionAuthentication,
     )
     permission_classes = (  # type: ignore[assignment]
@@ -27,8 +28,6 @@ class LongTokenOptainPairView(TokenViewBase):
     JSON web token pair to prove the authentication of those credentials.
     """
 
-    authentication_classes = (  # type: ignore[assignment]
-        authentication.BasicAuthentication,
-    )
+    authentication_classes = (PasswordBasicAuthentication,)  # type: ignore[assignment]
     permission_classes = ()
     serializer_class = LongTokenObtainSerializer  # type: ignore[assignment]

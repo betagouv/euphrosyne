@@ -1,66 +1,78 @@
-"""Share password failures by lowercased email across web, Basic and JWT.
+"""Password lockout shared by every password channel, keyed by lowercased email.
 
-Axes manages expiry with its standard cool-off. ORCID, existing sessions and
-JWT refresh remain available. Password successes reset failures in
-LowercaseEmailBackend; passwordless logins leave them intact.
+Built on allauth's rate limits (ACCOUNT_RATE_LIMITS):
+
+- ``login_failed`` counts attempts per email; allauth consumes one per attempt
+  and gives it back on success.
+- on the attempt that reaches that limit, ``login_lockout`` starts a lockout of
+  the same duration, counted from that failure;
+- a successful password sign-in clears the failures.
+
+ORCID logins, existing sessions and JWT refresh do not go through the password
+check and are not affected.
 """
 
-from axes.handlers.database import AxesDatabaseHandler
-from django.contrib import admin
-from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.shortcuts import render
-from django.utils.translation import gettext as _
-from rest_framework.request import Request
+import logging
+
+from allauth.core.internal import ratelimit
+from django.http import HttpRequest
+from django.utils.translation import gettext_lazy as _
+
+logger = logging.getLogger(__name__)
+
+APP = "allauth.account"
+LOCKOUT_ACTION = "login_lockout"
+FAILURES_ACTION = "login_failed"
+
+LOCKOUT_MESSAGE = _(
+    "Password sign-in is blocked for 15 minutes after too many failed attempts. "
+    "You can still log in with ORCID."
+)
 
 
-def account_username(
-    request: HttpRequest, credentials: dict | None = None
-) -> str | None:
-    """Use the same email for HTML username, Basic username and JWT email."""
-    data = credentials if credentials is not None else request.POST
-    username = data.get("email") or data.get("username")
-    return username.lower() if isinstance(username, str) else None
+def lockout_key(email: str) -> str:
+    """Same key as allauth's own ``login_failed`` key, without the site domain:
+    the platform serves a single site."""
+    return email.strip().lower()
 
 
-def is_passwordless_authentication(
-    request: HttpRequest, credentials: dict | None = None
-) -> bool:
-    # Credentials come from Django's authenticate(), never client-supplied flags.
-    # Django masks passwords in failure signals, but preserves the key.
-    # pylint: disable=unused-argument
-    return credentials is not None and credentials.get("password") is None
-
-
-class AccountAxesHandler(AxesDatabaseHandler):
-    def user_login_failed(self, sender, credentials: dict, request=None, **kwargs):
-        super().user_login_failed(sender, credentials, request=request, **kwargs)
-        if isinstance(request, Request):
-            # DRF stores attributes on its wrapper. AxesMiddleware receives the
-            # underlying Django request, so expose the lockout there as well.
-            # pylint: disable=protected-access
-            request._request.axes_locked_out = request.axes_locked_out
-            request._request.axes_credentials = credentials
-
-
-def password_lockout_response(
-    request: HttpRequest,
-    original_response: HttpResponse | None = None,
-    credentials: dict | None = None,
-) -> HttpResponse:
-    # pylint: disable=unused-argument
-    message = _(
-        "Password sign-in is blocked for 15 minutes after too many failed attempts. "
-        "You can still log in with ORCID."
+def is_locked_out(request: HttpRequest, email: str) -> bool:
+    return (
+        ratelimit.consume(
+            request,
+            app=APP,
+            action=LOCKOUT_ACTION,
+            key=lockout_key(email),
+            dry_run=True,
+            limit_get=True,
+        )
+        is None
     )
-    if request.path.startswith("/api/"):
-        return JsonResponse({"detail": message}, status=429)
-    return render(
-        request,
-        "euphro_admin/login.html",
-        {
-            **admin.site.each_context(request),
-            "title": _("Log in"),
-            "password_lockout_message": message,
-        },
-        status=429,
+
+
+def consume_attempt(request: HttpRequest, email: str):
+    """Count a password attempt. Returns the usage to roll back on success, or
+    ``None`` when the failure limit has already been reached."""
+    return ratelimit.consume(
+        request, app=APP, action=FAILURES_ACTION, key=lockout_key(email)
     )
+
+
+def record_failure(request: HttpRequest, email: str) -> bool:
+    """Start the lockout when this failure reaches the limit. Returns whether
+    the account is now locked out."""
+    key = lockout_key(email)
+    limit_reached = (
+        ratelimit.consume(
+            request, app=APP, action=FAILURES_ACTION, key=key, dry_run=True
+        )
+        is None
+    )
+    if limit_reached:
+        ratelimit.consume(request, app=APP, action=LOCKOUT_ACTION, key=key)
+        logger.warning("Password sign-in locked out after repeated failures")
+    return limit_reached
+
+
+def reset_failures(request: HttpRequest, email: str) -> None:
+    ratelimit.clear(request, app=APP, action=FAILURES_ACTION, key=lockout_key(email))

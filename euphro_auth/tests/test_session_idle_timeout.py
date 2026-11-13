@@ -73,8 +73,8 @@ def test_password_login_sets_expiry_on_first_response(client, clock, session_use
     user.save()
 
     response = client.post(
-        reverse("admin:login"),
-        {"username": user.email, "password": "test-pass-123"},
+        reverse("account_login"),
+        {"login": user.email, "password": "test-pass-123"},
     )
 
     assert response.status_code == 302

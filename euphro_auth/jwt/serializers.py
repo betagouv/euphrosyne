@@ -5,6 +5,7 @@ from rest_framework_simplejwt.serializers import (
 )
 from rest_framework_simplejwt.settings import api_settings as simplejwt_api_settings
 
+from .authentication import authenticate_password
 from .tokens import EuphroRefreshToken, LongEuphroRefreshToken
 
 
@@ -41,3 +42,18 @@ class LongTokenObtainSerializer(TokenObtainPairSerializer):
     """Generate long-lived token for app-to-app communication"""
 
     token_class = LongEuphroRefreshToken
+    user = None
+
+    def validate(self, attrs):
+        self.user = authenticate_password(
+            self.context.get("request"),
+            attrs[self.username_field],
+            attrs["password"],
+        )
+        if not simplejwt_api_settings.USER_AUTHENTICATION_RULE(self.user):
+            raise exceptions.AuthenticationFailed(
+                self.error_messages["no_active_account"],
+                "no_active_account",
+            )
+        refresh = self.get_token(self.user)
+        return {"refresh": str(refresh), "access": str(refresh.access_token)}

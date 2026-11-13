@@ -1,5 +1,9 @@
 from datetime import timedelta
 
+from allauth.account.adapter import get_adapter
+from django.core.exceptions import ValidationError
+from rest_framework import exceptions
+from rest_framework.authentication import BasicAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import (
     AuthenticationFailed,
@@ -10,6 +14,27 @@ from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import Token
 
 from ..models import User
+from ..password_lockout import LOCKOUT_MESSAGE
+
+
+def authenticate_password(request, email: str, password: str) -> User | None:
+    """Check an API password with the same lockout as the sign-in page."""
+    try:
+        return get_adapter(request).authenticate(
+            request, email=email, password=password
+        )
+    except ValidationError as error:
+        raise exceptions.Throttled(detail=str(LOCKOUT_MESSAGE)) from error
+
+
+class PasswordBasicAuthentication(BasicAuthentication):
+    def authenticate_credentials(self, userid, password, request=None):
+        user = authenticate_password(request, userid, password)
+        if user is None:
+            raise exceptions.AuthenticationFailed("Invalid username/password.")
+        if not user.is_active:
+            raise exceptions.AuthenticationFailed("User inactive or deleted.")
+        return (user, None)
 
 
 class EuphrosyneBackendToken(Token):

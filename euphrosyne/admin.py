@@ -1,3 +1,5 @@
+from allauth.account.views import login as account_login
+from allauth.account.views import logout as account_logout
 from django.apps import apps
 from django.contrib import admin
 from django.shortcuts import redirect
@@ -12,12 +14,19 @@ from lab.workplace.views import WorkplaceView
 
 
 class AdminSite(admin.AdminSite):
-    login_template = "euphro_admin/login.html"
-    password_change_template = "euphro_admin/password_reset_form.html"
-
     site_title = "Euphrosyne"
     site_header = "Euphrosyne"
     index_title = _("Dashboard")
+
+    # Sign-in, sign-out and password change are handled by django-allauth.
+    def login(self, request, extra_context=None):
+        return account_login(request)
+
+    def logout(self, request, extra_context=None):
+        return account_logout(request)
+
+    def password_change(self, request, extra_context=None):
+        return redirect("account_change_password")
 
     def get_urls(self) -> list[URLPattern | URLResolver]:  # type: ignore[override]
         urls: list[URLPattern | URLResolver] = [

@@ -671,9 +671,6 @@ msgstr ""
 "La connexion par mot de passe est bloquée pendant 15 minutes après trop de "
 "tentatives infructueuses. Vous pouvez toujours vous connecter avec ORCID."
 
-msgid "Log in"
-msgstr "Connexion"
-
 #, python-format
 msgid ""
 "Your password must contain at least one lowercase letter, one uppercase "
@@ -681,6 +678,15 @@ msgid ""
 msgstr ""
 "Votre mot de passe doit contenir au moins une minuscule, une majuscule, un "
 "chiffre et un caractère spécial de cette liste : %(characters)s."
+
+msgid "Log in"
+msgstr "Connexion"
+
+msgid "Log in with ORCID"
+msgstr "Se connecter avec ORCID"
+
+msgid "Forgotten your password or username?"
+msgstr "Mot de passe oublié ?"
 
 msgid "Invite user"
 msgstr "Inviter un utilisateur"
@@ -839,20 +845,6 @@ msgid "Close"
 msgstr "Fermer"
 
 #, python-format
-msgid ""
-"You are authenticated as %(username)s, but are not authorized to access this "
-"page. Would you like to login to a different account?"
-msgstr ""
-"Vous êtes connecté.e en tant que %(username)s, mais n'êtres pas autorisé.e à "
-"accéderà ce contenu. Voulez-vous vous connnecter avec un compte différent?"
-
-msgid "Log in with ORCID"
-msgstr "Se connecter avec ORCID"
-
-msgid "Forgotten your password or username?"
-msgstr "Mot de passe oublié ?"
-
-#, python-format
 msgid "Euphrosyne, open %(aglae_link)s data."
 msgstr "Euphrosyne, ouvrir les données de %(aglae_link)s."
 
@@ -870,59 +862,6 @@ msgstr "Mentions légales"
 
 msgid "Personal data and cookies"
 msgstr "Données personnelles et cookies"
-
-msgid "Password reset complete"
-msgstr "Mise à jour du mot de passe terminée"
-
-msgid "Your password has been set. You may go ahead and log in now."
-msgstr ""
-"Votre mot de passe a bien été mis à jour. Vous pouvez vous connecter à "
-"nouveau."
-
-msgid "New password"
-msgstr "Nouveau mot de passe"
-
-msgid ""
-"Please enter your new password twice so we can verify you typed it in "
-"correctly."
-msgstr ""
-"Entrez votre nouveau mot de passe deux fois pour être sûr qu'il soit correct."
-
-msgid "Change my password"
-msgstr "Modifier mon mot de passe"
-
-msgid ""
-"The password reset link was invalid, possibly because it has already been "
-"used.  Please request a new password reset."
-msgstr ""
-"Le lien d'inscription est invalide, peut-être parce qu'il a déjà été "
-"utilisé. Demandez-en un nouveau."
-
-msgid "Email sent"
-msgstr "Email envoyé"
-
-msgid ""
-"We’ve emailed you instructions for setting your password, if an account "
-"exists with the email you entered. You should receive them shortly."
-msgstr ""
-"Un email avec les instructions pour mettre à jour votre mot de passe vous a "
-"été envoyé, si un compte existe avec cet email."
-
-msgid ""
-"If you don’t receive an email, please make sure you’ve entered the address "
-"you registered with, and check your spam folder."
-msgstr ""
-"Si vous ne recevez aucun email, vérifiez que vous avez entré le bon email et "
-"vérifiez dans vos courriers indésirables."
-
-msgid "Go back to login page"
-msgstr "Retour à la page de connexion"
-
-msgid "Reset password"
-msgstr "Mettre à jour le mot de passe"
-
-msgid "Email address"
-msgstr "Email"
 
 #, python-format
 msgid "The online board to track your %(aglae_tag)s search projects"

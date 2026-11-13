@@ -377,7 +377,7 @@ class UserAdmin(DjangoUserAdmin):
         impersonator_user_id = request.user.pk
         impersonated_user_id = target_user.pk
         impersonation_started_at = timezone.now().isoformat()
-        backend = "euphro_auth.backends.LowercaseEmailBackend"
+        backend = "allauth.account.auth_backends.AuthenticationBackend"
 
         # Keep the actor, target and timestamp in the local administration audit
         # trail rather than in logs forwarded to diagnostic services.

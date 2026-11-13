@@ -1,0 +1,12 @@
+{% load allauth %}
+<form method="{{ attrs.method }}"
+      {% if attrs.action %}action="{{ attrs.action }}"{% endif %}>
+    {% slot body %}
+    {% endslot %}
+    {% if slots.actions %}
+    <div class="fr-mt-4w">
+        {% slot actions %}
+        {% endslot %}
+    </div>
+    {% endif %}
+</form>

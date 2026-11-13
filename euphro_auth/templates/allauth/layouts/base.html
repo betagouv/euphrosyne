@@ -1,11 +1,14 @@
 {% extends "unauthorized.html" %}
 {% load i18n static %}
+{% comment %}Sign-in pages (allauth "entrance" pages): two-panel DSFR layout.{% endcomment %}
+
+{% block title %}{% block head_title %}{% endblock head_title %} | Euphrosyne{% endblock %}
 
 {% block extrastyle %}
 <link rel="stylesheet" href="{% static "admin/css/login.css" %}">
 <link rel="stylesheet" type="text/css" href="{% static "css/login.css" %}">
 {{ block.super }}
-{{ form.media }}
+{% block extra_head %}{% endblock extra_head %}
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} login{% endblock %}
@@ -20,15 +23,4 @@
 
 {% block breadcrumbs %}{% endblock %}
 
-{% block content_panel %}
-  {{ block.super }}
-  <div id="content-main">
-
-      <h3>{% translate "Password reset complete" %}</h3>
-
-      <p>{% translate "Your password has been set. You may go ahead and log in now." %}</p>
-
-      <a href="{{ login_url }}" class="fr-link fr-link--sm">{% translate 'Log in' %}</a>
-
-  </div>
-{% endblock %}
+{% block footer %}{% block extra_body %}{% endblock extra_body %}{% endblock %}

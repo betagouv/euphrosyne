@@ -1,0 +1,41 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n %}
+
+{% block head_title %}{% translate "Log in" %}{% endblock head_title %}
+
+{% block content %}
+  <div id="content-main">
+    <h3>{% translate "Log in" %}</h3>
+
+    <div class="orcid-row fr-mt-6w fr-mb-4w">
+      <form action="{% url "social:begin" "orcid" %}" method="post">
+        {% csrf_token %}
+        <button class="button" type="submit">
+          <img alt="ORCID logo" src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_24x24.png" width="24" height="24" />
+          {% translate 'Log in with ORCID' %}
+        </button>
+      </form>
+    </div>
+
+    {% if not form.password_locked_out %}
+    {% url "account_login" as login_url %}
+    <form action="{{ login_url }}" method="post" id="login-form">
+      {% csrf_token %}
+      {% for field in form.visible_fields %}
+      <div class="fr-input-group{% if field.errors %} fr-input-group--error{% endif %}">
+        {{ field.as_field_group }}
+      </div>
+      {% endfor %}
+      {{ redirect_field }}
+
+      <div class="fr-mt-3v">
+        <a class="fr-link fr-link--sm" href="{% url "account_reset_password" %}">{% translate 'Forgotten your password or username?' %}</a>
+      </div>
+
+      <div class="fr-mt-4w">
+        <input type="submit" value="{% translate 'Log in' %}">
+      </div>
+    </form>
+    {% endif %}
+  </div>
+{% endblock content %}

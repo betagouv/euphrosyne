@@ -17,7 +17,6 @@ Including another URLconf
 import debug_toolbar
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
 
@@ -28,26 +27,7 @@ from orcid_oauth.views import UserCompleteAccountView
 urlpatterns = [
     path("", include("social_django.urls")),
     path("doc/", include("django.contrib.admindocs.urls")),
-    path(
-        "password_reset/",
-        auth_views.PasswordResetView.as_view(),
-        name="admin_password_reset",
-    ),
-    path(
-        "password_reset/done/",
-        auth_views.PasswordResetDoneView.as_view(),
-        name="password_reset_done",
-    ),
-    path(
-        "reset/<uidb64>/<token>/",
-        auth_views.PasswordResetConfirmView.as_view(),
-        name="password_reset_confirm",
-    ),
-    path(
-        "reset/done/",
-        auth_views.PasswordResetCompleteView.as_view(),
-        name="password_reset_complete",
-    ),
+    path("accounts/", include("euphro_auth.urls")),
     path(
         "registration/<uidb64>/<token>/",
         UserTokenRegistrationView.as_view(),
