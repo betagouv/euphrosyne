@@ -311,7 +311,6 @@ AXES_LOCKOUT_PARAMETERS = ["username"]
 AXES_USERNAME_CALLABLE = "euphro_auth.password_lockout.account_username"
 AXES_WHITELIST_CALLABLE = "euphro_auth.password_lockout.is_passwordless_authentication"
 AXES_LOCKOUT_CALLABLE = "euphro_auth.password_lockout.password_lockout_response"
-AXES_HANDLER = "euphro_auth.password_lockout.AccountAxesHandler"
 AXES_RESET_COOL_OFF_ON_FAILURE_DURING_LOCKOUT = False
 AXES_DISABLE_ACCESS_LOG = True
 AXES_SENSITIVE_PARAMETERS = ["username", "email", "ip_address"]
@@ -485,7 +484,7 @@ S3_SECRET_ACCESS_KEY = os.getenv("S3_SECRET_ACCESS_KEY")
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "euphro_auth.jwt.authentication.MFAEnforcingJWTAuthentication",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }

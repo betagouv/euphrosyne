@@ -654,6 +654,9 @@ msgstr "Un compte avec cet email existe déjà."
 msgid "I have read and accept the Terms and Conditions."
 msgstr "J'ai lu et j'accepte les conditions générales d'Euphrosyne."
 
+msgid "Herma token"
+msgstr "Jeton Herma"
+
 msgid "The Email must be set"
 msgstr "L'email doit être défini"
 
@@ -757,6 +760,33 @@ msgstr "Lire les CGU."
 
 msgid "Accept"
 msgstr "Accepter"
+
+#, python-format
+msgid "Generate a token here and paste it into Herma when it asks for one."
+msgstr "Générez un jeton ici et collez-le dans Herma lorsqu’il vous le demande."
+
+msgid ""
+"Copy this token now: it will not be displayed again. Do not share it, it "
+"gives access to your account."
+msgstr ""
+"Copiez ce jeton maintenant : il ne sera plus affiché. Ne le partagez pas, il "
+"donne accès à votre compte."
+
+#, python-format
+msgid "Expires on %(expires_at)s."
+msgstr "Expire le %(expires_at)s."
+
+msgid ""
+"Select the whole token (click in the field), copy it and paste it into Herma."
+msgstr ""
+"Sélectionnez le jeton en entier (cliquez dans le champ), copiez-le et collez-"
+"le dans Herma."
+
+msgid "Generate another token"
+msgstr "Générer un autre jeton"
+
+msgid "Generate a token"
+msgstr "Générer un jeton"
 
 msgid "Log out"
 msgstr "Se déconnecter"
@@ -1985,3 +2015,11 @@ msgstr "Schéma pluriannuel d’accessibilité"
 
 msgid "Site map"
 msgstr "Plan du site"
+
+msgid ""
+"Administrator accounts must use two-factor authentication: generate a Herma "
+"token from the Euphrosyne page /herma-token/ and paste it into Herma."
+msgstr ""
+"Les comptes administrateurs doivent utiliser l’authentification à deux "
+"facteurs : générez un jeton Herma depuis la page Euphrosyne /herma-token/ et "
+"collez-le dans Herma."

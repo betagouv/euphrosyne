@@ -5,6 +5,7 @@ from django.urls import include, path, reverse
 from django.urls.resolvers import URLPattern, URLResolver
 from django.utils.translation import gettext_lazy as _
 
+from euphro_auth.jwt.views import herma_token_view
 from euphro_auth.mfa.views import account_security_view
 from lab.documents.views import ProjectDocumentsView
 from lab.hdf5.views import HDF5View
@@ -26,6 +27,11 @@ class AdminSite(admin.AdminSite):
                 "security/",
                 self.admin_view(account_security_view),
                 name="account_security",
+            ),
+            path(
+                "herma-token/",
+                self.admin_view(herma_token_view),
+                name="herma_token",
             ),
             path(
                 "lab/project/<project_id>/documents",

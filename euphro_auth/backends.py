@@ -17,14 +17,12 @@ class PasswordAxesBackend(AxesStandaloneBackend):
 
 class LowercaseEmailBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
-        if username is None:
-            username = kwargs.get("email")
         if isinstance(username, str):
             username = username.lower()
         user = super().authenticate(
             request, username=username, password=password, **kwargs
         )
         if user is not None and settings.AXES_ENABLED:
-            # API password authentication does not emit user_logged_in.
+            # Reset failures on every successful password check.
             reset(username=user.get_username().lower())
         return user
