@@ -68,7 +68,7 @@ def test_nav_items_data_when_admin():
     assert data["items"][3]["item"]["badge"] == 0
 
     assert data["items"][4]["title"] == str(_("Administration"))
-    assert len(data["items"][4]["items"]) == 5
+    assert len(data["items"][4]["items"]) == 6
     assert data["items"][4]["items"][0]["title"] == str(_("Certifications"))
     assert data["items"][4]["items"][0]["item"]["href"] == reverse(
         "admin:certification_certification_changelist"
@@ -96,5 +96,7 @@ def test_nav_items_data_when_admin():
     assert data["items"][4]["items"][3]["item"]["extraPath"] == []
     assert data["items"][4]["items"][4]["title"] == str(_("Account security"))
     assert data["items"][4]["items"][4]["item"]["href"] == reverse("mfa_index")
+    assert data["items"][4]["items"][5]["title"] == str(_("Herma token"))
+    assert data["items"][4]["items"][5]["item"]["href"] == reverse("admin:herma_token")
 
     assert data["currentPath"] == "/path"

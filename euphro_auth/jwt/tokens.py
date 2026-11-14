@@ -1,5 +1,6 @@
 import datetime
 
+from django.conf import settings
 from rest_framework_simplejwt.settings import api_settings as rf_simplejwt_api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -7,15 +8,27 @@ from lab.permissions import is_lab_admin
 
 from ..models import User
 
+# Validity of the refresh token pasted into Herma. One day on purpose: the
+# token is issued after a full sign-in, second factor included.
+HERMA_TOKEN_LIFETIME = datetime.timedelta(days=1)
+
 
 class EuphroRefreshToken(RefreshToken):
     @classmethod
-    def for_user(cls, user: User):  # type: ignore[override]
+    def for_user(  # type: ignore[override] # pylint: disable=arguments-differ
+        cls, user: User, *, mfa: bool
+    ):
+        """``mfa``: whether the session issuing the token went through a second
+        factor. Administrator rights (``is_admin``, used by the Tools API) are
+        granted only then, or when MFA is not enforced."""
         token = super().for_user(user)
         token["projects"] = list(
             user.project_set.values("id", "name", "slug")  # type: ignore[misc]
         )
-        token["is_admin"] = is_lab_admin(user)
+        token["mfa"] = mfa
+        token["is_admin"] = is_lab_admin(user) and (
+            mfa or not settings.MFA_ADMIN_REQUIRED
+        )
         # because https://github.com/jazzband/djangorestframework-simplejwt/pull/887
         token["user_id"] = int(token["user_id"])
         return token
@@ -31,9 +44,3 @@ class EuphroToolsAPIToken(RefreshToken):
         token["projects"] = []
         token["is_admin"] = True
         return token
-
-
-class LongEuphroRefreshToken(EuphroRefreshToken):
-    """Token with a longer lifetime (app-to-app communication)."""
-
-    lifetime = datetime.timedelta(days=30)

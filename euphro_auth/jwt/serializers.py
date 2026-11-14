@@ -1,12 +1,19 @@
+import logging
+
 from rest_framework import exceptions
+from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import (
-    TokenObtainPairSerializer,
     TokenObtainSerializer,
+    TokenRefreshSerializer,
 )
 from rest_framework_simplejwt.settings import api_settings as simplejwt_api_settings
 
-from .authentication import authenticate_password
-from .tokens import EuphroRefreshToken, LongEuphroRefreshToken
+from ..mfa.services import is_session_verified
+from ..models import User
+from .authentication import MFA_REQUIRED_MESSAGE, is_token_refused_for_missing_mfa
+from .tokens import EuphroRefreshToken
+
+logger = logging.getLogger(__name__)
 
 
 # pylint: disable=abstract-method
@@ -21,7 +28,8 @@ class SessionTokenObtainSerializer(TokenObtainSerializer):
         self.fields = {}
 
     def validate(self, attrs):
-        self.user = self.context["request"].user
+        request = self.context["request"]
+        self.user = request.user
 
         if not simplejwt_api_settings.USER_AUTHENTICATION_RULE(self.user):
             raise exceptions.AuthenticationFailed(
@@ -29,31 +37,31 @@ class SessionTokenObtainSerializer(TokenObtainSerializer):
                 "no_active_account",
             )
 
-        refresh = self.get_token(self.user)
+        refresh = self.token_class.for_user(
+            self.user, mfa=is_session_verified(request, self.user)
+        )
 
         return {"refresh": str(refresh), "access": str(refresh.access_token)}
 
-    @classmethod
-    def get_token(cls, user):
-        return cls.token_class.for_user(user)
 
-
-class LongTokenObtainSerializer(TokenObtainPairSerializer):
-    """Generate long-lived token for app-to-app communication"""
-
-    token_class = LongEuphroRefreshToken
-    user = None
+class MFAEnforcingTokenRefreshSerializer(TokenRefreshSerializer):
+    """Refuse to refresh an administrator's token issued without a second factor
+    while MFA is enforced (including tokens issued before MFA)."""
 
     def validate(self, attrs):
-        self.user = authenticate_password(
-            self.context.get("request"),
-            attrs[self.username_field],
-            attrs["password"],
+        refresh = self.token_class(attrs["refresh"])
+        user_id = refresh.payload.get(simplejwt_api_settings.USER_ID_CLAIM)
+        user = (
+            User.objects.filter(**{simplejwt_api_settings.USER_ID_FIELD: user_id})
+            .only("pk", "is_superuser", "is_lab_admin")
+            .first()
+            if user_id
+            else None
         )
-        if not simplejwt_api_settings.USER_AUTHENTICATION_RULE(self.user):
-            raise exceptions.AuthenticationFailed(
-                self.error_messages["no_active_account"],
-                "no_active_account",
+        if user is not None and is_token_refused_for_missing_mfa(user, refresh):
+            logger.warning(
+                "Token refresh refused for administrator %s: token without MFA",
+                user.pk,
             )
-        refresh = self.get_token(self.user)
-        return {"refresh": str(refresh), "access": str(refresh.access_token)}
+            raise AuthenticationFailed(MFA_REQUIRED_MESSAGE, "mfa_required")
+        return super().validate(attrs)

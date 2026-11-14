@@ -1,6 +1,5 @@
 """OpenAPI (drf-spectacular) extensions for Euphrosyne JWT authentication."""
 
-from drf_spectacular.authentication import BasicScheme
 from drf_spectacular.contrib.rest_framework_simplejwt import SimpleJWTScheme
 
 
@@ -12,5 +11,7 @@ class EuphrosyneAdminJWTScheme(SimpleJWTScheme):
     name = "euphrosyneBackendJwtAuth"
 
 
-class PasswordBasicScheme(BasicScheme):
-    target_class = "euphro_auth.jwt.authentication.PasswordBasicAuthentication"
+class MFAEnforcingJWTScheme(SimpleJWTScheme):
+    """Default user JWT authentication, documented as simplejwt's."""
+
+    target_class = "euphro_auth.jwt.authentication.MFAEnforcingJWTAuthentication"

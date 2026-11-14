@@ -1,6 +1,4 @@
-import base64
 import datetime
-import json
 import time
 from unittest.mock import patch
 
@@ -18,7 +16,6 @@ from orcid_oauth.tests.helpers import orcid_callback, start_orcid_login
 
 pytestmark = pytest.mark.django_db
 PASSWORD = "T8!vQ2#rM6@zL9$p"
-CHANNELS = ["web", "basic", "jwt-json", "jwt-form", "long-basic"]
 
 
 @pytest.fixture(autouse=True)
@@ -65,166 +62,107 @@ def mocked_clock():
         yield clock
 
 
-def password_request(client, channel, email, password, ip="192.0.2.1", **extra):
-    extra["REMOTE_ADDR"] = ip
-    if channel == "web":
-        return client.post(
-            reverse("account_login"), {"login": email, "password": password}, **extra
-        )
-    if channel in {"basic", "long-basic"}:
-        credentials = base64.b64encode(f"{email}:{password}".encode()).decode()
-        extra["HTTP_AUTHORIZATION"] = f"Basic {credentials}"
-    url = "/api/auth/token/" if channel == "basic" else "/api/auth/long-token/"
-    data = {"email": email, "password": password}
-    if channel == "jwt-json":
-        return client.post(
-            url, json.dumps(data), content_type="application/json", **extra
-        )
-    return client.post(url, data, **extra)
+def password_request(client, email, password, ip="192.0.2.1", **extra):
+    return client.post(
+        reverse("account_login"),
+        {"login": email, "password": password},
+        REMOTE_ADDR=ip,
+        **extra,
+    )
 
 
-def is_locked_out_response(channel, response) -> bool:
-    if channel == "web":
-        content = response.content.decode()
-        return (
-            response.status_code == 200
-            and str(LOCKOUT_MESSAGE) in content
-            and 'id="login-form"' not in content
-        )
-    return response.status_code == 429 and "ORCID" in response.json()["detail"]
+def is_locked_out_response(response) -> bool:
+    content = response.content.decode()
+    return (
+        response.status_code == 200
+        and str(LOCKOUT_MESSAGE) in content
+        and 'id="login-form"' not in content
+        and reverse("orcid_login") in content
+    )
 
 
-def is_failure_response(channel, response) -> bool:
-    if channel == "web":
-        return (
-            response.status_code == 200
-            and 'id="login-form"' in response.content.decode()
-        )
-    return response.status_code == 401
+def is_failure_response(response) -> bool:
+    return (
+        response.status_code == 200 and 'id="login-form"' in response.content.decode()
+    )
 
 
-def is_success_response(channel, response) -> bool:
-    return response.status_code == (302 if channel == "web" else 200)
+def is_success_response(response) -> bool:
+    return response.status_code == 302
 
 
-def fail(client, user, times, channel="jwt-json"):
+def fail(client, user, times):
     for _ in range(times):
-        assert is_failure_response(
-            channel, password_request(client, channel, user.email, "wrong-password")
-        )
+        assert is_failure_response(password_request(client, user.email, "wrong"))
 
 
-@pytest.mark.parametrize("channel", CHANNELS)
-def test_fifth_password_failure_locks_every_channel(client, user, channel):
-    fail(client, user, 4, channel)
-    response = password_request(client, channel, user.email, "wrong-password")
-    assert is_locked_out_response(channel, response)
-    if channel == "web":
-        assert reverse("orcid_login") in response.content.decode()
-    for target in CHANNELS:
-        with patch.object(
-            User, "check_password", side_effect=AssertionError("blocked")
-        ):
-            response = password_request(
-                client, target, user.email, PASSWORD, "192.0.2.99"
-            )
-        assert is_locked_out_response(target, response)
+def test_fifth_password_failure_locks_password_sign_in(client, user):
+    fail(client, user, 4)
+    assert is_locked_out_response(password_request(client, user.email, "wrong"))
+    with patch.object(User, "check_password", side_effect=AssertionError("blocked")):
+        response = password_request(Client(), user.email, PASSWORD, "192.0.2.99")
+    assert is_locked_out_response(response)
     assert not auth.get_user(client).is_authenticated
 
 
 def test_shared_counter_normalizes_email_across_ips_and_user_agents(client, user):
-    for index, channel in enumerate(CHANNELS):
+    for index in range(5):
         response = password_request(
-            client,
-            channel,
+            Client(),
             user.email.upper() if index % 2 else user.email,
-            "wrong-password",
+            "wrong",
             f"192.0.2.{index + 1}",
             HTTP_USER_AGENT=f"browser-{index}",
         )
-        if index < 4:
-            assert is_failure_response(channel, response)
-    assert is_locked_out_response(channel, response)
+    assert is_locked_out_response(response)
     assert is_locked_out_response(
-        "basic", password_request(client, "basic", user.email.upper(), PASSWORD)
+        password_request(client, user.email.upper(), PASSWORD)
     )
 
 
-@pytest.mark.parametrize("channel", CHANNELS)
-def test_successful_password_authentication_resets_shared_failures(
-    client, user, channel
-):
+def test_successful_password_sign_in_resets_failures(client, user):
     fail(client, user, 4)
-    response = password_request(client, channel, user.email.upper(), PASSWORD)
-    assert is_success_response(channel, response)
+    assert is_success_response(password_request(client, user.email.upper(), PASSWORD))
     fail(Client(), user, 4)
-    assert is_success_response(
-        "jwt-json", password_request(Client(), "jwt-json", user.email, PASSWORD)
-    )
+    assert is_success_response(password_request(Client(), user.email, PASSWORD))
 
 
 def test_lockout_lasts_fifteen_minutes_from_the_fifth_failure(client, user, clock):
-    for channel in CHANNELS:
-        response = password_request(client, channel, user.email, "wrong-password")
+    for _ in range(5):
+        response = password_request(client, user.email, "wrong")
         clock.advance(minutes=1)
-    assert is_locked_out_response(channel, response)
+    assert is_locked_out_response(response)
     clock.advance(minutes=13, seconds=59)
     # Both correct and incorrect credentials must leave the deadline intact.
-    assert is_locked_out_response(
-        "basic", password_request(client, "basic", user.email, PASSWORD)
-    )
-    assert is_locked_out_response(
-        "jwt-json", password_request(client, "jwt-json", user.email, "wrong-password")
-    )
+    assert is_locked_out_response(password_request(client, user.email, PASSWORD))
+    assert is_locked_out_response(password_request(client, user.email, "wrong"))
     clock.advance(seconds=2)
-    assert is_success_response(
-        "jwt-json", password_request(client, "jwt-json", user.email, PASSWORD)
-    )
+    assert is_success_response(password_request(client, user.email, PASSWORD))
 
 
 def test_failures_older_than_fifteen_minutes_are_not_counted(client, user, clock):
     fail(client, user, 4)
     clock.advance(minutes=15, seconds=1)
     fail(client, user, 4)
-    assert is_success_response(
-        "jwt-json", password_request(client, "jwt-json", user.email, PASSWORD)
-    )
+    assert is_success_response(password_request(client, user.email, PASSWORD))
 
 
 def test_lockout_does_not_affect_another_account_on_the_same_ip(client, user):
-    for _ in range(5):
-        password_request(client, "basic", user.email, "wrong-password")
+    fail(client, user, 4)
+    password_request(client, user.email, "wrong")
     other = User.objects.create_user(
         email="other@example.com", password=PASSWORD, is_staff=True
     )
-    assert is_success_response(
-        "jwt-json", password_request(client, "jwt-json", other.email, PASSWORD)
-    )
-    assert is_locked_out_response(
-        "jwt-json", password_request(client, "jwt-json", user.email, PASSWORD)
-    )
-
-
-def test_missing_credentials_and_bad_basic_headers_do_not_count(client, user):
-    for _ in range(6):
-        assert client.post("/api/auth/long-token/", {}).status_code == 400
-        assert (
-            client.post(
-                "/api/auth/token/", HTTP_AUTHORIZATION="Basic invalid"
-            ).status_code
-            == 401
-        )
-    assert is_success_response(
-        "jwt-json", password_request(client, "jwt-json", user.email, PASSWORD)
-    )
+    assert is_success_response(password_request(Client(), other.email, PASSWORD))
+    assert is_locked_out_response(password_request(Client(), user.email, PASSWORD))
 
 
 def test_existing_session_and_refresh_remain_usable_during_lockout(client, user):
-    refresh = EuphroRefreshToken.for_user(user)
+    refresh = EuphroRefreshToken.for_user(user, mfa=False)
     client.force_login(user)
     other_client = Client()
-    for _ in range(5):
-        password_request(other_client, "basic", user.email, "wrong-password")
+    fail(other_client, user, 4)
+    password_request(other_client, user.email, "wrong")
     assert client.post("/api/auth/token/").status_code == 200
     assert (
         other_client.post(
@@ -232,22 +170,18 @@ def test_existing_session_and_refresh_remain_usable_during_lockout(client, user)
         ).status_code
         == 200
     )
-    assert is_locked_out_response(
-        "basic", password_request(Client(), "basic", user.email, PASSWORD)
-    )
+    assert is_locked_out_response(password_request(Client(), user.email, PASSWORD))
 
 
 def test_orcid_still_authenticates_locked_account_without_resetting_password_limit(
     client, user
 ):
-    for _ in range(5):
-        password_request(client, "web", user.email, "wrong-password")
+    fail(client, user, 4)
+    password_request(client, user.email, "wrong")
     uid = "0000-0002-1234-5678"
     SocialAccount.objects.create(user=user, provider="orcid", uid=uid)
     assert start_orcid_login(client).status_code == 302
     response = orcid_callback(client, uid)
     assert response.status_code == 302
     assert auth.get_user(client).pk == user.pk
-    assert is_locked_out_response(
-        "basic", password_request(Client(), "basic", user.email, PASSWORD)
-    )
+    assert is_locked_out_response(password_request(Client(), user.email, PASSWORD))

@@ -1,4 +1,4 @@
-"""Password lockout shared by every password channel, keyed by lowercased email.
+"""Password lockout of the sign-in page, keyed by lowercased email.
 
 Built on allauth's rate limits (ACCOUNT_RATE_LIMITS):
 
