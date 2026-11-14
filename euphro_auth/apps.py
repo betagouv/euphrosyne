@@ -11,6 +11,7 @@ class EuphroAuthConfig(AppConfig):
         # pylint: disable=import-outside-toplevel,unused-import
         from allauth.mfa.signals import authenticator_used
 
+        from . import checks  # noqa: F401  # registers the system checks
         from .email_addresses import remove_stale_email_addresses
         from .jwt import schema  # noqa: F401  # registers the OpenAPI extension
         from .mfa.conf import warn_if_mfa_disabled

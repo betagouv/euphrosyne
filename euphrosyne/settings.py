@@ -412,6 +412,10 @@ AUTH_USER_MODEL = "euphro_auth.User"
 # administrators. Only an explicit MFA_ADMIN_REQUIRED=0/false/no/off disables
 # it, for a rollback; any other value, including an empty one, keeps it on.
 MFA_ADMIN_REQUIRED = parse_mfa_admin_required(os.getenv("MFA_ADMIN_REQUIRED"))
+# TOTP secrets are encrypted at rest (euphro_auth.mfa.adapter). Comma-separated
+# Fernet keys: the first encrypts, all decrypt. Required (system check).
+MFA_ADAPTER = "euphro_auth.mfa.adapter.MFAAdapter"
+MFA_TOTP_ENCRYPTION_KEYS = _split_values(os.getenv("MFA_TOTP_ENCRYPTION_KEYS", ""))
 # No recovery codes: a superuser resets a lost factor. WebAuthn comes later.
 MFA_SUPPORTED_TYPES = ["totp"]
 MFA_TOTP_ISSUER = "Euphrosyne"
