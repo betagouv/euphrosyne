@@ -8,9 +8,10 @@ from ..jwt import tokens
 class TestJWTToken(TestCase):
     def test_refresh_token_for_user(self):
         project = lab_factories.ProjectWithLeaderFactory()
-        token = tokens.EuphroRefreshToken.for_user(project.leader.user)
+        token = tokens.EuphroRefreshToken.for_user(project.leader.user, mfa=False)
         assert token.payload["user_id"] == project.leader.user.id
         assert token.payload["is_admin"] is False
+        assert token.payload["mfa"] is False
         assert token.payload["projects"] == [
             {"id": project.id, "slug": project.slug, "name": project.name}
         ]

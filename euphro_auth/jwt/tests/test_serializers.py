@@ -1,3 +1,4 @@
+from django.contrib.sessions.backends.db import SessionStore
 from django.middleware.csrf import get_token
 from django.test import RequestFactory, TestCase
 from rest_framework_simplejwt.state import token_backend
@@ -14,6 +15,7 @@ class TestSerializers(TestCase):
         request = RequestFactory().post("/api/auth/token/")
         request.COOKIES["csrftoken"] = get_token(request)
         request.user = participation.user
+        request.session = SessionStore()
         serializer = SessionTokenObtainSerializer()
         serializer.context["request"] = request
 
