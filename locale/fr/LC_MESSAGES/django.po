@@ -521,6 +521,13 @@ msgstr ""
 "Nous avons bien reçu votre demande de données. Un membre de l'équipe "
 "%(facility_name)s la traitera dès que possible."
 
+msgid ""
+"Password sign-in is blocked for 15 minutes after too many failed attempts. "
+"You can still log in with ORCID."
+msgstr ""
+"La connexion par mot de passe est bloquée pendant 15 minutes après trop de "
+"tentatives infructueuses. Vous pouvez toujours vous connecter avec ORCID."
+
 msgid "Related project"
 msgstr "Projet apparenté"
 
@@ -695,13 +702,6 @@ msgstr "Invitation utilisateur"
 
 msgid "User invitations"
 msgstr "Invitations utilisateur"
-
-msgid ""
-"Password sign-in is blocked for 15 minutes after too many failed attempts. "
-"You can still log in with ORCID."
-msgstr ""
-"La connexion par mot de passe est bloquée pendant 15 minutes après trop de "
-"tentatives infructueuses. Vous pouvez toujours vous connecter avec ORCID."
 
 #, python-format
 msgid ""
