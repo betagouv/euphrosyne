@@ -72,9 +72,7 @@ class TestUserTokenRegistrationView(TestCase):
     def test_orcid_registration_uses_post_form(self):
         preresponse = self.client.get(self.view_url)
         response = self.client.get(preresponse.headers["Location"])
-        self.assertContains(
-            response,
-            '<button class="orcid-link" type="submit" name="provider" value="orcid">',
-        )
+        self.assertContains(response, f'action="{reverse("orcid_login")}"')
+        self.assertContains(response, 'name="process" value="login"')
         self.assertContains(response, 'name="csrfmiddlewaretoken"')
         self.assertNotContains(response, 'name="user_id"')

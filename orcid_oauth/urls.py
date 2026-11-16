@@ -19,7 +19,7 @@ urlpatterns = [
         name="socialaccount_login_error",
     ),
     path(
-        "registration/orcid/verify/<token>",
+        "registration/orcid/complete/",
         UserCompleteAccountView.as_view(),
         name="complete_registration_orcid",
     ),

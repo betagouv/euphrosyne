@@ -1,8 +1,5 @@
 from typing import Any, Dict
-from urllib.parse import parse_qs, urlsplit
 
-from allauth.socialaccount.adapter import get_adapter as get_socialaccount_adapter
-from allauth.socialaccount.providers.base import AuthProcess
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import SetPasswordForm
@@ -10,17 +7,14 @@ from django.contrib.auth.views import (
     INTERNAL_RESET_SESSION_TOKEN,
     PasswordResetConfirmView,
 )
-from django.http import HttpRequest
-from django.http.response import HttpResponse, HttpResponseBase, HttpResponseRedirect
+from django.http.response import HttpResponse, HttpResponseBase
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from orcid_oauth.invitations import (
-    INVITATION_SESSION_KEY,
     clear_invitation,
-    reject_invitation,
     store_invitation,
     validated_invitation_user,
 )
@@ -52,24 +46,6 @@ class UserTokenRegistrationView(PasswordResetConfirmView):
         ):
             clear_invitation(request)
         return super().dispatch(*args, **kwargs)
-
-    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if request.POST.get("provider") != "orcid":
-            return super().post(request, *args, **kwargs)
-        target = validated_invitation_user(request)
-        if target is None or self.user is None or target.pk != self.user.pk:
-            return reject_invitation(request)
-        # Django's invitation dispatch has already validated this page's token.
-        # Let allauth create the OAuth state and bind its attempt to that target.
-        provider = get_socialaccount_adapter(request).get_provider(request, "orcid")
-        response = provider.redirect(request, AuthProcess.LOGIN)
-        if not isinstance(response, HttpResponseRedirect):
-            return response
-        request.session[INVITATION_SESSION_KEY] = {
-            **request.session[INVITATION_SESSION_KEY],
-            "oauth_state": parse_qs(urlsplit(response.url).query)["state"][0],
-        }
-        return response
 
     def get_initial(self) -> Dict[str, Any]:
         initial = super().get_initial()
