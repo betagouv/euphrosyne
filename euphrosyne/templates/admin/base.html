@@ -3,6 +3,10 @@
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
 <head>
 <title>{% block title %}{% endblock %}</title>
+<link rel="apple-touch-icon" href="{% static "favicon/apple-touch-icon.png" %}"><!-- 180×180 -->
+<link rel="icon" href="{% static "favicon/favicon.svg" %}" type="image/svg+xml">
+<link rel="shortcut icon" href="{% static "favicon/favicon.ico" %}" type="image/x-icon"><!-- 32×32 -->
+<link rel="manifest" href="{% static "favicon/manifest.webmanifest" %}" crossorigin="use-credentials">
 <link rel="stylesheet" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}">
 {% if user.is_authenticated %}
 <link rel="stylesheet" type="text/css" href="{% static "main.css"%}"></link>
