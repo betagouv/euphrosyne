@@ -1,3 +1,18 @@
 python manage.py migrate
- DJANGO_SUPERUSER_PASSWORD=$(openssl rand -base64 64) python manage.py createsuperuser --email maxime.cattet@beta.gouv.fr --noinput || true
- DJANGO_SUPERUSER_PASSWORD=$(openssl rand -base64 64) python manage.py createsuperuser --email witold.wroblewski@beta.gouv.fr --noinput || true
+
+# Create a default superuser with a random password. Accounts are then reached
+# through "Mot de passe oublié ?". The suffix guarantees one character of each
+# class required by euphro_auth.password_validation.CharacterTypesValidator.
+create_superuser() {
+  if output=$(DJANGO_SUPERUSER_PASSWORD="$(openssl rand -base64 48)aA1-" \
+    python manage.py createsuperuser --email "$1" --noinput 2>&1); then
+    echo "$output"
+  elif echo "$output" | grep -q "already taken"; then
+    echo "Superuser $1 already exists, skipping."
+  else
+    echo "$output" >&2
+    echo "ERROR: could not create superuser $1" >&2
+  fi
+}
+
+create_superuser witold.wroblewski@beta.gouv.fr
