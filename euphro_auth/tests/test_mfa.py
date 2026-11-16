@@ -108,6 +108,23 @@ def test_admin_without_factor_must_enroll_after_password_login(client, admin_use
     assert response.context["form"].secret in response.content.decode()
 
 
+def test_enrollment_keeps_the_secret_shown_when_the_page_is_requested_again(
+    client, admin_user
+):
+    password_login(client, admin_user)
+    secret = client.get(ACTIVATE_URL).context["form"].secret
+    # The browser's favicon request is redirected to the enrollment page.
+    assert_mfa_gate(client, "/favicon.ico", ACTIVATE_URL)
+    assert client.get(f"{ACTIVATE_URL}?next=/favicon.ico").context["form"].secret == (
+        secret
+    )
+
+    response = client.post(ACTIVATE_URL, {"code": totp_code(secret)})
+
+    assert response.status_code == 302
+    assert Authenticator.objects.filter(user=admin_user, type="totp").exists()
+
+
 @pytest.mark.parametrize("path", [PROJECTS_URL, "/", "/accounts/2fa/"])
 def test_unverified_admin_pages_redirect_to_the_mfa_step(client, admin_user, path):
     client.force_login(admin_user)
