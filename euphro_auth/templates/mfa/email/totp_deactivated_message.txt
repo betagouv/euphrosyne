@@ -1,0 +1,4 @@
+{% extends "account/email/base_notification.txt" %}
+{% load i18n %}
+
+{% block notification_message %}{% blocktrans trimmed %}The authenticator application of your Euphrosyne account ({{ email }}) has just been removed.{% endblocktrans %}{% endblock notification_message %}

@@ -1,5 +1,6 @@
 import logging
 
+from allauth.account.decorators import reauthentication_required
 from allauth.mfa.base import views as base_views
 from allauth.mfa.totp import views as totp_views
 from allauth.mfa.totp.internal import flows as totp_flows
@@ -7,10 +8,10 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.http.response import HttpResponseBase
 from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
 
 from lab.permissions import is_lab_admin
 
-from ..emails import send_mfa_enrolled_email
 from . import services
 
 logger = logging.getLogger(__name__)
@@ -53,7 +54,6 @@ class ActivateTOTPView(totp_views.ActivateTOTPView):
         authenticator, _ = totp_flows.activate_totp(self.request, form)
         services.mark_enrollment_verified(self.request, authenticator)
         logger.info("MFA TOTP enrolled for user %s", self.request.user.pk)
-        send_mfa_enrolled_email(self.request.user)
         return redirect("/")
 
 
@@ -62,8 +62,17 @@ class DeactivateTOTPView(totp_views.DeactivateTOTPView):
         _check_mfa_user(request, changes_factor=True)
         return super().dispatch(request, *args, **kwargs)
 
+    # Removing the factor needs a fresh code or password, even within a verified
+    # session. Enrollment does not (MFA_REAUTHENTICATION_REQUIRED is off): it
+    # follows sign-in, and ORCID accounts have no password to give.
+    @method_decorator(reauthentication_required)
+    def _dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponseBase:
+        return super()._dispatch(request, *args, **kwargs)
+
     def form_valid(self, form) -> HttpResponse:
         totp_flows.deactivate_totp(self.request, self.authenticator)
+        services.end_sessions(self.request.user, keep=self.request.session.session_key)
+        services.forget_verification(self.request)
         logger.warning("MFA TOTP removed by user %s", self.request.user.pk)
         # An administrator sets up a new factor straight away.
         if services.is_mfa_required(self.request.user):

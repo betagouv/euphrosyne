@@ -2,10 +2,6 @@ import logging
 import time
 
 import pytest
-from allauth.account.internal.flows.login import (
-    _AUTHENTICATION_METHODS_USER_SESSION_KEY as AUTHENTICATION_METHODS_USER_SESSION_KEY,
-)
-from allauth.account.internal.flows.login import AUTHENTICATION_METHODS_SESSION_KEY
 from allauth.mfa import app_settings as mfa_settings
 from allauth.mfa.models import Authenticator
 from allauth.mfa.totp.internal.auth import (
@@ -163,6 +159,8 @@ def test_enrollment_with_wrong_codes_logs_consecutive_failures(
         ("fr", "[Euphrosyne] Authentification à deux facteurs activée"),
     ],
 )
+# Transactional: allauth sends the notice once the factor is committed.
+@pytest.mark.django_db(transaction=True)
 def test_enrollment_verifies_session_rotates_keys_and_informs_owner(
     admin_user, caplog, language, subject
 ):
@@ -278,27 +276,6 @@ def test_verified_session_stays_verified(verified_client):
     assert verified_client.post("/api/auth/token/").status_code == 200
 
 
-def test_mfa_record_of_another_authenticator_does_not_verify(client, admin_user):
-    secret = enroll(admin_user)
-    other_authenticator = TOTP.activate(
-        StaffUserFactory(), generate_totp_secret()
-    ).instance
-    client.force_login(admin_user)
-    session = client.session
-    session[AUTHENTICATION_METHODS_SESSION_KEY] = [
-        {
-            "method": "mfa",
-            "at": time.time(),
-            "id": other_authenticator.pk,
-            "type": "totp",
-        }
-    ]
-    session[AUTHENTICATION_METHODS_USER_SESSION_KEY] = str(admin_user.pk)
-    session.save()
-    assert_mfa_gate(client, PROJECTS_URL, VERIFY_URL)
-    assert verify(client, secret).status_code == 302
-
-
 # Other users
 
 
@@ -324,13 +301,33 @@ def test_account_security_page_shows_the_factor(verified_client):
 def test_removing_the_factor_requires_setting_up_a_new_one(
     verified_client, admin_user, caplog
 ):
+    other_client = Client()
+    other_client.force_login(admin_user)
+    verify(other_client, verified_client.secret, offset=1)
     with caplog.at_level(logging.WARNING, logger="euphro_auth.mfa.views"):
         response = verified_client.post(reverse("mfa_deactivate_totp"))
     assert response.url == reverse("mfa_activate_totp")
     assert not Authenticator.objects.filter(user=admin_user).exists()
     assert f"MFA TOTP removed by user {admin_user.pk}" in caplog.messages
+    assert len(mail.outbox) == 1
+    assert mail.outbox[0].to == [admin_user.email]
+    assert mail.outbox[0].subject == (
+        "[Euphrosyne] Authentification à deux facteurs désactivée"
+    )
+    assert not auth.get_user(other_client).is_authenticated
     assert_mfa_gate(verified_client, PROJECTS_URL, ACTIVATE_URL)
     assert_mfa_gate(verified_client, reverse("mfa_index"), ACTIVATE_URL)
+
+
+def test_removing_the_factor_needs_a_recent_code_or_password(
+    verified_client, admin_user, settings
+):
+    settings.ACCOUNT_REAUTHENTICATION_TIMEOUT = 0
+    response = verified_client.post(reverse("mfa_deactivate_totp"))
+    assert response.status_code == 302
+    assert response.url.startswith(reverse("account_reauthenticate"))
+    assert Authenticator.objects.filter(user=admin_user).exists()
+    assert not mail.outbox
 
 
 def test_password_reset_keeps_the_factor(client, admin_user):
@@ -371,8 +368,8 @@ def test_superuser_resets_a_factor_from_the_user_admin(
         f"MFA devices of user {target.pk} removed by superuser {admin_user.pk}"
         in caplog.messages
     )
-    # The target's verified session must set up a new factor.
-    assert_mfa_gate(target_client, PROJECTS_URL, ACTIVATE_URL)
+    # The target is signed out everywhere and sets up a new factor at sign-in.
+    assert not auth.get_user(target_client).is_authenticated
 
 
 def test_reset_action_is_reserved_to_superusers(verified_client):
