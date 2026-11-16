@@ -23,6 +23,40 @@ class TestAdmin(TestCase):
         self.assertContains(response, '<button class="button" type="submit">')
         self.assertContains(response, "ORCID")
 
+    @override_settings(
+        STORAGES={
+            "default": {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            },
+            "staticfiles": {
+                "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            },
+        }
+    )
+    def test_pages_declare_dsfr_favicon(self):
+        response = self.client.get(reverse("admin:login"))
+
+        self.assertContains(
+            response,
+            '<link rel="icon" href="/static/favicon/favicon.svg" '
+            'type="image/svg+xml">',
+        )
+        self.assertContains(
+            response,
+            '<link rel="shortcut icon" href="/static/favicon/favicon.ico" '
+            'type="image/x-icon">',
+        )
+        self.assertContains(
+            response,
+            '<link rel="apple-touch-icon" '
+            'href="/static/favicon/apple-touch-icon.png">',
+        )
+        self.assertContains(
+            response,
+            '<link rel="manifest" href="/static/favicon/manifest.webmanifest" '
+            'crossorigin="use-credentials">',
+        )
+
     def test_orcid_begin_rejects_get(self):
         response = self.client.get(reverse("social:begin", args=("orcid",)))
 
