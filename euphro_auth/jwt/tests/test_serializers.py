@@ -5,23 +5,22 @@ from rest_framework_simplejwt.state import token_backend
 
 from lab.tests.factories import ParticipationFactory
 
-from ..serializers import SessionTokenObtainSerializer
+from ..serializers import SessionAccessTokenSerializer
 
 
 class TestSerializers(TestCase):
     @staticmethod
-    def test_validate_return_tokens():
+    def test_validate_returns_an_access_token():
         participation = ParticipationFactory()
         request = RequestFactory().post("/api/auth/token/")
         request.COOKIES["csrftoken"] = get_token(request)
         request.user = participation.user
         request.session = SessionStore()
-        serializer = SessionTokenObtainSerializer()
+        serializer = SessionAccessTokenSerializer()
         serializer.context["request"] = request
 
         data = serializer.validate(None)
-        assert "refresh" in data
-        assert "access" in data
+        assert set(data) == {"access"}
         decoded_token = token_backend.decode(data["access"])
         assert "projects" in decoded_token
         assert decoded_token["projects"][0]["id"] == participation.project.id

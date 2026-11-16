@@ -1,12 +1,12 @@
 from django.urls import path
 
-from .jwt.api_views import MFAEnforcingTokenRefreshView, SessionTokenObtainPairView
+from .jwt.api_views import MFAEnforcingTokenRefreshView, SessionAccessTokenView
 
 urlpatterns = [
     path(
         "token/",
-        SessionTokenObtainPairView.as_view(),
-        name="token_obtain_pair",
+        SessionAccessTokenView.as_view(),
+        name="token_obtain",
     ),
     path(
         "token/refresh/", MFAEnforcingTokenRefreshView.as_view(), name="token_refresh"

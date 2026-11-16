@@ -1,4 +1,4 @@
-import { getToken, getAccessToken, jwtFetch } from "./jwt";
+import { getToken, jwtFetch } from "./jwt";
 
 export type ToolsFetch = (
   input: string | URL | globalThis.Request,
@@ -43,7 +43,7 @@ export default async function euphrosyneToolsFetch(
     headers: {
       "Content-Type": "application/json",
       ...init?.headers,
-      Authorization: `Bearer ${getAccessToken()}`,
+      Authorization: `Bearer ${await getToken()}`,
     },
   });
 }

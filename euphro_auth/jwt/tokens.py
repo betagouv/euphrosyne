@@ -1,4 +1,4 @@
-import datetime
+from datetime import timedelta
 
 from django.conf import settings
 from rest_framework_simplejwt.settings import api_settings as rf_simplejwt_api_settings
@@ -7,10 +7,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from lab.permissions import is_lab_admin
 
 from ..models import User
-
-# Validity of the refresh token pasted into Herma. One day on purpose: the
-# token is issued after a full sign-in, second factor included.
-HERMA_TOKEN_LIFETIME = datetime.timedelta(days=1)
 
 
 class EuphroRefreshToken(RefreshToken):
@@ -32,6 +28,14 @@ class EuphroRefreshToken(RefreshToken):
         # because https://github.com/jazzband/djangorestframework-simplejwt/pull/887
         token["user_id"] = int(token["user_id"])
         return token
+
+
+class HermaRefreshToken(EuphroRefreshToken):
+    """Refresh token pasted into Herma, the administrators' upload application.
+    Its one-day validity is chosen for Herma, independently of the default
+    refresh token lifetime."""
+
+    lifetime = timedelta(days=1)
 
 
 class EuphroToolsAPIToken(RefreshToken):
