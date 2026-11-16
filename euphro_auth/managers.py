@@ -20,6 +20,15 @@ class UserManagerQuerySet(models.QuerySet):
 class UserManager(BaseUserManager):
     """Custom user model manager with email as identifier and no deletion."""
 
+    @classmethod
+    def normalize_email(cls, email):
+        # allauth matches emails case-insensitively: store them in lowercase.
+        return super().normalize_email(email).lower()
+
+    def get_by_natural_key(self, username):
+        # Emails are stored in lowercase: find them whatever the case given.
+        return super().get_by_natural_key(self.normalize_email(username))
+
     def create_user(self, email, password, **extra_fields):
         if not email:
             raise ValueError(_("The Email must be set"))
