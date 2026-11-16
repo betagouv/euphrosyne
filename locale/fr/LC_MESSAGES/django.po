@@ -1764,6 +1764,15 @@ msgstr ""
 msgid "ORCID sign-in failed. Please try again."
 msgstr "La connexion avec ORCID a échoué. Veuillez réessayer."
 
+msgid "ORCID sign-in was cancelled."
+msgstr "La connexion avec ORCID a été annulée."
+
+msgid "Back to sign-in"
+msgstr "Retour à la connexion"
+
+msgid "You must complete your account information to continue."
+msgstr "Vous devez compléter les informations de votre compte pour continuer."
+
 msgid ""
 "Your ORCID registration invitation is invalid or has expired. Please reopen "
 "a valid invitation link."

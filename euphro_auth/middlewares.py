@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from lab.participations.gate import get_required_employer_completion_url
+from orcid_oauth.views import is_completion_required
 
 from .mfa import services as mfa_services
 from .models import User
@@ -82,8 +83,9 @@ class AccountGatesMiddleware:
     """Steps a signed-in session must complete, in this order:
 
     1. second factor, for administrators (euphro_auth.mfa);
-    2. acceptance of the latest CGU;
-    3. employer information, for the projects that require it.
+    2. account information, for invited users who signed in with ORCID;
+    3. acceptance of the latest CGU;
+    4. employer information, for the projects that require it.
 
     Pages are redirected to the step; API calls get a JSON 403 with
     ``detail``, ``code`` and ``redirect_url``. Only the session user is
@@ -112,8 +114,10 @@ class AccountGatesMiddleware:
             if view_name in MFA_ALLOWED:
                 return None
             return self._mfa_gate(request).response(request)
-        gate = self._cgu_gate(request, view_name) or self._employer_gate(
-            request, view_kwargs
+        gate = (
+            self._completion_gate(request, view_name)
+            or self._cgu_gate(request, view_name)
+            or self._employer_gate(request, view_kwargs)
         )
         return gate.response(request) if gate else None
 
@@ -125,6 +129,19 @@ class AccountGatesMiddleware:
             code="mfa_required",
             detail=_("Multi-factor authentication is required."),
             redirect_url=mfa_services.get_mfa_url(user, next_url),
+        )
+
+    @staticmethod
+    def _completion_gate(request: HttpRequest, view_name: str | None) -> Gate | None:
+        user = cast(User, request.user)
+        if view_name == "complete_registration_orcid" or not is_completion_required(
+            user
+        ):
+            return None
+        return Gate(
+            code="account_completion_required",
+            detail=_("You must complete your account information to continue."),
+            redirect_url=reverse("complete_registration_orcid"),
         )
 
     @staticmethod

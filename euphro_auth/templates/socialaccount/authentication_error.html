@@ -1,0 +1,12 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n %}
+
+{% block head_title %}{% translate "Log in" %}{% endblock head_title %}
+
+{% block content %}
+  <div id="content-main">
+    <h3>{% translate "Log in" %}</h3>
+    <p class="fr-mt-4w">{% translate "ORCID sign-in failed. Please try again." %}</p>
+    <p><a class="fr-link" href="{% url "account_login" %}">{% translate "Back to sign-in" %}</a></p>
+  </div>
+{% endblock content %}
