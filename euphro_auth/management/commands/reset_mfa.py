@@ -18,9 +18,9 @@ class Command(BaseCommand):
         parser.add_argument("email", help="Email address of the user")
 
     def handle(self, *args, **options):
-        email = options["email"].strip()
+        email = User.objects.normalize_email(options["email"])
         try:
-            user = User.objects.get(email__iexact=email)
+            user = User.objects.get(email=email)
         except User.DoesNotExist as error:
             raise CommandError(f"No user with email {email}.") from error
 

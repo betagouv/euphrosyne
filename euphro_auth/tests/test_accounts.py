@@ -121,6 +121,22 @@ def test_replaced_email_address_no_longer_signs_in(client, user):
     assert not mail.outbox
 
 
+def test_saves_keeping_the_email_do_not_touch_email_addresses(
+    user, django_assert_num_queries
+):
+    EmailAddress.objects.create(user=user, email="old@example.com")
+    auth.models.update_last_login(None, user)
+    user.first_name = "Jane"
+    with django_assert_num_queries(1):
+        user.save()
+    User.objects.get(pk=user.pk).save()
+    assert EmailAddress.objects.filter(email="old@example.com").exists()
+
+    user.email = "renamed@example.com"
+    user.save()
+    assert not EmailAddress.objects.filter(email="old@example.com").exists()
+
+
 def test_logout_url_signs_out_and_returns_to_login(client, user):
     client.force_login(user)
     response = client.post(f"{reverse('admin:logout')}?next=/login/")
