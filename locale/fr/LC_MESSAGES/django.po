@@ -856,6 +856,9 @@ msgstr "Administration"
 msgid "Account security"
 msgstr "Sécurité du compte"
 
+msgid "Manage two-factor authentication"
+msgstr "Gérer l'authentification à deux facteurs"
+
 msgid "Proton"
 msgstr "Proton"
 

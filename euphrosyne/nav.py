@@ -48,16 +48,6 @@ def get_nav_items(request: HttpRequest) -> list[NavElementJson]:
 
     admin_nav_items["items"].append(
         {
-            "title": str(_("Account security")),
-            "item": {
-                "href": reverse("mfa_index"),
-                "exactPath": False,
-                "extraPath": [],
-            },
-        }
-    )
-    admin_nav_items["items"].append(
-        {
             "title": str(_("Herma token")),
             "item": {
                 "href": reverse("admin:herma_token"),

@@ -212,7 +212,7 @@ class UserAdmin(DjangoUserAdmin):
         return list_display
 
     def get_readonly_fields(self, request: HttpRequest, obj: Optional[User] = None):
-        fields = ["password_display"]
+        fields = ["password_display", "account_security_display"]
         if apps.is_installed("radiation_protection"):
             fields += ["has_radiation_certification"]
         if request.user.is_superuser:
@@ -224,16 +224,23 @@ class UserAdmin(DjangoUserAdmin):
             "fr-mb-0",
             "fr-pb-1w",
         ]
+        profile_fields: tuple = (
+            ("email", "password_display"),
+            "first_name",
+            "last_name",
+        )
+        if (
+            obj
+            and obj.pk == request.user.pk
+            and mfa_services.is_mfa_required(request.user)
+        ):
+            profile_fields += ("account_security_display",)
         fieldsets = []
         fieldsets += [
             (
                 _("Profile"),
                 {
-                    "fields": (
-                        ("email", "password_display"),
-                        "first_name",
-                        "last_name",
-                    ),
+                    "fields": profile_fields,
                     "classes": [*fieldset_classes],
                 },
             ),
@@ -483,6 +490,14 @@ class UserAdmin(DjangoUserAdmin):
             else _("No password. You can set one using {}.")
         ).format(change_pasword_link)
         return format_html('<div class="help">{}</div>', mark_safe(text))
+
+    @admin.display(description=_("Account security"))
+    def account_security_display(self, obj: User):  # pylint: disable=unused-argument
+        return format_html(
+            '<a href="{}">{}</a>',
+            reverse("mfa_index"),
+            _("Manage two-factor authentication"),
+        )
 
     @admin.display(description=_("Radiation protection"), boolean=True)
     def has_radiation_certification(self, obj: User) -> bool:
