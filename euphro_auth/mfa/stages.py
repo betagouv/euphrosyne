@@ -1,6 +1,6 @@
 from allauth.mfa.stages import AuthenticateStage
 
-from .services import is_mfa_required
+from .services import is_mfa_required, remove_unreadable_factors
 
 
 class AdminAuthenticateStage(AuthenticateStage):
@@ -8,4 +8,7 @@ class AdminAuthenticateStage(AuthenticateStage):
     (administrators, unless MFA_ADMIN_REQUIRED is off)."""
 
     def _should_handle(self, request) -> bool:
-        return is_mfa_required(self.login.user) and super()._should_handle(request)
+        if not is_mfa_required(self.login.user):
+            return False
+        remove_unreadable_factors(self.login.user)
+        return super()._should_handle(request)
