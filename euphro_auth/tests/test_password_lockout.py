@@ -9,9 +9,10 @@ from django.test import Client
 from django.urls import reverse
 from django.utils import timezone
 
+from euphro_auth.adapters import LOCKOUT_MESSAGE
 from euphro_auth.jwt.tokens import EuphroRefreshToken
 from euphro_auth.models import User
-from euphro_auth.password_lockout import LOCKOUT_MESSAGE
+from euphro_auth.tests.test_accounts import NEW_PASSWORD, request_reset, reset_link
 from orcid_oauth.tests.helpers import orcid_callback, start_orcid_login
 
 pytestmark = pytest.mark.django_db
@@ -96,9 +97,8 @@ def fail(client, user, times):
         assert is_failure_response(password_request(client, user.email, "wrong"))
 
 
-def test_fifth_password_failure_locks_password_sign_in(client, user):
-    fail(client, user, 4)
-    assert is_locked_out_response(password_request(client, user.email, "wrong"))
+def test_five_password_failures_lock_password_sign_in(client, user):
+    fail(client, user, 5)
     with patch.object(User, "check_password", side_effect=AssertionError("blocked")):
         response = password_request(Client(), user.email, PASSWORD, "192.0.2.99")
     assert is_locked_out_response(response)
@@ -107,37 +107,41 @@ def test_fifth_password_failure_locks_password_sign_in(client, user):
 
 def test_shared_counter_normalizes_email_across_ips_and_user_agents(client, user):
     for index in range(5):
-        response = password_request(
-            Client(),
-            user.email.upper() if index % 2 else user.email,
-            "wrong",
-            f"192.0.2.{index + 1}",
-            HTTP_USER_AGENT=f"browser-{index}",
+        assert is_failure_response(
+            password_request(
+                Client(),
+                user.email.upper() if index % 2 else user.email,
+                "wrong",
+                f"192.0.2.{index + 1}",
+                HTTP_USER_AGENT=f"browser-{index}",
+            )
         )
-    assert is_locked_out_response(response)
     assert is_locked_out_response(
         password_request(client, user.email.upper(), PASSWORD)
     )
 
 
-def test_successful_password_sign_in_resets_failures(client, user):
-    fail(client, user, 4)
-    assert is_success_response(password_request(client, user.email.upper(), PASSWORD))
-    fail(Client(), user, 4)
-    assert is_success_response(password_request(Client(), user.email, PASSWORD))
-
-
-def test_lockout_lasts_fifteen_minutes_from_the_fifth_failure(client, user, clock):
+def test_lockout_lifts_when_the_oldest_failure_is_fifteen_minutes_old(
+    client, user, clock
+):
     for _ in range(5):
-        response = password_request(client, user.email, "wrong")
+        password_request(client, user.email, "wrong")
         clock.advance(minutes=1)
-    assert is_locked_out_response(response)
-    clock.advance(minutes=13, seconds=59)
-    # Both correct and incorrect credentials must leave the deadline intact.
+    clock.advance(minutes=9, seconds=59)
     assert is_locked_out_response(password_request(client, user.email, PASSWORD))
-    assert is_locked_out_response(password_request(client, user.email, "wrong"))
     clock.advance(seconds=2)
     assert is_success_response(password_request(client, user.email, PASSWORD))
+
+
+def test_password_reset_lifts_the_lockout(client, user):
+    fail(client, user, 5)
+    request_reset(client, user.email)
+    response = client.get(reset_link(), follow=True)
+    client.post(
+        response.redirect_chain[-1][0],
+        {"password1": NEW_PASSWORD, "password2": NEW_PASSWORD},
+    )
+    assert is_success_response(password_request(Client(), user.email, NEW_PASSWORD))
 
 
 def test_failures_older_than_fifteen_minutes_are_not_counted(client, user, clock):
@@ -148,8 +152,7 @@ def test_failures_older_than_fifteen_minutes_are_not_counted(client, user, clock
 
 
 def test_lockout_does_not_affect_another_account_on_the_same_ip(client, user):
-    fail(client, user, 4)
-    password_request(client, user.email, "wrong")
+    fail(client, user, 5)
     other = User.objects.create_user(
         email="other@example.com", password=PASSWORD, is_staff=True
     )
@@ -161,8 +164,7 @@ def test_existing_session_and_refresh_remain_usable_during_lockout(client, user)
     refresh = EuphroRefreshToken.for_user(user, mfa=False)
     client.force_login(user)
     other_client = Client()
-    fail(other_client, user, 4)
-    password_request(other_client, user.email, "wrong")
+    fail(other_client, user, 5)
     assert client.post("/api/auth/token/").status_code == 200
     assert (
         other_client.post(
@@ -176,8 +178,7 @@ def test_existing_session_and_refresh_remain_usable_during_lockout(client, user)
 def test_orcid_still_authenticates_locked_account_without_resetting_password_limit(
     client, user
 ):
-    fail(client, user, 4)
-    password_request(client, user.email, "wrong")
+    fail(client, user, 5)
     uid = "0000-0002-1234-5678"
     SocialAccount.objects.create(user=user, provider="orcid", uid=uid)
     assert start_orcid_login(client).status_code == 302

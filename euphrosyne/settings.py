@@ -323,15 +323,14 @@ ACCOUNT_PASSWORD_RESET_TOKEN_GENERATOR = (
 # PASSWORD_RESET_TIMEOUT (3 days).
 PASSWORD_RESET_LINK_TIMEOUT = 60 * 60
 
-# Password lockout: on the 5th failure within 15 minutes for an email
+# Password lockout: after 5 failures within 15 minutes for an email
 # (lowercased, whatever the IP address or user agent), password sign-in is
-# blocked for 15 minutes. See euphro_auth.password_lockout.
+# refused until the oldest failure is 15 minutes old. A password reset lifts it.
 # Per-IP limits are disabled: allauth does not trust X-Forwarded-For by default,
 # so behind the hosting router every client would share one address.
 ACCOUNT_RATE_LIMITS = {
     "login": None,
     "login_failed": "5/15m/key",
-    "login_lockout": "1/15m/key",
     "reset_password": "5/m/key",
     "reset_password_from_key": None,
     "signup": None,
