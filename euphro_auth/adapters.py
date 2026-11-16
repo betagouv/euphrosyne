@@ -13,7 +13,6 @@ LOCKOUT_MESSAGE = _(
 )
 
 
-# Phone methods are not used: accounts sign in by email.
 class AccountAdapter(DefaultAccountAdapter):  # pylint: disable=abstract-method
     error_messages = {
         **DefaultAccountAdapter.error_messages,
