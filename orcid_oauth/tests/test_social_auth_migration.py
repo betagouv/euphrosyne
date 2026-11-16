@@ -33,7 +33,7 @@ def social_auth_table_fixture():
         )
     yield
     with connection.cursor() as cursor:
-        cursor.execute("DROP TABLE social_auth_usersocialauth")
+        cursor.execute("DROP TABLE IF EXISTS social_auth_usersocialauth")
 
 
 def insert_social_auth(user, provider, uid, extra_data, created):
@@ -110,3 +110,35 @@ def test_conflicting_link_stops_the_migration():
 def test_missing_social_auth_table_is_a_no_op():
     run_migration()
     assert not SocialAccount.objects.exists()
+
+
+drop_migration = importlib.import_module(
+    "orcid_oauth.migrations.0002_drop_social_auth_tables"
+)
+
+
+def run_drop_migration():
+    with connection.cursor() as cursor:
+        for statement in drop_migration.Migration.operations[0].sql:
+            cursor.execute(statement)
+
+
+@pytest.mark.usefixtures("social_auth_table")
+def test_social_auth_tables_and_migration_history_are_dropped():
+    with connection.cursor() as cursor:
+        for table in drop_migration.SOCIAL_AUTH_TABLES[1:]:
+            cursor.execute(f"CREATE TABLE {table} (id serial PRIMARY KEY)")
+        cursor.execute(
+            "INSERT INTO django_migrations (app, name, applied) "
+            "VALUES ('social_django', '0001_initial', now())"
+        )
+
+    run_drop_migration()
+    run_drop_migration()  # Tables already dropped.
+
+    assert not set(drop_migration.SOCIAL_AUTH_TABLES) & set(
+        connection.introspection.table_names()
+    )
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT 1 FROM django_migrations WHERE app = 'social_django'")
+        assert cursor.fetchone() is None
