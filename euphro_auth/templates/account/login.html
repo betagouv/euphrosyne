@@ -24,9 +24,7 @@
     <form action="{{ login_url }}" method="post" id="login-form">
       {% csrf_token %}
       {% for field in form.visible_fields %}
-      <div class="fr-input-group{% if field.errors %} fr-input-group--error{% endif %}">
-        {{ field.as_field_group }}
-      </div>
+      {% include "euphro_auth/includes/dsfr_field_group.html" with field=field %}
       {% endfor %}
       {{ redirect_field }}
 
