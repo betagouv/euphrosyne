@@ -5,7 +5,6 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import CopyPlugin from "copy-webpack-plugin";
 import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
 import { PurgeCSSPlugin } from "purgecss-webpack-plugin";
 import webpack from "webpack";
@@ -136,12 +135,6 @@ export default {
       SENTRY_ENVIRONMENT: null,
     }),
     new MiniCssExtractPlugin(),
-    new CopyPlugin({
-      patterns: [
-        // DSFR favicon set; the manifest references its icons by relative path.
-        { from: "node_modules/@gouvfr/dsfr/dist/favicon", to: "favicon" },
-      ],
-    }),
     new PurgeCSSPlugin({
       paths: globSync([`{euphrosyne,euphro_auth,lab}/**/*`], {
         nodir: true,

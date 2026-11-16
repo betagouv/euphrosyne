@@ -361,6 +361,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "_static")
 STATICFILES_DIRS = [
     BASE_DIR / "euphrosyne/assets/dist",
     BASE_DIR / "euphrosyne/static",
+    ("favicon", BASE_DIR / "node_modules/@gouvfr/dsfr/dist/favicon"),
 ]
 
 # Default primary key field type
