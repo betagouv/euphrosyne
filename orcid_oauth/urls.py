@@ -14,11 +14,6 @@ urlpatterns = [
         name="socialaccount_login_cancelled",
     ),
     path(
-        "accounts/3rdparty/login/error/",
-        socialaccount_views.login_error,
-        name="socialaccount_login_error",
-    ),
-    path(
         "registration/orcid/complete/",
         UserCompleteAccountView.as_view(),
         name="complete_registration_orcid",
