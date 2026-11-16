@@ -1,23 +1,56 @@
 /**
  * Module used to fetch token from Euprhosyne backend and use it to authenticate
  * to external services (like euphrosyne-tools-api).
+ *
+ * The access token is obtained from the web session and kept in memory only:
+ * no refresh token and no browser storage, so a token never outlives the
+ * session (logout, next user of a shared browser).
  */
 
 import { getCSRFToken } from "../../lab/assets/js/utils.js";
 import { jwtDecode } from "jwt-decode";
 
+// Keys used by previous versions to store tokens in localStorage.
+const LEGACY_STORAGE_KEYS = ["euphrosyne-jwt-access", "euphrosyne-jwt-refresh"];
+
+let accessToken = null;
+
+function removeLegacyTokens() {
+  try {
+    LEGACY_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
+  } catch (e) {
+    console.error("Failed to remove legacy tokens", e);
+  }
+}
+
+removeLegacyTokens();
+
+async function shouldRetryWithNewToken(response) {
+  // 401: token expired or invalid. 403 with `mfa_required`: administrator token
+  // refused (session authentication comes first, so DRF answers 403).
+  if (response.status === 401) {
+    return true;
+  }
+  if (response.status !== 403) {
+    return false;
+  }
+  try {
+    const { code } = await response.clone().json();
+    return code === "mfa_required";
+  } catch {
+    return false;
+  }
+}
+
 export async function jwtFetch(input, init = {}, contentType) {
-  // Same as fetch, but tries to refresh token if status is 401
-  let attemps = 0,
+  // Same as fetch, but retries once with a new token if the token is refused
+  let attempts = 0,
     response;
-  while (attemps <= 1) {
-    if (attemps > 0) {
-      console.info(
-        "Received an unauthorized status code. Trying to refresh auth token.",
-      );
+  while (attempts <= 1) {
+    if (attempts > 0) {
+      console.info("Received a token refusal. Trying with a new auth token.");
     }
-    const shouldRefreshToken = attemps > 0;
-    const token = await getToken(!shouldRefreshToken);
+    const token = await getToken(attempts === 0);
     const headers = new Headers({
       ...init.headers,
       Authorization: `Bearer ${token}`,
@@ -33,59 +66,29 @@ export async function jwtFetch(input, init = {}, contentType) {
       headers,
       ...init,
     });
-    if (response.status !== 401) {
+    if (!(await shouldRetryWithNewToken(response))) {
       return response;
     }
-    attemps += 1;
+    attempts += 1;
   }
   return response;
 }
 
-export async function getToken(checkLocalStorage = true) {
-  if (checkLocalStorage) {
-    const localToken = localStorage.getItem("euphrosyne-jwt-access");
-    if (localToken) {
-      let decoded;
-      try {
-        decoded = jwtDecode(localToken);
-      } catch (e) {
-        console.error("Failed to decode token", e);
-        return getToken(false);
-      }
-      if (decoded.exp > Date.now() / 1000) {
-        return localToken;
-      }
-    }
+function isValid(token) {
+  try {
+    return jwtDecode(token).exp > Date.now() / 1000;
+  } catch (e) {
+    console.error("Failed to decode token", e);
+    return false;
   }
-
-  // Try refresh
-  const tokenRefresh = getRefreshToken();
-  if (tokenRefresh) {
-    const access = await refreshToken();
-    if (access) {
-      saveToken(access, tokenRefresh);
-      return access;
-    }
-  }
-
-  // Fetch new token
-  const { access, refresh } = await fetchToken();
-  if (access) {
-    saveToken(access, refresh);
-  }
-
-  if (!access) {
-    throw new Error("Failed to get token");
-  }
-  return access;
 }
 
-export function getAccessToken() {
-  return localStorage.getItem("euphrosyne-jwt-access");
-}
-
-function getRefreshToken() {
-  return localStorage.getItem("euphrosyne-jwt-refresh");
+export async function getToken(checkCache = true) {
+  if (checkCache && accessToken && isValid(accessToken)) {
+    return accessToken;
+  }
+  accessToken = await fetchToken();
+  return accessToken;
 }
 
 async function fetchToken() {
@@ -95,34 +98,21 @@ async function fetchToken() {
       "X-CSRFToken": getCSRFToken(),
     }),
   });
-  if (response.ok) {
-    const { access, refresh } = await response.json();
-    return { access, refresh };
+  let data = null;
+  try {
+    data = await response.json();
+  } catch {
+    // Not a JSON response
   }
-  return null;
-}
-
-async function refreshToken() {
-  const response = await fetch("/api/auth/token/refresh/", {
-    method: "POST",
-    body: JSON.stringify({
-      refresh: localStorage.getItem("euphrosyne-jwt-refresh"),
-    }),
-    headers: new Headers({
-      "X-CSRFToken": getCSRFToken(),
-      "Content-Type": "application/json",
-    }),
-  });
-  if (response.ok) {
-    const { access } = await response.json();
-    return access;
+  if (response.ok && data?.access) {
+    return data.access;
   }
-  return null;
-}
-
-function saveToken(accessToken, refreshToken = null) {
-  localStorage.setItem("euphrosyne-jwt-access", accessToken);
-  if (refreshToken) {
-    localStorage.setItem("euphrosyne-jwt-refresh", refreshToken);
+  if (!response.ok && data?.redirect_url) {
+    // The session must complete a step first (second factor, CGU...).
+    window.location.assign(data.redirect_url);
+    throw new Error(
+      `Failed to get token: ${data.detail || data.code || response.status}`,
+    );
   }
+  throw new Error(`Failed to get token (status ${response.status})`);
 }

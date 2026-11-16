@@ -1,6 +1,6 @@
 import logging
 
-from rest_framework import exceptions
+from rest_framework import exceptions, serializers
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import (
     TokenObtainSerializer,
@@ -17,8 +17,10 @@ logger = logging.getLogger(__name__)
 
 
 # pylint: disable=abstract-method
-class SessionTokenObtainSerializer(TokenObtainSerializer):
-    """Generate token based on session user"""
+class SessionAccessTokenSerializer(TokenObtainSerializer):
+    """Generate an access token for the session user. No refresh token is
+    returned: session clients get a new access token from their session, so a
+    token does not outlive the session (logout, next user of the browser)."""
 
     token_class = EuphroRefreshToken
     user = None
@@ -41,7 +43,13 @@ class SessionTokenObtainSerializer(TokenObtainSerializer):
             self.user, mfa=is_session_verified(request, self.user)
         )
 
-        return {"refresh": str(refresh), "access": str(refresh.access_token)}
+        return {"access": str(refresh.access_token)}
+
+
+class SessionAccessTokenResponseSerializer(serializers.Serializer):
+    """OpenAPI description of the session access token response."""
+
+    access = serializers.CharField(read_only=True)
 
 
 class MFAEnforcingTokenRefreshSerializer(TokenRefreshSerializer):

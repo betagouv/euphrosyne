@@ -14,7 +14,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from euphro_auth.tests.factories import LabAdminUserFactory, StaffUserFactory
 from euphro_auth.tests.test_mfa import enroll, verify
 
-from ..tokens import HERMA_TOKEN_LIFETIME, EuphroRefreshToken
+from ..tokens import EuphroRefreshToken
 
 pytestmark = pytest.mark.django_db
 
@@ -72,6 +72,9 @@ def refresh(token):
 def test_verified_admin_session_token_carries_mfa_and_admin_rights(verified_client):
     response = verified_client.post("/api/auth/token/")
     assert response.status_code == 200
+    # Session clients get an access token only: no refresh token that would
+    # outlive the session.
+    assert set(response.json()) == {"access"}
     payload = token_backend.decode(response.json()["access"])
     assert payload["mfa"] is True
     assert payload["is_admin"] is True
@@ -101,7 +104,6 @@ def test_other_users_get_tokens_without_second_factor(client):
     access = response.json()["access"]
     assert token_backend.decode(access)["mfa"] is False
     assert api_get(access).status_code == 200
-    assert refresh(response.json()["refresh"]).status_code == 200
 
 
 # Refusal of administrators' tokens without a second factor
@@ -183,7 +185,7 @@ def test_herma_page_issues_a_one_day_mfa_token(verified_client, admin_user, capl
     assert token["mfa"] is True
     assert token["is_admin"] is True
     lifetime = datetime.timedelta(seconds=token["exp"] - token["iat"])
-    assert lifetime == HERMA_TOKEN_LIFETIME == datetime.timedelta(days=1)
+    assert lifetime == datetime.timedelta(days=1)
     assert "Expire le" in response.content.decode()
     assert any(
         message.startswith(f"Herma token issued for user {admin_user.pk}")
