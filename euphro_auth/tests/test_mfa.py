@@ -23,6 +23,7 @@ from django.core.management import CommandError, call_command
 from django.test import Client
 from django.urls import reverse
 
+from euphro_auth.mfa.adapter import MFAAdapter
 from euphro_auth.mfa.conf import parse_mfa_admin_required, warn_if_mfa_disabled
 from orcid_oauth.tests.helpers import orcid_callback, start_orcid_login
 
@@ -483,3 +484,37 @@ def test_kill_switch_off_disables_mfa_with_a_warning(
     assert "MFA_ADMIN_REQUIRED is off" in caplog.text
     assert password_login(client, admin_user).url == "/"
     assert client.get(PROJECTS_URL).status_code == 200
+
+
+# Encryption of TOTP secrets
+
+
+def test_totp_secret_is_stored_encrypted_and_still_validates_codes(admin_user):
+    secret = generate_totp_secret()
+    totp = TOTP.activate(admin_user, secret)
+    stored = Authenticator.objects.get().data["secret"]
+    assert stored.startswith("fernet:")
+    assert secret not in stored
+    assert totp.validate_code(totp_code(secret))
+
+
+def test_unencrypted_secret_is_refused():
+    with pytest.raises(ValueError):
+        MFAAdapter().decrypt(generate_totp_secret())
+
+
+def test_secret_key_change_sends_administrators_back_to_enrollment(
+    client, admin_user, settings, caplog
+):
+    enroll(admin_user)
+    settings.SECRET_KEY = "another-secret-key"
+
+    with caplog.at_level(logging.WARNING, logger="euphro_auth.mfa.services"):
+        assert password_login(client, admin_user).status_code == 302
+    assert auth.get_user(client).pk == admin_user.pk
+    assert not Authenticator.objects.exists()
+    assert (
+        f"MFA TOTP of user {admin_user.pk} removed: its secret cannot be "
+        "decrypted with the current SECRET_KEY" in caplog.messages
+    )
+    assert_mfa_gate(client, PROJECTS_URL, ACTIVATE_URL)

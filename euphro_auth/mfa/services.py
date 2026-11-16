@@ -18,6 +18,7 @@ from django.utils.http import urlencode
 from lab.permissions import is_lab_admin
 
 from ..models import User
+from .adapter import is_readable
 
 logger = logging.getLogger(__name__)
 
@@ -117,6 +118,21 @@ def record_failure(user: User, step: str) -> None:
 def record_success(user: User) -> None:
     cache.delete(_failures_key(user))
     logger.info("MFA verification succeeded for user %s", user.pk)
+
+
+def remove_unreadable_factors(user: User) -> None:
+    """Remove TOTP factors whose secret can no longer be decrypted, after a
+    SECRET_KEY change: the user then sets up a new factor."""
+    for authenticator in Authenticator.objects.filter(
+        user_id=user.pk, type=Authenticator.Type.TOTP
+    ):
+        if not is_readable(authenticator.data["secret"]):
+            authenticator.delete()
+            logger.warning(
+                "MFA TOTP of user %s removed: its secret cannot be decrypted "
+                "with the current SECRET_KEY",
+                user.pk,
+            )
 
 
 def remove_factors(user: User) -> int:
