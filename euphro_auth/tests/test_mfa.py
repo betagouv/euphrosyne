@@ -309,6 +309,16 @@ def test_other_users_are_not_affected(client):
 # Account security page
 
 
+def test_own_profile_links_to_the_account_security_page(verified_client, admin_user):
+    link = f'href="{reverse("mfa_index")}"'
+    own_profile = reverse("admin:euphro_auth_user_change", args=[admin_user.pk])
+    assert link in verified_client.get(own_profile).content.decode()
+    other_profile = reverse(
+        "admin:euphro_auth_user_change", args=[StaffUserFactory().pk]
+    )
+    assert link not in verified_client.get(other_profile).content.decode()
+
+
 def test_account_security_page_shows_the_factor(verified_client):
     response = verified_client.get(reverse("mfa_index"))
     assert response.status_code == 200
