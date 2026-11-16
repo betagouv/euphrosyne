@@ -15,5 +15,4 @@ create_superuser() {
   fi
 }
 
-create_superuser maxime.cattet@beta.gouv.fr
 create_superuser witold.wroblewski@beta.gouv.fr
