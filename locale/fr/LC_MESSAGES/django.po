@@ -639,9 +639,6 @@ msgstr "Radioprotection"
 msgid "Invite new user"
 msgstr "Inviter un utilisateur"
 
-msgid "[Euphrosyne] Two-factor authentication enabled"
-msgstr "[Euphrosyne] Authentification à deux facteurs activée"
-
 msgid "[Euphrosyne] Invitation to register"
 msgstr "[Euphrosyne] Invitation à s'inscrire"
 
@@ -711,6 +708,19 @@ msgstr ""
 "Votre mot de passe doit contenir au moins une minuscule, une majuscule, un "
 "chiffre et un caractère spécial de cette liste : %(characters)s."
 
+msgid "Hello"
+msgstr "Bonjour"
+
+msgid ""
+"If you did not do this, contact the Euphrosyne team immediately and change "
+"your password."
+msgstr ""
+"Si vous n’êtes pas à l’origine de cette action, contactez immédiatement "
+"l’équipe Euphrosyne et changez votre mot de passe."
+
+msgid "The Euphrosyne team"
+msgstr "L'équipe Euphrosyne"
+
 msgid "Log in"
 msgstr "Connexion"
 
@@ -776,28 +786,6 @@ msgstr "Générer un autre jeton"
 msgid "Generate a token"
 msgstr "Générer un jeton"
 
-msgid "Hello"
-msgstr "Bonjour"
-
-#, python-format
-msgid ""
-"Two-factor authentication has just been enabled on your Euphrosyne account "
-"(%(email)s). An authenticator application will now be required to log in."
-msgstr ""
-"L’authentification à deux facteurs vient d’être activée sur votre compte "
-"Euphrosyne (%(email)s). Une application d’authentification sera désormais "
-"nécessaire pour vous connecter."
-
-msgid ""
-"If you did not do this, contact the Euphrosyne team immediately and change "
-"your password."
-msgstr ""
-"Si vous n’êtes pas à l’origine de cette action, contactez immédiatement "
-"l’équipe Euphrosyne et changez votre mot de passe."
-
-msgid "The Euphrosyne team"
-msgstr "L'équipe Euphrosyne"
-
 msgid "Create your account"
 msgstr "Créer votre compte"
 
@@ -826,6 +814,29 @@ msgstr "Cliquez sur ce lien pour créer votre compte :"
 
 msgid "Create account"
 msgstr "Créer mon compte"
+
+#, python-format
+msgid ""
+"Two-factor authentication has just been enabled on your Euphrosyne account "
+"(%(email)s). An authenticator application will now be required to log in."
+msgstr ""
+"L’authentification à deux facteurs vient d’être activée sur votre compte "
+"Euphrosyne (%(email)s). Une application d’authentification sera désormais "
+"nécessaire pour vous connecter."
+
+msgid "Two-factor authentication enabled"
+msgstr "Authentification à deux facteurs activée"
+
+#, python-format
+msgid ""
+"The authenticator application of your Euphrosyne account (%(email)s) has "
+"just been removed."
+msgstr ""
+"L’application d’authentification de votre compte Euphrosyne (%(email)s) "
+"vient d’être supprimée."
+
+msgid "Two-factor authentication disabled"
+msgstr "Authentification à deux facteurs désactivée"
 
 msgid "Enter your information"
 msgstr "Entrez vos informations"
@@ -1335,7 +1346,6 @@ msgstr ""
 "Vous n'avez pas les droits pour ce projet. Si vous pensez que c'est une "
 "erreur, contactez l'équipe %(facility_name)s."
 
-#, python-brace-format
 msgid ""
 "The run can't start while the following Run fields aren't defined: {fields}."
 msgstr ""

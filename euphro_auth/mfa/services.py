@@ -3,16 +3,20 @@
 import logging
 
 from allauth.account.internal.flows.login import (
+    AUTHENTICATION_METHODS_SESSION_KEY,
     get_authentication_records,
     record_authentication,
 )
 from allauth.mfa.models import Authenticator
 from django.conf import settings
+from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.sessions.models import Session
 from django.core.cache import cache
 from django.http import HttpRequest
 from django.middleware.csrf import rotate_token
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.http import urlencode
 
 from lab.permissions import is_lab_admin
@@ -42,26 +46,45 @@ def has_totp(user: User) -> bool:
 def is_session_verified(request: HttpRequest, user: User | AnonymousUser) -> bool:
     """Whether this session went through a second factor for this user.
 
-    allauth records, in the session, each authentication method used. A second
-    factor counts while the authenticator used still exists: removing a factor,
-    or a reset by a superuser, ends the verification of the user's sessions.
+    allauth records, in the session, each authentication method used. Removing
+    a factor, or a reset by a superuser, ends the user's other sessions and
+    forgets the second factor of the current one (end_sessions,
+    forget_verification), so the records alone are enough.
     An impersonation started from a verified session counts as verified."""
     if not user.is_authenticated:
         return False
-    authenticator_ids = set()
     for record in get_authentication_records(request, user):
         if record.get("method") != "mfa":
             continue
-        if record.get("type") == IMPERSONATION:
-            if record.get("impersonator_id") == request.session.get(
-                "impersonator_user_id"
-            ):
-                return True
-            continue
-        authenticator_ids.add(record.get("id"))
-    return Authenticator.objects.filter(
-        user_id=user.pk, pk__in=authenticator_ids
-    ).exists()
+        if record.get("type") != IMPERSONATION:
+            return True
+        if record.get("impersonator_id") == request.session.get("impersonator_user_id"):
+            return True
+    return False
+
+
+def forget_verification(request: HttpRequest) -> None:
+    """Drop the second-factor records of the current session."""
+    records = request.session.get(AUTHENTICATION_METHODS_SESSION_KEY, [])
+    request.session[AUTHENTICATION_METHODS_SESSION_KEY] = [
+        record for record in records if record.get("method") != "mfa"
+    ]
+
+
+def end_sessions(user: User, keep: str | None = None) -> int:
+    """Delete the user's sessions, except the one whose key is ``keep``.
+
+    Sessions are not indexed by user: this decodes every unexpired session, which
+    is fine for a rare event such as a factor removal or reset."""
+    ended = 0
+    sessions = Session.objects.filter(expire_date__gt=timezone.now())
+    if keep:
+        sessions = sessions.exclude(session_key=keep)
+    for session in sessions.iterator():
+        if session.get_decoded().get(SESSION_KEY) == str(user.pk):
+            session.delete()
+            ended += 1
+    return ended
 
 
 def rotate_session_keys(request: HttpRequest) -> None:
@@ -136,5 +159,7 @@ def remove_unreadable_factors(user: User) -> None:
 
 
 def remove_factors(user: User) -> int:
+    """Superuser reset: remove the user's factors and sign them out everywhere."""
     count, _ = Authenticator.objects.filter(user_id=user.pk).delete()
+    end_sessions(user)
     return count

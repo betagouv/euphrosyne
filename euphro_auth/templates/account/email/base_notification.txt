@@ -1,6 +1,6 @@
 {% load i18n %}{% autoescape off %}{% trans "Hello" %},
 
-{% blocktrans trimmed %}Two-factor authentication has just been enabled on your Euphrosyne account ({{ email }}). An authenticator application will now be required to log in.{% endblocktrans %}
+{% block notification_message %}{% endblock notification_message %}
 
 {% blocktrans trimmed %}If you did not do this, contact the Euphrosyne team immediately and change your password.{% endblocktrans %}
 

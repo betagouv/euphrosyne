@@ -316,6 +316,8 @@ ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS = False
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_LOGOUT_REDIRECT_URL = "/login/"
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Euphrosyne] "
+# Security notices (password changed or reset, factor added or removed).
+ACCOUNT_EMAIL_NOTIFICATIONS = True
 ACCOUNT_PASSWORD_RESET_TOKEN_GENERATOR = (
     "euphro_auth.tokens.PasswordResetTokenGenerator"
 )
@@ -424,8 +426,8 @@ MFA_FORMS = {
     "reauthenticate": "euphro_auth.mfa.forms.ReauthenticateForm",
     "activate_totp": "euphro_auth.mfa.forms.ActivateTOTPForm",
 }
-# Factor changes need a verified session (AccountGatesMiddleware), not a
-# second password prompt right after sign-in.
+# Enrollment needs no second password prompt right after sign-in; removing a
+# factor asks for a fresh code or password (euphro_auth.mfa.views).
 MFA_REAUTHENTICATION_REQUIRED = False
 # Emails are set by administrators and invitations, not verified by allauth.
 MFA_ALLOW_UNVERIFIED_EMAIL = True
