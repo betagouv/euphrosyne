@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 from django.contrib.auth.signals import user_logged_in
-from django.db.models.signals import post_init, post_save
+from django.db.models.signals import post_save
 
 
 class EuphroAuthConfig(AppConfig):
@@ -11,10 +11,7 @@ class EuphroAuthConfig(AppConfig):
         # pylint: disable=import-outside-toplevel,unused-import
         from allauth.mfa.signals import authenticator_used
 
-        from .email_addresses import (
-            remember_loaded_email,
-            remove_stale_email_addresses,
-        )
+        from .email_addresses import remove_stale_email_addresses
         from .jwt import schema  # noqa: F401  # registers the OpenAPI extension
         from .mfa.conf import warn_if_mfa_disabled
         from .mfa.signals import on_authenticator_used
@@ -24,11 +21,6 @@ class EuphroAuthConfig(AppConfig):
         user_logged_in.connect(
             set_session_idle_timeout,
             dispatch_uid="euphro_auth.set_session_idle_timeout",
-        )
-        post_init.connect(
-            remember_loaded_email,
-            sender=User,
-            dispatch_uid="euphro_auth.remember_loaded_email",
         )
         post_save.connect(
             remove_stale_email_addresses,
