@@ -1,3 +1,5 @@
+from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import timedelta
 
 from rest_framework_simplejwt.settings import api_settings as rf_simplejwt_api_settings
@@ -24,12 +26,28 @@ class EuphroRefreshToken(RefreshToken):
         return token
 
 
-class HermaRefreshToken(EuphroRefreshToken):
-    """Refresh token pasted into Herma, the administrators' upload application.
-    Its one-day validity is chosen for Herma, independently of the default
-    refresh token lifetime."""
+@dataclass(frozen=True)
+class TokenService:
+    """An application that asks the user to paste a refresh token
+    (see euphro_auth.jwt.views.service_token_view)."""
 
-    lifetime = timedelta(days=1)
+    name: str
+    lifetime: timedelta
+    allowed: Callable[[User], bool]
+
+    def issue(self, user: User) -> EuphroRefreshToken:
+        token = EuphroRefreshToken.for_user(user)
+        token.set_exp(lifetime=self.lifetime)
+        return token
+
+
+# Known services, by URL slug: a link cannot make the page show another name.
+TOKEN_SERVICES = {
+    # Herma, the administrators' upload application.
+    "herma": TokenService(
+        name="Herma", lifetime=timedelta(days=1), allowed=is_lab_admin
+    ),
+}
 
 
 class EuphroToolsAPIToken(RefreshToken):

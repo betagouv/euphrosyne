@@ -7,7 +7,6 @@ from django.urls import include, path, reverse
 from django.urls.resolvers import URLPattern, URLResolver
 from django.utils.translation import gettext_lazy as _
 
-from euphro_auth.jwt.views import herma_token_view
 from lab.documents.views import ProjectDocumentsView
 from lab.hdf5.views import HDF5View
 from lab.objects.views import ObjectImportErosView, ObjectImportPOPView
@@ -56,13 +55,6 @@ class AdminSite(admin.AdminSite):
         if apps.is_installed("lab_notebook"):
             urls.append(path("", include("lab_notebook.urls")))
 
-        urls.append(
-            path(
-                "herma-token/",
-                self.admin_view(herma_token_view),
-                name="herma_token",
-            )
-        )
         urls.append(
             path(
                 "lab/project/<project_id>/hdf5-viewer",

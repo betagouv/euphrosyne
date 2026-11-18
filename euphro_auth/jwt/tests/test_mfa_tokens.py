@@ -98,25 +98,31 @@ def test_tokens_are_accepted_and_refreshed(admin_user):
     assert token_backend.decode(response.json()["access"])["is_admin"] is True
 
 
-# Herma token page
+# Token page of other applications
+
+HERMA_TOKEN_URL = "/accounts/token/herma/"
 
 
 def issued_token(response) -> str:
     content = response.content.decode()
-    match = re.search(r'id="herma-token"[^>]*>([^<]+)</textarea>', content)
+    match = re.search(r'id="service-token"[^>]*>([^<]+)</textarea>', content)
     assert match
     return match.group(1).strip()
 
 
 def test_herma_page_issues_a_one_day_token(verified_client, admin_user, caplog):
-    assert verified_client.get(reverse("admin:herma_token")).status_code == 200
+    response = verified_client.get(HERMA_TOKEN_URL)
+    assert response.status_code == 200
+    assert "Générer un jeton pour Herma" in response.content.decode()
     with caplog.at_level(logging.INFO, logger="euphro_auth.jwt.views"):
-        response = verified_client.post(reverse("admin:herma_token"))
+        response = verified_client.post(HERMA_TOKEN_URL)
     token = RefreshToken(issued_token(response))
     assert token["is_admin"] is True
     lifetime = datetime.timedelta(seconds=token["exp"] - token["iat"])
     assert lifetime == datetime.timedelta(days=1)
-    assert "Expire le" in response.content.decode()
+    content = response.content.decode()
+    assert "Valable jusqu’au" in content
+    assert "Collez-le dans Herma, puis fermez cette fenêtre." in content
     assert any(
         message.startswith(f"Herma token issued for user {admin_user.pk}")
         for message in caplog.messages
@@ -126,11 +132,21 @@ def test_herma_page_issues_a_one_day_token(verified_client, admin_user, caplog):
 
 def test_herma_page_needs_a_verified_session(client, admin_user):
     client.force_login(admin_user)
-    response = client.post(reverse("admin:herma_token"))
+    response = client.post(HERMA_TOKEN_URL)
     assert response.status_code == 302
     assert response.url.startswith(reverse("mfa_activate_totp"))
 
 
+def test_herma_page_needs_a_signed_in_user(client):
+    response = client.get(HERMA_TOKEN_URL)
+    assert response.status_code == 302
+    assert response.url.startswith("/login/")
+
+
 def test_herma_page_is_reserved_to_administrators(client):
     client.force_login(StaffUserFactory())
-    assert client.get(reverse("admin:herma_token")).status_code == 403
+    assert client.get(HERMA_TOKEN_URL).status_code == 403
+
+
+def test_unknown_service_is_not_found(verified_client):
+    assert verified_client.get("/accounts/token/unknown/").status_code == 404
