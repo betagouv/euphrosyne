@@ -1,0 +1,3 @@
+{% load i18n %}
+{% comment %}Shown on the sign-in page: enrollment signs the session out (euphro_auth.mfa.views).{% endcomment %}
+{% translate "Two-factor authentication is enabled. Sign in again with a code from your app." %}

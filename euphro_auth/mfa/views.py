@@ -4,6 +4,7 @@ from allauth.account.decorators import reauthentication_required
 from allauth.mfa.base import views as base_views
 from allauth.mfa.totp import views as totp_views
 from allauth.mfa.totp.internal import flows as totp_flows
+from django.contrib.auth import logout
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.http.response import HttpResponseBase
@@ -36,8 +37,7 @@ class IndexView(base_views.IndexView):
 
 
 class ReauthenticateView(base_views.ReauthenticateView):
-    """Second factor of an already signed-in session (for example a session
-    started before MFA was enforced)."""
+    """Fresh code asked before removing a factor (see DeactivateTOTPView)."""
 
     def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponseBase:
         _check_mfa_user(request)
@@ -50,10 +50,14 @@ class ActivateTOTPView(totp_views.ActivateTOTPView):
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form) -> HttpResponse:
-        authenticator, _ = totp_flows.activate_totp(self.request, form)
-        services.mark_enrollment_verified(self.request, authenticator)
+        totp_flows.activate_totp(self.request, form)
         logger.info("MFA TOTP enrolled for user %s", self.request.user.pk)
-        return redirect("/")
+        # A signed-in session is never verified: the next sign-in asks for a
+        # code (AuthenticateStage), and Django's login() renews the session key
+        # and the CSRF token. allauth's message (mfa/messages/totp_activated.txt)
+        # asks the user to sign in again.
+        logout(self.request)
+        return redirect("account_login")
 
 
 class DeactivateTOTPView(totp_views.DeactivateTOTPView):

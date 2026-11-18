@@ -4,10 +4,12 @@ from typing import cast
 
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth import SESSION_KEY
+from django.contrib import messages
+from django.contrib.auth import SESSION_KEY, logout
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 
 from lab.participations.gate import get_required_employer_completion_url
@@ -57,7 +59,14 @@ ALWAYS_ALLOWED = {
     "javascript-catalog",
     "set_language",
 }
-MFA_ALLOWED = {"mfa_activate_totp", "mfa_reauthenticate", "cgu_acceptance"}
+# Reachable by an administrator setting up their factor.
+ENROLLMENT_ALLOWED = {"mfa_activate_totp", "cgu_acceptance"}
+
+
+def _with_next(url: str, request: HttpRequest) -> str:
+    if request.method != "GET":
+        return url
+    return url + "?" + urlencode({"next": request.get_full_path()})
 
 
 @dataclass
@@ -87,7 +96,9 @@ class AccountGatesMiddleware:
     3. acceptance of the latest CGU;
     4. employer information, for the projects that require it.
 
-    Pages are redirected to the step; API calls get a JSON 403 with
+    A signed-in session never becomes verified: an administrator who already
+    has a factor is signed out and signs in again with a code. Pages are
+    redirected to the step; API calls get a JSON 403 with
     ``detail``, ``code`` and ``redirect_url``. Only the session user is
     checked: API clients authenticated by JWT carry their MFA state in the
     token (see euphro_auth.jwt)."""
@@ -110,10 +121,12 @@ class AccountGatesMiddleware:
         if mfa_services.is_mfa_required(user) and not (
             mfa_services.is_session_verified(request, user)
         ):
-            # Until verified, only the MFA pages and the CGU page are reachable.
-            if view_name in MFA_ALLOWED:
+            if mfa_services.has_totp(cast(User, user)):
+                return self._sign_in_again_gate(request).response(request)
+            # Until enrolled, only enrollment and the CGU page are reachable.
+            if view_name in ENROLLMENT_ALLOWED:
                 return None
-            return self._mfa_gate(request).response(request)
+            return self._enrollment_gate(request).response(request)
         gate = (
             self._completion_gate(request, view_name)
             or self._cgu_gate(request, view_name)
@@ -122,13 +135,23 @@ class AccountGatesMiddleware:
         return gate.response(request) if gate else None
 
     @staticmethod
-    def _mfa_gate(request: HttpRequest) -> Gate:
-        user = cast(User, request.user)
-        next_url = request.get_full_path() if request.method == "GET" else None
+    def _enrollment_gate(request: HttpRequest) -> Gate:
         return Gate(
             code="mfa_required",
             detail=_("Multi-factor authentication is required."),
-            redirect_url=mfa_services.get_mfa_url(user, next_url),
+            redirect_url=_with_next(reverse("mfa_activate_totp"), request),
+        )
+
+    @staticmethod
+    def _sign_in_again_gate(request: HttpRequest) -> Gate:
+        logout(request)
+        detail = _("Sign in again with a code from your app.")
+        if not request.path.startswith("/api/"):
+            messages.info(request, detail)
+        return Gate(
+            code="mfa_required",
+            detail=detail,
+            redirect_url=_with_next(reverse("account_login"), request),
         )
 
     @staticmethod

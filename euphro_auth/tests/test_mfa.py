@@ -11,7 +11,6 @@ from allauth.mfa.totp.internal.auth import (
     hotp_value,
 )
 from allauth.socialaccount.models import SocialAccount
-from django.conf import settings as django_settings
 from django.contrib import auth
 from django.contrib.admin.models import LogEntry
 from django.core import mail
@@ -30,7 +29,7 @@ pytestmark = pytest.mark.django_db
 PASSWORD = "T8!vQ2#rM6@zL9$p"
 PROJECTS_URL = "/lab/project/"
 ACTIVATE_URL = "/accounts/2fa/totp/activate/"
-VERIFY_URL = "/accounts/2fa/reauthenticate/"
+LOGIN_URL = "/accounts/login/"
 
 
 @pytest.fixture(autouse=True)
@@ -72,15 +71,17 @@ def password_login(client: Client, user, **data):
     )
 
 
-def verify(client: Client, secret: str, offset: int = 0):
-    return client.post(VERIFY_URL, {"code": totp_code(secret, offset)})
+def sign_in(client: Client, user, secret: str, offset: int = 0) -> None:
+    """Sign in with the password and a code: a verified session."""
+    assert password_login(client, user).url == reverse("mfa_authenticate")
+    client.post(reverse("mfa_authenticate"), {"code": totp_code(secret, offset)})
+    assert auth.get_user(client).pk == user.pk
 
 
 @pytest.fixture(name="verified_client")
 def verified_client_fixture(client, admin_user):
     secret = enroll(admin_user)
-    client.force_login(admin_user)
-    assert verify(client, secret).status_code == 302
+    sign_in(client, admin_user, secret)
     client.secret = secret
     return client
 
@@ -126,11 +127,9 @@ def test_enrollment_keeps_the_secret_shown_when_the_page_is_requested_again(
 
 
 @pytest.mark.parametrize("path", [PROJECTS_URL, "/", "/accounts/2fa/"])
-def test_unverified_admin_pages_redirect_to_the_mfa_step(client, admin_user, path):
+def test_unverified_admin_pages_redirect_to_enrollment(client, admin_user, path):
     client.force_login(admin_user)
     assert_mfa_gate(client, path, f"{ACTIVATE_URL}?next=")
-    enroll(admin_user)
-    assert_mfa_gate(client, path, f"{VERIFY_URL}?next=")
 
 
 def test_unverified_admin_api_calls_get_a_json_403(client, admin_user):
@@ -170,35 +169,45 @@ def test_enrollment_with_wrong_codes_logs_consecutive_failures(
 
 
 @pytest.mark.parametrize(
-    "language, subject",
+    "language, subject, message",
     [
-        ("en", "[Euphrosyne] Two-factor authentication enabled"),
-        ("fr", "[Euphrosyne] Authentification à deux facteurs activée"),
+        (
+            "en",
+            "[Euphrosyne] Two-factor authentication enabled",
+            "Two-factor authentication is enabled. "
+            "Sign in again with a code from your app.",
+        ),
+        (
+            "fr",
+            "[Euphrosyne] Authentification à deux facteurs activée",
+            "L’authentification à deux facteurs est activée. "
+            "Reconnectez-vous avec un code de votre application.",
+        ),
     ],
 )
 # Transactional: allauth sends the notice once the factor is committed.
 @pytest.mark.django_db(transaction=True)
-def test_enrollment_verifies_session_rotates_keys_and_informs_owner(
-    admin_user, caplog, language, subject
+def test_enrollment_signs_out_and_informs_owner(
+    admin_user, caplog, language, subject, message
 ):
     # The preferred language follows the browser's (UserLanguageMiddleware).
     client = Client(headers={"accept-language": language})
-    client.force_login(admin_user)
+    password_login(client, admin_user)
     secret = client.get(ACTIVATE_URL).context["form"].secret
-    session_key = client.session.session_key
-    csrf_token = client.cookies[django_settings.CSRF_COOKIE_NAME].value
 
     with caplog.at_level(logging.INFO, logger="euphro_auth.mfa.views"):
         response = client.post(ACTIVATE_URL, {"code": totp_code(secret)})
 
-    assert response.status_code == 302
+    assert response.url == LOGIN_URL
+    assert not auth.get_user(client).is_authenticated
     assert Authenticator.objects.filter(user=admin_user, type="totp").exists()
-    assert client.session.session_key != session_key
-    assert client.cookies[django_settings.CSRF_COOKIE_NAME].value != csrf_token
     assert f"MFA TOTP enrolled for user {admin_user.pk}" in caplog.messages
     assert len(mail.outbox) == 1
     assert mail.outbox[0].to == [admin_user.email]
     assert mail.outbox[0].subject == subject
+    assert message in client.get(LOGIN_URL).content.decode()
+    # The code just used for enrollment is refused: sign in with the next one.
+    sign_in(client, admin_user, secret, offset=1)
     assert client.get(PROJECTS_URL).status_code == 200
 
 
@@ -269,22 +278,30 @@ def test_orcid_sign_in_of_an_admin_requires_the_second_factor(client, admin_user
     assert other.get(PROJECTS_URL).status_code == 200
 
 
-def test_session_signed_in_without_factor_verifies_with_a_code(client, admin_user):
+@pytest.mark.parametrize("path", [PROJECTS_URL, "/accounts/2fa/reauthenticate/"])
+def test_session_signed_in_without_code_must_sign_in_again(client, admin_user, path):
     secret = enroll(admin_user)
     client.force_login(admin_user)
-    assert_mfa_gate(client, PROJECTS_URL, VERIFY_URL)
-    assert client.get(VERIFY_URL).status_code == 200
-    session_key = client.session.session_key
-    csrf_token = client.cookies[django_settings.CSRF_COOKIE_NAME].value
 
-    response = client.post(
-        f"{VERIFY_URL}?next={PROJECTS_URL}", {"code": totp_code(secret)}
-    )
+    response = client.get(path)
 
-    assert response.url == PROJECTS_URL
-    assert client.session.session_key != session_key
-    assert client.cookies[django_settings.CSRF_COOKIE_NAME].value != csrf_token
+    assert response.url == f"{LOGIN_URL}?next={path.replace('/', '%2F')}"
+    assert not auth.get_user(client).is_authenticated
+    sign_in(client, admin_user, secret)
     assert client.get(PROJECTS_URL).status_code == 200
+
+
+def test_api_call_of_a_session_signed_in_without_code_signs_it_out(client, admin_user):
+    enroll(admin_user)
+    client.force_login(admin_user)
+    response = client.post("/api/auth/token/")
+    assert response.status_code == 403
+    assert response.json() == {
+        "detail": "Reconnectez-vous avec un code de votre application.",
+        "code": "mfa_required",
+        "redirect_url": LOGIN_URL,
+    }
+    assert not auth.get_user(client).is_authenticated
 
 
 def test_verified_session_stays_verified(verified_client):
@@ -302,7 +319,7 @@ def test_other_users_are_not_affected(client):
     user.save()
     assert password_login(client, user).status_code == 302
     assert client.get(PROJECTS_URL).status_code == 200
-    for url in ("/accounts/2fa/", ACTIVATE_URL, VERIFY_URL):
+    for url in ("/accounts/2fa/", ACTIVATE_URL, "/accounts/2fa/reauthenticate/"):
         assert client.get(url).status_code == 403
 
 
@@ -329,8 +346,9 @@ def test_removing_the_factor_requires_setting_up_a_new_one(
     verified_client, admin_user, caplog
 ):
     other_client = Client()
-    other_client.force_login(admin_user)
-    verify(other_client, verified_client.secret, offset=1)
+    sign_in(other_client, admin_user, verified_client.secret, offset=1)
+    # Removal asks for a fresh password or code, even right after sign-in.
+    verified_client.post(reverse("account_reauthenticate"), {"password": PASSWORD})
     with caplog.at_level(logging.WARNING, logger="euphro_auth.mfa.views"):
         response = verified_client.post(reverse("mfa_deactivate_totp"))
     assert response.url == reverse("mfa_activate_totp")
@@ -373,10 +391,11 @@ def test_superuser_resets_a_factor_from_the_user_admin(
     admin_user.is_superuser = True
     admin_user.save()
     target = LabAdminUserFactory()
+    target.set_password(PASSWORD)
+    target.save()
     target_secret = enroll(target)
     target_client = Client()
-    target_client.force_login(target)
-    verify(target_client, target_secret)
+    sign_in(target_client, target, target_secret)
     assert target_client.get(PROJECTS_URL).status_code == 200
 
     with caplog.at_level(logging.WARNING, logger="euphro_auth.admin"):
