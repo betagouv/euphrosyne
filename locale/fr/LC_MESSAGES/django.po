@@ -657,9 +657,6 @@ msgstr "Un compte avec cet email existe déjà."
 msgid "I have read and accept the Terms and Conditions."
 msgstr "J'ai lu et j'accepte les conditions générales d'Euphrosyne."
 
-msgid "Herma token"
-msgstr "Jeton Herma"
-
 msgid "The Email must be set"
 msgstr "L'email doit être défini"
 
@@ -783,32 +780,40 @@ msgstr "Lire les CGU."
 msgid "Accept"
 msgstr "Accepter"
 
-msgid "Generate a token here and paste it into Herma when it asks for one."
-msgstr ""
-"Générez un jeton ici et collez-le dans Herma lorsqu’il vous le demande."
-
-msgid ""
-"Copy this token now: it will not be displayed again. Do not share it, it "
-"gives access to your account."
-msgstr ""
-"Copiez ce jeton maintenant : il ne sera plus affiché. Ne le partagez pas, il "
-"donne accès à votre compte."
+#, python-format
+msgid "Generate a token for %(service)s"
+msgstr "Générer un jeton pour %(service)s"
 
 #, python-format
-msgid "Expires on %(expires_at)s."
-msgstr "Expire le %(expires_at)s."
-
-msgid ""
-"Select the whole token (click in the field), copy it and paste it into Herma."
-msgstr ""
-"Sélectionnez le jeton en entier (cliquez dans le champ), copiez-le et collez-"
-"le dans Herma."
+msgid "%(service)s asks for a token to access Euphrosyne on your behalf."
+msgstr "%(service)s demande un jeton pour accéder à Euphrosyne en votre nom."
 
 msgid "Generate another token"
 msgstr "Générer un autre jeton"
 
 msgid "Generate a token"
 msgstr "Générer un jeton"
+
+msgid "Token"
+msgstr "Jeton"
+
+#, python-format
+msgid ""
+"Valid until %(expires_at)s. You can generate a new one at any time. Do not "
+"share it."
+msgstr ""
+"Valable jusqu’au %(expires_at)s. Vous pouvez en générer un nouveau à tout "
+"moment. Ne le partagez pas."
+
+msgid "Copied"
+msgstr "Copié"
+
+msgid "Copy"
+msgstr "Copier"
+
+#, python-format
+msgid "Paste it into %(service)s, then close this window."
+msgstr "Collez-le dans %(service)s, puis fermez cette fenêtre."
 
 msgid "Create your account"
 msgstr "Créer votre compte"
