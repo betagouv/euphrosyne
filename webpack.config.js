@@ -123,7 +123,7 @@ export default {
     extensions: [".ts", ".tsx", ".js"],
   },
   optimization: {
-    minimizer: [new CssMinimizerPlugin()],
+    minimizer: ["...", new CssMinimizerPlugin()],
   },
   plugins: [
     new webpack.EnvironmentPlugin({
