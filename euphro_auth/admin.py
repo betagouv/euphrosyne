@@ -432,11 +432,6 @@ class UserAdmin(DjangoUserAdmin):
                 self.log_change(
                     request, target_user, "Reset two-factor authentication devices"
                 )
-                logger.warning(
-                    "MFA devices of user %s removed by superuser %s",
-                    target_user.pk,
-                    request.user.pk,
-                )
 
         if reset_users:
             self.message_user(

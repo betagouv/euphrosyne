@@ -51,7 +51,6 @@ class ActivateTOTPView(totp_views.ActivateTOTPView):
 
     def form_valid(self, form) -> HttpResponse:
         totp_flows.activate_totp(self.request, form)
-        logger.info("MFA TOTP enrolled for user %s", self.request.user.pk)
         # A signed-in session is never verified: the next sign-in asks for a
         # code (AuthenticateStage), and Django's login() renews the session key
         # and the CSRF token. allauth's message (mfa/messages/totp_activated.txt)

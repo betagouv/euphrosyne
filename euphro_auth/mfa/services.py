@@ -11,7 +11,6 @@ from django.conf import settings
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.models import Session
-from django.core.cache import cache
 from django.http import HttpRequest
 from django.utils import timezone
 
@@ -21,8 +20,6 @@ from ..models import User
 from .adapter import is_readable
 
 logger = logging.getLogger(__name__)
-
-FAILURES_CACHE_TIMEOUT = 24 * 60 * 60
 
 
 def is_mfa_required(user: User | AnonymousUser) -> bool:
@@ -77,27 +74,6 @@ def end_sessions(user: User, keep: str | None = None) -> int:
             session.delete()
             ended += 1
     return ended
-
-
-def _failures_key(user: User) -> str:
-    return f"euphro_auth.mfa.failures:{user.pk}"
-
-
-def record_failure(user: User, step: str) -> None:
-    key = _failures_key(user)
-    count = cache.get(key, 0) + 1
-    cache.set(key, count, FAILURES_CACHE_TIMEOUT)
-    logger.warning(
-        "MFA %s code rejected for user %s (consecutive failures: %s)",
-        step,
-        user.pk,
-        count,
-    )
-
-
-def record_success(user: User) -> None:
-    cache.delete(_failures_key(user))
-    logger.info("MFA verification succeeded for user %s", user.pk)
 
 
 def remove_unreadable_factors(user: User) -> None:
