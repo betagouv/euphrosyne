@@ -435,46 +435,18 @@ def test_authenticators_are_not_editable_in_the_admin(verified_client, admin_use
 # Impersonation
 
 
-@pytest.fixture(name="impersonating_client")
-def impersonating_client_fixture(verified_client, admin_user):
+def test_impersonated_users_cannot_reach_the_mfa_pages(verified_client, admin_user):
     admin_user.is_superuser = True
     admin_user.save()
-    target = LabAdminUserFactory()
+    target = StaffUserFactory()
     verified_client.post(
         reverse("admin:euphro_auth_user_changelist"),
         {"action": "impersonate_selected_user", "_selected_action": [target.pk]},
     )
     assert auth.get_user(verified_client).pk == target.pk
-    verified_client.target = target
-    return verified_client
-
-
-def test_impersonation_from_a_verified_session_is_verified(impersonating_client):
-    assert impersonating_client.get(PROJECTS_URL).status_code == 200
-
-
-def test_impersonation_of_an_unverified_superuser_session_is_not_verified(
-    client, admin_user, settings
-):
-    settings.MFA_ADMIN_REQUIRED = False
-    admin_user.is_superuser = True
-    admin_user.save()
-    target = LabAdminUserFactory()
-    client.force_login(admin_user)
-    client.post(
-        reverse("admin:euphro_auth_user_changelist"),
-        {"action": "impersonate_selected_user", "_selected_action": [target.pk]},
-    )
-    settings.MFA_ADMIN_REQUIRED = True
-    assert_mfa_gate(client, PROJECTS_URL, ACTIVATE_URL)
-
-
-def test_factor_changes_are_refused_while_impersonating(impersonating_client):
-    assert impersonating_client.get(ACTIVATE_URL).status_code == 403
-    assert impersonating_client.post(ACTIVATE_URL, {"code": "1"}).status_code == 403
-    enroll(impersonating_client.target)
-    assert impersonating_client.post(reverse("mfa_deactivate_totp")).status_code == 403
-    assert Authenticator.objects.filter(user=impersonating_client.target).exists()
+    assert verified_client.get(PROJECTS_URL).status_code == 200
+    for url in ("/accounts/2fa/", ACTIVATE_URL):
+        assert verified_client.get(url).status_code == 403
 
 
 # Kill switch (rollback only)

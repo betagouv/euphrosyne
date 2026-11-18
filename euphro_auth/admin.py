@@ -379,18 +379,18 @@ class UserAdmin(DjangoUserAdmin):
             return None
 
         target_user = queryset.get()
-        if target_user.is_superuser is True:
+        if is_lab_admin(target_user):
+            # Administrators have a second factor, which an impersonation
+            # session cannot give.
             self.message_user(
                 request,
-                _("Impersonating superusers is not allowed."),
+                _("Impersonating administrators is not allowed."),
                 level=messages.ERROR,
             )
             return None
 
         impersonator_user_id = request.user.pk
         impersonated_user_id = target_user.pk
-        # An impersonation started from a verified session is verified.
-        verified = mfa_services.is_session_verified(request, request.user)
         impersonation_started_at = timezone.now().isoformat()
         backend = "allauth.account.auth_backends.AuthenticationBackend"
 
@@ -405,10 +405,6 @@ class UserAdmin(DjangoUserAdmin):
         request.session["impersonator_user_id"] = impersonator_user_id
         request.session["impersonated_user_id"] = impersonated_user_id
         request.session["impersonation_started_at"] = impersonation_started_at
-        if verified:
-            mfa_services.mark_impersonation_verified(
-                request, target_user, impersonator_user_id
-            )
 
         self.message_user(
             request,

@@ -590,8 +590,8 @@ msgstr ""
 msgid "Please select exactly one user to impersonate."
 msgstr "Sélectionnez seulement un utilisateur à la fois."
 
-msgid "Impersonating superusers is not allowed."
-msgstr "Se connecter en tant que superadmin n'est pas autorisé."
+msgid "Impersonating administrators is not allowed."
+msgstr "Se connecter en tant qu'administrateur n'est pas autorisé."
 
 msgid "You are now impersonating {}."
 msgstr "Vous êtes connecté en tant que {}."
