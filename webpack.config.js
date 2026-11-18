@@ -135,15 +135,28 @@ export default {
       SENTRY_ENVIRONMENT: null,
     }),
     new MiniCssExtractPlugin(),
+    // Only purge the icon sets, which are large and mostly unused. Our own CSS
+    // and the DSFR target markup rendered by Django (admin templates, form
+    // errors, admin JS) that is not part of this repository, so purging them
+    // dropped rules in production.
     new PurgeCSSPlugin({
-      paths: globSync([`{euphrosyne,euphro_auth,lab}/**/*`], {
+      paths: globSync("./**/*.{html,py,js,jsx,ts,tsx}", {
         nodir: true,
         dotRelative: true,
+        // Never scan build output: it would make the result depend on the
+        // previous build.
+        ignore: [
+          "**/node_modules/**",
+          "**/assets/dist/**",
+          "_static/**", // collectstatic output (STATIC_ROOT)
+          "**/{venv,.venv,env}/**",
+          "**/.*/**",
+        ],
       }),
       safelist: {
         greedy: [/^fr-/],
       },
-      only: ["main", "anonymous", "dsfr", "icons"],
+      only: ["icons"],
     }),
   ],
   devtool: "source-map",
