@@ -1,3 +1,4 @@
+from allauth.account.models import EmailAddress
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.db import models
@@ -58,6 +59,7 @@ class User(AbstractUser):
 
     def save(self, *args, **kwargs):
         update_fields = kwargs.get("update_fields")
+        created = self._state.adding
         if update_fields is None:
             # Full save: normalize the email and both names.
             self.email = UserManager.normalize_email(self.email)
@@ -72,6 +74,14 @@ class User(AbstractUser):
             if "last_name" in update_fields:
                 self.last_name = normalize_person_name(self.last_name)
         super().save(*args, **kwargs)
+        if not created and (update_fields is None or "email" in update_fields):
+            # allauth records addresses in its own table (for example when it
+            # builds a password reset token) and accepts them for login and
+            # password reset: an address replaced in the user admin must not
+            # keep working.
+            EmailAddress.objects.filter(user=self).exclude(
+                email__iexact=self.email
+            ).delete()
 
     def validate_unique(self, exclude=None):
         # The case-insensitive constraint covers the email, and reports a
