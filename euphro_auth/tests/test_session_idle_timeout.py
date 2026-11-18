@@ -189,7 +189,7 @@ def test_anonymous_request_does_not_set_session_expiry(client):
 
 def test_jwt_only_request_does_not_create_session(client, session_user):
     user, _timeout = session_user
-    access = EuphroRefreshToken.for_user(user, mfa=False).access_token
+    access = EuphroRefreshToken.for_user(user).access_token
 
     response = client.get("/api/session-probe/", HTTP_AUTHORIZATION=f"Bearer {access}")
 
@@ -204,7 +204,7 @@ def test_jwt_user_cannot_change_another_sessions_timeout(client, session_user):
     token_user = StaffUserFactory(
         is_lab_admin=not (user.is_lab_admin or user.is_superuser)
     )
-    access = EuphroRefreshToken.for_user(token_user, mfa=False).access_token
+    access = EuphroRefreshToken.for_user(token_user).access_token
 
     # DRF authenticates this route with JWT before trying the session cookie.
     with patch.object(

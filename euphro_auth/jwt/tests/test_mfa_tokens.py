@@ -70,30 +70,13 @@ def refresh(token):
 # Session tokens
 
 
-def test_verified_admin_session_token_carries_mfa_and_admin_rights(verified_client):
+def test_verified_admin_session_token_carries_admin_rights(verified_client):
     response = verified_client.post("/api/auth/token/")
     assert response.status_code == 200
     # Session clients get an access token only: no refresh token that would
     # outlive the session.
     assert set(response.json()) == {"access"}
     payload = token_backend.decode(response.json()["access"])
-    assert payload["mfa"] is True
-    assert payload["is_admin"] is True
-
-
-def test_admin_rights_need_mfa_unless_mfa_is_not_enforced(admin_user, settings):
-    assert EuphroRefreshToken.for_user(admin_user, mfa=True)["is_admin"] is True
-    assert EuphroRefreshToken.for_user(admin_user, mfa=False)["is_admin"] is False
-    settings.MFA_ADMIN_REQUIRED = False
-    assert EuphroRefreshToken.for_user(admin_user, mfa=False)["is_admin"] is True
-
-
-def test_session_token_without_mfa_when_mfa_is_off(client, admin_user, settings):
-    settings.MFA_ADMIN_REQUIRED = False
-    client.force_login(admin_user)
-    response = client.post("/api/auth/token/")
-    payload = token_backend.decode(response.json()["access"])
-    assert payload["mfa"] is False
     assert payload["is_admin"] is True
 
 
@@ -103,69 +86,16 @@ def test_other_users_get_tokens_without_second_factor(client):
     response = client.post("/api/auth/token/")
     assert response.status_code == 200
     access = response.json()["access"]
-    assert token_backend.decode(access)["mfa"] is False
+    assert token_backend.decode(access)["is_admin"] is False
     assert api_get(access).status_code == 200
 
 
-# Refusal of administrators' tokens without a second factor
-
-
-def pre_mfa_token(user) -> RefreshToken:
-    """A token issued before MFA: no ``mfa`` claim."""
-    token = EuphroRefreshToken.for_user(user, mfa=False)
-    del token["mfa"]
-    return token
-
-
-@pytest.mark.parametrize(
-    "make_token",
-    [
-        pre_mfa_token,
-        lambda user: EuphroRefreshToken.for_user(user, mfa=False),
-    ],
-    ids=["without-claim", "mfa-false"],
-)
-def test_admin_tokens_without_mfa_are_refused_on_use_and_refresh(
-    admin_user, make_token, caplog
-):
-    token = make_token(admin_user)
-    response = api_get(token.access_token)
-    # 403: the first default authentication class (session) sends no
-    # WWW-Authenticate header.
-    assert response.status_code == 403
-    assert response.json()["code"] == "mfa_required"
-    with caplog.at_level(logging.WARNING):
-        response = refresh(token)
-    assert response.status_code == 401
-    assert response.json()["code"] == "mfa_required"
-    assert (
-        f"Token refresh refused for administrator {admin_user.pk}: token without MFA"
-        in caplog.messages
-    )
-
-
-def test_user_promoted_after_issue_needs_a_new_token():
-    user = StaffUserFactory()
-    token = EuphroRefreshToken.for_user(user, mfa=False)
-    user.is_lab_admin = True
-    user.save()
-    assert api_get(token.access_token).status_code == 403
-    assert refresh(token).status_code == 401
-
-
-def test_admin_tokens_with_mfa_are_accepted(admin_user):
-    token = EuphroRefreshToken.for_user(admin_user, mfa=True)
+def test_tokens_are_accepted_and_refreshed(admin_user):
+    token = EuphroRefreshToken.for_user(admin_user)
     assert api_get(token.access_token).status_code == 200
     response = refresh(token)
     assert response.status_code == 200
-    assert token_backend.decode(response.json()["access"])["mfa"] is True
-
-
-def test_tokens_without_mfa_are_accepted_when_mfa_is_off(admin_user, settings):
-    settings.MFA_ADMIN_REQUIRED = False
-    token = pre_mfa_token(admin_user)
-    assert api_get(token.access_token).status_code == 200
-    assert refresh(token).status_code == 200
+    assert token_backend.decode(response.json()["access"])["is_admin"] is True
 
 
 # Herma token page
@@ -178,12 +108,11 @@ def issued_token(response) -> str:
     return match.group(1).strip()
 
 
-def test_herma_page_issues_a_one_day_mfa_token(verified_client, admin_user, caplog):
+def test_herma_page_issues_a_one_day_token(verified_client, admin_user, caplog):
     assert verified_client.get(reverse("admin:herma_token")).status_code == 200
     with caplog.at_level(logging.INFO, logger="euphro_auth.jwt.views"):
         response = verified_client.post(reverse("admin:herma_token"))
     token = RefreshToken(issued_token(response))
-    assert token["mfa"] is True
     assert token["is_admin"] is True
     lifetime = datetime.timedelta(seconds=token["exp"] - token["iat"])
     assert lifetime == datetime.timedelta(days=1)
@@ -200,14 +129,6 @@ def test_herma_page_needs_a_verified_session(client, admin_user):
     response = client.post(reverse("admin:herma_token"))
     assert response.status_code == 302
     assert response.url.startswith(reverse("mfa_activate_totp"))
-
-
-def test_herma_page_works_without_mfa_when_mfa_is_off(client, admin_user, settings):
-    settings.MFA_ADMIN_REQUIRED = False
-    client.force_login(admin_user)
-    token = RefreshToken(issued_token(client.post(reverse("admin:herma_token"))))
-    assert token["mfa"] is False
-    assert token["is_admin"] is True
 
 
 def test_herma_page_is_reserved_to_administrators(client):

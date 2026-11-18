@@ -11,7 +11,6 @@ from django.utils.translation import gettext as _
 
 from lab.permissions import is_lab_admin
 
-from ..mfa import services as mfa_services
 from ..models import User
 from .tokens import HermaRefreshToken
 
@@ -31,9 +30,7 @@ def herma_token_view(request: HttpRequest) -> HttpResponse:
         "title": _("Herma token"),
     }
     if request.method == "POST":
-        refresh = HermaRefreshToken.for_user(
-            user, mfa=mfa_services.is_session_verified(request, user)
-        )
+        refresh = HermaRefreshToken.for_user(user)
         logger.info("Herma token issued for user %s (jti %s)", user.pk, refresh["jti"])
         context["refresh_token"] = str(refresh)
         context["expires_at"] = timezone.localtime(

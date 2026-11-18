@@ -9,9 +9,3 @@ class EuphrosyneAdminJWTScheme(SimpleJWTScheme):
 
     target_class = "euphro_auth.jwt.authentication.EuphrosyneAdminJWTAuthentication"
     name = "euphrosyneBackendJwtAuth"
-
-
-class MFAEnforcingJWTScheme(SimpleJWTScheme):
-    """Default user JWT authentication, documented as simplejwt's."""
-
-    target_class = "euphro_auth.jwt.authentication.MFAEnforcingJWTAuthentication"

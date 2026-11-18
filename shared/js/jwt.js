@@ -25,25 +25,9 @@ function removeLegacyTokens() {
 
 removeLegacyTokens();
 
-async function shouldRetryWithNewToken(response) {
-  // 401: token expired or invalid. 403 with `mfa_required`: administrator token
-  // refused (session authentication comes first, so DRF answers 403).
-  if (response.status === 401) {
-    return true;
-  }
-  if (response.status !== 403) {
-    return false;
-  }
-  try {
-    const { code } = await response.clone().json();
-    return code === "mfa_required";
-  } catch {
-    return false;
-  }
-}
-
 export async function jwtFetch(input, init = {}, contentType) {
   // Same as fetch, but retries once with a new token if the token is refused
+  // (expired or invalid)
   let attempts = 0,
     response;
   while (attempts <= 1) {
@@ -66,7 +50,7 @@ export async function jwtFetch(input, init = {}, contentType) {
       headers,
       ...init,
     });
-    if (!(await shouldRetryWithNewToken(response))) {
+    if (response.status !== 401) {
       return response;
     }
     attempts += 1;

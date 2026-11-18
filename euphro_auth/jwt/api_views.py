@@ -1,10 +1,9 @@
 from drf_spectacular.utils import extend_schema
 from rest_framework import authentication
 from rest_framework.permissions import IsAdminUser
-from rest_framework_simplejwt.views import TokenRefreshView, TokenViewBase
+from rest_framework_simplejwt.views import TokenViewBase
 
 from .serializers import (
-    MFAEnforcingTokenRefreshSerializer,
     SessionAccessTokenResponseSerializer,
     SessionAccessTokenSerializer,
 )
@@ -28,7 +27,3 @@ class SessionAccessTokenView(TokenViewBase):
     @extend_schema(request=None, responses=SessionAccessTokenResponseSerializer)
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
-
-
-class MFAEnforcingTokenRefreshView(TokenRefreshView):
-    serializer_class = MFAEnforcingTokenRefreshSerializer  # type: ignore[assignment]

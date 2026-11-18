@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-from django.conf import settings
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import (
     AuthenticationFailed,
@@ -10,32 +9,7 @@ from rest_framework_simplejwt.exceptions import (
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.tokens import Token
 
-from lab.permissions import is_lab_admin
-
 from ..models import User
-
-MFA_REQUIRED_MESSAGE = "Multi-factor authentication is required for administrators."
-
-
-def is_token_refused_for_missing_mfa(user: User, token) -> bool:
-    """While MFA is enforced, an administrator's token is accepted only when it
-    was issued after a second factor (``mfa`` claim exactly True). This also
-    refuses tokens issued before MFA, which have no such claim."""
-    return bool(
-        settings.MFA_ADMIN_REQUIRED
-        and is_lab_admin(user)
-        and token.get("mfa", None) is not True
-    )
-
-
-class MFAEnforcingJWTAuthentication(JWTAuthentication):
-    """Default JWT authentication: refuse administrators' tokens without MFA."""
-
-    def get_user(self, validated_token):
-        user = super().get_user(validated_token)
-        if is_token_refused_for_missing_mfa(user, validated_token):
-            raise AuthenticationFailed(MFA_REQUIRED_MESSAGE, code="mfa_required")
-        return user
 
 
 class EuphrosyneBackendToken(Token):
