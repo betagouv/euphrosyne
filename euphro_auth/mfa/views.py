@@ -17,14 +17,13 @@ from . import services
 logger = logging.getLogger(__name__)
 
 
-def _check_mfa_user(request: HttpRequest, *, changes_factor: bool = False) -> None:
-    # MFA is offered to administrators only for now. Anonymous requests are
-    # left to allauth, which redirects them to the sign-in page.
+def _check_mfa_user(request: HttpRequest) -> None:
+    # MFA is offered to administrators only for now, who cannot be
+    # impersonated. Anonymous requests are left to allauth, which redirects them
+    # to the sign-in page.
     if not request.user.is_authenticated:
         return
     if not is_lab_admin(request.user):
-        raise PermissionDenied
-    if changes_factor and request.session.get("impersonator_user_id"):
         raise PermissionDenied
 
 
@@ -47,7 +46,7 @@ class ReauthenticateView(base_views.ReauthenticateView):
 
 class ActivateTOTPView(totp_views.ActivateTOTPView):
     def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponseBase:
-        _check_mfa_user(request, changes_factor=True)
+        _check_mfa_user(request)
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form) -> HttpResponse:
@@ -59,7 +58,7 @@ class ActivateTOTPView(totp_views.ActivateTOTPView):
 
 class DeactivateTOTPView(totp_views.DeactivateTOTPView):
     def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponseBase:
-        _check_mfa_user(request, changes_factor=True)
+        _check_mfa_user(request)
         return super().dispatch(request, *args, **kwargs)
 
     # Removing the factor needs a fresh code or password, even within a verified

@@ -89,24 +89,28 @@ class TestImpersonateSelectedUserAction(TestCase):
             )
         ]
 
-    def test_impersonation_action_rejects_superuser_target(self):
+    def test_impersonation_action_rejects_administrator_targets(self):
         request = self.get_request(LabAdminUserFactory(is_superuser=True))
-        target_user = StaffUserFactory(is_superuser=True)
+        for target_user in (
+            StaffUserFactory(is_superuser=True),
+            LabAdminUserFactory(),
+        ):
+            request._messages.clear()  # pylint: disable=protected-access
 
-        response = self.model_admin.impersonate_selected_user(
-            request,
-            User.objects.filter(pk=target_user.pk),
-        )
-
-        assert response is None
-        assert request._messages == [  # pylint: disable=protected-access
-            (
-                messages.ERROR,
-                gettext("Impersonating superusers is not allowed."),
-                "",
-                False,
+            response = self.model_admin.impersonate_selected_user(
+                request,
+                User.objects.filter(pk=target_user.pk),
             )
-        ]
+
+            assert response is None
+            assert request._messages == [  # pylint: disable=protected-access
+                (
+                    messages.ERROR,
+                    gettext("Impersonating administrators is not allowed."),
+                    "",
+                    False,
+                )
+            ]
 
     def test_impersonation_action_logs_in_target_user_and_stores_metadata(self):
         admin_user = LabAdminUserFactory(is_superuser=True)

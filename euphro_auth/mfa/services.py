@@ -26,7 +26,6 @@ from .adapter import is_readable
 
 logger = logging.getLogger(__name__)
 
-IMPERSONATION = "impersonation"
 FAILURES_CACHE_TIMEOUT = 24 * 60 * 60
 
 
@@ -49,18 +48,13 @@ def is_session_verified(request: HttpRequest, user: User | AnonymousUser) -> boo
     allauth records, in the session, each authentication method used. Removing
     a factor, or a reset by a superuser, ends the user's other sessions and
     forgets the second factor of the current one (end_sessions,
-    forget_verification), so the records alone are enough.
-    An impersonation started from a verified session counts as verified."""
+    forget_verification), so the records alone are enough."""
     if not user.is_authenticated:
         return False
-    for record in get_authentication_records(request, user):
-        if record.get("method") != "mfa":
-            continue
-        if record.get("type") != IMPERSONATION:
-            return True
-        if record.get("impersonator_id") == request.session.get("impersonator_user_id"):
-            return True
-    return False
+    return any(
+        record.get("method") == "mfa"
+        for record in get_authentication_records(request, user)
+    )
 
 
 def forget_verification(request: HttpRequest) -> None:
@@ -104,14 +98,6 @@ def mark_enrollment_verified(request: HttpRequest, authenticator) -> None:
         enrolled=True,
     )
     rotate_session_keys(request)
-
-
-def mark_impersonation_verified(
-    request: HttpRequest, target: User, impersonator_id: int
-) -> None:
-    record_authentication(
-        request, target, "mfa", type=IMPERSONATION, impersonator_id=impersonator_id
-    )
 
 
 def get_mfa_url(user: User, next_url: str | None = None) -> str:
