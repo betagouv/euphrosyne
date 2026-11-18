@@ -161,7 +161,7 @@ def test_lockout_does_not_affect_another_account_on_the_same_ip(client, user):
 
 
 def test_existing_session_and_refresh_remain_usable_during_lockout(client, user):
-    refresh = EuphroRefreshToken.for_user(user, mfa=False)
+    refresh = EuphroRefreshToken.for_user(user)
     client.force_login(user)
     other_client = Client()
     fail(other_client, user, 5)

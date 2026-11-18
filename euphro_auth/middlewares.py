@@ -100,8 +100,8 @@ class AccountGatesMiddleware:
     has a factor is signed out and signs in again with a code. Pages are
     redirected to the step; API calls get a JSON 403 with
     ``detail``, ``code`` and ``redirect_url``. Only the session user is
-    checked: API clients authenticated by JWT carry their MFA state in the
-    token (see euphro_auth.jwt)."""
+    checked: API tokens are only issued to a session that went through these
+    steps (see euphro_auth.jwt)."""
 
     def __init__(self, get_response: Callable[[HttpRequest], HttpResponse]) -> None:
         self.get_response = get_response

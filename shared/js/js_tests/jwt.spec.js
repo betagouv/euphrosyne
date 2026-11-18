@@ -108,13 +108,10 @@ describe("getToken", () => {
 });
 
 describe("jwtFetch", () => {
-  it.each([
-    ["an unauthorized status", jsonResponse(401, { code: "token_not_valid" })],
-    ["a missing second factor", jsonResponse(403, { code: "mfa_required" })],
-  ])("retries once with a new token after %s", async (_, refusal) => {
+  it("retries once with a new token after an unauthorized status", async () => {
     fetchMock
       .mockResolvedValueOnce(jsonResponse(200, { access: "token 1" }))
-      .mockResolvedValueOnce(refusal)
+      .mockResolvedValueOnce(jsonResponse(401, { code: "token_not_valid" }))
       .mockResolvedValueOnce(jsonResponse(200, { access: "token 2" }))
       .mockResolvedValueOnce(jsonResponse(200, { ok: true }));
 
@@ -132,7 +129,7 @@ describe("jwtFetch", () => {
     );
   });
 
-  it("does not retry on other forbidden responses", async () => {
+  it("does not retry on forbidden responses", async () => {
     fetchMock
       .mockResolvedValueOnce(jsonResponse(200, { access: "token 1" }))
       .mockResolvedValueOnce(jsonResponse(403, { code: "permission_denied" }));

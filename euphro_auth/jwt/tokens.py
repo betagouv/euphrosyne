@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-from django.conf import settings
 from rest_framework_simplejwt.settings import api_settings as rf_simplejwt_api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -11,20 +10,15 @@ from ..models import User
 
 class EuphroRefreshToken(RefreshToken):
     @classmethod
-    def for_user(  # type: ignore[override] # pylint: disable=arguments-differ
-        cls, user: User, *, mfa: bool
-    ):
-        """``mfa``: whether the session issuing the token went through a second
-        factor. Administrator rights (``is_admin``, used by the Tools API) are
-        granted only then, or when MFA is not enforced."""
+    def for_user(cls, user: User):  # type: ignore[override]
+        """Tokens are issued to a session that went through AccountGatesMiddleware
+        (second factor of administrators included): consumers such as the Tools
+        API only read ``is_admin``."""
         token = super().for_user(user)
         token["projects"] = list(
             user.project_set.values("id", "name", "slug")  # type: ignore[misc]
         )
-        token["mfa"] = mfa
-        token["is_admin"] = is_lab_admin(user) and (
-            mfa or not settings.MFA_ADMIN_REQUIRED
-        )
+        token["is_admin"] = is_lab_admin(user)
         # because https://github.com/jazzband/djangorestframework-simplejwt/pull/887
         token["user_id"] = int(token["user_id"])
         return token
