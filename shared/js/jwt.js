@@ -10,20 +10,7 @@
 import { getCSRFToken } from "../../lab/assets/js/utils.js";
 import { jwtDecode } from "jwt-decode";
 
-// Keys used by previous versions to store tokens in localStorage.
-const LEGACY_STORAGE_KEYS = ["euphrosyne-jwt-access", "euphrosyne-jwt-refresh"];
-
 let accessToken = null;
-
-function removeLegacyTokens() {
-  try {
-    LEGACY_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
-  } catch (e) {
-    console.error("Failed to remove legacy tokens", e);
-  }
-}
-
-removeLegacyTokens();
 
 export async function jwtFetch(input, init = {}, contentType) {
   // Same as fetch, but retries once with a new token if the token is refused
@@ -91,12 +78,10 @@ async function fetchToken() {
   if (response.ok && data?.access) {
     return data.access;
   }
-  if (!response.ok && data?.redirect_url) {
-    // The session must complete a step first (second factor, CGU...).
-    window.location.assign(data.redirect_url);
-    throw new Error(
-      `Failed to get token: ${data.detail || data.code || response.status}`,
-    );
-  }
-  throw new Error(`Failed to get token (status ${response.status})`);
+  // A gate of AccountGatesMiddleware (second factor, CGU...) answers with a
+  // `detail`: the session changed after the page loaded. Leave the page as it
+  // is (unsaved form, upload in progress); its next load goes through the gate.
+  throw new Error(
+    `Failed to get token: ${data?.detail || `status ${response.status}`}`,
+  );
 }

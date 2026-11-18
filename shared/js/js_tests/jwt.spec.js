@@ -34,17 +34,6 @@ beforeEach(async () => {
   jwt = await import("../jwt");
 });
 
-describe("legacy storage", () => {
-  it("removes tokens stored by previous versions on load", async () => {
-    localStorage.setItem("euphrosyne-jwt-access", "old access");
-    localStorage.setItem("euphrosyne-jwt-refresh", "old refresh");
-    vi.resetModules();
-    await import("../jwt");
-    expect(localStorage.getItem("euphrosyne-jwt-access")).toBeNull();
-    expect(localStorage.getItem("euphrosyne-jwt-refresh")).toBeNull();
-  });
-});
-
 describe("getToken", () => {
   it("fetches an access token from the session endpoint", async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse(200, { access: "token 1" }));
@@ -80,29 +69,29 @@ describe("getToken", () => {
     expect(await jwt.getToken(false)).toBe("token 2");
   });
 
-  it("follows the redirection of a session gate and throws", async () => {
-    const assign = vi.fn();
-    vi.spyOn(window, "location", "get").mockReturnValue({ assign });
+  it("throws the detail of a session gate", async () => {
     fetchMock.mockResolvedValueOnce(
       jsonResponse(403, {
-        detail: "Multi-factor authentication is required.",
-        code: "mfa_required",
-        redirect_url: "/accounts/2fa/authenticate/",
+        detail: "You must accept the Terms and Conditions to continue.",
+        code: "cgu_acceptance_required",
+        redirect_url: "/cgu/",
       }),
     );
 
     await expect(jwt.getToken()).rejects.toThrow(
-      "Multi-factor authentication is required.",
+      "Failed to get token: You must accept the Terms and Conditions to continue.",
     );
-    expect(assign).toHaveBeenCalledWith("/accounts/2fa/authenticate/");
-    vi.restoreAllMocks();
   });
 
-  it("throws a clear error when no token is returned", async () => {
-    fetchMock.mockResolvedValueOnce(jsonResponse(403, { detail: "Nope" }));
+  it("throws the status when the response has no detail", async () => {
+    fetchMock.mockResolvedValueOnce({
+      ok: false,
+      status: 502,
+      json: vi.fn().mockRejectedValue(new SyntaxError("not JSON")),
+    });
 
     await expect(jwt.getToken()).rejects.toThrow(
-      "Failed to get token (status 403)",
+      "Failed to get token: status 502",
     );
   });
 });
