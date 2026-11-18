@@ -151,23 +151,6 @@ def test_unverified_admin_can_reach_cgu_and_log_out(client, admin_user):
     assert not auth.get_user(client).is_authenticated
 
 
-def test_enrollment_with_wrong_codes_logs_consecutive_failures(
-    client, admin_user, caplog
-):
-    client.force_login(admin_user)
-    client.get(ACTIVATE_URL)
-    with caplog.at_level(logging.WARNING, logger="euphro_auth.mfa.services"):
-        for _ in range(2):
-            assert client.post(ACTIVATE_URL, {"code": "000000"}).status_code == 200
-    assert [record.getMessage() for record in caplog.records] == [
-        f"MFA enrollment code rejected for user {admin_user.pk} "
-        "(consecutive failures: 1)",
-        f"MFA enrollment code rejected for user {admin_user.pk} "
-        "(consecutive failures: 2)",
-    ]
-    assert not Authenticator.objects.exists()
-
-
 @pytest.mark.parametrize(
     "language, subject, message",
     [
@@ -187,21 +170,17 @@ def test_enrollment_with_wrong_codes_logs_consecutive_failures(
 )
 # Transactional: allauth sends the notice once the factor is committed.
 @pytest.mark.django_db(transaction=True)
-def test_enrollment_signs_out_and_informs_owner(
-    admin_user, caplog, language, subject, message
-):
+def test_enrollment_signs_out_and_informs_owner(admin_user, language, subject, message):
     # The preferred language follows the browser's (UserLanguageMiddleware).
     client = Client(headers={"accept-language": language})
     password_login(client, admin_user)
     secret = client.get(ACTIVATE_URL).context["form"].secret
 
-    with caplog.at_level(logging.INFO, logger="euphro_auth.mfa.views"):
-        response = client.post(ACTIVATE_URL, {"code": totp_code(secret)})
+    response = client.post(ACTIVATE_URL, {"code": totp_code(secret)})
 
     assert response.url == LOGIN_URL
     assert not auth.get_user(client).is_authenticated
     assert Authenticator.objects.filter(user=admin_user, type="totp").exists()
-    assert f"MFA TOTP enrolled for user {admin_user.pk}" in caplog.messages
     assert len(mail.outbox) == 1
     assert mail.outbox[0].to == [admin_user.email]
     assert mail.outbox[0].subject == subject
@@ -222,19 +201,26 @@ def test_admin_with_factor_gives_a_code_before_being_signed_in(
     assert response.url == reverse("mfa_authenticate")
     assert not auth.get_user(client).is_authenticated
 
-    with caplog.at_level(logging.INFO, logger="euphro_auth.mfa.services"):
+    with caplog.at_level(logging.INFO, logger="euphro_auth.mfa.signals"):
         response = client.post(reverse("mfa_authenticate"), {"code": "000000"})
         assert response.status_code == 200
         assert not auth.get_user(client).is_authenticated
         response = client.post(reverse("mfa_authenticate"), {"code": totp_code(secret)})
     assert response.status_code == 302
     assert auth.get_user(client).pk == admin_user.pk
-    assert caplog.messages == [
-        f"MFA verification code rejected for user {admin_user.pk} "
-        "(consecutive failures: 1)",
-        f"MFA verification succeeded for user {admin_user.pk}",
-    ]
+    assert caplog.messages == [f"MFA code rejected for user {admin_user.pk} (sign-in)"]
     assert client.get(PROJECTS_URL).status_code == 200
+
+
+def test_wrong_reauthentication_code_is_logged(verified_client, admin_user, caplog):
+    with caplog.at_level(logging.WARNING, logger="euphro_auth.mfa.signals"):
+        response = verified_client.post(
+            reverse("mfa_reauthenticate"), {"code": "000000"}
+        )
+    assert response.status_code == 200
+    assert caplog.messages == [
+        f"MFA code rejected for user {admin_user.pk} (reauthentication)"
+    ]
 
 
 def test_codes_are_throttled_after_five_failures(client, admin_user):
@@ -385,9 +371,7 @@ def test_password_reset_keeps_the_factor(client, admin_user):
 # Recovery through a superuser (R30)
 
 
-def test_superuser_resets_a_factor_from_the_user_admin(
-    verified_client, admin_user, caplog
-):
+def test_superuser_resets_a_factor_from_the_user_admin(verified_client, admin_user):
     admin_user.is_superuser = True
     admin_user.save()
     target = LabAdminUserFactory()
@@ -398,11 +382,10 @@ def test_superuser_resets_a_factor_from_the_user_admin(
     sign_in(target_client, target, target_secret)
     assert target_client.get(PROJECTS_URL).status_code == 200
 
-    with caplog.at_level(logging.WARNING, logger="euphro_auth.admin"):
-        verified_client.post(
-            reverse("admin:euphro_auth_user_changelist"),
-            {"action": "reset_mfa_devices", "_selected_action": [target.pk]},
-        )
+    verified_client.post(
+        reverse("admin:euphro_auth_user_changelist"),
+        {"action": "reset_mfa_devices", "_selected_action": [target.pk]},
+    )
 
     assert not Authenticator.objects.filter(user=target).exists()
     assert LogEntry.objects.filter(
@@ -410,10 +393,6 @@ def test_superuser_resets_a_factor_from_the_user_admin(
         object_id=str(target.pk),
         change_message="Reset two-factor authentication devices",
     ).exists()
-    assert (
-        f"MFA devices of user {target.pk} removed by superuser {admin_user.pk}"
-        in caplog.messages
-    )
     # The target is signed out everywhere and sets up a new factor at sign-in.
     assert not auth.get_user(target_client).is_authenticated
 

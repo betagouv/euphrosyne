@@ -422,8 +422,6 @@ MFA_TOTP_ISSUER = "Euphrosyne"
 # Accept the previous and next 30-second codes, for clock drift.
 MFA_TOTP_TOLERANCE = 1
 MFA_FORMS = {
-    "authenticate": "euphro_auth.mfa.forms.AuthenticateForm",
-    "reauthenticate": "euphro_auth.mfa.forms.ReauthenticateForm",
     "activate_totp": "euphro_auth.mfa.forms.ActivateTOTPForm",
 }
 # Enrollment needs no second password prompt right after sign-in; removing a

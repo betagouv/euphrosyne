@@ -1,11 +1,18 @@
-from django.http import HttpRequest
+import logging
 
 from ..models import User
-from . import services
+
+logger = logging.getLogger(__name__)
 
 
-def on_authenticator_used(
-    sender, request: HttpRequest, user: User, reauthenticated: bool = False, **kwargs
+def log_authentication_failure(
+    sender, user: User, reauthentication: bool = False, **kwargs
 ) -> None:
     # pylint: disable=unused-argument
-    services.record_success(user)
+    """Name the account targeted by a wrong code: router logs only show the
+    request. allauth throttles the codes itself."""
+    logger.warning(
+        "MFA code rejected for user %s (%s)",
+        user.pk,
+        "reauthentication" if reauthentication else "sign-in",
+    )
