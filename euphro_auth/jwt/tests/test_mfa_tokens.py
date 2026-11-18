@@ -12,7 +12,7 @@ from rest_framework_simplejwt.state import token_backend
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from euphro_auth.tests.factories import LabAdminUserFactory, StaffUserFactory
-from euphro_auth.tests.test_mfa import enroll, verify
+from euphro_auth.tests.test_mfa import PASSWORD, enroll, sign_in
 
 from ..tokens import EuphroRefreshToken
 
@@ -47,14 +47,15 @@ def mfa_required(settings):
 
 @pytest.fixture(name="admin_user")
 def admin_user_fixture():
-    return LabAdminUserFactory()
+    user = LabAdminUserFactory()
+    user.set_password(PASSWORD)
+    user.save()
+    return user
 
 
 @pytest.fixture(name="verified_client")
 def verified_client_fixture(client, admin_user):
-    secret = enroll(admin_user)
-    client.force_login(admin_user)
-    assert verify(client, secret).status_code == 302
+    sign_in(client, admin_user, enroll(admin_user))
     return client
 
 

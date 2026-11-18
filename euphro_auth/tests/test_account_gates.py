@@ -88,10 +88,7 @@ def test_mfa_gate_comes_before_cgu_gate(client, settings):
     client.force_login(admin)
 
     response = client.get(PROJECTS_URL)
-    assert response.url.startswith(reverse("mfa_reauthenticate"))
-    # The MFA page itself is not sent to the CGU page.
-    assert client.get(reverse("mfa_reauthenticate")).status_code == 200
-    assert client.get(reverse("cgu_acceptance")).status_code == 200
+    assert response.url.startswith(reverse("account_login"))
 
 
 def test_cgu_gate_comes_before_employer_gate(client, settings):

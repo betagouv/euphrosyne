@@ -672,6 +672,9 @@ msgstr "Le superutilisateur doit avoir is_superuser=True"
 msgid "Multi-factor authentication is required."
 msgstr "L’authentification à deux facteurs est requise."
 
+msgid "Sign in again with a code from your app."
+msgstr "Reconnectez-vous avec un code de votre application."
+
 msgid "You must complete your account information to continue."
 msgstr "Vous devez compléter les informations de votre compte pour continuer."
 
@@ -858,6 +861,13 @@ msgstr ""
 
 msgid "Two-factor authentication disabled"
 msgstr "Authentification à deux facteurs désactivée"
+
+msgid ""
+"Two-factor authentication is enabled. Sign in again with a code from your "
+"app."
+msgstr ""
+"L’authentification à deux facteurs est activée. Reconnectez-vous avec un "
+"code de votre application."
 
 msgid "ORCID sign-in failed. Please try again."
 msgstr "La connexion avec ORCID a échoué. Veuillez réessayer."
