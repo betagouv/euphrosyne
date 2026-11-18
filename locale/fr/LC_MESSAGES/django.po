@@ -633,6 +633,12 @@ msgstr "Modifier le mot de passe en utilisant {}."
 msgid "No password. You can set one using {}."
 msgstr "Aucun mot de passe. Vous pouvez en définir un en utilisant {}."
 
+msgid "Account security"
+msgstr "Sécurité du compte"
+
+msgid "Manage two-factor authentication"
+msgstr "Gérer l'authentification à deux facteurs"
+
 msgid "Radiation protection"
 msgstr "Radioprotection"
 
@@ -665,6 +671,9 @@ msgstr "Le superutilisateur doit avoir is_superuser=True"
 
 msgid "Multi-factor authentication is required."
 msgstr "L’authentification à deux facteurs est requise."
+
+msgid "You must complete your account information to continue."
+msgstr "Vous devez compléter les informations de votre compte pour continuer."
 
 msgid "You must accept the Terms and Conditions to continue."
 msgstr ""
@@ -729,6 +738,18 @@ msgstr "Se connecter avec ORCID"
 
 msgid "Forgotten your password or username?"
 msgstr "Mot de passe oublié ?"
+
+msgid ""
+"Your ORCID account isn't connected to an existing account. Please use email/"
+"password to sign in, or register with ORCID first using the link you "
+"received in the invitation email."
+msgstr ""
+"Votre compte ORCID n'est pas connecté à un compte existant. Veuillez "
+"utiliser votre email/mot de passe pour vous connecter, ou enregistrez-vous "
+"d'abord avec ORCID en utilisant le lien reçu dans l'email d'invitation."
+
+msgid "Back to sign-in"
+msgstr "Retour à la connexion"
 
 msgid "Invite user"
 msgstr "Inviter un utilisateur"
@@ -838,6 +859,12 @@ msgstr ""
 msgid "Two-factor authentication disabled"
 msgstr "Authentification à deux facteurs désactivée"
 
+msgid "ORCID sign-in failed. Please try again."
+msgstr "La connexion avec ORCID a échoué. Veuillez réessayer."
+
+msgid "ORCID sign-in was cancelled."
+msgstr "La connexion avec ORCID a été annulée."
+
 msgid "Enter your information"
 msgstr "Entrez vos informations"
 
@@ -852,12 +879,6 @@ msgstr "Tableau de bord"
 
 msgid "Admin"
 msgstr "Administration"
-
-msgid "Account security"
-msgstr "Sécurité du compte"
-
-msgid "Manage two-factor authentication"
-msgstr "Gérer l'authentification à deux facteurs"
 
 msgid "Proton"
 msgstr "Proton"
@@ -1754,27 +1775,6 @@ msgstr "Objet"
 
 msgid "Date"
 msgstr "Date"
-
-msgid ""
-"Your ORCID account isn't connected to an existing account. Please use email/"
-"password to sign in, or register with ORCID first using the link you "
-"received in the invitation email."
-msgstr ""
-"Votre compte ORCID n'est pas connecté à un compte existant. Veuillez "
-"utiliser votre email/mot de passe pour vous connecter, ou enregistrez-vous "
-"d'abord avec ORCID en utilisant le lien reçu dans l'email d'invitation."
-
-msgid "ORCID sign-in failed. Please try again."
-msgstr "La connexion avec ORCID a échoué. Veuillez réessayer."
-
-msgid "ORCID sign-in was cancelled."
-msgstr "La connexion avec ORCID a été annulée."
-
-msgid "Back to sign-in"
-msgstr "Retour à la connexion"
-
-msgid "You must complete your account information to continue."
-msgstr "Vous devez compléter les informations de votre compte pour continuer."
 
 msgid ""
 "Your ORCID registration invitation is invalid or has expired. Please reopen "
