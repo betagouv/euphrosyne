@@ -1,5 +1,3 @@
-import datetime
-
 from rest_framework_simplejwt.settings import api_settings as rf_simplejwt_api_settings
 from rest_framework_simplejwt.tokens import RefreshToken
 
@@ -31,9 +29,3 @@ class EuphroToolsAPIToken(RefreshToken):
         token["projects"] = []
         token["is_admin"] = True
         return token
-
-
-class LongEuphroRefreshToken(EuphroRefreshToken):
-    """Token with a longer lifetime (app-to-app communication)."""
-
-    lifetime = datetime.timedelta(days=30)

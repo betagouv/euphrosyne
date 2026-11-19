@@ -1,0 +1,32 @@
+{% extends "unauthorized.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static "admin/css/login.css" %}">
+<link rel="stylesheet" type="text/css" href="{% static "css/login.css" %}">
+{{ block.super }}
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+
+{% block usertools %}{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content_panel %}
+  {{ block.super }}
+  <div id="content-main">
+    {% block mfa_content %}{% endblock %}
+
+    <form method="post" action="{% url 'admin:logout' %}" class="fr-mt-4w">
+      {% csrf_token %}
+      <button type="submit" class="fr-btn fr-btn--tertiary-no-outline fr-btn--sm">{% translate "Log out" %}</button>
+    </form>
+  </div>
+{% endblock %}

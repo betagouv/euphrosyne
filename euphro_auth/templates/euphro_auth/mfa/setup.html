@@ -1,0 +1,26 @@
+{% extends "euphro_auth/mfa/_layout.html" %}
+{% load i18n %}
+
+{% block mfa_content %}
+<h3>{% translate "Set up two-factor authentication" %}</h3>
+
+<p>
+  {% blocktranslate trimmed %}
+  Two-factor authentication is mandatory for administrator accounts.
+  Scan this QR code with an authenticator application (for example FreeOTP, Aegis, Google Authenticator or Microsoft Authenticator).
+  {% endblocktranslate %}
+</p>
+
+<div class="mfa-qr-code fr-my-3w" style="background: #fff; display: inline-block; padding: 0.5rem;">
+  {{ qr_code_svg|safe }}
+</div>
+
+<p class="fr-text--sm">
+  {% translate "If you cannot scan the QR code, enter this key manually in your application:" %}<br>
+  <code>{{ secret }}</code>
+</p>
+
+{% translate "Enter the 6-digit code displayed by your application to confirm." as hint %}
+{% translate "Confirm" as submit_label %}
+{% include "euphro_auth/mfa/_code_form.html" with hint=hint submit_label=submit_label %}
+{% endblock %}

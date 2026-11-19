@@ -38,3 +38,26 @@ def send_invitation_email(user: "User"):
         to_emails=[user.email],
         user=user,
     )
+
+
+def send_mfa_enrolled_email(user: "User"):
+    """Inform the account owner that a two-factor authentication device was
+    enrolled on their account."""
+    context = {
+        "email": user.email,
+        "site_url": settings.SITE_URL,
+    }
+
+    with use_user_language(user=user):
+        subject = _("[Euphrosyne] Two-factor authentication enabled")
+
+    sent = send_email_with_language(
+        subject=subject,
+        template_name="euphro_auth/mfa_enrolled_email",
+        context=context,
+        to_emails=[user.email],
+        user=user,
+    )
+    if not sent:
+        logger.warning("MFA enrollment email could not be sent to user %s", user.pk)
+    return sent

@@ -20,6 +20,9 @@ def setup_django_conf(monkeypatch: pytest.MonkeyPatch, settings):
     monkeypatch.setenv("EUPHROSYNE_TOOLS_API_URL", "https://tools")
     settings.EUPHROSYNE_TOOLS_API_URL = "https://tools"
     settings.FORCE_LAST_CGU_ACCEPTANCE_DT = None
+    # Most tests log lab admins in with force_login, which does not verify a
+    # second factor. MFA enforcement is tested explicitly in euphro_auth.mfa.
+    settings.MFA_ADMIN_REQUIRED = False
 
 
 @pytest.fixture(autouse=True, scope="session")

@@ -15,3 +15,9 @@ class EuphroAuthConfig(AppConfig):
             set_session_idle_timeout,
             dispatch_uid="euphro_auth.set_session_idle_timeout",
         )
+
+        from .mfa.conf import (  # pylint: disable=import-outside-toplevel
+            warn_if_mfa_disabled,
+        )
+
+        warn_if_mfa_disabled()

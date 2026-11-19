@@ -1,0 +1,12 @@
+{% extends "euphro_auth/mfa/_layout.html" %}
+{% load i18n %}
+
+{% block mfa_content %}
+<h3>{% translate "Two-factor authentication" %}</h3>
+
+<p>{% translate "Enter the 6-digit code displayed by your authenticator application." %}</p>
+
+{% translate "If you no longer have access to your application, ask a superuser to reset your two-factor authentication." as hint %}
+{% translate "Verify" as submit_label %}
+{% include "euphro_auth/mfa/_code_form.html" with hint=hint submit_label=submit_label %}
+{% endblock %}
