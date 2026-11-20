@@ -1,66 +1,63 @@
-from typing import Any, Dict
+from typing import Any, Dict, cast
 
-from django.contrib.auth import get_user_model
+from allauth.socialaccount.models import SocialAccount
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models
 from django.forms.models import ModelForm
-from django.http import HttpRequest, HttpResponse
-from django.http.response import HttpResponseBase
-from django.urls.base import reverse
+from django.http import HttpRequest
+from django.http.response import HttpResponse, HttpResponseBase
+from django.shortcuts import redirect
 from django.utils import timezone
 from django.views.generic.edit import UpdateView
-from social_django.models import Partial
 
 from euphro_auth.models import User
 
-from .invitations import (
-    registration_partial,
-    reject_invitation,
-)
+
+def is_completion_required(user: User) -> bool:
+    """An invited user who signed in with ORCID completes their information
+    before using the platform (see euphro_auth's AccountGatesMiddleware)."""
+    return (
+        user.invitation_completed_at is None
+        and SocialAccount.objects.filter(user=user, provider="orcid").exists()
+    )
 
 
-class UserCompleteAccountView(UpdateView):
+class UserCompleteAccountView(LoginRequiredMixin, UpdateView):
     """View displaying a form for the user to complete
-    and verify his/her information in ORCID OAuth process.
+    and verify his/her information after the first ORCID sign-in.
     """
 
     template_name = "oauth_complete_information_form.html"
-    model = get_user_model()
+    model = User
     fields = ["email", "first_name", "last_name"]
-    registration_partial: Partial
+    success_url = "/"
 
     def dispatch(
         self, request: HttpRequest, *args: Any, **kwargs: Any
     ) -> HttpResponseBase:
-        saved = registration_partial(request, kwargs["token"])
-        if saved is None or saved.kwargs["user"].invitation_completed_at:
-            return reject_invitation(request)
-        self.registration_partial = saved
+        if request.user.is_authenticated and not is_completion_required(
+            cast(User, request.user)
+        ):
+            return redirect("/")
         return super().dispatch(request, *args, **kwargs)
 
-    def get_partial(self) -> Partial:
-        return self.registration_partial
-
     def get_object(self, queryset: models.query.QuerySet | None = None) -> User:
-        partial = self.get_partial()
-        user = partial.kwargs.get("user")
-        return user
+        return cast(User, self.request.user)
 
     def get_initial(self) -> Dict[str, Any]:
-        partial = self.get_partial()
-        user_details = partial.kwargs.get("details")
+        account = SocialAccount.objects.get(user=self.object, provider="orcid")
+        # Values returned by ORCID, which the form proposes.
+        proposed = account.get_provider().extract_common_fields(account.extra_data)
         return {
             **super().get_initial(),
-            "email": user_details.get("email", None) or self.object.email,
-            "first_name": user_details.get("first_name", None),
-            "last_name": user_details.get("last_name", None),
+            **{
+                field: value
+                for field, value in proposed.items()
+                if field in self.fields and value
+            },
         }
 
     def form_valid(self, form: ModelForm) -> HttpResponse:
-        self.object.invitation_completed_at = timezone.now()
-        self.object.is_staff = True
-        response = super().form_valid(form)
-        return response
-
-    def get_success_url(self) -> str:
-        partial = self.get_partial()
-        return reverse("social:complete", args=(partial.backend,))
+        form.instance.invitation_completed_at = timezone.now()
+        form.instance.is_staff = True
+        return super().form_valid(form)

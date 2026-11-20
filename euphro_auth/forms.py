@@ -1,9 +1,11 @@
+from allauth.account.forms import LoginForm as AllauthLoginForm
+from allauth.account.forms import ResetPasswordForm as AllauthResetPasswordForm
 from django import forms
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.forms import SetPasswordForm as DjangoSetPasswordForm
 from django.contrib.auth.forms import UserChangeForm as DjangoUserChangeForm
 from django.contrib.auth.forms import UserCreationForm as DjangoUserCreationForm
-from django.core.exceptions import ValidationError
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -75,3 +77,26 @@ class CGUAcceptanceForm(forms.Form):
     accept_cgu = forms.BooleanField(
         label=_("I have read and accept the Terms and Conditions."), required=True
     )
+
+
+class ResetPasswordForm(AllauthResetPasswordForm):
+    users: list[User]
+
+    def clean_email(self) -> str:
+        email = super().clean_email()
+        # pylint: disable=attribute-defined-outside-init
+        # Like Django's password reset, skip accounts without a usable password
+        # (ORCID-only accounts).
+        self.users = [user for user in self.users if user.has_usable_password()]
+        return email
+
+
+class LoginForm(AllauthLoginForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # The page shows its own "forgotten password" link.
+        self.fields["password"].help_text = ""
+
+    @property
+    def password_locked_out(self) -> bool:
+        return self.has_error(NON_FIELD_ERRORS, "too_many_login_attempts")

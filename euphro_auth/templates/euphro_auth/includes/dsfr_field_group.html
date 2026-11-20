@@ -1,0 +1,23 @@
+{% comment %}
+A bound form field in DSFR markup. Errors are rendered as fr-error-text
+paragraphs rather than Django's ul.errorlist, which the admin CSS paints
+with a white background. The error id matches the widget's aria-describedby.
+{% endcomment %}
+<div class="fr-input-group{% if field.errors %} fr-input-group--error{% endif %}">
+    {% if field.use_fieldset %}
+    <fieldset{% if field.aria_describedby %} aria-describedby="{{ field.aria_describedby }}"{% endif %}>
+    {% if field.label %}{{ field.legend_tag }}{% endif %}
+    {% elif field.label %}
+    <label class="fr-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {% endif %}
+    {% if field.help_text %}
+    <div class="fr-hint-text"{% if field.auto_id %} id="{{ field.auto_id }}_helptext"{% endif %}>{{ field.help_text|safe }}</div>
+    {% endif %}
+    {{ field }}
+    {% if field.use_fieldset %}</fieldset>{% endif %}
+    {% if field.errors %}
+    <div{% if field.auto_id %} id="{{ field.auto_id }}_error"{% endif %}>
+        {% for error in field.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+    </div>
+    {% endif %}
+</div>

@@ -1,16 +1,13 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from .jwt.api_views import LongTokenOptainPairView, SessionTokenObtainPairView
+from .jwt.api_views import SessionAccessTokenView
 
 urlpatterns = [
     path(
         "token/",
-        SessionTokenObtainPairView.as_view(),
-        name="token_obtain_pair",
+        SessionAccessTokenView.as_view(),
+        name="token_obtain",
     ),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path(
-        "long-token/", LongTokenOptainPairView.as_view(), name="token_obtain_pair_long"
-    ),
 ]

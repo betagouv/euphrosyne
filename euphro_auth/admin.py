@@ -24,6 +24,7 @@ from lab.runs.models import Run
 
 from .emails import send_invitation_email
 from .forms import UserChangeForm, UserCreationForm
+from .mfa import services as mfa_services
 from .models import User, UserInvitation
 
 logger = logging.getLogger(__name__)
@@ -163,7 +164,11 @@ class UserAdmin(DjangoUserAdmin):
     )
     list_per_page = 30
     show_facets = ShowFacets.NEVER
-    actions = ("send_invitation_mail_action", "impersonate_selected_user")
+    actions = (
+        "send_invitation_mail_action",
+        "impersonate_selected_user",
+        "reset_mfa_devices",
+    )
 
     add_fieldsets = (
         (
@@ -189,6 +194,7 @@ class UserAdmin(DjangoUserAdmin):
         actions = super().get_actions(request, action_location)
         if request.user.is_superuser is not True:
             actions.pop("impersonate_selected_user", None)
+            actions.pop("reset_mfa_devices", None)
         return actions
 
     def get_list_display(self, request):
@@ -206,7 +212,7 @@ class UserAdmin(DjangoUserAdmin):
         return list_display
 
     def get_readonly_fields(self, request: HttpRequest, obj: Optional[User] = None):
-        fields = ["password_display"]
+        fields = ["password_display", "account_security_display"]
         if apps.is_installed("radiation_protection"):
             fields += ["has_radiation_certification"]
         if request.user.is_superuser:
@@ -218,16 +224,23 @@ class UserAdmin(DjangoUserAdmin):
             "fr-mb-0",
             "fr-pb-1w",
         ]
+        profile_fields: tuple = (
+            ("email", "password_display"),
+            "first_name",
+            "last_name",
+        )
+        if (
+            obj
+            and obj.pk == request.user.pk
+            and mfa_services.is_mfa_required(request.user)
+        ):
+            profile_fields += ("account_security_display",)
         fieldsets = []
         fieldsets += [
             (
                 _("Profile"),
                 {
-                    "fields": (
-                        ("email", "password_display"),
-                        "first_name",
-                        "last_name",
-                    ),
+                    "fields": profile_fields,
                     "classes": [*fieldset_classes],
                 },
             ),
@@ -366,10 +379,12 @@ class UserAdmin(DjangoUserAdmin):
             return None
 
         target_user = queryset.get()
-        if target_user.is_superuser is True:
+        if is_lab_admin(target_user):
+            # Administrators have a second factor, which an impersonation
+            # session cannot give.
             self.message_user(
                 request,
-                _("Impersonating superusers is not allowed."),
+                _("Impersonating administrators is not allowed."),
                 level=messages.ERROR,
             )
             return None
@@ -377,7 +392,7 @@ class UserAdmin(DjangoUserAdmin):
         impersonator_user_id = request.user.pk
         impersonated_user_id = target_user.pk
         impersonation_started_at = timezone.now().isoformat()
-        backend = "euphro_auth.backends.LowercaseEmailBackend"
+        backend = "allauth.account.auth_backends.AuthenticationBackend"
 
         # Keep the actor, target and timestamp in the local administration audit
         # trail rather than in logs forwarded to diagnostic services.
@@ -398,6 +413,41 @@ class UserAdmin(DjangoUserAdmin):
         )
 
         return HttpResponseRedirect("/")
+
+    @admin.action(description=_("Reset two-factor authentication"))
+    def reset_mfa_devices(self, request: HttpRequest, queryset: QuerySet[User]):
+        if request.user.is_superuser is not True:
+            self.message_user(
+                request,
+                _("You do not have permission to reset two-factor authentication."),
+                level=messages.ERROR,
+            )
+            return None
+
+        reset_users = []
+        for target_user in queryset:
+            if mfa_services.remove_factors(target_user):
+                reset_users.append(target_user)
+                # Actor and target are kept in the local administration audit trail.
+                self.log_change(
+                    request, target_user, "Reset two-factor authentication devices"
+                )
+
+        if reset_users:
+            self.message_user(
+                request,
+                _("Two-factor authentication reset for: {}.").format(
+                    ", ".join(user.email for user in reset_users)
+                ),
+                messages.SUCCESS,
+            )
+        else:
+            self.message_user(
+                request,
+                _("None of the selected users had two-factor authentication set up."),
+                messages.WARNING,
+            )
+        return None
 
     @admin.display(description=_("Name"))
     def full_name_display(self, obj: User) -> str:
@@ -431,6 +481,14 @@ class UserAdmin(DjangoUserAdmin):
             else _("No password. You can set one using {}.")
         ).format(change_pasword_link)
         return format_html('<div class="help">{}</div>', mark_safe(text))
+
+    @admin.display(description=_("Account security"))
+    def account_security_display(self, obj: User):  # pylint: disable=unused-argument
+        return format_html(
+            '<a href="{}">{}</a>',
+            reverse("mfa_index"),
+            _("Manage two-factor authentication"),
+        )
 
     @admin.display(description=_("Radiation protection"), boolean=True)
     def has_radiation_certification(self, obj: User) -> bool:

@@ -1,16 +1,15 @@
-from rest_framework import exceptions
-from rest_framework_simplejwt.serializers import (
-    TokenObtainPairSerializer,
-    TokenObtainSerializer,
-)
+from rest_framework import exceptions, serializers
+from rest_framework_simplejwt.serializers import TokenObtainSerializer
 from rest_framework_simplejwt.settings import api_settings as simplejwt_api_settings
 
-from .tokens import EuphroRefreshToken, LongEuphroRefreshToken
+from .tokens import EuphroRefreshToken
 
 
 # pylint: disable=abstract-method
-class SessionTokenObtainSerializer(TokenObtainSerializer):
-    """Generate token based on session user"""
+class SessionAccessTokenSerializer(TokenObtainSerializer):
+    """Generate an access token for the session user. No refresh token is
+    returned: session clients get a new access token from their session, so a
+    token does not outlive the session (logout, next user of the browser)."""
 
     token_class = EuphroRefreshToken
     user = None
@@ -20,7 +19,8 @@ class SessionTokenObtainSerializer(TokenObtainSerializer):
         self.fields = {}
 
     def validate(self, attrs):
-        self.user = self.context["request"].user
+        request = self.context["request"]
+        self.user = request.user
 
         if not simplejwt_api_settings.USER_AUTHENTICATION_RULE(self.user):
             raise exceptions.AuthenticationFailed(
@@ -28,16 +28,12 @@ class SessionTokenObtainSerializer(TokenObtainSerializer):
                 "no_active_account",
             )
 
-        refresh = self.get_token(self.user)
+        refresh = self.token_class.for_user(self.user)
 
-        return {"refresh": str(refresh), "access": str(refresh.access_token)}
-
-    @classmethod
-    def get_token(cls, user):
-        return cls.token_class.for_user(user)
+        return {"access": str(refresh.access_token)}
 
 
-class LongTokenObtainSerializer(TokenObtainPairSerializer):
-    """Generate long-lived token for app-to-app communication"""
+class SessionAccessTokenResponseSerializer(serializers.Serializer):
+    """OpenAPI description of the session access token response."""
 
-    token_class = LongEuphroRefreshToken
+    access = serializers.CharField(read_only=True)

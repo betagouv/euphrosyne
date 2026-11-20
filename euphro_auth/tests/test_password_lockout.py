@@ -1,24 +1,22 @@
-import base64
-import json
-from datetime import timedelta
+import datetime
+import time
 from unittest.mock import patch
 
 import pytest
-from axes.models import AccessAttempt
+from allauth.socialaccount.models import SocialAccount
 from django.contrib import auth
-from django.db.models import Sum
 from django.test import Client
 from django.urls import reverse
 from django.utils import timezone
-from social_django.models import UserSocialAuth
 
+from euphro_auth.adapters import LOCKOUT_MESSAGE
 from euphro_auth.jwt.tokens import EuphroRefreshToken
 from euphro_auth.models import User
-from orcid_oauth.backends import ORCIDOAuth2
+from euphro_auth.tests.test_accounts import NEW_PASSWORD, request_reset, reset_link
+from orcid_oauth.tests.helpers import orcid_callback, start_orcid_login
 
 pytestmark = pytest.mark.django_db
 PASSWORD = "T8!vQ2#rM6@zL9$p"
-CHANNELS = ["web", "basic", "jwt-json", "jwt-form", "long-basic"]
 
 
 @pytest.fixture(autouse=True)
@@ -41,164 +39,132 @@ def password_user():
     )
 
 
+class Clock:
+    def __init__(self):
+        self.now = time.time()
+
+    def advance(self, **kwargs):
+        self.now += datetime.timedelta(**kwargs).total_seconds()
+
+
 @pytest.fixture(name="clock")
 def mocked_clock():
-    with patch("django.utils.timezone.now", return_value=timezone.now()) as mocked:
-        with patch("axes.handlers.proxy.now", mocked):
-            yield mocked
+    """Rate limits and the database cache read time.time()."""
+    clock = Clock()
+    with (
+        patch("time.time", side_effect=lambda: clock.now),
+        patch(
+            "django.utils.timezone.now",
+            side_effect=lambda: datetime.datetime.fromtimestamp(
+                clock.now, tz=datetime.UTC
+            ),
+        ),
+    ):
+        yield clock
 
 
-def password_request(client, channel, email, password, ip="192.0.2.1", **extra):
-    extra["REMOTE_ADDR"] = ip
-    if channel == "web":
-        return client.post(
-            reverse("admin:login"), {"username": email, "password": password}, **extra
-        )
-    if channel in {"basic", "long-basic"}:
-        credentials = base64.b64encode(f"{email}:{password}".encode()).decode()
-        extra["HTTP_AUTHORIZATION"] = f"Basic {credentials}"
-    url = "/api/auth/token/" if channel == "basic" else "/api/auth/long-token/"
-    data = {"email": email, "password": password}
-    if channel == "jwt-json":
-        return client.post(
-            url, json.dumps(data), content_type="application/json", **extra
-        )
-    return client.post(url, data, **extra)
-
-
-def failures(email):
-    return (
-        AccessAttempt.objects.filter(username=email).aggregate(
-            count=Sum("failures_since_start")
-        )["count"]
-        or 0
+def password_request(client, email, password, ip="192.0.2.1", **extra):
+    return client.post(
+        reverse("account_login"),
+        {"login": email, "password": password},
+        REMOTE_ADDR=ip,
+        **extra,
     )
 
 
-@pytest.mark.parametrize("channel", CHANNELS)
-def test_fifth_password_failure_locks_every_channel(client, user, channel):
-    for count in range(1, 6):
-        response = password_request(client, channel, user.email, "wrong-password")
-        assert response.status_code == (
-            429 if count == 5 else 200 if channel == "web" else 401
-        )
-        assert failures(user.email) == count
-    if channel == "web":
-        assert reverse("social:begin", args=("orcid",)) in response.content.decode()
-        assert 'id="login-form"' not in response.content.decode()
-    else:
-        assert "ORCID" in response.json()["detail"]
-    for target in CHANNELS:
-        with patch.object(
-            User, "check_password", side_effect=AssertionError("blocked")
-        ):
-            response = password_request(
-                client, target, user.email, PASSWORD, "192.0.2.99"
-            )
-        assert response.status_code == 429
-        assert failures(user.email) == 5
+def is_locked_out_response(response) -> bool:
+    content = response.content.decode()
+    return (
+        response.status_code == 200
+        and str(LOCKOUT_MESSAGE) in content
+        and 'id="login-form"' not in content
+        and reverse("orcid_login") in content
+    )
+
+
+def is_failure_response(response) -> bool:
+    return (
+        response.status_code == 200 and 'id="login-form"' in response.content.decode()
+    )
+
+
+def is_success_response(response) -> bool:
+    return response.status_code == 302
+
+
+def fail(client, user, times):
+    for _ in range(times):
+        assert is_failure_response(password_request(client, user.email, "wrong"))
+
+
+def test_five_password_failures_lock_password_sign_in(client, user):
+    fail(client, user, 5)
+    with patch.object(User, "check_password", side_effect=AssertionError("blocked")):
+        response = password_request(Client(), user.email, PASSWORD, "192.0.2.99")
+    assert is_locked_out_response(response)
     assert not auth.get_user(client).is_authenticated
 
 
 def test_shared_counter_normalizes_email_across_ips_and_user_agents(client, user):
-    for index, channel in enumerate(CHANNELS):
-        response = password_request(
-            client,
-            channel,
-            user.email.upper() if index % 2 else user.email,
-            "wrong-password",
-            f"192.0.2.{index + 1}",
-            HTTP_USER_AGENT=f"browser-{index}",
+    for index in range(5):
+        assert is_failure_response(
+            password_request(
+                Client(),
+                user.email.upper() if index % 2 else user.email,
+                "wrong",
+                f"192.0.2.{index + 1}",
+                HTTP_USER_AGENT=f"browser-{index}",
+            )
         )
-        assert response.status_code == (
-            429 if index == 4 else 200 if channel == "web" else 401
-        )
-        assert failures(user.email) == index + 1
-    assert set(AccessAttempt.objects.values_list("username", flat=True)) == {user.email}
-    assert (
-        password_request(client, "basic", user.email.upper(), PASSWORD).status_code
-        == 429
+    assert is_locked_out_response(
+        password_request(client, user.email.upper(), PASSWORD)
     )
 
 
-@pytest.mark.parametrize("channel", CHANNELS)
-def test_successful_password_authentication_resets_shared_failures(
-    client, user, channel
+def test_lockout_lifts_when_the_oldest_failure_is_fifteen_minutes_old(
+    client, user, clock
 ):
-    for _ in range(4):
-        password_request(client, "jwt-json", user.email, "wrong-password")
-    response = password_request(client, channel, user.email.upper(), PASSWORD)
-    assert response.status_code == (302 if channel == "web" else 200)
-    assert failures(user.email) == 0
+    for _ in range(5):
+        password_request(client, user.email, "wrong")
+        clock.advance(minutes=1)
+    clock.advance(minutes=9, seconds=59)
+    assert is_locked_out_response(password_request(client, user.email, PASSWORD))
+    clock.advance(seconds=2)
+    assert is_success_response(password_request(client, user.email, PASSWORD))
 
 
-def test_lockout_expires_after_fifteen_minute_cooloff(client, user, clock):
-    started = clock.return_value
-    for index, channel in enumerate(CHANNELS):
-        clock.return_value = started + timedelta(minutes=index)
-        response = password_request(client, channel, user.email, "wrong-password")
-    assert response.status_code == 429
-    locked_at = clock.return_value
-    clock.return_value = locked_at + timedelta(minutes=14, seconds=59)
-    # Both correct and incorrect credentials must leave the original deadline intact.
-    assert password_request(client, "basic", user.email, PASSWORD).status_code == 429
-    assert (
-        password_request(client, "jwt-json", user.email, "wrong-password").status_code
-        == 429
+def test_password_reset_lifts_the_lockout(client, user):
+    fail(client, user, 5)
+    request_reset(client, user.email)
+    response = client.get(reset_link(), follow=True)
+    client.post(
+        response.redirect_chain[-1][0],
+        {"password1": NEW_PASSWORD, "password2": NEW_PASSWORD},
     )
-    assert failures(user.email) == 5
-    clock.return_value = locked_at + timedelta(minutes=15, seconds=1)
-    assert password_request(client, "jwt-json", user.email, PASSWORD).status_code == 200
-    assert failures(user.email) == 0
+    assert is_success_response(password_request(Client(), user.email, NEW_PASSWORD))
 
 
-def test_lockout_uses_axes_expiry_for_each_ip(client, user, clock):
-    started = clock.return_value
-    for index, channel in enumerate(CHANNELS):
-        clock.return_value = started + timedelta(minutes=index)
-        response = password_request(
-            client, channel, user.email, "wrong-password", f"192.0.2.{index + 1}"
-        )
-    assert response.status_code == 429
-    clock.return_value = started + timedelta(minutes=14, seconds=59)
-    assert password_request(client, "basic", user.email, PASSWORD).status_code == 429
-    # Axes expires the oldest IP's row after its own cooloff. The account then
-    # has fewer than five unexpired failures and can authenticate again.
-    clock.return_value = started + timedelta(minutes=15, seconds=1)
-    assert password_request(client, "jwt-json", user.email, PASSWORD).status_code == 200
-    assert failures(user.email) == 0
+def test_failures_older_than_fifteen_minutes_are_not_counted(client, user, clock):
+    fail(client, user, 4)
+    clock.advance(minutes=15, seconds=1)
+    fail(client, user, 4)
+    assert is_success_response(password_request(client, user.email, PASSWORD))
 
 
 def test_lockout_does_not_affect_another_account_on_the_same_ip(client, user):
-    for _ in range(5):
-        password_request(client, "basic", user.email, "wrong-password")
+    fail(client, user, 5)
     other = User.objects.create_user(
         email="other@example.com", password=PASSWORD, is_staff=True
     )
-    assert (
-        password_request(client, "jwt-json", other.email, PASSWORD).status_code == 200
-    )
-    assert failures(user.email) == 5
-
-
-def test_missing_credentials_and_bad_basic_headers_do_not_count(client, user):
-    for _ in range(6):
-        assert client.post("/api/auth/long-token/", {}).status_code == 400
-        assert (
-            client.post(
-                "/api/auth/token/", HTTP_AUTHORIZATION="Basic invalid"
-            ).status_code
-            == 401
-        )
-    assert failures(user.email) == 0
+    assert is_success_response(password_request(Client(), other.email, PASSWORD))
+    assert is_locked_out_response(password_request(Client(), user.email, PASSWORD))
 
 
 def test_existing_session_and_refresh_remain_usable_during_lockout(client, user):
     refresh = EuphroRefreshToken.for_user(user)
     client.force_login(user)
     other_client = Client()
-    for _ in range(5):
-        password_request(other_client, "basic", user.email, "wrong-password")
+    fail(other_client, user, 5)
     assert client.post("/api/auth/token/").status_code == 200
     assert (
         other_client.post(
@@ -206,41 +172,17 @@ def test_existing_session_and_refresh_remain_usable_during_lockout(client, user)
         ).status_code
         == 200
     )
-    assert failures(user.email) == 5
+    assert is_locked_out_response(password_request(Client(), user.email, PASSWORD))
 
 
 def test_orcid_still_authenticates_locked_account_without_resetting_password_limit(
-    client, user, settings
+    client, user
 ):
-    settings.SOCIAL_AUTH_ORCID_KEY = "client-id"
-    settings.SOCIAL_AUTH_ORCID_SECRET = "client-secret"
-    for _ in range(5):
-        password_request(client, "web", user.email, "wrong-password")
+    fail(client, user, 5)
     uid = "0000-0002-1234-5678"
-    UserSocialAuth.objects.create(user=user, provider="orcid", uid=uid, id_key="orcid")
-    begin = reverse("social:begin", args=("orcid",))
-    assert client.post(begin).status_code == 302
-    state = next(reversed(client.session["orcid_oauth2_transaction_index"]))
-    with (
-        patch.object(
-            ORCIDOAuth2,
-            "request_access_token",
-            return_value={"orcid": uid, "access_token": "token"},
-        ),
-        patch.object(
-            ORCIDOAuth2,
-            "user_data",
-            return_value={
-                "orcid-identifier": {"path": uid},
-                "person": {"name": {}, "emails": {"email": []}},
-            },
-        ),
-    ):
-        response = client.get(
-            reverse("social:complete", args=("orcid",)),
-            {"state": state, "code": "valid-code"},
-        )
+    SocialAccount.objects.create(user=user, provider="orcid", uid=uid)
+    assert start_orcid_login(client).status_code == 302
+    response = orcid_callback(client, uid)
     assert response.status_code == 302
     assert auth.get_user(client).pk == user.pk
-    assert failures(user.email) == 5
-    assert password_request(Client(), "basic", user.email, PASSWORD).status_code == 429
+    assert is_locked_out_response(password_request(Client(), user.email, PASSWORD))

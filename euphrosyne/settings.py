@@ -14,7 +14,7 @@ import os
 import subprocess
 
 # pylint: disable=line-too-long
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 import dj_database_url
@@ -26,6 +26,7 @@ from django.utils.csp import CSP
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
+from euphro_auth.mfa.conf import parse_mfa_admin_required
 from euphrosyne.features import add_feature_apps, enabled_features
 
 # pylint: disable=abstract-class-instantiated
@@ -139,8 +140,11 @@ CORE_INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "axes",
-    "social_django",
+    "allauth",
+    "allauth.account",
+    "allauth.mfa",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.orcid",
     "rest_framework",
     "django_filters",
     "lab",
@@ -167,21 +171,15 @@ MIDDLEWARE = (["debug_toolbar.middleware.DebugToolbarMiddleware"] if DEBUG else 
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     "euphro_auth.middlewares.SessionIdleTimeoutMiddleware",
     "euphro_auth.middleware.UserLanguageMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "social_django.middleware.SocialAuthExceptionMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.csp.ContentSecurityPolicyMiddleware",
-    "euphro_auth.middlewares.CGUAcceptanceMiddleware",
+    # Gates of signed-in sessions: MFA, then CGU, then employer information.
+    "euphro_auth.middlewares.AccountGatesMiddleware",
 ]
-
-if "radiation_protection" in EUPHROSYNE_FEATURES:
-    MIDDLEWARE.append(
-        "lab.participations.middleware.ParticipationEmployerCompletionMiddleware"
-    )
-
-MIDDLEWARE.append("axes.middleware.AxesMiddleware")
 
 ROOT_URLCONF = "euphrosyne.urls"
 
@@ -294,24 +292,63 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/topics/auth/customizing/#other-authentication-sources
 
 AUTHENTICATION_BACKENDS = [
-    "euphro_auth.backends.PasswordAxesBackend",
-    "orcid_oauth.backends.ORCIDOAuth2",
-    "euphro_auth.backends.LowercaseEmailBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-AXES_FAILURE_LIMIT = 5
-AXES_COOLOFF_TIME = timedelta(minutes=15)
-AXES_LOCKOUT_PARAMETERS = ["username"]
-AXES_USERNAME_CALLABLE = "euphro_auth.password_lockout.account_username"
-AXES_WHITELIST_CALLABLE = "euphro_auth.password_lockout.is_passwordless_authentication"
-AXES_LOCKOUT_CALLABLE = "euphro_auth.password_lockout.password_lockout_response"
-AXES_HANDLER = "euphro_auth.password_lockout.AccountAxesHandler"
-AXES_RESET_COOL_OFF_ON_FAILURE_DURING_LOCKOUT = False
-AXES_DISABLE_ACCESS_LOG = True
-AXES_SENSITIVE_PARAMETERS = ["username", "email", "ip_address"]
-# Account-only limits are intentional: changing IP or User-Agent cannot bypass
-# them, and unrelated accounts sharing an IP must remain accessible.
-SILENCED_SYSTEM_CHECKS = ["axes.W006"]
+# Accounts (django-allauth)
+# https://docs.allauth.org/en/latest/account/configuration.html
+
+ACCOUNT_ADAPTER = "euphro_auth.adapters.AccountAdapter"
+ACCOUNT_FORMS = {
+    "login": "euphro_auth.forms.LoginForm",
+    "reset_password": "euphro_auth.forms.ResetPasswordForm",
+}
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_UNIQUE_EMAIL = True
+# Accounts are created by administrators or by invitation: no self-service
+# signup and no email verification step.
+ACCOUNT_EMAIL_VERIFICATION = "none"
+# Like Django's password reset, send nothing to an address without an account.
+ACCOUNT_EMAIL_UNKNOWN_ACCOUNTS = False
+# No "remember me" choice: the session idle timeouts below always apply.
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_LOGOUT_REDIRECT_URL = "/login/"
+ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Euphrosyne] "
+# Security notices (password changed or reset, factor added or removed).
+ACCOUNT_EMAIL_NOTIFICATIONS = True
+ACCOUNT_PASSWORD_RESET_TOKEN_GENERATOR = (
+    "euphro_auth.tokens.PasswordResetTokenGenerator"
+)
+# Password reset links expire after one hour. Invitation links keep Django's
+# PASSWORD_RESET_TIMEOUT (3 days).
+PASSWORD_RESET_LINK_TIMEOUT = 60 * 60
+
+# Password lockout: after 5 failures within 15 minutes for an email
+# (lowercased, whatever the IP address or user agent), password sign-in is
+# refused until the oldest failure is 15 minutes old. A password reset lifts it.
+# Per-IP limits are disabled: allauth does not trust X-Forwarded-For by default,
+# so behind the hosting router every client would share one address.
+ACCOUNT_RATE_LIMITS = {
+    "login": None,
+    "login_failed": "5/15m/key",
+    "reset_password": "5/m/key",
+    "reset_password_from_key": None,
+    "signup": None,
+    "request_login_code": "3/m/key",
+    "verify_phone": "1/30s/key",
+}
+
+# Rate limits and allauth's one-time code replay protection are kept in the cache,
+# which must be shared by every process (gunicorn workers restart regularly).
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "euphrosyne_cache",
+        "OPTIONS": {"MAX_ENTRIES": 1_000_000},
+    }
+}
 
 
 # Internationalization
@@ -373,28 +410,47 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "euphro_auth.User"
 
-# For Python Social Auth; used for ORCID OAuth 2.0 flow
+# Multi-factor authentication (allauth.mfa): TOTP, mandatory for lab
+# administrators. Only an explicit MFA_ADMIN_REQUIRED=0/false/no/off disables
+# it, for a rollback; any other value, including an empty one, keeps it on.
+MFA_ADMIN_REQUIRED = parse_mfa_admin_required(os.getenv("MFA_ADMIN_REQUIRED"))
+# TOTP secrets are encrypted at rest with a key derived from SECRET_KEY
+# (euphro_auth.mfa.adapter).
+MFA_ADAPTER = "euphro_auth.mfa.adapter.MFAAdapter"
+# No recovery codes: a superuser resets a lost factor. WebAuthn comes later.
+MFA_SUPPORTED_TYPES = ["totp"]
+MFA_TOTP_ISSUER = "Euphrosyne"
+# Accept the previous and next 30-second codes, for clock drift.
+MFA_TOTP_TOLERANCE = 1
+MFA_FORMS = {
+    "activate_totp": "euphro_auth.mfa.forms.ActivateTOTPForm",
+}
+# Emails are set by administrators and invitations, not verified by allauth.
+MFA_ALLOW_UNVERIFIED_EMAIL = True
+
+# ORCID sign-in (allauth.socialaccount)
+# https://docs.allauth.org/en/latest/socialaccount/providers/orcid.html
 
 ORCID_USE_SANDBOX = os.getenv("ORCID_USE_SANDBOX", "false") == "true"
 
-SOCIAL_AUTH_FIELDS_STORED_IN_SESSION: list[str] = []
-SOCIAL_AUTH_JSONFIELD_ENABLED = True
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = "/"
-SOCIAL_AUTH_ORCID_LOGIN_ERROR_URL = "/login/"
-SOCIAL_AUTH_ORCID_KEY = os.getenv("SOCIAL_AUTH_ORCID_KEY")
-SOCIAL_AUTH_ORCID_SECRET = os.getenv("SOCIAL_AUTH_ORCID_SECRET")
-SOCIAL_AUTH_PIPELINE = (
-    "social_core.pipeline.social_auth.social_details",
-    "social_core.pipeline.social_auth.social_uid",
-    "social_core.pipeline.social_auth.auth_allowed",
-    "orcid_oauth.pipeline.social_user",
-    "social_core.pipeline.social_auth.associate_user",
-    "social_core.pipeline.social_auth.load_extra_data",
-    "social_core.pipeline.user.user_details",
-    "orcid_oauth.pipeline.complete_information",
-)
-SOCIAL_AUTH_URL_NAMESPACE = "social"
-SOCIAL_AUTH_USER_MODEL = "euphro_auth.User"
+SOCIALACCOUNT_ADAPTER = "orcid_oauth.adapters.SocialAccountAdapter"
+SOCIALACCOUNT_PROVIDERS = {
+    "orcid": {
+        "BASE_DOMAIN": "sandbox.orcid.org" if ORCID_USE_SANDBOX else "orcid.org",
+        "MEMBER_API": False,
+        "APPS": [
+            {
+                "client_id": os.getenv("SOCIAL_AUTH_ORCID_KEY", ""),
+                "secret": os.getenv("SOCIAL_AUTH_ORCID_SECRET", ""),
+            }
+        ],
+    }
+}
+# ORCID never creates an account and is never linked through an email address:
+# an ORCID iD is linked to an account only by a validated invitation.
+SOCIALACCOUNT_AUTO_SIGNUP = False
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = False
+SOCIALACCOUNT_STORE_TOKENS = False
 
 
 # For Django Debug Toolbar
@@ -419,8 +475,8 @@ DEFAULT_FROM_EMAIL = os.environ["DEFAULT_FROM_EMAIL"]
 
 FEEDBACK_EMAILS = os.getenv("FEEDBACK_EMAILS", "").split(",")
 
-# Necessary for the correct behavior of password reset flow:
 LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/"
 
 # Sliding expiration for authenticated web sessions, in seconds.
 SESSION_IDLE_TIMEOUT_ADMIN = 15 * 60

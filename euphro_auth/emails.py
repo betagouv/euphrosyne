@@ -1,4 +1,3 @@
-import logging
 import typing
 
 from django.conf import settings
@@ -11,8 +10,6 @@ from shared.email_utils import send_email_with_language, use_user_language
 
 if typing.TYPE_CHECKING:
     from euphro_auth.models import User
-
-logger = logging.getLogger(__name__)
 
 
 def send_invitation_email(user: "User"):
