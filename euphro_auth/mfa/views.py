@@ -1,6 +1,5 @@
 import logging
 
-from allauth.account.decorators import reauthentication_required
 from allauth.mfa.base import views as base_views
 from allauth.mfa.totp import views as totp_views
 from allauth.mfa.totp.internal import flows as totp_flows
@@ -9,7 +8,6 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.http.response import HttpResponseBase
 from django.shortcuts import redirect
-from django.utils.decorators import method_decorator
 
 from lab.permissions import is_lab_admin
 
@@ -37,7 +35,7 @@ class IndexView(base_views.IndexView):
 
 
 class ReauthenticateView(base_views.ReauthenticateView):
-    """Fresh code asked before removing a factor (see DeactivateTOTPView)."""
+    """Fresh code asked before removing a factor."""
 
     def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponseBase:
         _check_mfa_user(request)
@@ -63,13 +61,6 @@ class DeactivateTOTPView(totp_views.DeactivateTOTPView):
     def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponseBase:
         _check_mfa_user(request)
         return super().dispatch(request, *args, **kwargs)
-
-    # Removing the factor needs a fresh code or password, even within a verified
-    # session. Enrollment does not (MFA_REAUTHENTICATION_REQUIRED is off): it
-    # follows sign-in, and ORCID accounts have no password to give.
-    @method_decorator(reauthentication_required)
-    def _dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponseBase:
-        return super()._dispatch(request, *args, **kwargs)
 
     def form_valid(self, form) -> HttpResponse:
         totp_flows.deactivate_totp(self.request, self.authenticator)
