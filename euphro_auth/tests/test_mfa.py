@@ -71,6 +71,11 @@ def password_login(client: Client, user, **data):
     )
 
 
+def reauthenticate(client: Client) -> None:
+    """allauth asks for the password again before enrollment."""
+    client.post(reverse("account_reauthenticate"), {"password": PASSWORD})
+
+
 def sign_in(client: Client, user, secret: str, offset: int = 0) -> None:
     """Sign in with the password and a code: a verified session."""
     assert password_login(client, user).url == reverse("mfa_authenticate")
@@ -100,6 +105,14 @@ def test_admin_without_factor_must_enroll_after_password_login(client, admin_use
     assert auth.get_user(client).pk == admin_user.pk
 
     assert_mfa_gate(client, PROJECTS_URL, ACTIVATE_URL)
+    # The password is asked again first, and the gate lets that page through.
+    assert_mfa_gate(client, ACTIVATE_URL, reverse("account_reauthenticate"))
+    assert client.get(reverse("account_reauthenticate")).status_code == 200
+    response = client.post(
+        reverse("account_reauthenticate"),
+        {"password": PASSWORD, "next": ACTIVATE_URL},
+    )
+    assert response.url == ACTIVATE_URL
     response = client.get(ACTIVATE_URL)
     assert response.status_code == 200
     totp_url = response.context["totp_url"]
@@ -113,6 +126,7 @@ def test_enrollment_keeps_the_secret_shown_when_the_page_is_requested_again(
     client, admin_user
 ):
     password_login(client, admin_user)
+    reauthenticate(client)
     secret = client.get(ACTIVATE_URL).context["form"].secret
     # The browser's favicon request is redirected to the enrollment page.
     assert_mfa_gate(client, "/favicon.ico", ACTIVATE_URL)
@@ -174,6 +188,7 @@ def test_enrollment_signs_out_and_informs_owner(admin_user, language, subject, m
     # The preferred language follows the browser's (UserLanguageMiddleware).
     client = Client(headers={"accept-language": language})
     password_login(client, admin_user)
+    reauthenticate(client)
     secret = client.get(ACTIVATE_URL).context["form"].secret
 
     response = client.post(ACTIVATE_URL, {"code": totp_code(secret)})
@@ -243,6 +258,20 @@ def test_a_code_cannot_be_used_twice(client, admin_user):
     response = other.post(reverse("mfa_authenticate"), {"code": code})
     assert response.status_code == 200
     assert not auth.get_user(other).is_authenticated
+
+
+def test_orcid_admin_without_password_enrolls_without_reauthentication(
+    client, admin_user
+):
+    SocialAccount.objects.create(
+        user=admin_user, provider="orcid", uid="0000-0002-1234-5678"
+    )
+    admin_user.set_unusable_password()
+    admin_user.invitation_completed_at = admin_user.date_joined
+    admin_user.save()
+    start_orcid_login(client)
+    orcid_callback(client)
+    assert client.get(ACTIVATE_URL).status_code == 200
 
 
 def test_orcid_sign_in_of_an_admin_requires_the_second_factor(client, admin_user):

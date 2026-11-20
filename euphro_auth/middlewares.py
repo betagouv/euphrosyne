@@ -60,7 +60,8 @@ ALWAYS_ALLOWED = {
     "set_language",
 }
 # Reachable by an administrator setting up their factor.
-ENROLLMENT_ALLOWED = {"mfa_activate_totp", "cgu_acceptance"}
+# allauth asks for the password again before enrollment.
+ENROLLMENT_ALLOWED = {"mfa_activate_totp", "account_reauthenticate", "cgu_acceptance"}
 
 
 def _with_next(url: str, request: HttpRequest) -> str:

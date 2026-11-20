@@ -424,9 +424,6 @@ MFA_TOTP_TOLERANCE = 1
 MFA_FORMS = {
     "activate_totp": "euphro_auth.mfa.forms.ActivateTOTPForm",
 }
-# Enrollment needs no second password prompt right after sign-in; removing a
-# factor asks for a fresh code or password (euphro_auth.mfa.views).
-MFA_REAUTHENTICATION_REQUIRED = False
 # Emails are set by administrators and invitations, not verified by allauth.
 MFA_ALLOW_UNVERIFIED_EMAIL = True
 
