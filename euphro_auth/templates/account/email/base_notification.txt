@@ -4,7 +4,7 @@
 
 {% blocktrans trimmed %}If you did not do this, contact the Euphrosyne team immediately and change your password.{% endblocktrans %}
 
-{{ site_url }}
+{{ current_site.domain }}
 
 {% blocktrans %}The Euphrosyne team{% endblocktrans %}
 {% endautoescape %}

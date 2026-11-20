@@ -1,4 +1,0 @@
-{% extends "account/email/base_notification.txt" %}
-{% load i18n %}
-
-{% block notification_message %}{% blocktrans trimmed %}Two-factor authentication has just been enabled on your Euphrosyne account ({{ email }}). An authenticator application will now be required to log in.{% endblocktrans %}{% endblock notification_message %}

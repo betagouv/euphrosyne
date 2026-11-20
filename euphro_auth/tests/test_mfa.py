@@ -170,13 +170,13 @@ def test_unverified_admin_can_reach_cgu_and_log_out(client, admin_user):
     [
         (
             "en",
-            "[Euphrosyne] Two-factor authentication enabled",
+            "[Euphrosyne] Authenticator App Activated",
             "Two-factor authentication is enabled. "
             "Sign in again with a code from your app.",
         ),
         (
             "fr",
-            "[Euphrosyne] Authentification à deux facteurs activée",
+            "[Euphrosyne] Application d'authentification activée",
             "L’authentification à deux facteurs est activée. "
             "Reconnectez-vous avec un code de votre application.",
         ),
@@ -199,6 +199,10 @@ def test_enrollment_signs_out_and_informs_owner(admin_user, language, subject, m
     assert len(mail.outbox) == 1
     assert mail.outbox[0].to == [admin_user.email]
     assert mail.outbox[0].subject == subject
+    # The notice gives the site, not the client IP address (the hosting
+    # router's).
+    assert "testserver" in mail.outbox[0].body
+    assert "127.0.0.1" not in mail.outbox[0].body
     assert message in client.get(LOGIN_URL).content.decode()
     # The code just used for enrollment is refused: sign in with the next one.
     sign_in(client, admin_user, secret, offset=1)
@@ -372,7 +376,7 @@ def test_removing_the_factor_requires_setting_up_a_new_one(
     assert len(mail.outbox) == 1
     assert mail.outbox[0].to == [admin_user.email]
     assert mail.outbox[0].subject == (
-        "[Euphrosyne] Authentification à deux facteurs désactivée"
+        "[Euphrosyne] Application d'authentification désactivée"
     )
     assert not auth.get_user(other_client).is_authenticated
     assert_mfa_gate(verified_client, PROJECTS_URL, ACTIVATE_URL)
