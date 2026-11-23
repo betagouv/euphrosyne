@@ -1,4 +1,7 @@
 from allauth.account.adapter import DefaultAccountAdapter
+from allauth.account.internal.flows.reauthentication import (
+    get_reauthentication_flows,
+)
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
@@ -28,3 +31,13 @@ class AccountAdapter(DefaultAccountAdapter):  # pylint: disable=abstract-method
     def is_open_for_signup(self, request: HttpRequest) -> bool:
         # Accounts are created by administrators, or by invitation.
         return False
+
+    def is_reauthentication_required(self, *, app: str, **kwargs) -> bool:
+        # Accounts with no way to reauthenticate (ORCID only, no second factor
+        # yet) would be refused, and an administrator could then never set up
+        # the second factor the gate requires. They have just signed in
+        # through ORCID.
+        user = self.request.user
+        if user.is_authenticated and not get_reauthentication_flows(user):
+            return False
+        return super().is_reauthentication_required(app=app, **kwargs)

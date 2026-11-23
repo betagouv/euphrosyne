@@ -12,10 +12,10 @@ from ...factories import ProjectFactory
 class CheckLongRunningVMsTest(TestCase):
     def setUp(self):
         self.token_patcher = patch(
-            "euphro_auth.jwt.tokens.EuphroToolsAPIToken.for_euphrosyne"
+            "lab.management.commands.check_long_running_vms.tools_api_backend_token",
+            return_value="fake_token",
         )
         self.mock_token = self.token_patcher.start()
-        self.mock_token.return_value.access_token = "fake_token"
 
         self.get_patcher = patch("requests.get")
         self.mock_get = self.get_patcher.start()

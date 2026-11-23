@@ -3,11 +3,11 @@ from typing import Literal
 
 
 def _get_euphrosyne_token():
-    from euphro_auth.jwt.tokens import (  # pylint: disable=import-outside-toplevel
-        EuphroToolsAPIToken,
+    from euphro_auth.jwt.signing import (  # pylint: disable=import-outside-toplevel
+        tools_api_backend_token,
     )
 
-    return EuphroToolsAPIToken.for_euphrosyne().access_token
+    return tools_api_backend_token()
 
 
 def get_run_data_path(

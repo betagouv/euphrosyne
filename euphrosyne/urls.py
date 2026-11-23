@@ -20,10 +20,18 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
 
+from euphro_auth.oidc.views import device_authorization
 from euphro_auth.views import UserTokenRegistrationView, cgu_acceptance_view
 from lab.participations.views import complete_employer_information
 
 urlpatterns = [
+    # Before allauth's OpenID Connect URLs, which it overrides.
+    path(
+        "identity/o/device",
+        device_authorization,
+        name="oidc_device_authorization",
+    ),
+    path("", include("allauth.idp.urls")),
     path("", include("orcid_oauth.urls")),
     path("doc/", include("django.contrib.admindocs.urls")),
     path("accounts/", include("euphro_auth.urls")),

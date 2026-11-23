@@ -3,7 +3,6 @@ from allauth.mfa.base import views as mfa_views
 from django.urls import URLPattern, path
 from django.views.generic import RedirectView
 
-from .jwt.views import service_token_view
 from .mfa import views as euphro_mfa_views
 
 # allauth account pages offered by the platform. Email management and setting a
@@ -52,6 +51,4 @@ urlpatterns: list[URLPattern] = [
         euphro_mfa_views.DeactivateTOTPView.as_view(),
         name="mfa_deactivate_totp",
     ),
-    # Token pasted into another application (euphro_auth.jwt.tokens.TOKEN_SERVICES).
-    path("token/<slug:service>/", service_token_view, name="service_token"),
 ]
