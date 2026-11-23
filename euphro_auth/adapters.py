@@ -33,11 +33,10 @@ class AccountAdapter(DefaultAccountAdapter):  # pylint: disable=abstract-method
         return False
 
     def is_reauthentication_required(self, *, app: str, **kwargs) -> bool:
-        # An ORCID-only account (no password, no second factor yet) has no
-        # way to reauthenticate: allauth 65.22 would refuse it, and an
-        # administrator could then never set up the second factor that
-        # AccountGatesMiddleware requires. Such users signed in through ORCID
-        # just before, as allauth 65.21 assumed.
+        # Accounts with no way to reauthenticate (ORCID only, no second factor
+        # yet) would be refused, and an administrator could then never set up
+        # the second factor the gate requires. They have just signed in
+        # through ORCID.
         user = self.request.user
         if user.is_authenticated and not get_reauthentication_flows(user):
             return False
