@@ -24,6 +24,7 @@ env:
   EUPHROSYNE_TOOLS_API_URL: http://localhost:8001
   EROS_HTTP_TOKEN: token
   RADIATION_PROTECTION_TALLY_SECRET_KEY: secret
+  TOOLS_API_BACKEND_TOKEN_SECRET: n0t5os3cre7-backend
   RADIATION_PROTECTION_RISK_ADVISOR_EMAIL: test@test.com
   RADIATION_PROTECTION_RISK_ADVISOR_FULLNAME: Risk Advisor
   GOODFLAG_API_BASE: https://culture-test01.lex-persona.com/
@@ -39,6 +40,14 @@ jobs:
     steps:
       # -- block install --
       - uses: actions/checkout@v4
+
+      - name: Generate a token signing key
+        run: |
+          {
+            echo "IDP_OIDC_PRIVATE_KEY<<PEM"
+            openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048
+            echo "PEM"
+          } >> "$GITHUB_ENV"
 
       - uses: actions/setup-python@v5
         with:
@@ -105,6 +114,14 @@ jobs:
     steps:
       # -- block install --
       - uses: actions/checkout@v4
+
+      - name: Generate a token signing key
+        run: |
+          {
+            echo "IDP_OIDC_PRIVATE_KEY<<PEM"
+            openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048
+            echo "PEM"
+          } >> "$GITHUB_ENV"
 
       - uses: actions/setup-python@v5
         with:

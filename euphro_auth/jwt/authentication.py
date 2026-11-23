@@ -1,6 +1,9 @@
 from datetime import timedelta
+from functools import cache
 
+from django.conf import settings
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.backends import TokenBackend
 from rest_framework_simplejwt.exceptions import (
     AuthenticationFailed,
     InvalidToken,
@@ -12,13 +15,30 @@ from rest_framework_simplejwt.tokens import Token
 from ..models import User
 
 
+@cache
+def _backend_token_backend() -> TokenBackend:
+    return TokenBackend("HS256", settings.TOOLS_API_BACKEND_TOKEN_SECRET)
+
+
 class EuphrosyneBackendToken(Token):
     """
-    Custom token class for Euphrosyne backend communication.
+    Token the Tools API signs to call Euphrosyne. It is signed with a secret
+    dedicated to this channel, not with the key of the tokens Euphrosyne issues.
     """
 
     token_type = "euphrosyne_backend"
     lifetime = timedelta(minutes=5)
+
+    @property
+    def token_backend(self) -> TokenBackend:  # type: ignore[override]
+        return _backend_token_backend()
+
+    @classmethod
+    def for_euphrosyne(cls) -> "EuphrosyneBackendToken":
+        """Build the token the Tools API sends (used by tests)."""
+        token = cls()
+        token[api_settings.USER_ID_CLAIM] = "euphrosyne"
+        return token
 
     def verify(self) -> None:
         # Subclass to remove JTI_CLAIM and token type check

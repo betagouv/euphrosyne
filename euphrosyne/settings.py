@@ -26,6 +26,7 @@ from django.utils.csp import CSP
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
+from euphro_auth.jwt.keys import load_private_key_pem, public_key_pem
 from euphro_auth.mfa.conf import parse_mfa_admin_required
 from euphrosyne.features import add_feature_apps, enabled_features
 
@@ -527,6 +528,20 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+# JSON web tokens are signed with an RSA key that only Euphrosyne holds: the
+# Tools API verifies them with the public key. The variable keeps the name
+# allauth's OpenID Connect provider reads, so the key can be reused there.
+TOKEN_SIGNING_PRIVATE_KEY = load_private_key_pem(os.environ["IDP_OIDC_PRIVATE_KEY"])
+SIMPLE_JWT = {
+    "ALGORITHM": "RS256",
+    "SIGNING_KEY": TOKEN_SIGNING_PRIVATE_KEY,
+    "VERIFYING_KEY": public_key_pem(TOKEN_SIGNING_PRIVATE_KEY),
+    "ISSUER": SITE_URL,
+}
+# HS256 secret shared with the Tools API, only to verify the tokens it signs to
+# call Euphrosyne (euphro_auth.jwt.authentication.EuphrosyneBackendToken).
+TOOLS_API_BACKEND_TOKEN_SECRET = os.environ["TOOLS_API_BACKEND_TOKEN_SECRET"]
 
 SPECTACULAR_SETTINGS = {
     # Separate request components without read-only fields: in a shared

@@ -14,7 +14,7 @@ from data_management.models import (
     LifecycleOperationType,
     LifecycleState,
 )
-from euphro_auth.jwt.tokens import EuphroToolsAPIToken
+from euphro_auth.jwt.authentication import EuphrosyneBackendToken
 
 from .factories import ProjectDataFactory
 
@@ -22,7 +22,7 @@ CALLBACK_URL = "/api/data-management/operations/callback"
 
 
 def _backend_headers() -> dict[str, str]:
-    token = EuphroToolsAPIToken.for_euphrosyne()
+    token = EuphrosyneBackendToken.for_euphrosyne()
     return {"Authorization": f"Bearer {token}"}
 
 

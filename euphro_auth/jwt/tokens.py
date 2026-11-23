@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from datetime import timedelta
 
 from rest_framework_simplejwt.settings import api_settings as rf_simplejwt_api_settings
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from lab.permissions import is_lab_admin
 
@@ -59,4 +59,16 @@ class EuphroToolsAPIToken(RefreshToken):
         token[rf_simplejwt_api_settings.USER_ID_CLAIM] = "euphrosyne"
         token["projects"] = []
         token["is_admin"] = True
+        return token
+
+
+class ErosImageToken(AccessToken):
+    """Token put in the URL of EROS images proxied by the Tools API. The URL is
+    shown to any user who sees the object, so the token names no user and only
+    grants the ``tools:eros`` scope."""
+
+    @classmethod
+    def for_images(cls):
+        token = cls()
+        token["scope"] = "tools:eros"
         return token

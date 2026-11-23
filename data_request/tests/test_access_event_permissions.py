@@ -2,7 +2,7 @@ import pytest
 from django.test import Client
 from rest_framework_simplejwt.tokens import AccessToken
 
-from euphro_auth.jwt.tokens import EuphroToolsAPIToken
+from euphro_auth.jwt.authentication import EuphrosyneBackendToken
 
 from .factories import DataRequestFactory
 
@@ -38,7 +38,7 @@ def test_access_event_rejects_user_jwt(project_api_context):
 @pytest.mark.django_db
 def test_access_event_accepts_backend_jwt():
     data_request = DataRequestFactory()
-    token = EuphroToolsAPIToken.for_euphrosyne()
+    token = EuphrosyneBackendToken.for_euphrosyne()
     response = Client().post(
         "/api/data-request/access-event",
         {"data_request": data_request.id, "path": "test/path"},

@@ -13,7 +13,7 @@ from data_management.models import (
     LifecycleOperationType,
     LifecycleState,
 )
-from euphro_auth.jwt.tokens import EuphroToolsAPIToken
+from euphro_auth.jwt.authentication import EuphrosyneBackendToken
 from euphro_auth.tests.factories import LabAdminUserFactory, StaffUserFactory
 from lab.tests.factories import ParticipationFactory
 
@@ -21,7 +21,9 @@ from .factories import ProjectDataFactory
 
 
 def _backend_headers(token: str | None = None) -> dict[str, str]:
-    return {"Authorization": f"Bearer {token or EuphroToolsAPIToken.for_euphrosyne()}"}
+    return {
+        "Authorization": f"Bearer {token or EuphrosyneBackendToken.for_euphrosyne()}"
+    }
 
 
 @pytest.mark.django_db
@@ -108,7 +110,7 @@ def test_project_lifecycle_api_is_forbidden_for_non_member_staff_users():
 @pytest.mark.django_db
 def test_project_lifecycle_api_rejects_non_backend_jwt_user():
     project_data = ProjectDataFactory(lifecycle_state=LifecycleState.HOT)
-    token = EuphroToolsAPIToken.for_user(StaffUserFactory())
+    token = EuphrosyneBackendToken.for_user(StaffUserFactory())
 
     response = Client().get(
         f"/api/data-management/projects/{project_data.project.slug}/lifecycle",
