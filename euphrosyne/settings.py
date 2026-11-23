@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import json
 import os
 import subprocess
 
@@ -26,6 +27,7 @@ from django.utils.csp import CSP
 from django.utils.translation import gettext_lazy as _
 from sentry_sdk.integrations.django import DjangoIntegration
 
+from euphro_auth.jwt.keys import load_private_key_pem
 from euphro_auth.mfa.conf import parse_mfa_admin_required
 from euphrosyne.features import add_feature_apps, enabled_features
 
@@ -145,6 +147,7 @@ CORE_INSTALLED_APPS = [
     "allauth.mfa",
     "allauth.socialaccount",
     "allauth.socialaccount.providers.orcid",
+    "allauth.idp.oidc",
     "rest_framework",
     "django_filters",
     "lab",
@@ -523,10 +526,39 @@ S3_SECRET_ACCESS_KEY = os.getenv("S3_SECRET_ACCESS_KEY")
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "euphro_auth.jwt.authentication.UserTokenAuthentication",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+# OpenID Connect provider (allauth.idp.oidc)
+# https://docs.allauth.org/en/latest/idp/openid-connect/configuration.html
+# Herma signs in with the device flow; the Tools API gets its tokens with the
+# client credentials grant. Every token Euphrosyne issues, including the ones it
+# signs itself (euphro_auth.jwt.signing), is an RS256 JWT signed with this key:
+# other services verify them with /.well-known/jwks.json.
+IDP_OIDC_PRIVATE_KEY = load_private_key_pem(os.environ["IDP_OIDC_PRIVATE_KEY"])
+# Key rotation: a JSON list of {"pem", "issued_at", "expires_at"} entries.
+IDP_OIDC_PRIVATE_KEYS = [
+    {**key, "pem": load_private_key_pem(key["pem"])}
+    for key in json.loads(os.getenv("IDP_OIDC_PRIVATE_KEYS") or "[]")
+]
+IDP_OIDC_ADAPTER = "euphro_auth.oidc.adapter.EuphroOIDCAdapter"
+IDP_OIDC_ACCESS_TOKEN_FORMAT = "jwt"
+IDP_OIDC_ACCESS_TOKEN_EXPIRES_IN = 5 * 60
+# Renewed on each refresh: a client unused for a day must sign in again.
+IDP_OIDC_REFRESH_TOKEN_EXPIRES_IN = 24 * 60 * 60
+IDP_OIDC_ROTATE_REFRESH_TOKEN = True
+# "none": Herma is a public client (no secret in a desktop application).
+IDP_OIDC_AUTH_METHODS = ["client_secret_basic", "none"]
+OIDC_HERMA_CLIENT_ID = "herma"
+OIDC_TOOLS_API_CLIENT_ID = "euphrosyne-tools-api"
+# Secret of the Tools API client (ensure_oidc_clients sets it). Equal to the
+# Tools API's EUPHROSYNE_OIDC_CLIENT_SECRET: it only lets the Tools API get its
+# own tokens. Rotate it by changing both.
+OIDC_TOOLS_API_CLIENT_SECRET = os.getenv("OIDC_TOOLS_API_CLIENT_SECRET", "")
+# Clients only lab administrators may authorize.
+OIDC_ADMIN_ONLY_CLIENTS = [OIDC_HERMA_CLIENT_ID]
 
 SPECTACULAR_SETTINGS = {
     # Separate request components without read-only fields: in a shared

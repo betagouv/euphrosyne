@@ -10,7 +10,6 @@ from django.urls import reverse
 from django.utils import timezone
 
 from euphro_auth.adapters import LOCKOUT_MESSAGE
-from euphro_auth.jwt.tokens import EuphroRefreshToken
 from euphro_auth.models import User
 from euphro_auth.tests.test_accounts import NEW_PASSWORD, request_reset, reset_link
 from orcid_oauth.tests.helpers import orcid_callback, start_orcid_login
@@ -160,18 +159,10 @@ def test_lockout_does_not_affect_another_account_on_the_same_ip(client, user):
     assert is_locked_out_response(password_request(Client(), user.email, PASSWORD))
 
 
-def test_existing_session_and_refresh_remain_usable_during_lockout(client, user):
-    refresh = EuphroRefreshToken.for_user(user)
+def test_existing_session_remains_usable_during_lockout(client, user):
     client.force_login(user)
-    other_client = Client()
-    fail(other_client, user, 5)
+    fail(Client(), user, 5)
     assert client.post("/api/auth/token/").status_code == 200
-    assert (
-        other_client.post(
-            "/api/auth/token/refresh/", {"refresh": str(refresh)}
-        ).status_code
-        == 200
-    )
     assert is_locked_out_response(password_request(Client(), user.email, PASSWORD))
 
 

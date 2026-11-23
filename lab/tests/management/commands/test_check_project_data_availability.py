@@ -28,14 +28,14 @@ def test_check_project_data_availability_only_checks_hot_projects():
     with (
         mock.patch(
             "lab.management.commands.check_project_data_availability."
-            "EuphroToolsAPIToken.for_euphrosyne"
-        ) as token_mock,
+            "tools_api_backend_token",
+            return_value="fake-token",
+        ),
         mock.patch(
             "lab.management.commands.check_project_data_availability.requests.get",
             return_value=_available_response(available=True),
         ) as get_mock,
     ):
-        token_mock.return_value.access_token = "fake-token"
 
         call_command("check_project_data_availability", stdout=StringIO())
 
@@ -64,8 +64,9 @@ def test_check_project_data_availability_checks_all_projects_without_data_manage
     with (
         mock.patch(
             "lab.management.commands.check_project_data_availability."
-            "EuphroToolsAPIToken.for_euphrosyne"
-        ) as token_mock,
+            "tools_api_backend_token",
+            return_value="fake-token",
+        ),
         mock.patch(
             "lab.management.commands.check_project_data_availability.apps.is_installed",
             return_value=False,
@@ -75,7 +76,6 @@ def test_check_project_data_availability_checks_all_projects_without_data_manage
             return_value=_available_response(available=False),
         ) as get_mock,
     ):
-        token_mock.return_value.access_token = "fake-token"
 
         call_command("check_project_data_availability", stdout=StringIO())
 

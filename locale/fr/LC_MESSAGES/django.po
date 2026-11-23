@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-28 11:48+0100\n"
+"POT-Creation-Date: 2026-11-23 11:15+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -780,41 +780,6 @@ msgstr "Lire les CGU."
 msgid "Accept"
 msgstr "Accepter"
 
-#, python-format
-msgid "Generate a token for %(service)s"
-msgstr "Générer un jeton pour %(service)s"
-
-#, python-format
-msgid "%(service)s asks for a token to access Euphrosyne on your behalf."
-msgstr "%(service)s demande un jeton pour accéder à Euphrosyne en votre nom."
-
-msgid "Generate another token"
-msgstr "Générer un autre jeton"
-
-msgid "Generate a token"
-msgstr "Générer un jeton"
-
-msgid "Token"
-msgstr "Jeton"
-
-#, python-format
-msgid ""
-"Valid until %(expires_at)s. You can generate a new one at any time. Do not "
-"share it."
-msgstr ""
-"Valable jusqu’au %(expires_at)s. Vous pouvez en générer un nouveau à tout "
-"moment. Ne le partagez pas."
-
-msgid "Copied"
-msgstr "Copié"
-
-msgid "Copy"
-msgstr "Copier"
-
-#, python-format
-msgid "Paste it into %(service)s, then close this window."
-msgstr "Collez-le dans %(service)s, puis fermez cette fenêtre."
-
 msgid "Create your account"
 msgstr "Créer votre compte"
 
@@ -834,6 +799,29 @@ msgid ""
 "The registration link was invalid, possibly because it has already been used."
 msgstr ""
 "Le lien d'inscription est invalide, peut-être parce qu'il a déjà été utilisé."
+
+msgid "Authorize"
+msgstr "Autoriser"
+
+msgid "Confirm Device"
+msgstr "Confirmer l'appareil"
+
+#, python-format
+msgid ""
+"Please confirm the code shown on your %(client_name)s to authorize this "
+"device."
+msgstr ""
+"Veuillez confirmer le code affiché sur votre %(client_name)s pour autoriser "
+"cet appareil."
+
+msgid "Code"
+msgstr "Code"
+
+msgid "Confirm"
+msgstr "Confirmer"
+
+msgid "Deny"
+msgstr "Refuser"
 
 msgid "You've been invited to register at Euphrosyne."
 msgstr "Vous avez été invité à vous inscrire sur Euphrosyne."

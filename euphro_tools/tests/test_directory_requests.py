@@ -28,10 +28,12 @@ def simulated_http(monkeypatch: MonkeyPatch, settings) -> Iterator[MagicMock]:
     with (
         requests.Session() as session,
         patch("requests.adapters.HTTPAdapter.send") as send,
-        patch("euphro_tools.hooks.EuphroToolsAPIToken.for_euphrosyne") as token,
+        patch(
+            "euphro_tools.hooks.tools_api_backend_token",
+            return_value="test-service-token",
+        ),
     ):
         session.trust_env = False
-        token.return_value.access_token = "test-service-token"
         monkeypatch.setattr(requests, "post", session.post)
         settings.EUPHROSYNE_TOOLS_API_URL = "https://tools.example/api/"
         response = requests.Response()
