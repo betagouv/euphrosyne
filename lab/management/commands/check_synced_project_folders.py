@@ -5,7 +5,7 @@ import requests
 import sentry_sdk
 from django.core.management.base import BaseCommand
 
-from euphro_auth.jwt.tokens import EuphroToolsAPIToken
+from euphro_auth.jwt.signing import tools_api_backend_token
 
 from ...models import Project
 
@@ -23,7 +23,7 @@ class Command(BaseCommand):
         project_slugs = Project.objects.values_list("slug", flat=True)
         if not project_slugs:
             return
-        token = EuphroToolsAPIToken.for_euphrosyne().access_token
+        token = tools_api_backend_token()
         results: ResponseBody | None = None
         try:
             response = requests.post(

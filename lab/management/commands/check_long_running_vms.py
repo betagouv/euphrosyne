@@ -6,7 +6,7 @@ import sentry_sdk
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 
-from euphro_auth.jwt.tokens import EuphroToolsAPIToken
+from euphro_auth.jwt.signing import tools_api_backend_token
 from lab.emails import send_long_lasting_email
 
 from ...models import Project
@@ -33,7 +33,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        token = EuphroToolsAPIToken.for_euphrosyne().access_token
+        token = tools_api_backend_token()
         self.stdout.write(
             "[long running vms] Making request to Euphrosyne Tools",
         )

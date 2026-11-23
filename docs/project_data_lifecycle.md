@@ -277,7 +277,8 @@ All routes are mounted under `/api/data-management/`.
 
 - purpose: receive final status from `euphrosyne-tools-api`
 - authentication:
-  - `EuphrosyneAdminJWTAuthentication`
+  - `EuphrosyneBackendAuthentication`: OpenID Connect token of the Tools API
+    client (client credentials grant, scope `euphrosyne:backend`)
   - authenticated request required
 - response:
   - `200 OK` on success and on repeated callback for a terminal operation

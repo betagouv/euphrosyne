@@ -12,9 +12,9 @@ from django.utils import timezone
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from euphro_auth.jwt.tokens import EuphroRefreshToken
+from euphro_auth.jwt.authentication import UserTokenAuthentication
+from euphro_auth.tests.oidc import herma_token
 
 from .factories import StaffUserFactory
 
@@ -187,9 +187,9 @@ def test_anonymous_request_does_not_set_session_expiry(client):
     assert not Session.objects.exists()
 
 
-def test_jwt_only_request_does_not_create_session(client, session_user):
+def test_token_only_request_does_not_create_session(client, session_user):
     user, _timeout = session_user
-    access = EuphroRefreshToken.for_user(user).access_token
+    access = herma_token(user)
 
     response = client.get("/api/session-probe/", HTTP_AUTHORIZATION=f"Bearer {access}")
 
@@ -198,17 +198,17 @@ def test_jwt_only_request_does_not_create_session(client, session_user):
     assert not Session.objects.exists()
 
 
-def test_jwt_user_cannot_change_another_sessions_timeout(client, session_user):
+def test_token_user_cannot_change_another_sessions_timeout(client, session_user):
     user, timeout = session_user
     client.force_login(user)
     token_user = StaffUserFactory(
         is_lab_admin=not (user.is_lab_admin or user.is_superuser)
     )
-    access = EuphroRefreshToken.for_user(token_user).access_token
+    access = herma_token(token_user)
 
-    # DRF authenticates this route with JWT before trying the session cookie.
+    # DRF authenticates this route with the token before trying the session.
     with patch.object(
-        protected_api_view.cls, "authentication_classes", [JWTAuthentication]
+        protected_api_view.cls, "authentication_classes", [UserTokenAuthentication]
     ):
         response = client.get(
             "/api/session-probe/", HTTP_AUTHORIZATION=f"Bearer {access}"

@@ -116,7 +116,7 @@ class ErosProvider(ObjectProvider):
     def construct_image_url(self, path: str) -> str:
         """Construct image URL from C2RMF path."""
         # pylint: disable=import-outside-toplevel
-        from euphro_auth.jwt.tokens import ErosImageToken
+        from euphro_auth.jwt.signing import eros_image_token
 
         eros_id, image_id = path.split("/")
         if eros_id.startswith("C2RMF"):
@@ -137,7 +137,7 @@ class ErosProvider(ObjectProvider):
         if settings.EROS_BASE_IMAGE_URL:
             token = os.environ["EROS_HTTP_TOKEN"]
         else:
-            token = ErosImageToken.for_images()
+            token = eros_image_token()
         return f"{url}?token={token}"
 
 
