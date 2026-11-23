@@ -18,7 +18,7 @@ from rest_framework.response import Response
 from rest_framework.settings import api_settings as rf_api_settings
 from rest_framework.views import APIView
 
-from euphro_auth.jwt.authentication import EuphrosyneAdminJWTAuthentication
+from euphro_auth.jwt.authentication import EuphrosyneBackendAuthentication
 from euphro_tools.project_data import post_cool_project, post_restore_project
 from lab.api_views.permissions import (
     IsLabAdminUser,
@@ -242,7 +242,7 @@ class LifecycleOperationCallbackRequestSerializer(  # pylint: disable=abstract-m
 
 
 class LifecycleOperationCallbackAPIView(APIView):
-    authentication_classes = [EuphrosyneAdminJWTAuthentication]
+    authentication_classes = [EuphrosyneBackendAuthentication]
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
@@ -292,7 +292,7 @@ class LifecycleOperationCallbackAPIView(APIView):
 class ProjectLifecycleAPIView(APIView):
     permission_classes = [IsProjectMemberOrLabAdminOrEuphrosyneBackend]
     authentication_classes = [
-        EuphrosyneAdminJWTAuthentication,
+        EuphrosyneBackendAuthentication,
         *rf_api_settings.DEFAULT_AUTHENTICATION_CLASSES,
     ]
 

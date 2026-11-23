@@ -58,16 +58,14 @@ def test_rename_project_directory(requests_mock: MagicMock, settings):
 
 
 @patch("euphro_tools.hooks.requests")
-@patch("euphro_tools.hooks.EuphroToolsAPIToken")
-def test_make_request_has_auth_header(
-    token_class_mock: MagicMock, request_mock: MagicMock
-):
+@patch("euphro_tools.hooks.tools_api_backend_token", return_value="service-token")
+def test_make_request_has_auth_header(token_mock: MagicMock, request_mock: MagicMock):
     request_mock.post.return_value.status_code = 204
     _make_request("https://url")
-    token_class_mock.for_euphrosyne.assert_called()
-    assert "Authorization" in request_mock.post.call_args[1]["headers"]
-    assert request_mock.post.call_args[1]["headers"]["Authorization"].startswith(
-        "Bearer "
+    token_mock.assert_called()
+    assert (
+        request_mock.post.call_args[1]["headers"]["Authorization"]
+        == "Bearer service-token"
     )
 
 

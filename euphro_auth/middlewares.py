@@ -102,7 +102,7 @@ class AccountGatesMiddleware:
     redirected to the step; API calls get a JSON 403 with
     ``detail``, ``code`` and ``redirect_url``. Only the session user is
     checked: API tokens are only issued to a session that went through these
-    steps (see euphro_auth.jwt)."""
+    steps (see euphro_auth.jwt and euphro_auth.oidc)."""
 
     def __init__(self, get_response: Callable[[HttpRequest], HttpResponse]) -> None:
         self.get_response = get_response
