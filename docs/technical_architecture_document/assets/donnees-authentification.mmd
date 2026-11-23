@@ -32,39 +32,26 @@ erDiagram
     bigint user_id FK
     integer permission_id FK
   }
-  social_auth_usersocialauth["UserSocialAuth"] {
-    bigint id PK
+  account_emailaddress["EmailAddress"] {
+    integer id PK
+    bigint user_id FK
+    varchar email
+    boolean verified
+    boolean primary
+  }
+  socialaccount_socialaccount["SocialAccount"] {
+    integer id PK
     bigint user_id FK
     varchar provider
     varchar uid
-    timestamptz created
+    timestamptz date_joined
   }
-  social_auth_association["Association"] {
+  mfa_authenticator["Authenticator"] {
     bigint id PK
-    varchar server_url
-    varchar handle
-    integer issued
-    integer lifetime
-  }
-  social_auth_code["Code"] {
-    bigint id PK
-    varchar email
-    varchar code
-    boolean verified
-    timestamptz timestamp
-  }
-  social_auth_nonce["Nonce"] {
-    bigint id PK
-    varchar server_url
-    integer timestamp
-    varchar salt
-  }
-  social_auth_partial["Partial"] {
-    bigint id PK
-    smallint next_step
-    varchar backend
-    timestamptz timestamp
+    bigint user_id FK
+    varchar type
     jsonb data
+    timestamptz last_used_at "nullable"
   }
   django_admin_log["LogEntry"] {
     integer id PK
@@ -95,6 +82,8 @@ erDiagram
   auth_group ||..o{ euphro_auth_user_groups : "group_id"
   euphro_auth_user ||..o{ euphro_auth_user_user_permissions : "user_id"
   auth_permission ||..o{ euphro_auth_user_user_permissions : "permission_id"
-  euphro_auth_user ||..o{ social_auth_usersocialauth : "user_id"
+  euphro_auth_user ||..o{ account_emailaddress : "user_id"
+  euphro_auth_user ||..o{ socialaccount_socialaccount : "user_id"
+  euphro_auth_user ||..o{ mfa_authenticator : "user_id"
   django_content_type |o..o{ django_admin_log : "content_type_id"
   euphro_auth_user ||..o{ django_admin_log : "user_id"

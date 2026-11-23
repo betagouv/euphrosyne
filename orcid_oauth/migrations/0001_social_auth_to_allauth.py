@@ -1,8 +1,8 @@
 """Copy the ORCID links of social_django (``social_auth_usersocialauth``) to
 allauth (``socialaccount_socialaccount``).
 
-social_django is no longer installed, so its table is read with SQL. The table
-is kept: it is dropped by a later migration, once this copy has been checked.
+social_django is no longer installed, so its table is read with SQL. Its tables
+are dropped by 0002_drop_social_auth_tables.
 OAuth credentials kept by social_django are not copied: the platform never
 uses them after sign-in.
 """
