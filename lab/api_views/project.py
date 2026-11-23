@@ -8,8 +8,8 @@ from rest_framework import generics, serializers
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import SAFE_METHODS, IsAdminUser
 
-from lab.permissions import is_lab_admin, is_project_leader
 from data_management.models import LifecycleState
+from lab.permissions import is_lab_admin, is_project_leader
 from lab.runs.models import Run
 
 from ..models import Participation, Project
@@ -46,7 +46,7 @@ class ProjectFilter(filters.FilterSet):
             "lifecycle_state",
         ]
 
-    def filter_lifecycle_state(self, queryset, name, value):
+    def filter_lifecycle_state(self, queryset, _name, value):
         if not value:
             return queryset
         query = Q(project_data__lifecycle_state=value)
