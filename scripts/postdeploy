@@ -1,3 +1,6 @@
+#!/bin/bash
+set -e
+
 python manage.py migrate
 python manage.py createcachetable
 python manage.py ensure_oidc_clients
