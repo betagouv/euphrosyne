@@ -17,6 +17,9 @@ msgstr "Machine virtuelle"
 msgid "No running virtual machines"
 msgstr "Aucune machine virtuelle en cours d'exécution"
 
+msgid "Unable to load virtual machines"
+msgstr "Impossible de charger les machines virtuelles"
+
 msgid "No upcoming projects"
 msgstr "Aucun projet à venir"
 

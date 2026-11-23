@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { jwtFetch } from "../../../../shared/js/jwt.js";
 import euphrosyneToolsService from "../../../../lab/workplace/assets/js/euphrosyne-tools-service.js";
 import euphrosyneToolsFetch from "../../../../shared/js/euphrosyne-tools-client";
+import { parseRunningVMs } from "./running-vms";
 
 const deleteVm = (vm: string) => {
   // Vm name starts with euphro-stg-vm, so we need to remove it
@@ -33,22 +34,26 @@ export default function RunningVMTable() {
     "No running virtual machines": window.gettext(
       "No running virtual machines",
     ),
+    "Unable to load virtual machines": window.gettext(
+      "Unable to load virtual machines",
+    ),
   };
 
   const [isLoading, setIsLoading] = useState(true);
   const [vms, setVms] = useState<string[]>([]);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     jwtFetch(`${process.env.EUPHROSYNE_TOOLS_API_URL}/vms/`, {
       method: "GET",
     })
-      .then((response) => response?.json())
-      .then((data) => {
-        if (data) {
-          setVms(data);
-          setIsLoading(false);
-        }
-      });
+      .then(parseRunningVMs)
+      .then(setVms)
+      .catch((error) => {
+        console.error(error);
+        setHasError(true);
+      })
+      .finally(() => setIsLoading(false));
   }, []);
 
   return (
@@ -64,6 +69,10 @@ export default function RunningVMTable() {
           {isLoading ? (
             <tr>
               <td colSpan={2}>...</td>
+            </tr>
+          ) : hasError ? (
+            <tr>
+              <td colSpan={2}>{t["Unable to load virtual machines"]}</td>
             </tr>
           ) : (
             <>
