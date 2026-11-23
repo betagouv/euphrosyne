@@ -1350,6 +1350,7 @@ msgstr ""
 "Vous n'avez pas les droits pour ce projet. Si vous pensez que c'est une "
 "erreur, contactez l'équipe %(facility_name)s."
 
+#, python-brace-format
 msgid ""
 "The run can't start while the following Run fields aren't defined: {fields}."
 msgstr ""
