@@ -105,14 +105,7 @@ def test_admin_without_factor_must_enroll_after_password_login(client, admin_use
     assert auth.get_user(client).pk == admin_user.pk
 
     assert_mfa_gate(client, PROJECTS_URL, ACTIVATE_URL)
-    # The password is asked again first, and the gate lets that page through.
-    assert_mfa_gate(client, ACTIVATE_URL, reverse("account_reauthenticate"))
-    assert client.get(reverse("account_reauthenticate")).status_code == 200
-    response = client.post(
-        reverse("account_reauthenticate"),
-        {"password": PASSWORD, "next": ACTIVATE_URL},
-    )
-    assert response.url == ACTIVATE_URL
+    # The password just entered is enough: no second prompt.
     response = client.get(ACTIVATE_URL)
     assert response.status_code == 200
     totp_url = response.context["totp_url"]
@@ -122,11 +115,18 @@ def test_admin_without_factor_must_enroll_after_password_login(client, admin_use
     assert response.context["form"].secret in response.content.decode()
 
 
+def test_enrollment_asks_for_the_password_again_after_the_timeout(
+    client, admin_user, settings
+):
+    password_login(client, admin_user)
+    settings.ACCOUNT_REAUTHENTICATION_TIMEOUT = 0
+    assert_mfa_gate(client, ACTIVATE_URL, reverse("account_reauthenticate"))
+
+
 def test_enrollment_keeps_the_secret_shown_when_the_page_is_requested_again(
     client, admin_user
 ):
     password_login(client, admin_user)
-    reauthenticate(client)
     secret = client.get(ACTIVATE_URL).context["form"].secret
     # The browser's favicon request is redirected to the enrollment page.
     assert_mfa_gate(client, "/favicon.ico", ACTIVATE_URL)
@@ -188,7 +188,6 @@ def test_enrollment_signs_out_and_informs_owner(admin_user, language, subject, m
     # The preferred language follows the browser's (UserLanguageMiddleware).
     client = Client(headers={"accept-language": language})
     password_login(client, admin_user)
-    reauthenticate(client)
     secret = client.get(ACTIVATE_URL).context["form"].secret
 
     response = client.post(ACTIVATE_URL, {"code": totp_code(secret)})
