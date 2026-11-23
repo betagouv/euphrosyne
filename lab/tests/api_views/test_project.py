@@ -5,6 +5,7 @@ from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
+from data_management.models import LifecycleState, ProjectData
 from euphro_auth.tests import factories as auth_factories
 from lab.api_views.project import (
     IsLabAdminUser,
@@ -57,6 +58,25 @@ class TestProjectListView(TestCase):
                 self.august_project.name,
             ]
         ) == set(project["name"] for project in response.json())
+
+    def test_project_filtering_by_lifecycle_state(self):
+        for project, state in (
+            (self.june_project, LifecycleState.COOL),
+            (self.july_project, LifecycleState.COOLING),
+        ):
+            ProjectData.objects.update_or_create(
+                project=project, defaults={"lifecycle_state": state}
+            )
+        ProjectData.objects.filter(project=self.august_project).delete()
+
+        hot = self.client.get(self.api_url, {"lifecycle_state": "HOT"})
+        cool = self.client.get(self.api_url, {"lifecycle_state": "COOL"})
+        invalid = self.client.get(self.api_url, {"lifecycle_state": "NOPE"})
+
+        # August has no lifecycle data: implicitly hot.
+        assert [p["name"] for p in hot.json()] == [self.august_project.name]
+        assert [p["name"] for p in cool.json()] == [self.june_project.name]
+        assert invalid.status_code == 400
 
     @mock.patch("lab.api_views.project.ProjectFilter.filter_after")
     @mock.patch("lab.api_views.project.ProjectFilter.filter_before")

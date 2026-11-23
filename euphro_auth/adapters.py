@@ -1,7 +1,7 @@
-from allauth.account.adapter import DefaultAccountAdapter
 import time
 
 from allauth.account import app_settings as account_settings
+from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.internal.flows.login import get_authentication_records
 from allauth.account.internal.flows.reauthentication import (
     get_reauthentication_flows,
