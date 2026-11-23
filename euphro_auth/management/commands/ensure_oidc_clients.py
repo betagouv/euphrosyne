@@ -24,6 +24,7 @@ def _clients() -> dict[str, dict]:
             "grant_types": [Client.GrantType.CLIENT_CREDENTIALS],
             "scopes": [EUPHROSYNE_BACKEND_SCOPE],
             "skip_consent": True,
+            "secret": settings.OIDC_TOOLS_API_CLIENT_SECRET,
         },
     }
 
@@ -31,12 +32,13 @@ def _clients() -> dict[str, dict]:
 class Command(BaseCommand):
     help = (
         "Create or update the OpenID Connect clients (Herma, Tools API). "
-        "Secrets are left untouched: set the Tools API's in the admin."
+        "The Tools API's secret comes from OIDC_TOOLS_API_CLIENT_SECRET."
     )
 
     def handle(self, *args, **options):
         for client_id, config in _clients().items():
-            # A new confidential client gets a random secret nobody knows.
+            # A new client gets a random secret nobody knows, kept until a
+            # secret is configured.
             client, created = Client.objects.get_or_create(id=client_id)
             client.name = config["name"]
             client.type = config["type"]
@@ -45,6 +47,9 @@ class Command(BaseCommand):
             client.set_default_scopes(config["scopes"])
             client.set_response_types([])
             client.skip_consent = config["skip_consent"]
+            secret = config.get("secret")
+            if secret and not client.check_secret(secret):
+                client.set_secret(secret)
             client.save()
             self.stdout.write(
                 f"{'Created' if created else 'Updated'} OIDC client {client_id}."

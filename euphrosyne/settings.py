@@ -553,6 +553,10 @@ IDP_OIDC_ROTATE_REFRESH_TOKEN = True
 IDP_OIDC_AUTH_METHODS = ["client_secret_basic", "none"]
 OIDC_HERMA_CLIENT_ID = "herma"
 OIDC_TOOLS_API_CLIENT_ID = "euphrosyne-tools-api"
+# Secret of the Tools API client (ensure_oidc_clients sets it). Equal to the
+# Tools API's EUPHROSYNE_OIDC_CLIENT_SECRET: it only lets the Tools API get its
+# own tokens. Rotate it by changing both.
+OIDC_TOOLS_API_CLIENT_SECRET = os.getenv("OIDC_TOOLS_API_CLIENT_SECRET", "")
 # Clients only lab administrators may authorize.
 OIDC_ADMIN_ONLY_CLIENTS = [OIDC_HERMA_CLIENT_ID]
 

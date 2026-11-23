@@ -219,8 +219,26 @@ def test_tools_api_token_without_the_backend_scope_is_refused():
     assert response.status_code == 401
 
 
-def test_ensure_oidc_clients_keeps_the_secret():
-    tools_api = OIDCClient.objects.get(id=django_settings.OIDC_TOOLS_API_CLIENT_ID)
+def _tools_api_client() -> OIDCClient:
+    return OIDCClient.objects.get(id=django_settings.OIDC_TOOLS_API_CLIENT_ID)
+
+
+def test_ensure_oidc_clients_sets_the_tools_api_secret(settings):
+    settings.OIDC_TOOLS_API_CLIENT_SECRET = "first-secret"
+    call_command("ensure_oidc_clients", stdout=StringIO())
+    assert _tools_api_client().check_secret("first-secret")
+
+    # Rotation: a new value replaces the old one.
+    settings.OIDC_TOOLS_API_CLIENT_SECRET = "second-secret"
+    call_command("ensure_oidc_clients", stdout=StringIO())
+    tools_api = _tools_api_client()
+    assert tools_api.check_secret("second-secret")
+    assert not tools_api.check_secret("first-secret")
+
+
+def test_ensure_oidc_clients_keeps_the_secret_when_none_is_configured(settings):
+    settings.OIDC_TOOLS_API_CLIENT_SECRET = ""
+    tools_api = _tools_api_client()
     tools_api.set_secret("tools-api-secret")
     tools_api.save()
 
