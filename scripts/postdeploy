@@ -1,4 +1,6 @@
 python manage.py migrate
+python manage.py createcachetable
+python manage.py ensure_oidc_clients
 
 # Create a default superuser with a random password. Accounts are then reached
 # through "Mot de passe oublié ?". The suffix guarantees one character of each

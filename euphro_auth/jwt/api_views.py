@@ -1,34 +1,31 @@
-from rest_framework import authentication
+from drf_spectacular.utils import extend_schema
+from rest_framework import authentication, serializers
 from rest_framework.permissions import IsAdminUser
-from rest_framework_simplejwt.views import TokenViewBase
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from .serializers import LongTokenObtainSerializer, SessionTokenObtainSerializer
+from .signing import session_access_token
 
 
-class SessionTokenObtainPairView(TokenViewBase):
+# pylint: disable=abstract-method
+class SessionAccessTokenResponseSerializer(serializers.Serializer):
+    """OpenAPI description of the session access token response."""
+
+    access = serializers.CharField(read_only=True)
+
+
+class SessionAccessTokenView(APIView):
     """
-    Takes an authenticated request and returns an access and refresh JSON web
-    token pair to prove the authentication of those credentials.
-    """
-
-    authentication_classes = (  # type: ignore[assignment]
-        authentication.BasicAuthentication,
-        authentication.SessionAuthentication,
-    )
-    permission_classes = (  # type: ignore[assignment]
-        IsAdminUser,
-    )  # permission to user with `is_staff`
-    serializer_class = SessionTokenObtainSerializer  # type: ignore[assignment]
-
-
-class LongTokenOptainPairView(TokenViewBase):
-    """
-    Takes an authenticated request and returns a long-lived access and refresh
-    JSON web token pair to prove the authentication of those credentials.
+    Takes a request authenticated by the web session and returns an access
+    JSON web token. No password is accepted here and no refresh token is
+    returned: ask this view again for a new access token, so a token does not
+    outlive the session (logout, next user of the browser).
     """
 
-    authentication_classes = (  # type: ignore[assignment]
-        authentication.BasicAuthentication,
-    )
-    permission_classes = ()
-    serializer_class = LongTokenObtainSerializer  # type: ignore[assignment]
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (IsAdminUser,)  # permission to user with `is_staff`
+
+    @extend_schema(request=None, responses=SessionAccessTokenResponseSerializer)
+    def post(self, request: Request) -> Response:
+        return Response({"access": session_access_token(request.user)})

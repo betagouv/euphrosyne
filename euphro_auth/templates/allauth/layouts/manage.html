@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% comment %}Account management pages: the signed-in DSFR layout.{% endcomment %}
+
+{% block title %}{% block head_title %}{% endblock head_title %} | Euphrosyne{% endblock %}
+
+{% block extrastyle %}{{ block.super }}{% block extra_head %}{% endblock extra_head %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content_wrapper %}
+<div class="fr-container fr-my-4w">
+  <div class="fr-grid-row">
+    <div class="fr-col-12 fr-col-md-8">
+      {% block content %}{% endblock content %}
+    </div>
+  </div>
+</div>
+{% endblock content_wrapper %}
+
+{% block footer %}{% block extra_body %}{% endblock extra_body %}{% endblock %}

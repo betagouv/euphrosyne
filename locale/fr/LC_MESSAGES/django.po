@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-28 11:48+0100\n"
+"POT-Creation-Date: 2026-11-23 11:15+0100\n"
 "PO-Revision-Date: 2021-09-09 19:04+0200\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -521,6 +521,13 @@ msgstr ""
 "Nous avons bien reçu votre demande de données. Un membre de l'équipe "
 "%(facility_name)s la traitera dès que possible."
 
+msgid ""
+"Password sign-in is blocked for 15 minutes after too many failed attempts. "
+"You can still log in with ORCID."
+msgstr ""
+"La connexion par mot de passe est bloquée pendant 15 minutes après trop de "
+"tentatives infructueuses. Vous pouvez toujours vous connecter avec ORCID."
+
 msgid "Related project"
 msgstr "Projet apparenté"
 
@@ -583,11 +590,27 @@ msgstr ""
 msgid "Please select exactly one user to impersonate."
 msgstr "Sélectionnez seulement un utilisateur à la fois."
 
-msgid "Impersonating superusers is not allowed."
-msgstr "Se connecter en tant que superadmin n'est pas autorisé."
+msgid "Impersonating administrators is not allowed."
+msgstr "Se connecter en tant qu'administrateur n'est pas autorisé."
 
 msgid "You are now impersonating {}."
 msgstr "Vous êtes connecté en tant que {}."
+
+msgid "Reset two-factor authentication"
+msgstr "Réinitialiser l’authentification à deux facteurs"
+
+msgid "You do not have permission to reset two-factor authentication."
+msgstr ""
+"Vous n’avez pas la permission de réinitialiser l’authentification à deux "
+"facteurs."
+
+msgid "Two-factor authentication reset for: {}."
+msgstr "Authentification à deux facteurs réinitialisée pour : {}."
+
+msgid "None of the selected users had two-factor authentication set up."
+msgstr ""
+"Aucun des utilisateurs sélectionnés n’avait configuré l’authentification à "
+"deux facteurs."
 
 msgid "Name"
 msgstr "Nom"
@@ -609,6 +632,12 @@ msgstr "Modifier le mot de passe en utilisant {}."
 
 msgid "No password. You can set one using {}."
 msgstr "Aucun mot de passe. Vous pouvez en définir un en utilisant {}."
+
+msgid "Account security"
+msgstr "Sécurité du compte"
+
+msgid "Manage two-factor authentication"
+msgstr "Gérer l'authentification à deux facteurs"
 
 msgid "Radiation protection"
 msgstr "Radioprotection"
@@ -637,6 +666,22 @@ msgstr "Le superutilisateur doit avoir is_staff=True"
 msgid "Superuser must have is_superuser=True."
 msgstr "Le superutilisateur doit avoir is_superuser=True"
 
+msgid "Multi-factor authentication is required."
+msgstr "L’authentification à deux facteurs est requise."
+
+msgid "Sign in again with a code from your app."
+msgstr "Reconnectez-vous avec un code de votre application."
+
+msgid "You must complete your account information to continue."
+msgstr "Vous devez compléter les informations de votre compte pour continuer."
+
+msgid "You must accept the Terms and Conditions to continue."
+msgstr ""
+"Vous devez accepter les Conditions Générales d'Utilisation pour continuer."
+
+msgid "Employer information is required for this project."
+msgstr "Les informations sur l’employeur sont requises pour ce projet."
+
 msgid "email address"
 msgstr "adresse email"
 
@@ -664,16 +709,6 @@ msgstr "Invitation utilisateur"
 msgid "User invitations"
 msgstr "Invitations utilisateur"
 
-msgid ""
-"Password sign-in is blocked for 15 minutes after too many failed attempts. "
-"You can still log in with ORCID."
-msgstr ""
-"La connexion par mot de passe est bloquée pendant 15 minutes après trop de "
-"tentatives infructueuses. Vous pouvez toujours vous connecter avec ORCID."
-
-msgid "Log in"
-msgstr "Connexion"
-
 #, python-format
 msgid ""
 "Your password must contain at least one lowercase letter, one uppercase "
@@ -681,6 +716,40 @@ msgid ""
 msgstr ""
 "Votre mot de passe doit contenir au moins une minuscule, une majuscule, un "
 "chiffre et un caractère spécial de cette liste : %(characters)s."
+
+msgid "Hello"
+msgstr "Bonjour"
+
+msgid ""
+"If you did not do this, contact the Euphrosyne team immediately and change "
+"your password."
+msgstr ""
+"Si vous n’êtes pas à l’origine de cette action, contactez immédiatement "
+"l’équipe Euphrosyne et changez votre mot de passe."
+
+msgid "The Euphrosyne team"
+msgstr "L'équipe Euphrosyne"
+
+msgid "Log in"
+msgstr "Connexion"
+
+msgid "Log in with ORCID"
+msgstr "Se connecter avec ORCID"
+
+msgid "Forgotten your password or username?"
+msgstr "Mot de passe oublié ?"
+
+msgid ""
+"Your ORCID account isn't connected to an existing account. Please use email/"
+"password to sign in, or register with ORCID first using the link you "
+"received in the invitation email."
+msgstr ""
+"Votre compte ORCID n'est pas connecté à un compte existant. Veuillez "
+"utiliser votre email/mot de passe pour vous connecter, ou enregistrez-vous "
+"d'abord avec ORCID en utilisant le lien reçu dans l'email d'invitation."
+
+msgid "Back to sign-in"
+msgstr "Retour à la connexion"
 
 msgid "Invite user"
 msgstr "Inviter un utilisateur"
@@ -731,8 +800,28 @@ msgid ""
 msgstr ""
 "Le lien d'inscription est invalide, peut-être parce qu'il a déjà été utilisé."
 
-msgid "Hello"
-msgstr "Bonjour"
+msgid "Authorize"
+msgstr "Autoriser"
+
+msgid "Confirm Device"
+msgstr "Confirmer l'appareil"
+
+#, python-format
+msgid ""
+"Please confirm the code shown on your %(client_name)s to authorize this "
+"device."
+msgstr ""
+"Veuillez confirmer le code affiché sur votre %(client_name)s pour autoriser "
+"cet appareil."
+
+msgid "Code"
+msgstr "Code"
+
+msgid "Confirm"
+msgstr "Confirmer"
+
+msgid "Deny"
+msgstr "Refuser"
 
 msgid "You've been invited to register at Euphrosyne."
 msgstr "Vous avez été invité à vous inscrire sur Euphrosyne."
@@ -743,15 +832,21 @@ msgstr "Cliquez sur ce lien pour créer votre compte :"
 msgid "Create account"
 msgstr "Créer mon compte"
 
-msgid "The Euphrosyne team"
-msgstr "L'équipe Euphrosyne"
+msgid ""
+"Two-factor authentication is enabled. Sign in again with a code from your "
+"app."
+msgstr ""
+"L’authentification à deux facteurs est activée. Reconnectez-vous avec un "
+"code de votre application."
+
+msgid "ORCID sign-in failed. Please try again."
+msgstr "La connexion avec ORCID a échoué. Veuillez réessayer."
+
+msgid "ORCID sign-in was cancelled."
+msgstr "La connexion avec ORCID a été annulée."
 
 msgid "Enter your information"
 msgstr "Entrez vos informations"
-
-msgid "You must accept the Terms and Conditions to continue."
-msgstr ""
-"Vous devez accepter les Conditions Générales d'Utilisation pour continuer."
 
 msgid "Terms and Conditions Agreement"
 msgstr "Conditions Générales d'Utilisation"
@@ -839,20 +934,6 @@ msgid "Close"
 msgstr "Fermer"
 
 #, python-format
-msgid ""
-"You are authenticated as %(username)s, but are not authorized to access this "
-"page. Would you like to login to a different account?"
-msgstr ""
-"Vous êtes connecté.e en tant que %(username)s, mais n'êtres pas autorisé.e à "
-"accéderà ce contenu. Voulez-vous vous connnecter avec un compte différent?"
-
-msgid "Log in with ORCID"
-msgstr "Se connecter avec ORCID"
-
-msgid "Forgotten your password or username?"
-msgstr "Mot de passe oublié ?"
-
-#, python-format
 msgid "Euphrosyne, open %(aglae_link)s data."
 msgstr "Euphrosyne, ouvrir les données de %(aglae_link)s."
 
@@ -870,59 +951,6 @@ msgstr "Mentions légales"
 
 msgid "Personal data and cookies"
 msgstr "Données personnelles et cookies"
-
-msgid "Password reset complete"
-msgstr "Mise à jour du mot de passe terminée"
-
-msgid "Your password has been set. You may go ahead and log in now."
-msgstr ""
-"Votre mot de passe a bien été mis à jour. Vous pouvez vous connecter à "
-"nouveau."
-
-msgid "New password"
-msgstr "Nouveau mot de passe"
-
-msgid ""
-"Please enter your new password twice so we can verify you typed it in "
-"correctly."
-msgstr ""
-"Entrez votre nouveau mot de passe deux fois pour être sûr qu'il soit correct."
-
-msgid "Change my password"
-msgstr "Modifier mon mot de passe"
-
-msgid ""
-"The password reset link was invalid, possibly because it has already been "
-"used.  Please request a new password reset."
-msgstr ""
-"Le lien d'inscription est invalide, peut-être parce qu'il a déjà été "
-"utilisé. Demandez-en un nouveau."
-
-msgid "Email sent"
-msgstr "Email envoyé"
-
-msgid ""
-"We’ve emailed you instructions for setting your password, if an account "
-"exists with the email you entered. You should receive them shortly."
-msgstr ""
-"Un email avec les instructions pour mettre à jour votre mot de passe vous a "
-"été envoyé, si un compte existe avec cet email."
-
-msgid ""
-"If you don’t receive an email, please make sure you’ve entered the address "
-"you registered with, and check your spam folder."
-msgstr ""
-"Si vous ne recevez aucun email, vérifiez que vous avez entré le bon email et "
-"vérifiez dans vos courriers indésirables."
-
-msgid "Go back to login page"
-msgstr "Retour à la page de connexion"
-
-msgid "Reset password"
-msgstr "Mettre à jour le mot de passe"
-
-msgid "Email address"
-msgstr "Email"
 
 #, python-format
 msgid "The online board to track your %(aglae_tag)s search projects"
@@ -1734,15 +1762,6 @@ msgid ""
 msgstr ""
 "Votre invitation à vous inscrire avec ORCID est invalide ou a expiré. "
 "Veuillez rouvrir un lien d'invitation valide."
-
-msgid ""
-"Your ORCID account isn't connected to an existing account. Please use email/"
-"password to sign in, or register with ORCID first using the link you "
-"received in the invitation email."
-msgstr ""
-"Votre compte ORCID n'est pas connecté à un compte existant. Veuillez "
-"utiliser votre email/mot de passe pour vous connecter, ou enregistrez-vous "
-"d'abord avec ORCID en utilisant le lien reçu dans l'email d'invitation."
 
 msgid "Verify your information"
 msgstr "Vérifiez vos informations"

@@ -2,7 +2,7 @@ from rest_framework import generics, serializers
 from rest_framework.permissions import IsAuthenticated
 
 from data_request.emails import send_data_request_created_email
-from euphro_auth.jwt.authentication import EuphrosyneAdminJWTAuthentication
+from euphro_auth.jwt.authentication import EuphrosyneBackendAuthentication
 from lab.runs.models import Run
 
 from .models import DataAccessEvent, DataRequest
@@ -52,5 +52,5 @@ class DataAccessEventSerializer(serializers.ModelSerializer):
 class DataAccessEventCreateAPIView(generics.CreateAPIView):
     queryset = DataAccessEvent.objects.all()
     serializer_class = DataAccessEventSerializer
-    authentication_classes = [EuphrosyneAdminJWTAuthentication]
+    authentication_classes = [EuphrosyneBackendAuthentication]
     permission_classes = [IsAuthenticated]

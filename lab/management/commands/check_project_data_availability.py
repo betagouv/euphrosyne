@@ -5,7 +5,7 @@ import sentry_sdk
 from django.apps import apps
 from django.core.management.base import BaseCommand
 
-from euphro_auth.jwt.tokens import EuphroToolsAPIToken
+from euphro_auth.jwt.signing import tools_api_backend_token
 
 from ...models import Project
 
@@ -28,7 +28,7 @@ class Command(BaseCommand):
             projects = projects.filter(project_data__lifecycle_state=LifecycleState.HOT)
         if not projects:
             return
-        token = EuphroToolsAPIToken.for_euphrosyne().access_token
+        token = tools_api_backend_token()
         for project in projects:
             self.stdout.write(
                 "[data availability] Checking project %s" % project.name,

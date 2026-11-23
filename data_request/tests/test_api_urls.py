@@ -3,7 +3,7 @@ from unittest import mock
 import pytest
 from django.test import Client, override_settings
 
-from euphro_auth.jwt.tokens import EuphroToolsAPIToken
+from euphro_auth.tests.oidc import tools_api_backend_token
 from lab.tests import factories as lab_factories
 
 from . import factories
@@ -128,7 +128,7 @@ def test_create_view_logs_warning_when_origin_is_rejected(caplog):
 @override_settings(DATA_REQUEST_ALLOWED_ORIGINS=[ALLOWED_ORIGIN])
 def test_data_access_event_create():
     data_request = factories.DataRequestFactory()
-    token = EuphroToolsAPIToken.for_euphrosyne()
+    token = tools_api_backend_token()
     data = {
         "data_request": data_request.id,
         "path": "path/to/data",

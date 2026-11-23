@@ -1,0 +1,29 @@
+{% load allauth %}
+<div class="fr-input-group{% if attrs.errors %} fr-input-group--error{% endif %}">
+    {% if attrs.type != "checkbox" and attrs.type != "radio" %}
+    <label class="fr-label" for="{{ attrs.id }}">{% slot label %}{% endslot %}</label>
+    {% endif %}
+    <input class="fr-input"
+           {% if attrs.required %}required{% endif %}
+           {% if attrs.disabled %}disabled{% endif %}
+           {% if attrs.readonly %}readonly{% endif %}
+           {% if attrs.checked %}checked{% endif %}
+           {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+           {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+           {% if attrs.placeholder %}placeholder="{{ attrs.placeholder }}"{% endif %}
+           {% if attrs.autocomplete %}autocomplete="{{ attrs.autocomplete }}"{% endif %}
+           {% if attrs.value is not None %}value="{{ attrs.value }}"{% endif %}
+           {% if attrs.errors %}aria-invalid="true"{% if attrs.id %} aria-describedby="{{ attrs.id }}_error"{% endif %}{% endif %}
+           type="{{ attrs.type }}">
+    {% if attrs.type == "checkbox" or attrs.type == "radio" %}
+    <label class="fr-label" for="{{ attrs.id }}">{% slot label %}{% endslot %}</label>
+    {% endif %}
+    {% if slots.help_text %}
+    <p class="fr-hint-text">{% slot help_text %}{% endslot %}</p>
+    {% endif %}
+    {% if attrs.errors %}
+    <div{% if attrs.id %} id="{{ attrs.id }}_error"{% endif %}>
+        {% for error in attrs.errors %}<p class="fr-error-text">{{ error }}</p>{% endfor %}
+    </div>
+    {% endif %}
+</div>

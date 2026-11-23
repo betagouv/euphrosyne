@@ -7,7 +7,7 @@ import requests
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from euphro_auth.jwt.tokens import EuphroToolsAPIToken
+from euphro_auth.jwt.signing import tools_api_backend_token
 
 logger = logging.getLogger(__name__)
 INVALID_SEGMENT_CHARS = re.compile(r"[/\\\x00-\x1f\x7f]")
@@ -30,7 +30,7 @@ def _make_request(
     url: str, raise_on_error: bool = False
 ) -> Optional[requests.Response]:
     """Make an authorized request to Euphrosyne tools API."""
-    token = EuphroToolsAPIToken.for_euphrosyne().access_token
+    token = tools_api_backend_token()
     try:
         response = requests.post(
             url,

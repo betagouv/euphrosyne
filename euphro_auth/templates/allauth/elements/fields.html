@@ -1,0 +1,5 @@
+{% comment %}Non-field errors are shown by the page layout.{% endcomment %}
+{% for field in attrs.form.hidden_fields %}{{ field }}{% endfor %}
+{% for field in attrs.form.visible_fields %}
+{% include "euphro_auth/includes/dsfr_field_group.html" with field=field %}
+{% endfor %}

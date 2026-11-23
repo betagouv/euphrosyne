@@ -1,0 +1,15 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n %}
+{% comment %}Shown by allauth when an ORCID iD is linked to no account.{% endcomment %}
+
+{% block head_title %}{% translate "Log in" %}{% endblock head_title %}
+
+{% block content %}
+  <div id="content-main">
+    <h3>{% translate "Log in" %}</h3>
+    <p class="fr-mt-4w">
+      {% translate "Your ORCID account isn't connected to an existing account. Please use email/password to sign in, or register with ORCID first using the link you received in the invitation email." %}
+    </p>
+    <p><a class="fr-link" href="{% url "account_login" %}">{% translate "Back to sign-in" %}</a></p>
+  </div>
+{% endblock content %}

@@ -1,0 +1,26 @@
+{% extends "unauthorized.html" %}
+{% load i18n static %}
+{% comment %}Sign-in pages (allauth "entrance" pages): two-panel DSFR layout.{% endcomment %}
+
+{% block title %}{% block head_title %}{% endblock head_title %} | Euphrosyne{% endblock %}
+
+{% block extrastyle %}
+<link rel="stylesheet" href="{% static "admin/css/login.css" %}">
+<link rel="stylesheet" type="text/css" href="{% static "css/login.css" %}">
+{{ block.super }}
+{% block extra_head %}{% endblock extra_head %}
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+
+{% block usertools %}{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block footer %}{% block extra_body %}{% endblock extra_body %}{% endblock %}

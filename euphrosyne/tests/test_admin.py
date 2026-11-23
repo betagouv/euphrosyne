@@ -17,24 +17,22 @@ class TestAdmin(TestCase):
         response = self.client.get(reverse("admin:login"))
         self.assertContains(
             response,
-            f'<form action="{reverse("social:begin", args=("orcid",))}" method="post">',
+            f'<form action="{reverse("orcid_login")}" method="post">',
         )
         self.assertContains(response, 'name="csrfmiddlewaretoken"')
         self.assertContains(response, '<button class="button" type="submit">')
         self.assertContains(response, "ORCID")
 
-    def test_orcid_begin_rejects_get(self):
-        response = self.client.get(reverse("social:begin", args=("orcid",)))
+    def test_orcid_begin_does_not_redirect_on_get(self):
+        response = self.client.get(reverse("orcid_login"))
 
-        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.status_code, 200)
 
     @override_settings(
         SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies",
-        SOCIAL_AUTH_ORCID_KEY="client-id",
-        SOCIAL_AUTH_ORCID_SECRET="client-secret",
     )
     def test_orcid_begin_post_redirects_to_orcid(self):
-        response = self.client.post(reverse("social:begin", args=("orcid",)))
+        response = self.client.post(reverse("orcid_login"), {"process": "login"})
 
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.url.startswith("https://orcid.org/oauth/authorize?"))

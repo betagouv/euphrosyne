@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="{% static "css/unauthorized.css" %}">
 {% endblock %}
 
-{% block content %}
+{% block content_wrapper %}
     <div class="fr-grid-row fr-grid-row--gutters fr-grid-row--middle" id="panels-container">
       <div class="fr-col-0 fr-col-md-6 left-panel fr-background-alt--blue-ecume">
           <div class="fr-container left-panel__container">
@@ -37,9 +37,9 @@
                 </p>
             {% endfor %}
             {% endif %}
-            {% block content_panel %}{% endblock %}
+            {% block content %}{% block content_panel %}{% endblock %}{% endblock %}
             </div>
         </div>
     </div>
 
-{% endblock %}
+{% endblock content_wrapper %}
