@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django_filters import rest_framework as filters
@@ -8,6 +9,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import SAFE_METHODS, IsAdminUser
 
 from lab.permissions import is_lab_admin, is_project_leader
+from data_management.models import LifecycleState
 from lab.runs.models import Run
 
 from ..models import Participation, Project
@@ -30,10 +32,28 @@ class ProjectFilter(filters.FilterSet):
     start_after = filters.DateFilter(field_name="end_date", method="filter_after")
     end_before = filters.DateFilter(field_name="start_date", method="filter_before")
     end_after = filters.DateFilter(field_name="end_date", method="filter_after")
+    lifecycle_state = filters.ChoiceFilter(
+        choices=LifecycleState.choices, method="filter_lifecycle_state"
+    )
 
     class Meta:
         model = Project
-        fields = ["start_before", "start_after", "end_before", "end_after"]
+        fields = [
+            "start_before",
+            "start_after",
+            "end_before",
+            "end_after",
+            "lifecycle_state",
+        ]
+
+    def filter_lifecycle_state(self, queryset, name, value):
+        if not value:
+            return queryset
+        query = Q(project_data__lifecycle_state=value)
+        if value == LifecycleState.HOT:
+            # Projects without lifecycle data yet are implicitly hot.
+            query |= Q(project_data__isnull=True)
+        return queryset.filter(query)
 
     def filter_before(self, queryset, name, value):
         # Ensure value is timezone-aware
@@ -52,7 +72,8 @@ class ProjectFilter(filters.FilterSet):
 
 class ProjectList(generics.ListAPIView):
     """List projects with optional filters on start and end dates in the query params.
-    Filters names: start_before, start_after, end_before, end_after.
+    Filters names: start_before, start_after, end_before, end_after,
+    lifecycle_state (e.g. HOT).
     Example: <URL>?start_after=2023-06-30&end_before=2023-07-23"""
 
     queryset = (
