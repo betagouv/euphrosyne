@@ -526,6 +526,35 @@ class TestRunAdminScheduleAction(TestCase):
         )
         assert '<form id="schedule-modal-form"' in resp.content.decode()
 
+    def _render_change_view(self, user):
+        request = RequestFactory().get(
+            reverse("admin:lab_run_change", args=[self.run.id])
+            + f"?project={self.project.id}"
+        )
+        request.user = user
+        request.resolver_match = MagicMock()
+        resp = self.run_admin.change_view(request, str(self.run.id))
+        resp.render()
+        return resp.content.decode()
+
+    def test_schedule_button_is_rendered_for_admin(self):
+        content = self._render_change_view(self.admin_user)
+
+        assert 'class="aglae-object-tools"' in content
+        assert 'aria-controls="schedule-modal"' in content
+        assert content.count('class="aglae-object-tools"') == 1
+
+    def test_schedule_button_is_not_rendered_for_non_admin(self):
+        leader = auth_factories.StaffUserFactory()
+        factories.ParticipationFactory(
+            project=self.project, user=leader, is_leader=True
+        )
+
+        content = self._render_change_view(leader)
+
+        assert 'class="aglae-object-tools"' in content  # history link
+        assert 'data-fr-opened="false" aria-controls="schedule-modal"' not in content
+
     def test_schedule_action_as_admin(self):
         request = RequestFactory().post(
             reverse(

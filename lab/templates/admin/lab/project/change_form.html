@@ -8,6 +8,16 @@
 {% endblock %}
 {% endif %}
 
+{% block object-tools %}
+{% if change and not is_popup %}
+  <ul class="aglae-object-tools">
+    {% block object-tools-items %}
+      {% change_form_object_tools %}
+    {% endblock %}
+  </ul>
+{% endif %}
+{% endblock %}
+
 {% block content %}
     {% if not add %}
     <div class="fr-container">
@@ -15,15 +25,6 @@
     </div>
     {% endif %}
     <div id="content-main" class="project-{{ add|yesno:"add,change" }} fr-container fr-mt-3w">
-        {% block object-tools %}
-        {% if change and not is_popup %}
-          <ul class="aglae-object-tools">
-            {% block object-tools-items %}
-              {% change_form_object_tools %}
-            {% endblock %}
-          </ul>
-        {% endif %}
-        {% endblock %}
         <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}{% if form_url %}action="{{ form_url }}" {% endif %}method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
             <div>
             {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}

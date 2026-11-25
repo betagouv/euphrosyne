@@ -74,12 +74,17 @@
         {% endblock messages %}
         <!-- Content -->
         <div id="content" class="{% block coltype %}colM{% endblock %}">
-          {% block pretitle %}{% endblock %}
-          {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
-          {% block content_subtitle %}{% if subtitle %}<h2>{{ subtitle }}</h2>{% endif %}{% endblock %}
+          <div class="titles-and-tools">
+            <div class="titles">
+              {% block pretitle %}{% endblock %}
+              {% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+              {% block content_subtitle %}{% if subtitle %}<h2>{{ subtitle }}</h2>{% endif %}{% endblock %}
+            </div>
+            {% comment %}Outside "content" since Django 6.1: change_form/change_list override "content".{% endcomment %}
+            {% block object-tools %}{% endblock %}
+          </div>
           {% block content_wrapper %}
           {% block content %}
-            {% block object-tools %}{% endblock %}
             {{ content }}
           {% endblock %}
           {% endblock content_wrapper %}
