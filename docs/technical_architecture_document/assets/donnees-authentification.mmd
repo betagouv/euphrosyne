@@ -32,39 +32,59 @@ erDiagram
     bigint user_id FK
     integer permission_id FK
   }
-  social_auth_usersocialauth["UserSocialAuth"] {
+  account_emailaddress["EmailAddress"] {
+    integer id PK
+    bigint user_id FK
+    varchar email
+    boolean verified
+    boolean primary
+  }
+  account_emailconfirmation["EmailConfirmation"] {
+    integer id PK
+    integer email_address_id FK
+    varchar key UK
+    timestamptz created
+    timestamptz sent "nullable"
+  }
+  mfa_authenticator["Authenticator"] {
     bigint id PK
+    bigint user_id FK
+    varchar type
+    timestamptz created_at
+    timestamptz last_used_at "nullable"
+  }
+  socialaccount_socialaccount["SocialAccount"] {
+    integer id PK
     bigint user_id FK
     varchar provider
     varchar uid
-    timestamptz created
+    timestamptz last_login
   }
-  social_auth_association["Association"] {
-    bigint id PK
-    varchar server_url
-    varchar handle
-    integer issued
-    integer lifetime
+  socialaccount_socialapp["SocialApp"] {
+    integer id PK
+    varchar provider
+    varchar name
+    varchar client_id
   }
-  social_auth_code["Code"] {
-    bigint id PK
-    varchar email
-    varchar code
-    boolean verified
-    timestamptz timestamp
+  socialaccount_socialtoken["SocialToken"] {
+    integer id PK
+    integer account_id FK
+    integer app_id FK "nullable"
+    timestamptz expires_at "nullable"
   }
-  social_auth_nonce["Nonce"] {
-    bigint id PK
-    varchar server_url
-    integer timestamp
-    varchar salt
+  allauth_idp_oidc_client["OIDCClient"] {
+    varchar id PK
+    bigint owner_id FK "nullable"
+    varchar name
+    varchar type
+    timestamptz created_at
   }
-  social_auth_partial["Partial"] {
+  allauth_idp_oidc_token["OIDCToken"] {
     bigint id PK
-    smallint next_step
-    varchar backend
-    timestamptz timestamp
-    jsonb data
+    varchar client_id FK "nullable"
+    bigint user_id FK "nullable"
+    varchar type
+    timestamptz expires_at "nullable"
   }
   django_admin_log["LogEntry"] {
     integer id PK
@@ -95,6 +115,14 @@ erDiagram
   auth_group ||..o{ euphro_auth_user_groups : "group_id"
   euphro_auth_user ||..o{ euphro_auth_user_user_permissions : "user_id"
   auth_permission ||..o{ euphro_auth_user_user_permissions : "permission_id"
-  euphro_auth_user ||..o{ social_auth_usersocialauth : "user_id"
+  euphro_auth_user ||..o{ account_emailaddress : "user_id"
+  account_emailaddress ||..o{ account_emailconfirmation : "email_address_id"
+  euphro_auth_user ||..o{ mfa_authenticator : "user_id"
+  euphro_auth_user ||..o{ socialaccount_socialaccount : "user_id"
+  socialaccount_socialaccount ||..o{ socialaccount_socialtoken : "account_id"
+  socialaccount_socialapp |o..o{ socialaccount_socialtoken : "app_id"
+  euphro_auth_user |o..o{ allauth_idp_oidc_client : "owner_id"
+  allauth_idp_oidc_client |o..o{ allauth_idp_oidc_token : "client_id"
+  euphro_auth_user |o..o{ allauth_idp_oidc_token : "user_id"
   django_content_type |o..o{ django_admin_log : "content_type_id"
   euphro_auth_user ||..o{ django_admin_log : "user_id"

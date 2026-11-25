@@ -4,7 +4,9 @@ flowchart LR
   radio["Plateforme Euphrosyne<br/>Service radioprotection<br/>Résultats / documents"]
   goodflag["Instance Goodflag du ministère<br/>Signature électronique"]
   participant -->|"HTTPS"| tally
-  tally -->|"Webhook HTTPS signé<br/>Résultats de quiz"| radio
+  waf["WAF"]
+  tally -->|"Notification HTTPS signée<br/>Résultats du questionnaire"| waf
+  waf -->|"HTTPS"| radio
   radio -->|"HTTPS / signature"| goodflag
 
   classDef app fill:#e9f1ff,stroke:#6b87b0,color:#18324f;
@@ -15,3 +17,4 @@ flowchart LR
   class radio app;
   class participant access;
   class tally,goodflag external;
+  class waf control;

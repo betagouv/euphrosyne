@@ -1,10 +1,9 @@
 flowchart LR
   user["Navigateur<br/>Chercheur / administrateur"]
-  subgraph scale["SCALINGO · Paris · osc-secnum-fr1"]
-    portal["Plateforme Euphrosyne<br/>Gestion utilisateurs<br/>et projets de recherche<br/>Django / DRF"]
-    tools["Tools API<br/>Données scientifiques<br/>Accès aux VM<br/>FastAPI"]
+  subgraph scale["SCALINGO · Paris"]
+    portal["Plateforme Euphrosyne<br/>Gestion utilisateurs<br/>et projets de recherche<br/>Django"]
+    tools["Tools API<br/>Données scientifiques<br/>Accès aux machines virtuelles<br/>FastAPI"]
     pg[("PostgreSQL<br/>Utilisateurs / projets / métadonnées")]
-    portal <-->|"HTTPS / JWT<br/>Opérations / callbacks"| tools
     portal -->|"SQL"| pg
   end
   subgraph scientific["STOCKAGE SCIENTIFIQUE · westeurope"]
@@ -14,9 +13,13 @@ flowchart LR
   subgraph media["IMAGES / ASSETS · westeurope"]
     assets[("Azure Blob<br/>Images / fichiers assets")]
   end
+  waf["WAF"]
   mailjet["Mailjet<br/>Envoi des e-mails<br/>Invitations / notifications"]
-  user -->|"HTTPS / session"| portal
-  user -->|"HTTPS / JWT"| tools
+  user -->|"HTTPS"| waf
+  waf -->|"HTTPS / session"| portal
+  waf -->|"HTTPS / JWT"| tools
+  portal -->|"HTTPS / JWT<br/>Opérations"| waf
+  tools -->|"HTTPS / JWT<br/>Notifications"| waf
   user -->|"HTTPS / SAS<br/>Accès direct autorisé"| scientific
   tools -->|"HTTPS / fichiers"| hot
   tools -->|"HTTPS / archivage<br/>Restauration"| cool
@@ -33,3 +36,4 @@ flowchart LR
   class pg,hot,cool,assets data;
   class user access;
   class mailjet external;
+  class waf control;

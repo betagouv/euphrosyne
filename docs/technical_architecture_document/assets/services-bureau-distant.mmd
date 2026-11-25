@@ -1,25 +1,27 @@
 flowchart LR
-  user["Navigateur<br/>Utilisateur Euphrosyne authentifié & membre du projet"]
-  tools["Tools API<br/>Déploiement & accès VM"]
+  user["Navigateur<br/>Utilisateur authentifié et membre du projet"]
+  tools["Tools API<br/>Déploiement et accès aux machines"]
   control["Contrôle Azure<br/>API · Key Vault"]
-  subgraph vnet["AZURE VNET · 10.0.0.0/16 · westeurope"]
-    guac["Guacamole<br/>App Service · HTTPS public<br/>Subnet 10.0.2.0/24"]
-    guacd["guacd · ACI privé<br/>Subnet 10.0.4.0/24"]
-    mysql[("MySQL privé<br/>Subnet 10.0.3.0/24")]
-    vm["VM Windows par projet<br/>NIC privée · 10.0.1.0/24"]
+  subgraph vnet["RÉSEAU PRIVÉ AZURE · westeurope et polandcentral"]
+    guac["Guacamole<br/>HTTPS public"]
+    guacd["guacd<br/>Privé"]
+    mysql[("MySQL<br/>Privé")]
+    vm["Machine virtuelle Windows par projet<br/>Privée · polandcentral pour la tomographie"]
     guac -->|"TCP 4822"| guacd
     guac -->|"TCP 3306"| mysql
     guacd -->|"RDP 3389"| vm
   end
   hot[("Azure Files · HOT<br/>Stockage scientifique")]
-  user -->|"HTTPS /  JWT"| tools
+  waf["WAF"]
+  user -->|"HTTPS"| waf
+  waf -->|"HTTPS / JWT"| tools
   user -->|"HTTPS / jeton de session"| guac
   tools -->|"REST HTTPS / droits"| guac
   tools -->|"HTTPS"| control
-  control -->|"Gestion VM"| vm
-  control -->|"Webhook"| tools
-  guacd -->|"Volume Files / SMB"| hot
-  vm -->|"SMB 445 / volume Z:"| hot
+  control -->|"Gestion des machines"| vm
+  control -->|"Notification HTTPS"| tools
+  guacd -->|"SMB"| hot
+  vm -->|"SMB 445"| hot
   style vnet fill:#edf3fb,stroke:#5578a7,stroke-width:2px
 
   classDef app fill:#e9f1ff,stroke:#6b87b0,color:#18324f;
@@ -29,5 +31,5 @@ flowchart LR
   classDef control fill:#f0ebfa,stroke:#9480b1,color:#403057;
   class tools,guac,guacd app;
   class mysql,hot data;
-  class control,vm control;
+  class control,vm,waf control;
   class user access;
