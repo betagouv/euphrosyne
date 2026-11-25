@@ -101,6 +101,12 @@ class TestProjectAdminViewAsAdminUser(BaseTestCases.BaseTestProjectAdmin):
         assert "other project 1" in response.content.decode()
         assert "other project 2" in response.content.decode()
 
+    def test_change_project_renders_object_tools_once(self):
+        response = self.client.get(
+            reverse("admin:lab_project_change", args=[self.change_project.id])
+        )
+        assert response.content.decode().count('class="aglae-object-tools"') == 1
+
     def test_add_project_form_has_confidential_checkbox(self):
         response = self.client.get(self.add_view_url)
         assert '<input type="checkbox" name="confidential"' in response.content.decode()
