@@ -1,19 +1,21 @@
 flowchart LR
   user["Navigateur<br/>Visiteur / demandeur"]
-  subgraph scale["SCALINGO · Paris · osc-secnum-fr1"]
+  subgraph scale["SCALINGO · Paris"]
     digi["Catalogue de données<br/>Next.js"]
-    api["Plateforme Euphrosyne<br/>Recherche / demandes<br/>Django / DRF"]
+    api["Plateforme Euphrosyne<br/>Recherche / demandes<br/>Django"]
     es[("Elasticsearch<br/>Index du Catalogue de données")]
     pg[("PostgreSQL<br/>Demandes de données")]
-    digi -->|"Recherche<br/>HTTPS"| api
-    digi -.->|"Construction<br/>HTTPS"| api
     api -->|"HTTP / index"| es
     api -->|"SQL / demandes"| pg
 
   end
   refs["OpenTheso, GeoNames<br/>Filtres"]
-  user -->|"HTTPS"| digi
-  user -->|"HTTPS / demande de données"| api
+  waf["WAF"]
+  user -->|"HTTPS"| waf
+  waf -->|"HTTPS"| digi
+  waf -->|"HTTPS / demande de données"| api
+  digi -->|"Recherche<br/>HTTPS"| waf
+  digi -.->|"Construction<br/>HTTPS"| waf
   user -->|"HTTPS / suggestions"| refs
 
   classDef app fill:#e9f1ff,stroke:#6b87b0,color:#18324f;
@@ -25,3 +27,4 @@ flowchart LR
   class pg,es data;
   class user access;
   class refs external;
+  class waf control;
