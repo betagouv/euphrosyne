@@ -1,4 +1,5 @@
 import datetime
+import logging
 import time
 from unittest.mock import patch
 
@@ -177,3 +178,42 @@ def test_orcid_still_authenticates_locked_account_without_resetting_password_lim
     assert response.status_code == 302
     assert auth.get_user(client).pk == user.pk
     assert is_locked_out_response(password_request(Client(), user.email, PASSWORD))
+
+
+# Journal
+
+
+def test_wrong_password_logs_the_account_not_the_email_or_password(
+    client, user, caplog
+):
+    with caplog.at_level(logging.WARNING, logger="euphro_auth"):
+        password_request(client, user.email.upper(), "wrong-password")
+    assert [(r.levelno, r.getMessage()) for r in caplog.records] == [
+        (logging.WARNING, f"Password sign-in failed for user {user.pk}")
+    ]
+    assert "locked" not in caplog.text
+    assert "wrong-password" not in caplog.text
+
+
+def test_wrong_password_for_unknown_address_logs_a_neutral_mention(client, caplog):
+    with caplog.at_level(logging.WARNING, logger="euphro_auth"):
+        password_request(client, "nobody@example.com", "wrong-password")
+    assert caplog.messages == ["Password sign-in failed for unknown account"]
+    assert "nobody" not in caplog.text
+
+
+def test_successful_password_sign_in_logs_nothing(client, user, caplog):
+    with caplog.at_level(logging.DEBUG, logger="euphro_auth"):
+        assert is_success_response(password_request(client, user.email, PASSWORD))
+    assert caplog.messages == []
+
+
+def test_lockout_refusal_is_logged_with_its_code(client, user, caplog):
+    fail(client, user, 5)
+    caplog.clear()
+    with caplog.at_level(logging.WARNING, logger="euphro_auth"):
+        response = password_request(Client(), user.email, PASSWORD, "192.0.2.99")
+    assert is_locked_out_response(response)
+    assert caplog.messages == [
+        f"Password sign-in refused for user {user.pk} (too_many_login_attempts)"
+    ]

@@ -1,3 +1,4 @@
+import logging
 import time
 
 from allauth.account import app_settings as account_settings
@@ -6,10 +7,14 @@ from allauth.account.internal.flows.login import get_authentication_records
 from allauth.account.internal.flows.reauthentication import (
     get_reauthentication_flows,
 )
+from django.core.exceptions import ValidationError
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
 from .mfa import services as mfa_services
+from .signals import describe_account
+
+logger = logging.getLogger(__name__)
 
 LOCKOUT_MESSAGE = _(
     "Password sign-in is blocked for 15 minutes after too many failed attempts. "
@@ -22,6 +27,22 @@ class AccountAdapter(DefaultAccountAdapter):  # pylint: disable=abstract-method
         **DefaultAccountAdapter.error_messages,
         "too_many_login_attempts": LOCKOUT_MESSAGE,
     }
+
+    def pre_authenticate(self, request: HttpRequest, **credentials) -> None:
+        # The password is not checked once locked out, so Django sends no
+        # `user_login_failed` signal: log the refusal here.
+        try:
+            super().pre_authenticate(request, **credentials)
+        except ValidationError as error:
+            if error.code == "too_many_login_attempts":
+                logger.warning(
+                    "Password sign-in refused for %s (%s)",
+                    describe_account(
+                        credentials.get("email") or credentials.get("username")
+                    ),
+                    error.code,
+                )
+            raise
 
     def get_login_stages(self) -> list[str]:
         # Ask for the second factor only where MFA is enforced.
