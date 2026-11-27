@@ -71,3 +71,34 @@ def test_every_10_minutes_job_command_order(mock_call_command):
     # If radiation_protection is installed, verify the second command
     if apps.is_installed("radiation_protection"):
         assert called_commands[1] == "send_electrical_signature_processes"
+
+
+@pytest.mark.django_db
+@mock.patch("lab.management.commands.every_10_minutes_job.management.call_command")
+@mock.patch("lab.management.commands.every_10_minutes_job.apps.is_installed")
+def test_every_10_minutes_job_command_reconciles_lifecycle_operations(
+    mock_is_installed, mock_call_command
+):
+    """Stale lifecycle operations are reconciled when data_management is installed."""
+    mock_is_installed.side_effect = lambda app: app == "data_management"
+
+    call_command("every_10_minutes_job", stdout=StringIO())
+
+    called_commands = [call[0][0] for call in mock_call_command.call_args_list]
+    assert called_commands == ["send_notifications", "reconcile_lifecycle_operations"]
+
+
+@pytest.mark.django_db
+@mock.patch("lab.management.commands.every_10_minutes_job.management.call_command")
+@mock.patch("lab.management.commands.every_10_minutes_job.apps.is_installed")
+def test_every_10_minutes_job_command_without_data_management(
+    mock_is_installed, mock_call_command
+):
+    mock_is_installed.return_value = False
+
+    call_command("every_10_minutes_job", stdout=StringIO())
+
+    assert not any(
+        call[0][0] == "reconcile_lifecycle_operations"
+        for call in mock_call_command.call_args_list
+    )

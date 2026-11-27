@@ -12,3 +12,6 @@ class Command(BaseCommand):
 
         if apps.is_installed("radiation_protection"):
             management.call_command("send_electrical_signature_processes")
+
+        if apps.is_installed("data_management"):
+            management.call_command("reconcile_lifecycle_operations")
