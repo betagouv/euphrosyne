@@ -43,6 +43,9 @@ Relevant settings:
   be used for manual archive and restore actions.
 - `EUPHROSYNE_TOOLS_API_URL`
   Base URL used for server-to-server calls to `euphrosyne-tools-api`.
+- `DATA_LIFECYCLE_OPERATION_TIMEOUT_HOURS`
+  Optional, default `6`. Age after which an operation without completion
+  callback is failed and its project moved to `ERROR`.
 
 Operationally, leaving `DATA_COOLING_ENABLE=false` is a valid setup when you
 want the feature available but do not want automatic cooling yet.
@@ -364,6 +367,8 @@ The implementation is intentionally strict about state transitions.
 - failed start requests create failed operations and surface `502`
 - projects only transition to `COOL` or `HOT` after verified success
 - failure transitions move the project to `ERROR` when valid
+- operations that never receive a completion callback are failed automatically
+  (see below)
 
 Retry rules are operation-aware:
 
@@ -376,12 +381,37 @@ Retry rules are operation-aware:
 
 This keeps retry semantics aligned with the last known storage transition.
 
+### Operations without a completion callback
+
+The tools API runs COOL/RESTORE copies in a background task and tracks them in
+memory. If its worker dies mid-copy (deploy, restart, out-of-memory), no
+callback is ever sent: the operation would stay `RUNNING` and the project
+`COOLING` / `RESTORING` forever, with no way to retry.
+
+`reconcile_lifecycle_operations` (run every 10 minutes by `every_10_minutes_job`
+when `data_management` is installed) fails any `PENDING` / `RUNNING` operation
+started more than `DATA_LIFECYCLE_OPERATION_TIMEOUT_HOURS` hours ago (default
+`6`). The operation becomes `FAILED` with `error_details.reason ==
+"stale_operation"`, and the project moves to `ERROR` when it is in the
+in-flight state matching the operation (`COOL` -> `COOLING`, `RESTORE` ->
+`RESTORING`). The normal retry rules above then apply. A late callback for an
+operation already failed this way is ignored.
+
+Set the timeout above the longest legitimate copy: a copy slower than the
+timeout is reported as failed and has to be retried.
+
 ## Operational Commands
 
 ### `python manage.py schedule_project_cooling`
 
 Use this for batch scheduling of eligible projects. It is the normal
 operator-facing entrypoint for automatic cooling.
+
+### `python manage.py reconcile_lifecycle_operations [--dry-run] [--stale-after-hours N]`
+
+Fails lifecycle operations that never received a completion callback and moves
+their project to `ERROR` so they can be retried. Already run automatically every
+10 minutes; use `--dry-run` to list what would be failed.
 
 ### `python manage.py cool_project <project_slug>`
 

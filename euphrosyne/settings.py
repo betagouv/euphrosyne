@@ -124,6 +124,11 @@ def _get_bool_env(name: str, default: bool = False) -> bool:
 
 
 DATA_COOLING_ENABLE = _get_bool_env("DATA_COOLING_ENABLE", default=False)
+# A COOL/RESTORE operation with no completion callback after this many hours is
+# marked as failed so that the project can be retried.
+DATA_LIFECYCLE_OPERATION_TIMEOUT_HOURS = float(
+    os.getenv("DATA_LIFECYCLE_OPERATION_TIMEOUT_HOURS", "6")
+)
 
 
 # Application definition
